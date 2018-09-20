@@ -79,13 +79,13 @@
 
 
 
-<meta name="description" content="最近尝试了免杀工具thefatrat，记录一些使用过程和坑： 常见的免杀方式一般是：文件免杀方法和内存免杀方法 文件免杀指：加壳、加花等。内存免杀指：修改内存特征码、修改字符串等。">
+<meta name="description" content="最近尝试了免杀工具thefatrat，记录一些使用过程和坑： 常见的免杀方式一般是：文件免杀方法和内存免杀方法 文件免杀指：加壳、加花等。内存免杀指：修改内存特征码、修改字符串等。 推荐一篇博文：http://anhkgg.com/aanti-virus/ 下面就记录thefatrat的使用和杀软查杀结果：采用在线查杀https://www.virustotal.com和http://www.vi">
 <meta name="keywords" content="web安全">
 <meta property="og:type" content="article">
 <meta property="og:title" content="关于Thefatrat免杀使用">
 <meta property="og:url" content="/2018/09/关于Thefatrat免杀使用/index.html">
 <meta property="og:site_name" content="Misaki&#39;s Blog">
-<meta property="og:description" content="最近尝试了免杀工具thefatrat，记录一些使用过程和坑： 常见的免杀方式一般是：文件免杀方法和内存免杀方法 文件免杀指：加壳、加花等。内存免杀指：修改内存特征码、修改字符串等。">
+<meta property="og:description" content="最近尝试了免杀工具thefatrat，记录一些使用过程和坑： 常见的免杀方式一般是：文件免杀方法和内存免杀方法 文件免杀指：加壳、加花等。内存免杀指：修改内存特征码、修改字符串等。 推荐一篇博文：http://anhkgg.com/aanti-virus/ 下面就记录thefatrat的使用和杀软查杀结果：采用在线查杀https://www.virustotal.com和http://www.vi">
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="c:/Users/MISAKI/AppData/Roaming/Typora/typora-user-images/1537411201695.png">
 <meta property="og:image" content="c:/Users/MISAKI/AppData/Roaming/Typora/typora-user-images/1537411232831.png">
@@ -99,10 +99,10 @@
 <meta property="og:image" content="c:/Users/MISAKI/AppData/Roaming/Typora/typora-user-images/1537411546630.png">
 <meta property="og:image" content="c:/Users/MISAKI/AppData/Roaming/Typora/typora-user-images/1537411559765.png">
 <meta property="og:image" content="c:/Users/MISAKI/AppData/Roaming/Typora/typora-user-images/1537411605459.png">
-<meta property="og:updated_time" content="2018-09-20T03:10:03.841Z">
+<meta property="og:updated_time" content="2018-09-20T04:37:14.924Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="关于Thefatrat免杀使用">
-<meta name="twitter:description" content="最近尝试了免杀工具thefatrat，记录一些使用过程和坑： 常见的免杀方式一般是：文件免杀方法和内存免杀方法 文件免杀指：加壳、加花等。内存免杀指：修改内存特征码、修改字符串等。">
+<meta name="twitter:description" content="最近尝试了免杀工具thefatrat，记录一些使用过程和坑： 常见的免杀方式一般是：文件免杀方法和内存免杀方法 文件免杀指：加壳、加花等。内存免杀指：修改内存特征码、修改字符串等。 推荐一篇博文：http://anhkgg.com/aanti-virus/ 下面就记录thefatrat的使用和杀软查杀结果：采用在线查杀https://www.virustotal.com和http://www.vi">
 <meta name="twitter:image" content="c:/Users/MISAKI/AppData/Roaming/Typora/typora-user-images/1537411201695.png">
 
 
@@ -345,7 +345,8 @@
       
         <p>最近尝试了免杀工具thefatrat，记录一些使用过程和坑：</p>
 <p>常见的免杀方式一般是：文件免杀方法和内存免杀方法</p>
-<p>文件免杀指：加壳、加花等。内存免杀指：修改内存特征码、修改字符串等。<br><a id="more"></a><br>推荐一篇博文：<a href="http://anhkgg.com/aanti-virus/" target="_blank" rel="noopener">http://anhkgg.com/aanti-virus/</a></p>
+<p>文件免杀指：加壳、加花等。内存免杀指：修改内存特征码、修改字符串等。</p>
+<p>推荐一篇博文：<a href="http://anhkgg.com/aanti-virus/" target="_blank" rel="noopener">http://anhkgg.com/aanti-virus/</a></p>
 <p>下面就记录thefatrat的使用和杀软查杀结果：采用在线查杀<a href="https://www.virustotal.com和http://www.virscan.org/language/zh-cn/" target="_blank" rel="noopener">https://www.virustotal.com和http://www.virscan.org/language/zh-cn/</a><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">thefatrat的项目地址为：https://github.com/screetsec/thefatrat</span><br></pre></td></tr></table></figure></p>
 <p>安装步骤为：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">git clone https://github.com/Screetsec/TheFatRat.git</span><br><span class="line"></span><br><span class="line">cd TheFatRat</span><br><span class="line"></span><br><span class="line">chmod +x setup.sh &amp;&amp; ./setup.sh</span><br></pre></td></tr></table></figure></p>
 <p>安装后，建议查看logs文件夹下的fudwin文件,记录了安装使用中的存在的问题，比如使用中会出现There was an error creating your FUD rat with Powerstager 这种错误，查看fudwin文件，可以看到py2没有安装names模块，安装后正常使用。</p>
