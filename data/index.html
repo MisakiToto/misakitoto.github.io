@@ -100,7 +100,7 @@
 <meta property="og:site_name" content="Misaki&#39;s Blog">
 <meta property="og:description" content="SSRF SSRF漏洞的利用与学习 SSRF攻击实例解析 SSRF漏洞的挖掘经验  XXE XML实体注入漏洞攻与防 浅谈XXE漏洞攻击与防御  SSTI 服务端模板注入攻击 Python 模板字符串与模板注入  XSS 再谈同源策略 跨站的艺术 Browser’s XSS Filter Bypass Cheat Sheet  逻辑漏洞 Web安全测试中常见逻辑漏洞解析 未授权访问漏洞的检测与利用">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-09-20T04:25:10.767Z">
+<meta property="og:updated_time" content="2018-09-21T08:27:16.110Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="资料收集">
 <meta name="twitter:description" content="SSRF SSRF漏洞的利用与学习 SSRF攻击实例解析 SSRF漏洞的挖掘经验  XXE XML实体注入漏洞攻与防 浅谈XXE漏洞攻击与防御  SSTI 服务端模板注入攻击 Python 模板字符串与模板注入  XSS 再谈同源策略 跨站的艺术 Browser’s XSS Filter Bypass Cheat Sheet  逻辑漏洞 Web安全测试中常见逻辑漏洞解析 未授权访问漏洞的检测与利用">
@@ -309,6 +309,14 @@
 <li><a href="http://www.freebuf.com/articles/web/164510.html" target="_blank" rel="noopener">任意用户密码重置（五）：重置凭证可暴破</a></li>
 <li><a href="http://www.freebuf.com/articles/web/166667.html" target="_blank" rel="noopener">任意用户密码重置（六）：应答中存在影响后续逻辑的状态参数</a></li>
 <li><a href="http://www.freebuf.com/articles/web/176211.html" target="_blank" rel="noopener">任意用户密码重置（七）：Token可预测</a></li>
+<li><a href="http://gh0st.cn/archives/2018-04-18/1" target="_blank" rel="noopener">Web安全测试学习手册-业务逻辑测试</a></li>
+<li><a href="http://gh0st.cn/archives/2018-04-08/1" target="_blank" rel="noopener">二维码登陆的常见缺陷剖析</a></li>
+</ul>
+<h3 id="渗透测试"><a href="#渗透测试" class="headerlink" title="渗透测试"></a>渗透测试</h3><ul>
+<li><a href="https://xz.aliyun.com/t/2516" target="_blank" rel="noopener">Web渗透测试笔记</a></li>
+<li><a href="http://www.freebuf.com/column/175653.html" target="_blank" rel="noopener">记一次对某企业的渗透测试实战</a></li>
+<li><a href="https://xz.aliyun.com/t/2482" target="_blank" rel="noopener">渗透测试工具备忘录</a></li>
+<li><a href="https://xz.aliyun.com/t/2412" target="_blank" rel="noopener">API 接口渗透测试</a></li>
 </ul>
 <h3 id="内网渗透"><a href="#内网渗透" class="headerlink" title="内网渗透"></a>内网渗透</h3><ul>
 <li><a href="http://blog.neargle.com/SecNewsBak/drops/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F%E4%B8%AD%E8%BD%AC%E5%8F%91%E5%B7%A5%E5%85%B7%E6%80%BB%E7%BB%93.html" target="_blank" rel="noopener">内网渗透中转发工具总结</a></li>
@@ -456,7 +464,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#SSRF"><span class="nav-number">1.</span> <span class="nav-text">SSRF</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#XXE"><span class="nav-number">2.</span> <span class="nav-text">XXE</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#SSTI"><span class="nav-number">3.</span> <span class="nav-text">SSTI</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#XSS"><span class="nav-number">4.</span> <span class="nav-text">XSS</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#逻辑漏洞"><span class="nav-number">5.</span> <span class="nav-text">逻辑漏洞</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#内网渗透"><span class="nav-number">6.</span> <span class="nav-text">内网渗透</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#SSRF"><span class="nav-number">1.</span> <span class="nav-text">SSRF</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#XXE"><span class="nav-number">2.</span> <span class="nav-text">XXE</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#SSTI"><span class="nav-number">3.</span> <span class="nav-text">SSTI</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#XSS"><span class="nav-number">4.</span> <span class="nav-text">XSS</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#逻辑漏洞"><span class="nav-number">5.</span> <span class="nav-text">逻辑漏洞</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#渗透测试"><span class="nav-number">6.</span> <span class="nav-text">渗透测试</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#内网渗透"><span class="nav-number">7.</span> <span class="nav-text">内网渗透</span></a></li></ol></div>
             
 
           </div>
