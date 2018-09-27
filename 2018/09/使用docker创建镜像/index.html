@@ -418,7 +418,7 @@ height:40vh;
 <li>使用docker build命令和 Dockerfile 文件</li>
 </ul>
 <h4 id="docker-commit命令"><a href="#docker-commit命令" class="headerlink" title="docker commit命令"></a>docker commit命令</h4><p>首先我们在本地拉取ubuntu镜像作为基础的镜像环境。</p>
-<p><img src="C:\Users\MISAKI\AppData\Roaming\Typora\typora-user-images\1537841397553.png" alt="1537841397553"></p>
+<p><img src="\2018\09\使用docker创建镜像\1537841397553.png" alt="1537841397553"></p>
 <p>如果我们在拉取的ubuntu镜像上安装 nginx，使用</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker run -it 镜像名 /bin/bash</span><br></pre></td></tr></table></figure>
 <p> 这样进入需要修改的镜像内部。</p>
@@ -427,17 +427,17 @@ height:40vh;
 <p>等待构建结束后，使用exit退出，保存镜像，避免镜像内容丢失。</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker commit 修改的镜像id 用户名/仓库名</span><br></pre></td></tr></table></figure>
 <p>结束后便构建了一个设定好的镜像，如下所示。</p>
-<p><img src="C:\Users\MISAKI\AppData\Roaming\Typora\typora-user-images\1537847890986.png" alt="1537847890986"></p>
+<p><img src="\2018\09\使用docker创建镜像\1537847890986.png" alt="1537847890986"></p>
 <p>如果需要上传镜像仓库，在<a href="https://hub.docker.com/注册登陆创建仓库即可，然后使用docker" target="_blank" rel="noopener">https://hub.docker.com/注册登陆创建仓库即可，然后使用docker</a> login登陆，此处使用的是命令行参数直接登陆。</p>
-<p><img src="C:\Users\MISAKI\AppData\Roaming\Typora\typora-user-images\1537842447299.png" alt="1537842447299"></p>
+<p><img src="\2018\09\使用docker创建镜像\1537842447299.png" alt="1537842447299"></p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">执行：docker push 用户名/仓库名:标签</span><br></pre></td></tr></table></figure>
 <p>在hub.docker上就可以看到镜像信息了：</p>
-<p><img src="C:\Users\MISAKI\AppData\Roaming\Typora\typora-user-images\1537848219021.png" alt="1537848219021"></p>
+<p><img src="\2018\09\使用docker创建镜像\1537848219021.png" alt="1537848219021"></p>
 <p>如需运行构建的docker</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker run -d -p 80 --name web_web misakiyui/web nginx -g &quot;daemon off;&quot;</span><br></pre></td></tr></table></figure>
 <p>–name: 容器名</p>
 <p>nginx -g “daemon off;” 表示在镜像内运行的命令，在前台开启一个nginx进程</p>
-<p><img src="C:\Users\MISAKI\AppData\Roaming\Typora\typora-user-images\1537857107741.png" alt="1537857107741"></p>
+<p><img src="\2018\09\使用docker创建镜像\1537857107741.png" alt="1537857107741"></p>
 <p>访问映射端口32768则可以看到安装的nginx了。</p>
 <h4 id="Dockerfile"><a href="#Dockerfile" class="headerlink" title="Dockerfile"></a>Dockerfile</h4><p>使用docker commit现在已经不推荐，推荐使用更为灵活的Dockerfile来构建镜像，如下Dockerfile，同样是在ubuntu下构建nginx</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">FROM ubuntu:18.04</span><br><span class="line">MAINTAINER misaki</span><br><span class="line">RUN apt-get update &amp;&amp; apt-get -y install nginx</span><br><span class="line">RUN echo &quot;hello world&quot; &gt; /var/www/html/index.nginx-debian.html</span><br><span class="line">EXPOSE 80</span><br></pre></td></tr></table></figure>
@@ -446,7 +446,7 @@ height:40vh;
 <p>构建完成后再docker images中便可以看到设定的镜像了</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">运行 docker run -d -p 80 --name web_web misakiyui/web nginx -g &quot;daemon off;&quot; 开启镜像</span><br></pre></td></tr></table></figure>
 <p>这时候查看映射到本地的端口docker ps，本地映射32772端口，访问后就可以看到修改的信息和nginx了 。</p>
-<p><img src="C:\Users\MISAKI\AppData\Roaming\Typora\typora-user-images\1537865562767.png" alt="1537865562767"></p>
+<p><img src="\2018\09\使用docker创建镜像\1537865562767.png" alt="1537865562767"></p>
 
     </article>
     <!-- license  -->
