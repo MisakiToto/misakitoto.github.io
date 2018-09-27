@@ -22,7 +22,7 @@
     <meta name="description" content="One way to choose one">
     <meta http-equiv="Cache-control" content="no-cache">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
-    <title>新的开始！ · Misaki&#39;s Blog</title>
+    <title>基于scrapy的备份文件扫描 · Misaki&#39;s Blog</title>
     <style type="text/css">
     @font-face {
         font-family: 'Oswald-Regular';
@@ -227,7 +227,7 @@
                 <a href="/" >Misaki&#39;s Blog</a>
             </div>
             <div class="post-title">
-                <a href="#" class="post-name">新的开始！</a>
+                <a href="#" class="post-name">基于scrapy的备份文件扫描</a>
             </div>
     </div>
     
@@ -257,7 +257,7 @@ height:40vh;
         <h1 class="intro-title">
             <!-- 主页  -->
             
-            新的开始！
+            基于scrapy的备份文件扫描
             <!-- 404 -->
             
         </h1>
@@ -274,14 +274,20 @@ height:40vh;
             <div class="post-intros">
                 <!-- 文章页标签  -->
                 
+                    <div class= post-intro-tags >
+    
+        <a class="post-tag" href="javascript:void(0);" data-tags = "python">python</a>
+    
+</div>
+                
                 
                     <div class="post-intro-read">
-                        <span>字数统计: <span class="post-count word-count">0</span>阅读时长: <span class="post-count reading-time">1 min</span></span>
+                        <span>字数统计: <span class="post-count word-count">975</span>阅读时长: <span class="post-count reading-time">5 min</span></span>
                     </div>
                 
                 <div class="post-intro-meta">
                     <span class="post-intro-calander iconfont-archer">&#xe676;</span>
-                    <span class="post-intro-time">2018/09/18</span>
+                    <span class="post-intro-time">2018/09/27</span>
                     
                     <span id="busuanzi_container_page_pv" class="busuanzi-pv">
                         <span class="iconfont-archer">&#xe602;</span>
@@ -405,15 +411,33 @@ height:40vh;
         <div class="container container-unloaded">
             <main class="main post-page">
     <article class="article-entry">
-        
+        <p>Scrapy，Python开发的一个快速、高层次的屏幕抓取和web抓取框架，用于抓取web站点并从页面中提取结构化的数据。Scrapy用途广泛，可以用于数据挖掘、监测和自动测试。</p>
+<p>首先生成项目文件</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">scrapy startproject spiderdata</span><br></pre></td></tr></table></figure>
+<p>生成成功后，会有以下目录结构，首先在spiderdata中的spider目录创建我们的spider文件。</p>
+<p><img src="\2018\09\基于scrapy的备份文件扫描\1538017021874.png" alt="1538017021874"></p>
+<p>备份文件扫描文件名，有两个选择，一是基于字典，二是根据url的备份文件名，从以往发现备份文件的结果上看，两种方式都是经常存在使用的。</p>
+<p>于是创建backup文件，用来生成备份文件名，创建一个列表用来存储字典文件名，另外创建一个方法用来基于url生成备份文件名。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line">#coding:utf-8</span><br><span class="line"></span><br><span class="line">import urlparse</span><br><span class="line"></span><br><span class="line">class backup(object):</span><br><span class="line">    def __init__(self, url):</span><br><span class="line">        self.url = url</span><br><span class="line">        self.list2 = [&apos;/db.zip&apos;, &apos;/fdsa.rar&apos;, &apos;/ftp.rar&apos;, &apos;/gg.rar&apos;, &apos;/hdocs.rar&apos;, &apos;/hdocs.zip&apos;, &apos;/a.zip&apos;, &apos;/web.zip&apos;,</span><br><span class="line">                      &apos;/web.rar&apos;, &apos;/1.rar&apos;, &apos;/bbs.rar&apos;, &apos;/www.root.rar&apos;,</span><br><span class="line">                      &apos;/123.rar&apos;, &apos;/data.rar&apos;, &apos;/bak.rar&apos;, &apos;/oa.rar&apos;, &apos;/admin.rar&apos;, &apos;/www.rar&apos;, &apos;/2014.rar&apos;,</span><br><span class="line">                      &apos;/2015.rar&apos;, &apos;/2016.rar&apos;, &apos;/2014.zip&apos;, &apos;/2015.zip&apos;, &apos;/2016.zip&apos;,</span><br><span class="line">                      &apos;/2017.zip&apos;, &apos;/1.zip&apos;, &apos;/1.gz&apos;, &apos;/1.tar.gz&apos;, &apos;/2.zip&apos;, &apos;/2.rar&apos;, &apos;/123.rar&apos;, &apos;/123.zip&apos;, &apos;/a.rar&apos;,</span><br><span class="line">                      &apos;/a.zip&apos;, &apos;/admin.rar&apos;, &apos;/back.rar&apos;, &apos;/backup.rar&apos;, &apos;/bak.rar&apos;,</span><br><span class="line">                      &apos;/bbs.rar&apos;, &apos;/bbs.zip&apos;, &apos;/beifen.rar&apos;, &apos;/beifen.zip&apos;, &apos;/beian.rar&apos;, &apos;/data.rar&apos;, &apos;/data.zip&apos;,</span><br><span class="line">                      &apos;/HYTop.rar&apos;, &apos;/root.rar&apos;, &apos;/Release.rar&apos;, &apos;/Release.zip&apos;, &apos;/sql.rar&apos;,</span><br><span class="line">                      &apos;/test.rar&apos;, &apos;/template.rar&apos;, &apos;/template.zip&apos;, &apos;/upfile.rar&apos;, &apos;/vip.rar&apos;, &apos;/wangzhan.rar&apos;,</span><br><span class="line">                      &apos;/wangzhan.zip&apos;, &apos;/web.rar&apos;, &apos;/web.zip&apos;, &apos;/website.rar&apos;, &apos;/www.rar&apos;,</span><br><span class="line">                      &apos;/www.zip&apos;, &apos;/wwwroot.rar&apos;, &apos;/wwwroot.zip&apos;, &apos;/wz.rar&apos;]</span><br><span class="line"></span><br><span class="line">    def backup(self):</span><br><span class="line">        list_a = []</span><br><span class="line">        parse = urlparse.urlparse(self.url)</span><br><span class="line">        name = parse.netloc.split(&apos;.&apos;)</span><br><span class="line">        name_url = parse.netloc.replace(&apos;.&apos;, &apos;&apos;)</span><br><span class="line">        for i in [&apos;.rar&apos;, &apos;.zip&apos;, &apos;.tar.gz&apos;, &apos;.7z&apos;]:</span><br><span class="line">            list_a.append(parse.scheme + &apos;://&apos; + parse.netloc + &apos;/&apos; + parse.netloc + i)   #http://www.baidu.com/www.baidu.com.zip</span><br><span class="line">            if &apos;www&apos; in name:</span><br><span class="line">                list_a.append(self.url + &apos;/&apos; + name[1] + i)   #http://www.baidu.com/baidu.zip</span><br><span class="line">                list_a.append(self.url + &apos;/&apos; + &apos;&apos;.join(name[1:]) + i)     #http://www.baidu.com/baiducom.zip</span><br><span class="line">            else:</span><br><span class="line">                list_a.append(self.url + &apos;/&apos; + name[0] + i)       #http://www.baidu.com/baidu.zip</span><br><span class="line">            list_a.append(self.url + &apos;/&apos; + name_url + i)     #http://www.baidu.com/wwwbaiducom.zip</span><br><span class="line">        for x in self.list2:</span><br><span class="line">            list_a.append(self.url + x)</span><br><span class="line">        return list_a</span><br></pre></td></tr></table></figure>
+<p>在spider的爬虫文件中使用以下代码</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">#coding:utf-8</span><br><span class="line"></span><br><span class="line">import scrapy</span><br><span class="line">from backup import backup</span><br><span class="line">from ..items import SpiderdateItem</span><br><span class="line"></span><br><span class="line">class spiderdata(scrapy.Spider):</span><br><span class="line"></span><br><span class="line">    name = &quot;spiderdata&quot;</span><br><span class="line">    content_type = [&apos;application/x-rar&apos;,&apos;application/x-gzip&apos;,&apos;application/zip&apos;,&apos;application/octet-stream&apos;,&apos;application/x-7z-compressed&apos;]</span><br><span class="line"></span><br><span class="line">    def start_requests(self):</span><br><span class="line">        with open(&apos;ip.txt&apos;,&apos;r&apos;) as f:</span><br><span class="line">            for i in f.readlines():</span><br><span class="line">                ip = i.strip(&apos;\n&apos;)</span><br><span class="line">                back = backup(ip)</span><br><span class="line">                url_ip = back.backup()</span><br><span class="line">                for x in url_ip:</span><br><span class="line">                    yield scrapy.Request(x, callback=self.parse,dont_filter=True)</span><br><span class="line"></span><br><span class="line">    def parse(self, response):</span><br><span class="line">        item = SpiderdateItem()</span><br><span class="line">        if response.headers[&apos;Content-Type&apos;] in self.content_type:</span><br><span class="line">            print &quot;[&quot; + str(response.status) + &quot;]&quot; + u&apos; 检测到存在备份文件的URL: &apos;+ response.url</span><br><span class="line">            item[&apos;url&apos;] = response.url</span><br><span class="line">            yield item</span><br></pre></td></tr></table></figure>
+<p>调用之前创建的备份文件名函数，使用start_requests来生成一个可迭代对象。</p>
+<p>数据通过item来保存本地，所以在items中创建一个参数，并且在settings中开启item管道。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">url = scrapy.Field()</span><br></pre></td></tr></table></figure>
+<p>在piplines中创建本地文件保存文件，创建一次文件对象，写入后根据 爬虫关闭后再关闭本地文件。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">def __init__(self):</span><br><span class="line">    self.f = open(&quot;url.txt&quot;,&apos;w&apos;)</span><br><span class="line"></span><br><span class="line">def process_item(self, item, spider):</span><br><span class="line">    self.f.write(item[&apos;url&apos;].encode(&quot;utf-8&quot;)+&apos;\n&apos;)</span><br><span class="line">    return item</span><br><span class="line"></span><br><span class="line">def close_spider(self, spider):</span><br><span class="line">    self.f.close()</span><br></pre></td></tr></table></figure>
+<p>因此只需在spiderdata中创建ip.txt文件即可，写入需要检测的url，另外如果不想看到scrapy的log输出，可以用在setting中添加如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">LOG_LEVEL = &apos;WARNING&apos;</span><br></pre></td></tr></table></figure>
+<p>只显示warning级的log输出.</p>
+
     </article>
     <!-- license  -->
     
         <div class="license-wrapper">
             <p>原文作者：<a href="">Misaki</a>
-            <p>原文链接：<a href="/2018/09/新的开始！/">/2018/09/新的开始！/</a>
-            <p>发表日期：<a href="/2018/09/新的开始！/">September 18th 2018, 12:32:10 am</a>
-            <p>更新日期：<a href="/2018/09/新的开始！/">September 20th 2018, 1:01:02 pm</a>
+            <p>原文链接：<a href="/2018/09/基于scrapy的备份文件扫描/">/2018/09/基于scrapy的备份文件扫描/</a>
+            <p>发表日期：<a href="/2018/09/基于scrapy的备份文件扫描/">September 27th 2018, 10:51:38 am</a>
+            <p>更新日期：<a href="/2018/09/基于scrapy的备份文件扫描/">September 27th 2018, 11:10:15 am</a>
             <p>版权声明：本文采用<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">知识共享署名-非商业性使用 4.0 国际许可协议</a>进行许可</p>
         </div>
     
@@ -421,13 +445,13 @@ height:40vh;
     <ul class="post-paginator">
         <li class="next">
             
-                <div class="nextSlogan">Next Post</div>
-                <a href= "/2018/09/表达式注入/" title= "表达式注入">
-                    <div class="nextTitle">表达式注入</div>
-                </a>
-            
         </li>
         <li class="previous">
+            
+                <div class="prevSlogan">Previous Post</div>
+                <a href= "/2018/09/使用docker创建镜像/" title= "使用docker创建镜像">
+                    <div class="prevTitle">使用docker创建镜像</div>
+                </a>
             
         </li>
     </ul>
