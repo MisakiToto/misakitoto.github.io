@@ -1,0 +1,905 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+    <!-- title -->
+
+
+
+
+<!-- keywords -->
+
+
+
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" >
+    <meta name="author" content="Misaki">
+    <meta name="renderer" content="webkit">
+    <meta name="copyright" content="Misaki">
+    
+    <meta name="keywords" content="hexo,Misaki,Misaki-blog">
+    
+    <meta name="description" content="One way to choose one">
+    <meta http-equiv="Cache-control" content="no-cache">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+    <title>Apache和Nginx安全配置 · Misaki&#39;s Blog</title>
+    <style type="text/css">
+    @font-face {
+        font-family: 'Oswald-Regular';
+        src: url("/font/Oswald-Regular.ttf");
+    }
+
+    body {
+        margin: 0;
+    }
+
+    header,
+    footer,
+    .back-top,
+    .sidebar,
+    .container,
+    .site-intro-meta,
+    .toc-wrapper {
+        display: none;
+    }
+
+    .site-intro {
+        position: relative;
+        z-index: 3;
+        width: 100%;
+        /* height: 50vh; */
+        overflow: hidden;
+    }
+
+    .site-intro-placeholder {
+        position: absolute;
+        z-index: -2;
+        top: 0;
+        left: 0;
+        width: calc(100% + 300px);
+        height: 100%;
+        background: repeating-linear-gradient(-45deg, #444 0, #444 80px, #333 80px, #333 160px);
+        background-position: center center;
+        transform: translate3d(-226px, 0, 0);
+        animation: gradient-move 2.5s ease-out 0s infinite;
+    }
+
+    @keyframes gradient-move {
+        0% {
+            transform: translate3d(-226px, 0, 0);
+        }
+        100% {
+            transform: translate3d(0, 0, 0);
+        }
+    }
+
+</style>
+
+    <link rel="preload" href= "/css/style.css?v=20180824" as="style" onload="this.onload=null;this.rel='stylesheet'" />
+    <link rel="stylesheet" href= "/css/mobile.css?v=20180824" media="(max-width: 980px)">
+    
+    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'" />
+    
+    <!-- /*! loadCSS. [c]2017 Filament Group, Inc. MIT License */
+/* This file is meant as a standalone workflow for
+- testing support for link[rel=preload]
+- enabling async CSS loading in browsers that do not support rel=preload
+- applying rel preload css once loaded, whether supported or not.
+*/ -->
+<script>
+(function( w ){
+	"use strict";
+	// rel=preload support test
+	if( !w.loadCSS ){
+		w.loadCSS = function(){};
+	}
+	// define on the loadCSS obj
+	var rp = loadCSS.relpreload = {};
+	// rel=preload feature support test
+	// runs once and returns a function for compat purposes
+	rp.support = (function(){
+		var ret;
+		try {
+			ret = w.document.createElement( "link" ).relList.supports( "preload" );
+		} catch (e) {
+			ret = false;
+		}
+		return function(){
+			return ret;
+		};
+	})();
+
+	// if preload isn't supported, get an asynchronous load by using a non-matching media attribute
+	// then change that media back to its intended value on load
+	rp.bindMediaToggle = function( link ){
+		// remember existing media attr for ultimate state, or default to 'all'
+		var finalMedia = link.media || "all";
+
+		function enableStylesheet(){
+			link.media = finalMedia;
+		}
+
+		// bind load handlers to enable media
+		if( link.addEventListener ){
+			link.addEventListener( "load", enableStylesheet );
+		} else if( link.attachEvent ){
+			link.attachEvent( "onload", enableStylesheet );
+		}
+
+		// Set rel and non-applicable media type to start an async request
+		// note: timeout allows this to happen async to let rendering continue in IE
+		setTimeout(function(){
+			link.rel = "stylesheet";
+			link.media = "only x";
+		});
+		// also enable media after 3 seconds,
+		// which will catch very old browsers (android 2.x, old firefox) that don't support onload on link
+		setTimeout( enableStylesheet, 3000 );
+	};
+
+	// loop through link elements in DOM
+	rp.poly = function(){
+		// double check this to prevent external calls from running
+		if( rp.support() ){
+			return;
+		}
+		var links = w.document.getElementsByTagName( "link" );
+		for( var i = 0; i < links.length; i++ ){
+			var link = links[ i ];
+			// qualify links to those with rel=preload and as=style attrs
+			if( link.rel === "preload" && link.getAttribute( "as" ) === "style" && !link.getAttribute( "data-loadcss" ) ){
+				// prevent rerunning on link
+				link.setAttribute( "data-loadcss", true );
+				// bind listeners to toggle media back
+				rp.bindMediaToggle( link );
+			}
+		}
+	};
+
+	// if unsupported, run the polyfill
+	if( !rp.support() ){
+		// run once at least
+		rp.poly();
+
+		// rerun poly on an interval until onload
+		var run = w.setInterval( rp.poly, 500 );
+		if( w.addEventListener ){
+			w.addEventListener( "load", function(){
+				rp.poly();
+				w.clearInterval( run );
+			} );
+		} else if( w.attachEvent ){
+			w.attachEvent( "onload", function(){
+				rp.poly();
+				w.clearInterval( run );
+			} );
+		}
+	}
+
+
+	// commonjs
+	if( typeof exports !== "undefined" ){
+		exports.loadCSS = loadCSS;
+	}
+	else {
+		w.loadCSS = loadCSS;
+	}
+}( typeof global !== "undefined" ? global : this ) );
+</script>
+
+    <link rel="icon" href= "/assets/favicon.ico" />
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/webfontloader@1.6.28/webfontloader.min.js" as="script" />
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js" as="script" />
+    <link rel="preload" href="/scripts/main.js" as="script" />
+    <link rel="preload" as="font" href="/font/Oswald-Regular.ttf" crossorigin>
+    <link rel="preload" as="font" href="https://at.alicdn.com/t/font_327081_1dta1rlogw17zaor.woff" crossorigin>
+    
+    <!-- fancybox -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.js" defer></script>
+    <!-- 百度统计  -->
+    
+    <script>
+        var _hmt = _hmt || [];
+        (function () {
+        var hm = document.createElement("script");
+        hm.src = "https://hm.baidu.com/hm.js?PV: ${count} :)";
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(hm, s);
+        })();
+    </script>
+    
+    <!-- 谷歌统计  -->
+    
+</head>
+
+    
+        <body class="post-body">
+    
+    
+<header class="header">
+
+    <div class="read-progress"></div>
+    <div class="header-sidebar-menu">&#xe775;</div>
+    <!-- post页的toggle banner  -->
+    
+    <div class="banner">
+            <div class="blog-title">
+                <a href="/" >Misaki&#39;s Blog</a>
+            </div>
+            <div class="post-title">
+                <a href="#" class="post-name">Apache和Nginx安全配置</a>
+            </div>
+    </div>
+    
+    <a class="home-link" href=/>Misaki's Blog</a>
+</header>
+    <div class="wrapper">
+        <div class="site-intro" style="
+
+
+
+
+
+
+
+
+
+height:45vh;
+">
+    
+    <!-- 主页  -->
+    
+    
+    <!-- 404页  -->
+            
+    <div class="site-intro-placeholder"></div>
+    <div class="site-intro-img" style="background-image: url(/intro/post-bg.jpg)"></div>
+    <div class="site-intro-meta">
+        <!-- 标题  -->
+        <h1 class="intro-title">
+            <!-- 主页  -->
+            
+            Apache和Nginx安全配置
+            <!-- 404 -->
+            
+        </h1>
+        <!-- 副标题 -->
+        <p class="intro-subtitle">
+            <!-- 主页副标题  -->
+            
+            
+            <!-- 404 -->
+            
+        </p>
+        <!-- 文章页meta -->
+        
+            <div class="post-intros">
+                <!-- 文章页标签  -->
+                
+                    <div class= post-intro-tags >
+    
+        <a class="post-tag" href="javascript:void(0);" data-tags = "web安全">web安全</a>
+    
+</div>
+                
+                
+                    <div class="post-intro-read">
+                        <span>字数统计: <span class="post-count word-count">2.8k</span>阅读时长: <span class="post-count reading-time">11 min</span></span>
+                    </div>
+                
+                <div class="post-intro-meta">
+                    <span class="post-intro-calander iconfont-archer">&#xe676;</span>
+                    <span class="post-intro-time">2018/10/09</span>
+                    
+                    <span id="busuanzi_container_page_pv" class="busuanzi-pv">
+                        <span class="iconfont-archer">&#xe602;</span>
+                        <span id="busuanzi_value_page_pv"></span>
+                    </span>
+                    
+                    <span class="shareWrapper">
+                        <span class="iconfont-archer shareIcon">&#xe71d;</span>
+                        <span class="shareText">Share</span>
+                        <ul class="shareList">
+                            <li class="iconfont-archer share-qr" data-type="qr">&#xe75b;
+                                <div class="share-qrcode"></div>
+                            </li>
+                            <li class="iconfont-archer" data-type="weibo">&#xe619;</li>
+                            <li class="iconfont-archer" data-type="qzone">&#xe62e;</li>
+                            <li class="iconfont-archer" data-type="twitter">&#xe634;</li>
+                            <li class="iconfont-archer" data-type="facebook">&#xe67a;</li>
+                        </ul>
+                    </span>
+                </div>
+            </div>
+        
+    </div>
+</div>
+        <script>
+ 
+  // get user agent
+  var browser = {
+    versions: function () {
+      var u = window.navigator.userAgent;
+      return {
+        userAgent: u,
+        trident: u.indexOf('Trident') > -1, //IE内核
+        presto: u.indexOf('Presto') > -1, //opera内核
+        webKit: u.indexOf('AppleWebKit') > -1, //苹果、谷歌内核
+        gecko: u.indexOf('Gecko') > -1 && u.indexOf('KHTML') == -1, //火狐内核
+        mobile: !!u.match(/AppleWebKit.*Mobile.*/), //是否为移动终端
+        ios: !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/), //ios终端
+        android: u.indexOf('Android') > -1 || u.indexOf('Linux') > -1, //android终端或者uc浏览器
+        iPhone: u.indexOf('iPhone') > -1 || u.indexOf('Mac') > -1, //是否为iPhone或者安卓QQ浏览器
+        iPad: u.indexOf('iPad') > -1, //是否为iPad
+        webApp: u.indexOf('Safari') == -1, //是否为web应用程序，没有头部与底部
+        weixin: u.indexOf('MicroMessenger') == -1, //是否为微信浏览器
+        uc: u.indexOf('UCBrowser') > -1 //是否为android下的UC浏览器
+      };
+    }()
+  }
+  console.log("userAgent:" + browser.versions.userAgent);
+
+  // callback
+  function fontLoaded() {
+    console.log('font loaded');
+    if (document.getElementsByClassName('site-intro-meta')) {
+      document.getElementsByClassName('intro-title')[0].classList.add('intro-fade-in');
+      document.getElementsByClassName('intro-subtitle')[0].classList.add('intro-fade-in');
+      var postIntros = document.getElementsByClassName('post-intros')[0]
+      if (postIntros) {
+        postIntros.classList.add('post-fade-in');
+      }
+    }
+  }
+
+  // UC不支持跨域，所以直接显示
+  function asyncCb(){
+    if (browser.versions.uc) {
+      console.log("UCBrowser");
+      fontLoaded();
+    } else {
+      WebFont.load({
+        custom: {
+          families: ['Oswald-Regular']
+        },
+        loading: function () {  //所有字体开始加载
+          // console.log('loading');
+        },
+        active: function () {  //所有字体已渲染
+          fontLoaded();
+        },
+        inactive: function () { //字体预加载失败，无效字体或浏览器不支持加载
+          console.log('inactive: timeout');
+          fontLoaded();
+        },
+        timeout: 5000 // Set the timeout to two seconds
+      });
+    }
+  }
+
+  function asyncErr(){
+    console.warn('script load from CDN failed, will load local script')
+  }
+
+  // load webfont-loader async, and add callback function
+  function async(u, cb, err) {
+    var d = document, t = 'script',
+      o = d.createElement(t),
+      s = d.getElementsByTagName(t)[0];
+    o.src = u;
+    if (cb) { o.addEventListener('load', function (e) { cb(null, e); }, false); }
+    if (err) { o.addEventListener('error', function (e) { err(null, e); }, false); }
+    s.parentNode.insertBefore(o, s);
+  }
+
+  var asyncLoadWithFallBack = function(arr, success, reject) {
+      var currReject = function(){
+        reject()
+        arr.shift()
+        if(arr.length)
+          async(arr[0], success, currReject)
+        }
+
+      async(arr[0], success, currReject)
+  }
+
+  asyncLoadWithFallBack([
+    "https://cdn.jsdelivr.net/npm/webfontloader@1.6.28/webfontloader.min.js", 
+    "https://cdn.bootcss.com/webfont/1.6.28/webfontloader.js",
+    "/lib/webfontloader.min.js"
+  ], asyncCb, asyncErr)
+</script>        
+        <img class="loading" src="/assets/loading.svg" style="display: block; margin: 6rem auto 0 auto; width: 6rem; height: 6rem;" />
+        <div class="container container-unloaded">
+            <main class="main post-page">
+    <article class="article-entry">
+        <h3 id="apache安全配置"><a href="#apache安全配置" class="headerlink" title="apache安全配置"></a>apache安全配置</h3><h4 id="apache运行原理"><a href="#apache运行原理" class="headerlink" title="apache运行原理"></a>apache运行原理</h4><p>Apache是基于模块化设计的，它的核心代码并不多，大多数的功能都被分散到各个模块中，各个模块在系统启动的时候按需载入。从配置文件中可以看到加载的各个模块。</p>
+<p>apache在启动阶段采用root权限来获取更多的资源使用权限，这个时候会加载配置文件，模块，资源文件等，在下一个运行阶段，Apache为了获得系统资源最大的使用权限，将以特权用户root完成启动。分11个阶段处理用户的请求。</p>
+<h4 id="apache的两种工作模式"><a href="#apache的两种工作模式" class="headerlink" title="apache的两种工作模式"></a>apache的两种工作模式</h4><p>Apache通过MPM(多路处理模块)来使用操作系统的资源，对进程和线程池进行管理。Apache为了能够获得更好的运行性能，针对不同的平台 (Unix/Linux、Window)提供了不同的MPM，用户可以根据实际情况进行选择，其中最常使用的MPM有 prefork和worker两种。</p>
+<ul>
+<li><p>prefork </p>
+<p>一个单独的控制进程(父进程)负责产生子进程，这些子进程用于监听请求并作出应答。Apache总是试图保持一些备用的 (spare)或是空闲的子进程用于迎接即将到来的请求。这样客户端就无需在得到服务前等候子进程的产生。在Unix系统中，父进程通常以root身份运行以便邦定80端口，而 Apache产生的子进程通常以一个低特权的用户运行。User和Group指令用于配置子进程的低特权用户。</p>
+</li>
+<li><p>worker</p>
+<p>每个进程能够拥有的线程数量是固定的。服务器会根据负载情况增加或减少进程数量。一个单独的控制进程(父进程)负责子进程的建立。每个子进程能够建立 ThreadsPerChild数量的服务线程和一个监听线程，该监听线程监听接入请求并将其传递给服务线程处理和应答。Apache总是试图维持一个备 用(spare)或是空闲的服务线程池。这样，客户端无须等待新线程或新进程的建立即可得到处理。在Unix中，为了能够绑定80端口，父进程一般都是以 root身份启动，随后，Apache以较低权限的用户建立子进程和线程。User和Group指令用于配置Apache子进程的权限。</p>
+</li>
+</ul>
+<h4 id="apache-在centos下配置"><a href="#apache-在centos下配置" class="headerlink" title="apache 在centos下配置"></a>apache 在centos下配置</h4><p>apache配置文件，默认文件在/etc/httpd/conf/httpd.conf路径下</p>
+<p>那么简单理解一下，配置参数的含义和使用，Allow和Deny可以用于apache的conf文件或者.htaccess文件中（配合Directory, Location, Files等），用来控制目录和文件的访问授权。<br>所以，最常用的是：<br>Order Deny,Allow<br>Allow from All</p>
+<p>注意“Deny,Allow”中间只有一个逗号，也只能有一个逗号，有空格都会出错；单词的大小写不限。上面设定的含义是先设定“先检查禁止设定，没有禁止的全部允许”，而第二句没有Deny，也就是没有禁止访问的设定，直接就是允许所有访问了。</p>
+<p>但是如果想限制IP访问，如下写</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Order Deny,Allow</span><br><span class="line">Deny from 192.168.1.1</span><br><span class="line">Allow from all</span><br></pre></td></tr></table></figure>
+<p>这时候限制不起作用，Order取规则为最后一个Allow规则，首先限制IP访问，但是会继续查看Allow规定指定的信息，IP又在all中，所以限制不起作用。所以可以如下写：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">Order Deny,Allow</span><br><span class="line">Deny from 192.168.1.1</span><br><span class="line">或者</span><br><span class="line">Order Allow,Deny</span><br><span class="line">Allow from all</span><br><span class="line">Deny from 192.168.1.1</span><br></pre></td></tr></table></figure>
+<p>比如：如下的常用配置</p>
+<p>1、在配置文件开始部分和下部有两个配置项，用来隐藏banner信息：</p>
+<p><code>ServerTokens OS</code>　 修改为：<code>ServerTokens Prod</code> </p>
+<p>（在出现错误页的时候不显示服务器操作系统的名称）<br><code>ServerSignature On</code> 修改为：<code>ServerSignature Off</code></p>
+<p>（不回显apache版本信息）  </p>
+<p>2、apache在一些系统的默认配置中，开启目录浏览，所以可以使用以下关闭设置。</p>
+<p>将<code>Options Indexes FollowSymLinks</code> 改为 <code>Options -Indexes FollowSymLinks</code> </p>
+<p>3、取消部分目录的php执行权限</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&lt;Directory &quot;/var/www/html/upload&quot;&gt;     </span><br><span class="line">    &lt;FilesMatch &quot;\.(?i:php|php3|php5)$&quot;&gt;     </span><br><span class="line">        Deny from all     </span><br><span class="line">    &lt;/FilesMatch&gt; </span><br><span class="line">&lt;/Directory&gt; </span><br><span class="line">//在upload目录下，尽可能多匹配后缀php|php3|php5的文件，不分大小写。</span><br></pre></td></tr></table></figure>
+<p>还可以在主机配置文件中增加php_flag engine off指令即可，配置如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Options FollowSymLinks</span><br><span class="line">AllowOverride None</span><br><span class="line">Order allow,deny</span><br><span class="line">Allow from all </span><br><span class="line">php_flag engine off</span><br></pre></td></tr></table></figure></p>
+<p>5、配置httpd.conf限制一些特殊目录的特定ip访问，如内部接口等。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&lt;Directory &quot;/var/www/html/aaa&quot;&gt;     </span><br><span class="line">    Order Deny,Allow</span><br><span class="line">    Deny from all</span><br><span class="line">    Allow from 192.168.1.111    </span><br><span class="line">&lt;/Directory&gt;</span><br></pre></td></tr></table></figure>
+<p>6、配置httpd.conf限制一些文件类型的访问，如txt的日志</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&lt;Files ~ &quot;.txt$&quot;&gt; </span><br><span class="line">    Order allow,deny </span><br><span class="line">    Deny from all </span><br><span class="line">&lt;/Files&gt;</span><br></pre></td></tr></table></figure>
+<p>7、针对URL相对路径的禁止访问：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&lt;Location /dir/&gt;</span><br><span class="line">Order allow,deny</span><br><span class="line">Deny from all</span><br><span class="line">&lt;/Location&gt;</span><br></pre></td></tr></table></figure>
+<h3 id="Nginx-安全配置"><a href="#Nginx-安全配置" class="headerlink" title="Nginx 安全配置"></a>Nginx 安全配置</h3><h4 id="nginx-工作原理"><a href="#nginx-工作原理" class="headerlink" title="nginx 工作原理"></a>nginx 工作原理</h4><p>Nginx由内核和模块组成，nginx核心模块包括：HTTP模块、EVENT模块和MAIL模块。nginx仅仅通过查找配置文件将客户端请求映射到一个location block（location是Nginx配置中的一个指令，用于URL匹配），而在这个location中所配置的每个指令将会启动不同的模块去完成相应的工作。nginx架构类似于Apache的Worker工作状态，Nginx的每一个Worker进程都管理着大量的线程，真正处理请求的是Worker之下的线程。</p>
+<p>nginx本身不能处理PHP，它只是个web服务器，当接收到请求后，如果是php请求，则发给php解释器处理，并把结果返回给客户端。nginx一般是把请求发fastcgi管理进程处理，fastcgi管理进程选择cgi子进程处理结果并返回被nginx。</p>
+<p>nginx涉及到两个账户，一个是nginx的运行账户，一个是php-fpm的运行账户。如果访问的是一个静态文件，则只需要nginx的运行账户对文件具有读取权限；而如果访问的是一个php文件，则首先需要nginx的运行账户对文件有读取权限，读取到文件后发现是一个php文件，则转发给php-fpm，此时则需要php-fpm账户对文件具有读取权限。  </p>
+<h4 id="nginx-在centos下的安全配置"><a href="#nginx-在centos下的安全配置" class="headerlink" title="nginx 在centos下的安全配置"></a>nginx 在centos下的安全配置</h4><ol>
+<li>nginx设置问题</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">#隐藏 Nginx 的版本号，提高安全性。</span><br><span class="line">    server_tokens off;</span><br><span class="line">#开启高效文件传输模式，sendfile 指令指定 Nginx 是否调用sendfile 函数来输出文件，对于普通应用设为 on，如果用来进行下载等应用磁盘 IO 重负载应用，可设置为 off，以平衡磁盘与网络 I/O 处理速度，降低系统的负载。</span><br><span class="line">    sendfile on;</span><br><span class="line">#是否开启目录列表访问，默认关闭。</span><br><span class="line">    autoindex off;</span><br></pre></td></tr></table></figure>
+<p>开头的配置</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">user www-data;   //用户和组</span><br><span class="line">worker_processes auto;   //进程数</span><br><span class="line">pid /run/nginx.pid;  //进程文件</span><br><span class="line">include /etc/nginx/modules-enabled/*.conf;  //导入其他配置文件到nginx配置文件</span><br></pre></td></tr></table></figure>
+<p>events配置</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">events &#123;</span><br><span class="line">	worker_connections 768;   //设置一个worker进程同时打开的最大连接数</span><br><span class="line">	# multi_accept on;    //告诉nginx收到一个新连接通知后接受尽可能多的连接</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>http配置</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br></pre></td><td class="code"><pre><span class="line">http &#123;</span><br><span class="line"></span><br><span class="line">	##</span><br><span class="line">	# Basic Settings</span><br><span class="line">	##</span><br><span class="line"></span><br><span class="line">	sendfile on;      //开启高效文件传输模式</span><br><span class="line">	tcp_nopush on;     //告诉 Nginx 在一个数据包里发送所有头文件</span><br><span class="line">	tcp_nodelay on;    //告诉 Nginx 不要缓存数据，而是一段一段的发送</span><br><span class="line">	keepalive_timeout 65;   //连接超时时间，单位是秒</span><br><span class="line">	types_hash_max_size 2048;   //上传文件大小限制	</span><br><span class="line">	# server_tokens off;      //隐藏 Nginx 的版本号</span><br><span class="line"></span><br><span class="line">	# server_names_hash_bucket_size 64;</span><br><span class="line">	# server_name_in_redirect off;</span><br><span class="line"></span><br><span class="line">	include /etc/nginx/mime.types;   //包含配置</span><br><span class="line">	default_type application/octet-stream;  //默认传输类型</span><br><span class="line"></span><br><span class="line">	##</span><br><span class="line">	# SSL Settings	</span><br><span class="line">	##</span><br><span class="line"></span><br><span class="line">	ssl_protocols TLSv1 TLSv1.1 TLSv1.2; # Dropping SSLv3, ref: POODLE</span><br><span class="line">	ssl_prefer_server_ciphers on;</span><br><span class="line"></span><br><span class="line">	##</span><br><span class="line">	# Logging Settings</span><br><span class="line">	##</span><br><span class="line"></span><br><span class="line">	access_log /var/log/nginx/access.log;   //访问日志</span><br><span class="line">	error_log /var/log/nginx/error.log;     //错误日志</span><br><span class="line"></span><br><span class="line">	##</span><br><span class="line">	# Gzip Settings</span><br><span class="line">	##</span><br><span class="line"></span><br><span class="line">	gzip on;</span><br><span class="line"></span><br><span class="line">	# gzip_vary on;</span><br><span class="line">	# gzip_proxied any;</span><br><span class="line">	# gzip_comp_level 6;</span><br><span class="line">	# gzip_buffers 16 8k;</span><br><span class="line">	# gzip_http_version 1.1;</span><br><span class="line">	# gzip_types text/plain text/css application/json application/javascript text/xml application/xml application/xml+rss text/javascript;</span><br><span class="line"></span><br><span class="line">	##</span><br><span class="line">	# Virtual Host Configs</span><br><span class="line">	##</span><br><span class="line"></span><br><span class="line">	include /etc/nginx/conf.d/*.conf;</span><br><span class="line">	include /etc/nginx/sites-enabled/*;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>server配置</p>
+<p>众所周知，Nginx的配置文件分为Server、Location、If等一些配置块，并且存在包含关系，和编程语言比较类似。如果在外层配置的一些选项，是可以被继承到内层的。</p>
+<p>但这里的继承也有一些特性，比如add_header，子块中配置后将会覆盖父块中的add_header添加的<strong>所有</strong>HTTP头，造成一些安全隐患。</p>
+<p>server配置在一些系统上不是默认的nginx配置，如果需要修改可以在nginx配置中添加，或者添加include，包含进其他的自定义server。</p>
+<p>如下列代码，Server块添加了CSP头：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">server &#123;</span><br><span class="line">    ...</span><br><span class="line">    add_header Content-Security-Policy &quot;default-src &apos;self&apos;&quot;;</span><br><span class="line">    add_header X-Frame-Options DENY;</span><br><span class="line"></span><br><span class="line">    location = /test &#123;</span><br><span class="line">        add_header X-Content-Type-Options nosniff;</span><br><span class="line">        rewrite ^(.*)$ /xss.html break;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>但/test的location中又添加了X-Content-Type-Options头，导致父块中的add_header全部失效。</p>
+<ol start="2">
+<li>禁止一个目录的访问<br>示例：禁止访问path目录  </li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">location ^~ /path &#123; </span><br><span class="line">deny all; </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>可以把path换成实际需要的目录，目录path后是否带有”/“，带“/”会禁止访问该目录和该目录下所有文件。不带”/“的情况就有些复杂了，只要目录开头匹配上那个关键字就会禁止；注意要放在fastcgi配置之前。  </p>
+<p>这个常见于Nginx做反向代理的情况，动态的部分被proxy_pass传递给后端端口，而静态文件需要Nginx来处理。</p>
+<p>假设静态文件存储在/home/目录下，而该目录在url中名字为files，那么就需要用alias设置目录的别名：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">location /files &#123;</span><br><span class="line">    alias /home/;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>此时，访问<code>http://example.com/files/readme.txt</code>，就可以获取<code>/home/readme.txt</code>文件。</p>
+<p>但我们注意到，url上<code>/files</code>没有加后缀<code>/</code>，而alias设置的<code>/home/</code>是有后缀<code>/</code>的，这个<code>/</code>就导致我们可以从<code>/home/</code>目录穿越到他的上层目录。从而导致一个目录穿越问题。</p>
+<ol start="3">
+<li>禁止php文件的访问及执行</li>
+</ol>
+<p>示例：去掉单个目录的PHP执行权限  </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">location ~ /attachments/.*\.(php|php5)?$ &#123; </span><br><span class="line">deny all; </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>示例：去掉多个目录的PHP执行权限  </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">location ~  </span><br><span class="line">/(attachments|upload)/.*\.(php|php5)?$ &#123; </span><br><span class="line">deny all; </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ol start="4">
+<li>禁止IP的访问 </li>
+</ol>
+<p>示例：禁止IP段的写法：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">deny 10.0.0.0/24;</span><br></pre></td></tr></table></figure></p>
+<p>示例：只允许某个IP或某个IP段用户访问，其它的用户全都禁止<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">allow  </span><br><span class="line">x.x.x.x;  </span><br><span class="line">allow 10.0.0.0/24;  </span><br><span class="line">deny all;</span><br></pre></td></tr></table></figure></p>
+<ol start="5">
+<li>禁用非必要的方法</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">if ($request_method !~ ^(GET|HEAD|POST)$ ) &#123;</span><br><span class="line">    return   444;</span><br><span class="line">	&#125;</span><br></pre></td></tr></table></figure>
+<ol start="6">
+<li>禁用扩展名</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">location ~* .(txt|doc|sql|gz|svn|git)$ &#123;</span><br><span class="line">   deny all;</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure>
+<ol start="7">
+<li>根据用户的真实 IP 做连接限制</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">## 这里取得原始用户的IP地址</span><br><span class="line">map $http_x_forwarded_for  $clientRealIp &#123;</span><br><span class="line">    &quot;&quot;  $remote_addr;</span><br><span class="line">    ~^(?P&lt;firstAddr&gt;[0-9\.]+),?.*$    $firstAddr;</span><br><span class="line">&#125;</span><br><span class="line"> </span><br><span class="line">## 针对原始用户 IP 地址做限制</span><br><span class="line">limit_conn_zone $clientRealIp zone=TotalConnLimitZone:20m ;</span><br><span class="line">limit_conn  TotalConnLimitZone  50;</span><br><span class="line">limit_conn_log_level notice;</span><br><span class="line"> </span><br><span class="line">## 针对原始用户 IP 地址做限制</span><br><span class="line">limit_req_zone $clientRealIp zone=ConnLimitZone:20m  rate=10r/s;</span><br><span class="line">#limit_req zone=ConnLimitZone burst=10 nodelay;</span><br><span class="line">limit_req_log_level notice;</span><br></pre></td></tr></table></figure>
+<p>参考资料：</p>
+<p><a href="https://www.cnblogs.com/chenpingzhao/p/5785416.html" target="_blank" rel="noopener">https://www.cnblogs.com/chenpingzhao/p/5785416.html</a></p>
+<p><a href="https://wooyun.kieran.top/#!/drops/201.Nginx%E5%AE%89%E5%85%A8%E9%85%8D%E7%BD%AE%E7%A0%94%E7%A9%B6" target="_blank" rel="noopener">https://wooyun.kieran.top/#!/drops/201.Nginx%E5%AE%89%E5%85%A8%E9%85%8D%E7%BD%AE%E7%A0%94%E7%A9%B6</a></p>
+<p><a href="https://wooyun.kieran.top/#!/drops/315.Apache%E5%AE%89%E5%85%A8%E9%85%8D%E7%BD%AE" target="_blank" rel="noopener">https://wooyun.kieran.top/#!/drops/315.Apache%E5%AE%89%E5%85%A8%E9%85%8D%E7%BD%AE</a></p>
+<p><a href="https://blog.csdn.net/yf3585595511/article/details/54933646" target="_blank" rel="noopener">https://blog.csdn.net/yf3585595511/article/details/54933646</a></p>
+
+    </article>
+    <!-- license  -->
+    
+        <div class="license-wrapper">
+            <p>原文作者：<a href="">Misaki</a>
+            <p>原文链接：<a href="/2018/10/Apache和Nginx安全配置/">/2018/10/Apache和Nginx安全配置/</a>
+            <p>发表日期：<a href="/2018/10/Apache和Nginx安全配置/">October 9th 2018, 4:21:20 pm</a>
+            <p>更新日期：<a href="/2018/10/Apache和Nginx安全配置/">October 9th 2018, 10:38:34 pm</a>
+            <p>版权声明：本文采用<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">知识共享署名-非商业性使用 4.0 国际许可协议</a>进行许可</p>
+        </div>
+    
+    <!-- paginator  -->
+    <ul class="post-paginator">
+        <li class="next">
+            
+        </li>
+        <li class="previous">
+            
+                <div class="prevSlogan">Previous Post</div>
+                <a href= "/2018/10/XSS-GAME记录/" title= "XSS GAME记录">
+                    <div class="prevTitle">XSS GAME记录</div>
+                </a>
+            
+        </li>
+    </ul>
+    <!-- 评论插件 -->
+    <!-- 来必力City版安装代码 -->
+
+<!-- City版安装代码已完成 -->
+    
+    
+    <!-- partial('_partial/comment/changyan') -->
+    <!--PC版-->
+
+
+    
+    
+
+    <!-- 评论 -->
+</main>
+            <!-- profile -->
+            
+        </div>
+        <footer class="footer footer-unloaded">
+    <!-- social  -->
+    
+    <div class="social">
+        
+    
+        
+    
+        
+            
+                <a href="https://github.com/MisakiKata" class="iconfont-archer github" target="_blank" title=github></a>
+            
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+            
+                <a href="http://www.stackoverflow.com/" class="iconfont-archer stack-overflow" target="_blank" title=stack-overflow></a>
+            
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+            
+                <a href="https://www.t00ls.net/members-profile-12179.html" class="iconfont-archer others" target="_blank" title=others></a>
+            
+        
+    
+        
+    
+
+    </div>
+    
+    <!-- 不蒜子  -->
+    
+    <div class="busuanzi-container">
+    
+     
+    <span id="busuanzi_container_site_pv">PV: <span id="busuanzi_value_site_pv"></span> :)</span>
+    
+    </div>
+    
+</footer>
+    </div>
+    <!-- toc -->
+    
+    <div class="toc-wrapper" style=
+    
+
+
+
+
+
+
+
+
+
+top:45vh;
+
+    >
+        <div class="toc-catalog">
+            <span class="iconfont-archer catalog-icon">&#xe613;</span><span>CATALOG</span>
+        </div>
+        <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#apache安全配置"><span class="toc-number">1.</span> <span class="toc-text">apache安全配置</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#apache运行原理"><span class="toc-number">1.1.</span> <span class="toc-text">apache运行原理</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#apache的两种工作模式"><span class="toc-number">1.2.</span> <span class="toc-text">apache的两种工作模式</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#apache-在centos下配置"><span class="toc-number">1.3.</span> <span class="toc-text">apache 在centos下配置</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Nginx-安全配置"><span class="toc-number">2.</span> <span class="toc-text">Nginx 安全配置</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#nginx-工作原理"><span class="toc-number">2.1.</span> <span class="toc-text">nginx 工作原理</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#nginx-在centos下的安全配置"><span class="toc-number">2.2.</span> <span class="toc-text">nginx 在centos下的安全配置</span></a></li></ol></li></ol>
+    </div>
+    
+    <div class="back-top iconfont-archer">&#xe639;</div>
+    <div class="sidebar sidebar-hide">
+    <ul class="sidebar-tabs sidebar-tabs-active-0">
+        <li class="sidebar-tab-archives"><span class="iconfont-archer">&#xe67d;</span><span class="tab-name">Archive</span></li>
+        <li class="sidebar-tab-tags"><span class="iconfont-archer">&#xe61b;</span><span class="tab-name">Tag</span></li>
+        <li class="sidebar-tab-categories"><span class="iconfont-archer">&#xe666;</span><span class="tab-name">Cate</span></li>
+    </ul>
+    <div class="sidebar-content sidebar-content-show-archive">
+          <div class="sidebar-panel-archives">
+    <!-- 在ejs中将archive按照时间排序 -->
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <div class="total-and-search">
+        <div class="total-archive">
+        Total : 10
+        </div>
+        <!-- search  -->
+        
+    </div>
+    
+    <div class="post-archive">
+    
+    
+    
+    
+    <div class="archive-year"> 2018 </div>
+    <ul class="year-list">
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">10/09</span><a class="archive-post-title" href= "/2018/10/Apache和Nginx安全配置/" >Apache和Nginx安全配置</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">10/05</span><a class="archive-post-title" href= "/2018/10/XSS-GAME记录/" >XSS GAME记录</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">09/28</span><a class="archive-post-title" href= "/2018/09/批量获取数据库权限/" >批量获取数据库权限</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">09/27</span><a class="archive-post-title" href= "/2018/09/基于scrapy的备份文件扫描/" >基于scrapy的备份文件扫描</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">09/25</span><a class="archive-post-title" href= "/2018/09/使用docker创建镜像/" >使用docker创建镜像</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">09/20</span><a class="archive-post-title" href= "/2018/09/关于Thefatrat免杀使用/" >关于Thefatrat免杀使用</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">09/18</span><a class="archive-post-title" href= "/2018/09/表达式注入/" >表达式注入</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">09/18</span><a class="archive-post-title" href= "/2018/09/对意外发现的某站点测试/" >对意外发现的某站点测试</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">09/18</span><a class="archive-post-title" href= "/2018/09/zoomeye接口实现/" >zoomeye接口实现</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">09/18</span><a class="archive-post-title" href= "/2018/09/新的开始！/" >新的开始！</a>
+        </li>
+    
+    </div>
+  </div>
+        <div class="sidebar-panel-tags">
+    <div class="sidebar-tags-name">
+    
+        <span class="sidebar-tag-name" data-tags="web安全"><span class="iconfont-archer">&#xe606;</span>web安全</span>
+    
+        <span class="sidebar-tag-name" data-tags="系统安全"><span class="iconfont-archer">&#xe606;</span>系统安全</span>
+    
+        <span class="sidebar-tag-name" data-tags="python"><span class="iconfont-archer">&#xe606;</span>python</span>
+    
+        <span class="sidebar-tag-name" data-tags="渗透测试"><span class="iconfont-archer">&#xe606;</span>渗透测试</span>
+    
+    </div>
+    <div class="iconfont-archer sidebar-tags-empty">&#xe678;</div>
+    <div class="tag-load-fail" style="display: none; color: #ccc; font-size: 0.6rem;">
+    缺失模块。<br/>
+    1、请确保node版本大于6.2<br/>
+    2、在博客根目录（注意不是archer根目录）执行以下命令：<br/>
+    <span style="color: #f75357; font-size: 1rem; line-height: 2rem;">npm i hexo-generator-json-content --save</span><br/>
+    3、在根目录_config.yml里添加配置：
+    <pre style="color: #787878; font-size: 0.6rem;">
+jsonContent:
+  meta: false
+  pages: false
+  posts:
+    title: true
+    date: true
+    path: true
+    text: false
+    raw: false
+    content: false
+    slug: false
+    updated: false
+    comments: false
+    link: false
+    permalink: false
+    excerpt: false
+    categories: true
+    tags: true</pre>
+    </div> 
+    <div class="sidebar-tags-list"></div>
+</div>
+        <div class="sidebar-panel-categories">
+    <div class="sidebar-categories-name">
+    
+    </div>
+    <div class="iconfont-archer sidebar-categories-empty">&#xe678;</div>
+    <div class="sidebar-categories-list"></div>
+</div>
+    </div>
+</div> 
+    <script>
+    var siteMeta = {
+        root: "/",
+        author: "Misaki"
+    }
+</script>
+    <!-- CDN failover -->
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js"></script>
+    <script type="text/javascript">
+        if (typeof window.$ === 'undefined')
+        {
+            console.warn('jquery load from jsdelivr failed, will load local script')
+            document.write('<script src="/lib/jquery.min.js">\x3C/script>')
+        }
+    </script>
+    <script src="/scripts/main.js"></script>
+    <!-- algolia -->
+    
+    <!-- busuanzi  -->
+    
+    <script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    
+    <!-- CNZZ  -->
+    
+    </div>
+    <!-- async load share.js -->
+    
+        <script src="/scripts/share.js" async></script>    
+     
+    </body>
+</html>
+
+
