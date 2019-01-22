@@ -22,7 +22,7 @@
     <meta name="description" content="One way to choose one">
     <meta http-equiv="Cache-control" content="no-cache">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
-    <title>新的开始！ · Misaki&#39;s Blog</title>
+    <title>Android 逆向Smali语言初识 · Misaki&#39;s Blog</title>
     <style type="text/css">
     @font-face {
         font-family: 'Oswald-Regular';
@@ -227,7 +227,7 @@
                 <a href="/" >Misaki&#39;s Blog</a>
             </div>
             <div class="post-title">
-                <a href="#" class="post-name">新的开始！</a>
+                <a href="#" class="post-name">Android 逆向Smali语言初识</a>
             </div>
     </div>
     
@@ -259,7 +259,7 @@ height:45vh;
         <h1 class="intro-title">
             <!-- 主页  -->
             
-            新的开始！
+            Android 逆向Smali语言初识
             <!-- 404 -->
             
         </h1>
@@ -276,14 +276,20 @@ height:45vh;
             <div class="post-intros">
                 <!-- 文章页标签  -->
                 
+                    <div class= post-intro-tags >
+    
+        <a class="post-tag" href="javascript:void(0);" data-tags = "移动安全">移动安全</a>
+    
+</div>
+                
                 
                     <div class="post-intro-read">
-                        <span>字数统计: <span class="post-count word-count">0</span>阅读时长: <span class="post-count reading-time">1 min</span></span>
+                        <span>字数统计: <span class="post-count word-count">1.1k</span>阅读时长: <span class="post-count reading-time">4 min</span></span>
                     </div>
                 
                 <div class="post-intro-meta">
                     <span class="post-intro-calander iconfont-archer">&#xe676;</span>
-                    <span class="post-intro-time">2018/09/18</span>
+                    <span class="post-intro-time">2019/01/22</span>
                     
                     <span id="busuanzi_container_page_pv" class="busuanzi-pv">
                         <span class="iconfont-archer">&#xe602;</span>
@@ -407,15 +413,42 @@ height:45vh;
         <div class="container container-unloaded">
             <main class="main post-page">
     <article class="article-entry">
-        
+        <h3 id="Android-逆向Smali语言初识"><a href="#Android-逆向Smali语言初识" class="headerlink" title="Android 逆向Smali语言初识"></a>Android 逆向Smali语言初识</h3><p>​    Smali，Baksmali分别是指安卓系统里的Java虚拟机（Dalvik）所使用的一种.dex格式文件的汇编器，反汇编器。</p>
+<h4 id="函数语法"><a href="#函数语法" class="headerlink" title="函数语法"></a>函数语法</h4><p>​    Smali 语法规范与格式Smali 是对 Dalvik 虚拟机字节码的一种解释，虽然不是官方标准语言，但所有语句都遵循一套语法规范。要了解 smali 语法规范，可以先从了解 Dalvik 虚拟机字节码的指令格式开始。3.1 Dalvik 虚拟机字节码指令格式在 Android 4.0 源码 Dalvik/docs 目录下提供了一份文档 instruction-formats.html，里面详细列举了 Dalvik 虚拟机字节码指令的所有格式。<br>    Dalvik 虚拟机字节码的类型、方法和字段的表示方法3.2.1 类型Dalvik 字节码有两种类型，基本类型和引用类型。对象和数组是引用类型，其它都是基本类型。</p>
+<p>Dalvik 字节码类型描述符 </p>
+<p>​      描述符       类型 </p>
+<ul>
+<li>V             void，只能用于返回值类型</li>
+<li>Z             boolean</li>
+<li>B             byte</li>
+<li>S             short</li>
+<li>C             charI intJ long（64 位）</li>
+<li>F             floatD double（64 位）</li>
+<li>L             Java 类类型</li>
+<li>[              数组类型 </li>
+</ul>
+<p>常见的代码含义：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br></pre></td><td class="code"><pre><span class="line">#表示当前代码在源java文件中的行数。</span><br><span class="line">.line</span><br><span class="line">  .line 34</span><br><span class="line"></span><br><span class="line">#表示来自公共方法methodAReturn返回值是一个对象com.bolex.AA</span><br><span class="line">method</span><br><span class="line">.method public methodAReturn(Lcom/bolex/AA;Lcom/bolex/AA;)Lcom/bolex/AA;</span><br><span class="line"></span><br><span class="line">#表示该函数上需要使用3个寄存器</span><br><span class="line">registers</span><br><span class="line">.registers 3</span><br><span class="line"></span><br><span class="line">#表示接收两个入参都是AA对象，并标记寄存器p1和p2</span><br><span class="line">param</span><br><span class="line">    .param p1, &quot;mAA&quot;    # Lcom/bolex/AA;</span><br><span class="line">    .param p2, &quot;sAA&quot;    # Lcom/bolex/AA;</span><br><span class="line"></span><br><span class="line">#表示函数内执行的起始标记</span><br><span class="line">.prologue</span><br><span class="line">    .prologue</span><br><span class="line"></span><br><span class="line">#表示 返回寄存器上p1对象</span><br><span class="line">return-object</span><br><span class="line">  return-object p1</span><br><span class="line">#表示函数结束标记</span><br><span class="line">.end method</span><br><span class="line"></span><br><span class="line">#创建一个AA对象</span><br><span class="line">new-instance</span><br><span class="line"> new-instance v0, Lcom/bolex/AA;</span><br><span class="line"></span><br><span class="line">#表示使用无参构造方法直接调用</span><br><span class="line">invoke-direct</span><br><span class="line"> invoke-direct &#123;v0&#125;, Lcom/bolex/AA;-&gt;&lt;init&gt;()V</span><br><span class="line"></span><br><span class="line">#表示为虚拟方法</span><br><span class="line">invoke-virtual</span><br><span class="line"> </span><br><span class="line"> #数组操作指令</span><br><span class="line">    #new-array构造指定类型I也就是int类型并且把值赋给v0</span><br><span class="line">    # v0=new int[8];</span><br><span class="line">    new-array v0,v0,[ I</span><br><span class="line"></span><br><span class="line">    #array-length 获取给定v0寄存器中数组的长度并将值赋给v1寄存器，数组长度就是数组的个数。v1=v0,也就是说v1=8</span><br><span class="line">    array-length v1,v0</span><br><span class="line"></span><br><span class="line">    # 方法调用指令 </span><br><span class="line">    #new-instance v1,... 构造一个指定类型对象的新实例，并将对象引用赋值给v1寄存器。</span><br><span class="line">    #L表示java类型中的任何类，</span><br><span class="line">    # StringBuilder对象是动态对象，允许扩充它所封装的字符串中字符的数量，但是您可以为它可容纳的最大字符数指定一个值。相当于是一个string的升级版。</span><br><span class="line">    new-instance v1,Ljava/lang/StringBuilder;</span><br><span class="line"></span><br><span class="line">    # 方法调用指令</span><br><span class="line">    #&lt;init&gt;:在实例创建出来的时候调用，包括调用new操作符；</span><br><span class="line">    new-direct v1,Ljava/lang/StringBuilder;-&gt;&lt;init&gt;( )v</span><br><span class="line"></span><br><span class="line">    # 跳转指令   if (v0!=0)</span><br><span class="line">    #if-nez 的意思就是 not equal zero 如果v0不等于0，那么就继续向下执行，如果等于0就跳转到标号名为cond_0的位置。</span><br><span class="line">    if-nez v0, : cond_0 </span><br><span class="line"></span><br><span class="line">    # goto的含义就是强行跳转到标号名为goto_0的地方</span><br><span class="line">    goto :goto_0</span><br><span class="line">    </span><br><span class="line">    #标号cond_0</span><br><span class="line">    ：cond_0</span><br><span class="line"></span><br><span class="line">    # 数据转换指令</span><br><span class="line">    #把int型变量转变为float变量</span><br><span class="line">    int-to-float v2,v2</span><br><span class="line"></span><br><span class="line">    # 数据运算指令</span><br><span class="line">    # 相当于 v2+=v2，第一个v2是寄存器，第二个和第三个是数据</span><br><span class="line">    add-float v2,v2,v2</span><br></pre></td></tr></table></figure>
+<h4 id="Java编译dex文件"><a href="#Java编译dex文件" class="headerlink" title="Java编译dex文件"></a>Java编译dex文件</h4><p>以下用常见的hello world来表示smali语法结构。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">public class firedt &#123;</span><br><span class="line">    public static void main(String[] args)&#123;</span><br><span class="line">        System.out.println(&quot;hello world&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>在AS中打开代码，安装java2smali插件后，在build-&gt;compile to smali编译为smali代码。</p>
+<p>编译完成后的代码为以下，并对关键代码进行注释含义：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">.class public Lfiredt;    #定义一个firedt类</span><br><span class="line">.super Ljava/lang/Object;    #继承object类</span><br><span class="line">.source &quot;firedt.java&quot;       #由firedt.java编译来 </span><br><span class="line"></span><br><span class="line"></span><br><span class="line"># direct methods</span><br><span class="line">.method public constructor &lt;init&gt;()V     </span><br><span class="line">    .registers 1             #注册一个寄存器</span><br><span class="line"></span><br><span class="line">    .prologue   #代码开始</span><br><span class="line">    .line 1            #第一行</span><br><span class="line">    invoke-direct &#123;p0&#125;, Ljava/lang/Object;-&gt;&lt;init&gt;()V </span><br><span class="line"></span><br><span class="line">    return-void</span><br><span class="line">.end method</span><br><span class="line"></span><br><span class="line">.method public static main([Ljava/lang/String;)V   #说明一个main的静态方法，类型为void</span><br><span class="line">    .registers 3   </span><br><span class="line"></span><br><span class="line">    .prologue</span><br><span class="line">    .line 3</span><br><span class="line">    sget-object v0, Ljava/lang/System;-&gt;out:Ljava/io/PrintStream;   #获取变量对象保存到v0</span><br><span class="line"></span><br><span class="line">    const-string v1, &quot;hello world&quot;   #赋值一个字符串v1=hello world</span><br><span class="line"></span><br><span class="line">    invoke-virtual &#123;v0, v1&#125;, Ljava/io/PrintStream;-&gt;println(Ljava/lang/String;)V   #调用printstream的println方法把v0赋值v1</span><br><span class="line"></span><br><span class="line">    .line 4   </span><br><span class="line">    return-void</span><br><span class="line">.end method  #方法结束，一个method对应一个end method</span><br></pre></td></tr></table></figure>
+<h3 id="参考资料："><a href="#参考资料：" class="headerlink" title="参考资料："></a>参考资料：</h3><ol>
+<li><p><a href="https://blog.csdn.net/qq373432361/article/details/49557579" target="_blank" rel="noopener">smali语法中文参考文档</a></p>
+</li>
+<li><p><a href="https://www.52pojie.cn/thread-687375-1-1.html" target="_blank" rel="noopener">逆向之Smali入门学习</a></p>
+</li>
+</ol>
+
     </article>
     <!-- license  -->
     
         <div class="license-wrapper">
             <p>原文作者：<a href="">Misaki</a>
-            <p>原文链接：<a href="/2018/09/新的开始！/">/2018/09/新的开始！/</a>
-            <p>发表日期：<a href="/2018/09/新的开始！/">September 18th 2018, 12:32:10 am</a>
-            <p>更新日期：<a href="/2018/09/新的开始！/">September 20th 2018, 1:01:02 pm</a>
+            <p>原文链接：<a href="/2019/01/Android-逆向Smali语言初识/">/2019/01/Android-逆向Smali语言初识/</a>
+            <p>发表日期：<a href="/2019/01/Android-逆向Smali语言初识/">January 22nd 2019, 3:55:56 pm</a>
+            <p>更新日期：<a href="/2019/01/Android-逆向Smali语言初识/">January 22nd 2019, 3:58:12 pm</a>
             <p>版权声明：本文采用<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">知识共享署名-非商业性使用 4.0 国际许可协议</a>进行许可</p>
         </div>
     
@@ -423,13 +456,13 @@ height:45vh;
     <ul class="post-paginator">
         <li class="next">
             
-                <div class="nextSlogan">Next Post</div>
-                <a href= "/2018/09/表达式注入/" title= "表达式注入">
-                    <div class="nextTitle">表达式注入</div>
-                </a>
-            
         </li>
         <li class="previous">
+            
+                <div class="prevSlogan">Previous Post</div>
+                <a href= "/2018/11/ELK搭建使用/" title= "ELK搭建使用">
+                    <div class="prevTitle">ELK搭建使用</div>
+                </a>
             
         </li>
     </ul>
@@ -542,7 +575,7 @@ top:45vh;
         <div class="toc-catalog">
             <span class="iconfont-archer catalog-icon">&#xe613;</span><span>CATALOG</span>
         </div>
-        
+        <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#Android-逆向Smali语言初识"><span class="toc-number">1.</span> <span class="toc-text">Android 逆向Smali语言初识</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#函数语法"><span class="toc-number">1.1.</span> <span class="toc-text">函数语法</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Java编译dex文件"><span class="toc-number">1.2.</span> <span class="toc-text">Java编译dex文件</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#参考资料："><span class="toc-number">2.</span> <span class="toc-text">参考资料：</span></a></li></ol>
     </div>
     
     <div class="back-top iconfont-archer">&#xe639;</div>
