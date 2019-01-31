@@ -1,943 +1,338 @@
 <!DOCTYPE html>
-<html lang="zh-Hans">
-    <!-- title -->
+<html lang="zh-CN">
 
 
 
 
-<!-- keywords -->
+
+
 
 
 
 
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" >
-    <meta name="author" content="Misaki">
-    <meta name="renderer" content="webkit">
-    <meta name="copyright" content="Misaki">
-    
-    <meta name="keywords" content="hexo,Misaki,Misaki-blog">
-    
+    <meta charset="utf-8" />
+    <link rel="apple-touch-icon" sizes="76x76" href="/favicon.ico">
+    <link rel="icon" type="image/png" href="/favicon.ico">
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0, shrink-to-fit=no" name="viewport" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
     <meta name="description" content="One way to choose one">
-    <meta http-equiv="Cache-control" content="no-cache">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
-    <title>ELK搭建使用 · Misaki&#39;s Blog</title>
-    <style type="text/css">
-    @font-face {
-        font-family: 'Oswald-Regular';
-        src: url("/font/Oswald-Regular.ttf");
-    }
-
-    body {
-        margin: 0;
-    }
-
-    header,
-    footer,
-    .back-top,
-    .sidebar,
-    .container,
-    .site-intro-meta,
-    .toc-wrapper {
-        display: none;
-    }
-
-    .site-intro {
-        position: relative;
-        z-index: 3;
-        width: 100%;
-        /* height: 50vh; */
-        overflow: hidden;
-    }
-
-    .site-intro-placeholder {
-        position: absolute;
-        z-index: -2;
-        top: 0;
-        left: 0;
-        width: calc(100% + 300px);
-        height: 100%;
-        background: repeating-linear-gradient(-45deg, #444 0, #444 80px, #333 80px, #333 160px);
-        background-position: center center;
-        transform: translate3d(-226px, 0, 0);
-        animation: gradient-move 2.5s ease-out 0s infinite;
-    }
-
-    @keyframes gradient-move {
-        0% {
-            transform: translate3d(-226px, 0, 0);
-        }
-        100% {
-            transform: translate3d(0, 0, 0);
-        }
-    }
-
-</style>
-
-    <link rel="preload" href= "/css/style.css?v=20180824" as="style" onload="this.onload=null;this.rel='stylesheet'" />
-    <link rel="stylesheet" href= "/css/mobile.css?v=20180824" media="(max-width: 980px)">
+    <meta name="author" content="Misaki">
+    <meta name="keywords" content="">
+    <title>ELK搭建使用 ~ Misaki&#39;s Blog</title>
+    <link rel="stylesheet" href="/css/Material_Icons.css">
+    <!-- <link rel="stylesheet" href="/css/font-awesome.css"> -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/css/main.css">
     
-    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'" />
-    
-    <!-- /*! loadCSS. [c]2017 Filament Group, Inc. MIT License */
-/* This file is meant as a standalone workflow for
-- testing support for link[rel=preload]
-- enabling async CSS loading in browsers that do not support rel=preload
-- applying rel preload css once loaded, whether supported or not.
-*/ -->
-<script>
-(function( w ){
-	"use strict";
-	// rel=preload support test
-	if( !w.loadCSS ){
-		w.loadCSS = function(){};
-	}
-	// define on the loadCSS obj
-	var rp = loadCSS.relpreload = {};
-	// rel=preload feature support test
-	// runs once and returns a function for compat purposes
-	rp.support = (function(){
-		var ret;
-		try {
-			ret = w.document.createElement( "link" ).relList.supports( "preload" );
-		} catch (e) {
-			ret = false;
-		}
-		return function(){
-			return ret;
-		};
-	})();
-
-	// if preload isn't supported, get an asynchronous load by using a non-matching media attribute
-	// then change that media back to its intended value on load
-	rp.bindMediaToggle = function( link ){
-		// remember existing media attr for ultimate state, or default to 'all'
-		var finalMedia = link.media || "all";
-
-		function enableStylesheet(){
-			link.media = finalMedia;
-		}
-
-		// bind load handlers to enable media
-		if( link.addEventListener ){
-			link.addEventListener( "load", enableStylesheet );
-		} else if( link.attachEvent ){
-			link.attachEvent( "onload", enableStylesheet );
-		}
-
-		// Set rel and non-applicable media type to start an async request
-		// note: timeout allows this to happen async to let rendering continue in IE
-		setTimeout(function(){
-			link.rel = "stylesheet";
-			link.media = "only x";
-		});
-		// also enable media after 3 seconds,
-		// which will catch very old browsers (android 2.x, old firefox) that don't support onload on link
-		setTimeout( enableStylesheet, 3000 );
-	};
-
-	// loop through link elements in DOM
-	rp.poly = function(){
-		// double check this to prevent external calls from running
-		if( rp.support() ){
-			return;
-		}
-		var links = w.document.getElementsByTagName( "link" );
-		for( var i = 0; i < links.length; i++ ){
-			var link = links[ i ];
-			// qualify links to those with rel=preload and as=style attrs
-			if( link.rel === "preload" && link.getAttribute( "as" ) === "style" && !link.getAttribute( "data-loadcss" ) ){
-				// prevent rerunning on link
-				link.setAttribute( "data-loadcss", true );
-				// bind listeners to toggle media back
-				rp.bindMediaToggle( link );
-			}
-		}
-	};
-
-	// if unsupported, run the polyfill
-	if( !rp.support() ){
-		// run once at least
-		rp.poly();
-
-		// rerun poly on an interval until onload
-		var run = w.setInterval( rp.poly, 500 );
-		if( w.addEventListener ){
-			w.addEventListener( "load", function(){
-				rp.poly();
-				w.clearInterval( run );
-			} );
-		} else if( w.attachEvent ){
-			w.attachEvent( "onload", function(){
-				rp.poly();
-				w.clearInterval( run );
-			} );
-		}
-	}
-
-
-	// commonjs
-	if( typeof exports !== "undefined" ){
-		exports.loadCSS = loadCSS;
-	}
-	else {
-		w.loadCSS = loadCSS;
-	}
-}( typeof global !== "undefined" ? global : this ) );
-</script>
-
-    <link rel="icon" href= "/assets/favicon.ico" />
-    <link rel="preload" href="https://cdn.jsdelivr.net/npm/webfontloader@1.6.28/webfontloader.min.js" as="script" />
-    <link rel="preload" href="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js" as="script" />
-    <link rel="preload" href="/scripts/main.js" as="script" />
-    <link rel="preload" as="font" href="/font/Oswald-Regular.ttf" crossorigin>
-    <link rel="preload" as="font" href="https://at.alicdn.com/t/font_327081_1dta1rlogw17zaor.woff" crossorigin>
-    
-    <!-- fancybox -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.js" defer></script>
-    <!-- 百度统计  -->
-    
-    <script>
-        var _hmt = _hmt || [];
-        (function () {
-        var hm = document.createElement("script");
-        hm.src = "https://hm.baidu.com/hm.js?PV: ${count} :)";
-        var s = document.getElementsByTagName("script")[0];
-        s.parentNode.insertBefore(hm, s);
-        })();
-    </script>
-    
-    <!-- 谷歌统计  -->
+        <link rel="stylesheet" href="/css/post.css">
+        
+            <link rel="stylesheet" href="/css/Prettify/tomorrow-night-eighties.min.css">
+        
     
 </head>
 
-    
-        <body class="post-body">
-    
-    
-<header class="header">
-
-    <div class="read-progress"></div>
-    <div class="header-sidebar-menu">&#xe775;</div>
-    <!-- post页的toggle banner  -->
-    
-    <div class="banner">
-            <div class="blog-title">
-                <a href="/" >Misaki&#39;s Blog</a>
-            </div>
-            <div class="post-title">
-                <a href="#" class="post-name">ELK搭建使用</a>
-            </div>
-    </div>
-    
-    <a class="home-link" href=/>Misaki's Blog</a>
-</header>
-    <div class="wrapper">
-        <div class="site-intro" style="
-
-
-
-
-
-
-
-
-
-height:45vh;
-">
-    
-    <!-- 主页  -->
-    
-    
-    <!-- 404页  -->
-            
-    <div class="site-intro-placeholder"></div>
-    <div class="site-intro-img" style="background-image: url(/intro/post-bg.jpg)"></div>
-    <div class="site-intro-meta">
-        <!-- 标题  -->
-        <h1 class="intro-title">
-            <!-- 主页  -->
-            
-            ELK搭建使用
-            <!-- 404 -->
-            
-        </h1>
-        <!-- 副标题 -->
-        <p class="intro-subtitle">
-            <!-- 主页副标题  -->
-            
-            
-            <!-- 404 -->
-            
-        </p>
-        <!-- 文章页meta -->
-        
-            <div class="post-intros">
-                <!-- 文章页标签  -->
-                
-                    <div class= post-intro-tags >
-    
-        <a class="post-tag" href="javascript:void(0);" data-tags = "web安全">web安全</a>
-    
-</div>
-                
-                
-                    <div class="post-intro-read">
-                        <span>字数统计: <span class="post-count word-count">1.1k</span>阅读时长: <span class="post-count reading-time">4 min</span></span>
-                    </div>
-                
-                <div class="post-intro-meta">
-                    <span class="post-intro-calander iconfont-archer">&#xe676;</span>
-                    <span class="post-intro-time">2018/11/04</span>
+<body class=" sidebar-collapse">
+<nav class="navbar navbar-transparent navbar-color-on-scroll fixed-top navbar-expand-lg" color-on-scroll="100" id="sectionsNav">
+    <div class="container">
+        <div class="navbar-translate">
+            <a class="navbar-brand" href="/">
+                Misaki&#39;s Blog</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="navbar-toggler-icon"></span>
+                <span class="navbar-toggler-icon"></span>
+                <span class="navbar-toggler-icon"></span>
+            </button>
+        </div>
+            <div class="collapse navbar-collapse">
+                <ul class="navbar-nav ml-auto">
                     
-                    <span id="busuanzi_container_page_pv" class="busuanzi-pv">
-                        <span class="iconfont-archer">&#xe602;</span>
-                        <span id="busuanzi_value_page_pv"></span>
-                    </span>
-                    
-                    <span class="shareWrapper">
-                        <span class="iconfont-archer shareIcon">&#xe71d;</span>
-                        <span class="shareText">Share</span>
-                        <ul class="shareList">
-                            <li class="iconfont-archer share-qr" data-type="qr">&#xe75b;
-                                <div class="share-qrcode"></div>
+                        
+                            <li class="nav-item">
+                                <a class="nav-link" href="/archives/">
+                                    archives
+                                </a>
                             </li>
-                            <li class="iconfont-archer" data-type="weibo">&#xe619;</li>
-                            <li class="iconfont-archer" data-type="qzone">&#xe62e;</li>
-                            <li class="iconfont-archer" data-type="twitter">&#xe634;</li>
-                            <li class="iconfont-archer" data-type="facebook">&#xe67a;</li>
-                        </ul>
-                    </span>
-                </div>
+                        
+                            <li class="nav-item">
+                                <a class="nav-link" href="/about/">
+                                    about
+                                </a>
+                            </li>
+                        
+                    
+                    
+                        
+                            <li class="nav-item">
+                                <a class="nav-link" rel="tooltip" title="" data-placement="bottom" href="https://github.com/MisakiKata" target="_blank" data-original-title="See me here">
+                                    <i class="fa fa-github"></i>
+                                </a>
+                            </li>
+                        
+                            <li class="nav-item">
+                                <a class="nav-link" rel="tooltip" title="" data-placement="bottom" href="https://www.t00ls.net/members-profile-12179.html" target="_blank" data-original-title="See me here">
+                                    <i class="fa fa-twitch"></i>
+                                </a>
+                            </li>
+                        
+                    
+                </ul>
             </div>
-        
     </div>
-</div>
-        <script>
- 
-  // get user agent
-  var browser = {
-    versions: function () {
-      var u = window.navigator.userAgent;
-      return {
-        userAgent: u,
-        trident: u.indexOf('Trident') > -1, //IE内核
-        presto: u.indexOf('Presto') > -1, //opera内核
-        webKit: u.indexOf('AppleWebKit') > -1, //苹果、谷歌内核
-        gecko: u.indexOf('Gecko') > -1 && u.indexOf('KHTML') == -1, //火狐内核
-        mobile: !!u.match(/AppleWebKit.*Mobile.*/), //是否为移动终端
-        ios: !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/), //ios终端
-        android: u.indexOf('Android') > -1 || u.indexOf('Linux') > -1, //android终端或者uc浏览器
-        iPhone: u.indexOf('iPhone') > -1 || u.indexOf('Mac') > -1, //是否为iPhone或者安卓QQ浏览器
-        iPad: u.indexOf('iPad') > -1, //是否为iPad
-        webApp: u.indexOf('Safari') == -1, //是否为web应用程序，没有头部与底部
-        weixin: u.indexOf('MicroMessenger') == -1, //是否为微信浏览器
-        uc: u.indexOf('UCBrowser') > -1 //是否为android下的UC浏览器
-      };
-    }()
-  }
-  console.log("userAgent:" + browser.versions.userAgent);
+</nav>
+    
+  <div class="page-header header-filter" data-parallax="true" style="background-image: url('/img/post-banner.jpg'); height: 70vh;">
+    
+      <div class="container">
+        <h1 class="title text-center post_title">ELK搭建使用</h1>
+        <p class="text-center"><b>Sunday, November 4th 2018, 5:05 pm</b></p>
+      </div>
+    
+  </div>
 
-  // callback
-  function fontLoaded() {
-    console.log('font loaded');
-    if (document.getElementsByClassName('site-intro-meta')) {
-      document.getElementsByClassName('intro-title')[0].classList.add('intro-fade-in');
-      document.getElementsByClassName('intro-subtitle')[0].classList.add('intro-fade-in');
-      var postIntros = document.getElementsByClassName('post-intros')[0]
-      if (postIntros) {
-        postIntros.classList.add('post-fade-in');
-      }
-    }
-  }
-
-  // UC不支持跨域，所以直接显示
-  function asyncCb(){
-    if (browser.versions.uc) {
-      console.log("UCBrowser");
-      fontLoaded();
-    } else {
-      WebFont.load({
-        custom: {
-          families: ['Oswald-Regular']
-        },
-        loading: function () {  //所有字体开始加载
-          // console.log('loading');
-        },
-        active: function () {  //所有字体已渲染
-          fontLoaded();
-        },
-        inactive: function () { //字体预加载失败，无效字体或浏览器不支持加载
-          console.log('inactive: timeout');
-          fontLoaded();
-        },
-        timeout: 5000 // Set the timeout to two seconds
-      });
-    }
-  }
-
-  function asyncErr(){
-    console.warn('script load from CDN failed, will load local script')
-  }
-
-  // load webfont-loader async, and add callback function
-  function async(u, cb, err) {
-    var d = document, t = 'script',
-      o = d.createElement(t),
-      s = d.getElementsByTagName(t)[0];
-    o.src = u;
-    if (cb) { o.addEventListener('load', function (e) { cb(null, e); }, false); }
-    if (err) { o.addEventListener('error', function (e) { err(null, e); }, false); }
-    s.parentNode.insertBefore(o, s);
-  }
-
-  var asyncLoadWithFallBack = function(arr, success, reject) {
-      var currReject = function(){
-        reject()
-        arr.shift()
-        if(arr.length)
-          async(arr[0], success, currReject)
-        }
-
-      async(arr[0], success, currReject)
-  }
-
-  asyncLoadWithFallBack([
-    "https://cdn.jsdelivr.net/npm/webfontloader@1.6.28/webfontloader.min.js", 
-    "https://cdn.bootcss.com/webfont/1.6.28/webfontloader.js",
-    "/lib/webfontloader.min.js"
-  ], asyncCb, asyncErr)
-</script>        
-        <img class="loading" src="/assets/loading.svg" style="display: block; margin: 6rem auto 0 auto; width: 6rem; height: 6rem;" />
-        <div class="container container-unloaded">
-            <main class="main post-page">
-    <article class="article-entry">
-        <h3 id="ELK日志分析系统搭建使用"><a href="#ELK日志分析系统搭建使用" class="headerlink" title="ELK日志分析系统搭建使用"></a>ELK日志分析系统搭建使用</h3><p>ELK是三个开源软件的缩写，分别表示：Elasticsearch , Logstash, Kibana , 它们都是开源软件。但现在新增了一个FileBeat，它是一个轻量级的日志收集处理工具(Agent)，Filebeat占用资源少，适合于在各个服务器上搜集日志后传输给Logstash，但此次并不添加filebeat，仍然以es、logstash、kibana做搭建使用。</p>
+  
+  
+  
+    <div class="row" style="margin: 0 0 0; z-index: 999;">
+  <div class="col-md-8 offset-md-1">
+    <div class="main main-raised">
+      <div class="container">
+        <div class="section">
+          <div class="post_content">
+              <h3 id="ELK日志分析系统搭建使用"><a href="#ELK日志分析系统搭建使用" class="headerlink" title="ELK日志分析系统搭建使用"></a>ELK日志分析系统搭建使用</h3><p>ELK是三个开源软件的缩写，分别表示：Elasticsearch , Logstash, Kibana , 它们都是开源软件。但现在新增了一个FileBeat，它是一个轻量级的日志收集处理工具(Agent)，Filebeat占用资源少，适合于在各个服务器上搜集日志后传输给Logstash，但此次并不添加filebeat，仍然以es、logstash、kibana做搭建使用。</p>
 <p>使用环境：centos6.5  192.168.253.138作为日志来源服务器   apache</p>
 <p>​           centos7    192.168.253.139  作为显示终端服务器</p>
 <h4 id="安装jdk"><a href="#安装jdk" class="headerlink" title="安装jdk"></a>安装jdk</h4><p>首先安装Java，版本1.8以上。</p>
 <h4 id="安装Elasticsearch"><a href="#安装Elasticsearch" class="headerlink" title="安装Elasticsearch"></a>安装Elasticsearch</h4><p>下载elasticsearch ，</p>
 <p>wget  <a href="https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-6.4.2.tar.gz" target="_blank" rel="noopener">https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-6.4.2.tar.gz</a></p>
 <p>修改解压文件中的config/elasticsearch.yml 文件</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"># 这里指定的是集群名称，需要修改为对应的，开启了自发现功能后，ES会按照此集群名称进行集群发现</span><br><span class="line"></span><br><span class="line">cluster.name: es_cluster</span><br><span class="line">node.name: es_cluster_1 </span><br><span class="line"></span><br><span class="line"># 数据目录</span><br><span class="line"></span><br><span class="line">path.data: /data/data</span><br><span class="line"></span><br><span class="line"># log 目录</span><br><span class="line"></span><br><span class="line">path.logs: /data/logs</span><br><span class="line"></span><br><span class="line"># 修改一下ES的监听地址，这样别的机器也可以访问</span><br><span class="line"></span><br><span class="line">network.host: 192.168.253.139</span><br><span class="line"></span><br><span class="line"># 默认的端口号</span><br><span class="line"></span><br><span class="line">http.port: 9200</span><br><span class="line">discovery.zen.ping.unicast.hosts: [&quot;192.168.253.138&quot;, &quot;192.168.253.139&quot;]</span><br></pre></td></tr></table></figure>
-<p>在使用中可能会因为系统内存等问题导致启动失败，所以可以预调整系统参数。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">设置内核参数</span><br><span class="line"></span><br><span class="line">vi /etc/sysctl.conf</span><br><span class="line"># 增加以下参数</span><br><span class="line">vm.max_map_count=655360</span><br><span class="line">执行以下命令，确保生效配置生效：</span><br><span class="line"></span><br><span class="line">sysctl -p</span><br><span class="line">设置资源参数</span><br><span class="line"></span><br><span class="line">vi /etc/security/limits.conf</span><br><span class="line"># 修改</span><br><span class="line">* soft nofile 65536</span><br><span class="line">* hard nofile 131072</span><br><span class="line">* soft nproc 65536</span><br><span class="line">* hard nproc 131072</span><br><span class="line">设置用户资源参数</span><br><span class="line"></span><br><span class="line">vi /etc/security/limits.d/20-nproc.conf</span><br><span class="line"># 设置elk用户参数</span><br><span class="line">elk    soft    nproc     65536</span><br></pre></td></tr></table></figure>
-<p>启动elk需要非root用户，所以创建elk用户。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">useradd elk         #创建用户elk</span><br><span class="line">groupadd elk        #创建组elk</span><br><span class="line">useradd elk -g elk  #将用户添加到组</span><br><span class="line"></span><br><span class="line">mkdir  -pv  /data/&#123;data,logs&#125; # 创建数据和日志目录</span><br><span class="line"></span><br><span class="line"># 修改文件所有者</span><br><span class="line">chown -R elk:elk /data/</span><br><span class="line">chown -R elk:elk /etc/elasticsearch/</span><br></pre></td></tr></table></figure>
-<p>切换到elk用户，启动服务</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">启动文件  /etc/elasticsearch/bin/elasticsearch</span><br><span class="line">服务器要关闭防火墙</span><br><span class="line">systemctl stop firewalld.service</span><br></pre></td></tr></table></figure>
-<p>这时候可以看到log输出，节点正常启动.</p>
+<pre><code># 这里指定的是集群名称，需要修改为对应的，开启了自发现功能后，ES会按照此集群名称进行集群发现
+
+cluster.name: es_cluster
+node.name: es_cluster_1 
+
+# 数据目录
+
+path.data: /data/data
+
+# log 目录
+
+path.logs: /data/logs
+
+# 修改一下ES的监听地址，这样别的机器也可以访问
+
+network.host: 192.168.253.139
+
+# 默认的端口号
+
+http.port: 9200
+discovery.zen.ping.unicast.hosts: [&quot;192.168.253.138&quot;, &quot;192.168.253.139&quot;]
+</code></pre><p>在使用中可能会因为系统内存等问题导致启动失败，所以可以预调整系统参数。</p>
+<pre><code>设置内核参数
+
+vi /etc/sysctl.conf
+# 增加以下参数
+vm.max_map_count=655360
+执行以下命令，确保生效配置生效：
+
+sysctl -p
+设置资源参数
+
+vi /etc/security/limits.conf
+# 修改
+* soft nofile 65536
+* hard nofile 131072
+* soft nproc 65536
+* hard nproc 131072
+设置用户资源参数
+
+vi /etc/security/limits.d/20-nproc.conf
+# 设置elk用户参数
+elk    soft    nproc     65536
+</code></pre><p>启动elk需要非root用户，所以创建elk用户。</p>
+<pre><code>useradd elk         #创建用户elk
+groupadd elk        #创建组elk
+useradd elk -g elk  #将用户添加到组
+
+mkdir  -pv  /data/{data,logs} # 创建数据和日志目录
+
+# 修改文件所有者
+chown -R elk:elk /data/
+chown -R elk:elk /etc/elasticsearch/
+</code></pre><p>切换到elk用户，启动服务</p>
+<pre><code>启动文件  /etc/elasticsearch/bin/elasticsearch
+服务器要关闭防火墙
+systemctl stop firewalld.service
+</code></pre><p>这时候可以看到log输出，节点正常启动.</p>
 <p><img src="\2018\11\ELK搭建使用\1540283021102.png" alt="1540283021102"></p>
 <p>用浏览器访问，同时可以正常使用</p>
 <p><img src="\2018\11\ELK搭建使用\1540283045137.png" alt="1540283045137"></p>
 <h4 id="安装Logstash"><a href="#安装Logstash" class="headerlink" title="安装Logstash"></a>安装Logstash</h4><p>下载解压</p>
 <p>wget  <a href="https://artifacts.elastic.co/downloads/logstash/logstash-6.4.2.tar.gz" target="_blank" rel="noopener">https://artifacts.elastic.co/downloads/logstash/logstash-6.4.2.tar.gz</a></p>
 <p>在解压后目录执行</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/usr/share/logstash/bin/logstash -e &apos;input &#123; stdin &#123; &#125; &#125; output &#123; stdout &#123;&#125; &#125;&apos;</span><br></pre></td></tr></table></figure>
-<p>在命令行输入什么内容讲原样输出，比如：</p>
+<pre><code>/usr/share/logstash/bin/logstash -e &#39;input { stdin { } } output { stdout {} }&#39;
+</code></pre><p>在命令行输入什么内容讲原样输出，比如：</p>
 <p><img src="\2018\11\ELK搭建使用\1540283339125.png" alt="1540283339125"></p>
 <p>显示正常以后再去修改配置文件，需要自己添加，创建如下内容文件。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">cat logstash-simple.conf</span><br><span class="line"></span><br><span class="line">input&#123;</span><br><span class="line">    file &#123;</span><br><span class="line">          path =&gt; &quot;/var/log/httpd/*&quot;</span><br><span class="line">          start_position =&gt; beginning</span><br><span class="line">     &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">output &#123;</span><br><span class="line">    stdout &#123; codec=&gt; rubydebug &#125;</span><br><span class="line">    elasticsearch &#123;</span><br><span class="line">          hosts =&gt; &quot;192.168.253.132:9200&quot;</span><br><span class="line">          protocol =&gt; &quot;http&quot;</span><br><span class="line">          index  =&gt; &quot;logstash-%&#123;+YYYY-MM&#125;&quot;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>开启服务，执行如下命令：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/usr/share/logstash/bin/logstash  -f /usr/share/logstash/config/logstash-simple.conf</span><br></pre></td></tr></table></figure>
-<p>我们可以查看 ES 是否接收到了数据：</p>
+<pre><code>cat logstash-simple.conf
+
+input{
+    file {
+          path =&gt; &quot;/var/log/httpd/*&quot;
+          start_position =&gt; beginning
+     }
+}
+
+output {
+    stdout { codec=&gt; rubydebug }
+    elasticsearch {
+          hosts =&gt; &quot;192.168.253.132:9200&quot;
+          protocol =&gt; &quot;http&quot;
+          index  =&gt; &quot;logstash-%{+YYYY-MM}&quot;
+    }
+}
+</code></pre><p>开启服务，执行如下命令：</p>
+<pre><code>/usr/share/logstash/bin/logstash  -f /usr/share/logstash/config/logstash-simple.conf 
+</code></pre><p>我们可以查看 ES 是否接收到了数据：</p>
 <p><img src="\2018\11\ELK搭建使用\1541323006347.png" alt="1541323006347"></p>
 <h4 id="Kibana的安装"><a href="#Kibana的安装" class="headerlink" title="Kibana的安装"></a>Kibana的安装</h4><p>wget <a href="https://artifacts.elastic.co/downloads/kibana/kibana-6.4.2-linux-x86_64.tar.gz" target="_blank" rel="noopener">https://artifacts.elastic.co/downloads/kibana/kibana-6.4.2-linux-x86_64.tar.gz</a></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">编辑kibana.yml配置文件</span><br><span class="line">vi /usr/share/kibana/config/kibana.yml </span><br><span class="line"></span><br><span class="line">修改以下参数：</span><br><span class="line">server.port: 5601           #开启默认端口5601，本文修改默认端口为5602</span><br><span class="line">server.host: “192.168.253.139”   #站点地址</span><br><span class="line">elasticsearch.url: http://192.168.253.139:9200   #指向elasticsearch服务的ip地址</span><br><span class="line">kibana.index: “.kibana”</span><br></pre></td></tr></table></figure>
-<p>启动</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">执行以下命令启动：</span><br><span class="line">/usr/share/kibana/bin/kibana</span><br></pre></td></tr></table></figure>
-<p>测试浏览器访问</p>
+<pre><code>编辑kibana.yml配置文件
+vi /usr/share/kibana/config/kibana.yml 
+
+修改以下参数：
+server.port: 5601           #开启默认端口5601，本文修改默认端口为5602
+server.host: “192.168.253.139”   #站点地址
+elasticsearch.url: http://192.168.253.139:9200   #指向elasticsearch服务的ip地址
+kibana.index: “.kibana”
+</code></pre><p>启动</p>
+<pre><code>执行以下命令启动：
+/usr/share/kibana/bin/kibana
+</code></pre><p>测试浏览器访问</p>
 <p>访问：<a href="http://192.168.253.139:5602" target="_blank" rel="noopener">http://192.168.253.139:5602</a></p>
 <p><img src="\2018\11\ELK搭建使用\1541323089099.png" alt="1541323089099"></p>
 <p>正常启动后，需要配置索引，设置logstash-* ，添加索引和Available fields后，点击Discover就可以看到logstash传输过来的日志信息。</p>
 <p><img src="\2018\11\ELK搭建使用\1541323158320.png" alt="1541323158320"></p>
 <p>然后可以手动添加fields参数或者创建图表。</p>
 <h4 id="yum-安装"><a href="#yum-安装" class="headerlink" title="yum 安装"></a>yum 安装</h4><p>以上安装方式为下载配置安装，可以使用yum安装。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"># 导入私钥</span><br><span class="line">rpm --import https://artifacts.elastic.co/GPG-KEY-elasticsearch</span><br><span class="line"></span><br><span class="line"># 添加yum源</span><br><span class="line">vim /etc/yum.repos.d/es.repo</span><br></pre></td></tr></table></figure>
-<p>yum源内容：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">[elasticsearch-6.x]</span><br><span class="line">name=Elasticsearch repository for 6.x packages</span><br><span class="line">baseurl=https://artifacts.elastic.co/packages/6.x/yum</span><br><span class="line">gpgcheck=1</span><br><span class="line">gpgkey=https://artifacts.elastic.co/GPG-KEY-elasticsearch</span><br><span class="line">enabled=1</span><br><span class="line">autorefresh=1</span><br><span class="line">type=rpm-md</span><br></pre></td></tr></table></figure>
-<p>执行安装：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"># 安装java + ELK</span><br><span class="line">yum install java-1.8.0-openjdk.x86_64 elasticsearch.noarch kibana.x86_64 logstash.noarch -y</span><br><span class="line"></span><br><span class="line"># 修改配置文件</span><br><span class="line">vi /etc/logstash/logstash.yml</span><br><span class="line">vi /etc/elasticsearch/elasticsearch.yml</span><br><span class="line">vi /etc/kibana/kibana.yml</span><br><span class="line"></span><br><span class="line"># 启动服务</span><br><span class="line">systemctl start logstash.service elasticsearch.service kibana.service</span><br></pre></td></tr></table></figure>
-<p>配置文件和上文相同修改，如若无法访问，关闭防火墙 。</p>
+<pre><code># 导入私钥
+rpm --import https://artifacts.elastic.co/GPG-KEY-elasticsearch
+
+# 添加yum源
+vim /etc/yum.repos.d/es.repo
+</code></pre><p>yum源内容：</p>
+<pre><code>[elasticsearch-6.x]
+name=Elasticsearch repository for 6.x packages
+baseurl=https://artifacts.elastic.co/packages/6.x/yum
+gpgcheck=1
+gpgkey=https://artifacts.elastic.co/GPG-KEY-elasticsearch
+enabled=1
+autorefresh=1
+type=rpm-md
+</code></pre><p>执行安装：</p>
+<pre><code># 安装java + ELK
+yum install java-1.8.0-openjdk.x86_64 elasticsearch.noarch kibana.x86_64 logstash.noarch -y
+
+# 修改配置文件
+vi /etc/logstash/logstash.yml
+vi /etc/elasticsearch/elasticsearch.yml
+vi /etc/kibana/kibana.yml
+
+# 启动服务
+systemctl start logstash.service elasticsearch.service kibana.service
+</code></pre><p>配置文件和上文相同修改，如若无法访问，关闭防火墙 。</p>
 <p>参考链接：</p>
 <p><a href="https://blog.csdn.net/KingBoyWorld/article/details/78555120" target="_blank" rel="noopener">https://blog.csdn.net/KingBoyWorld/article/details/78555120</a></p>
 <p><a href="https://www.cnblogs.com/yuhuLin/p/7018858.html" target="_blank" rel="noopener">https://www.cnblogs.com/yuhuLin/p/7018858.html</a></p>
 <p><a href="https://www.elastic.co/products" target="_blank" rel="noopener">https://www.elastic.co/products</a></p>
 
-    </article>
-    <!-- license  -->
-    
-        <div class="license-wrapper">
-            <p>原文作者：<a href="">Misaki</a>
-            <p>原文链接：<a href="/2018/11/ELK搭建使用/">/2018/11/ELK搭建使用/</a>
-            <p>发表日期：<a href="/2018/11/ELK搭建使用/">November 4th 2018, 5:05:12 pm</a>
-            <p>更新日期：<a href="/2018/11/ELK搭建使用/">November 4th 2018, 5:34:33 pm</a>
-            <p>版权声明：本文采用<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">知识共享署名-非商业性使用 4.0 国际许可协议</a>进行许可</p>
+          </div>
+          <br><br>
+          <div>
+              <p>
+                       
+                      <span class="badge badge-default">#&nbsp;web安全</span>
+                      &nbsp;
+                      
+              </p>
+          </div>
         </div>
-    
-    <!-- paginator  -->
-    <ul class="post-paginator">
-        <li class="next">
-            
-                <div class="nextSlogan">Next Post</div>
-                <a href= "/2019/01/Android-逆向Smali语言初识/" title= "Android 逆向Smali语言初识">
-                    <div class="nextTitle">Android 逆向Smali语言初识</div>
-                </a>
-            
-        </li>
-        <li class="previous">
-            
-                <div class="prevSlogan">Previous Post</div>
-                <a href= "/2018/10/Apache中ModSecurity安装配置/" title= "Apache中ModSecurity安装配置">
-                    <div class="prevTitle">Apache中ModSecurity安装配置</div>
-                </a>
-            
-        </li>
-    </ul>
-    <!-- 评论插件 -->
-    <!-- 来必力City版安装代码 -->
-
-<!-- City版安装代码已完成 -->
-    
-    
-    <!-- partial('_partial/comment/changyan') -->
-    <!--PC版-->
-
-
-    
-    
-
-    <!-- 评论 -->
-</main>
-            <!-- profile -->
-            
-        </div>
-        <footer class="footer footer-unloaded">
-    <!-- social  -->
-    
-    <div class="social">
-        
-    
-        
-    
-        
-            
-                <a href="https://github.com/MisakiKata" class="iconfont-archer github" target="_blank" title=github></a>
-            
-        
-    
-        
-    
-        
-    
-        
-    
-        
-    
-        
-    
-        
-    
-        
-    
-        
-    
-        
-    
-        
-            
-                <a href="http://www.stackoverflow.com/" class="iconfont-archer stack-overflow" target="_blank" title=stack-overflow></a>
-            
-        
-    
-        
-    
-        
-    
-        
-    
-        
-    
-        
-    
-        
-    
-        
-            
-                <a href="https://www.t00ls.net/members-profile-12179.html" class="iconfont-archer others" target="_blank" title=others></a>
-            
-        
-    
-        
-    
-
-    </div>
-    
-    <!-- 不蒜子  -->
-    
-    <div class="busuanzi-container">
-    
-     
-    <span id="busuanzi_container_site_pv">PV: <span id="busuanzi_value_site_pv"></span> :)</span>
-    
-    </div>
-    
-</footer>
-    </div>
-    <!-- toc -->
-    
-    <div class="toc-wrapper" style=
-    
-
-
-
-
-
-
-
-
-
-top:45vh;
-
-    >
-        <div class="toc-catalog">
-            <span class="iconfont-archer catalog-icon">&#xe613;</span><span>CATALOG</span>
-        </div>
-        <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#ELK日志分析系统搭建使用"><span class="toc-number">1.</span> <span class="toc-text">ELK日志分析系统搭建使用</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#安装jdk"><span class="toc-number">1.1.</span> <span class="toc-text">安装jdk</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#安装Elasticsearch"><span class="toc-number">1.2.</span> <span class="toc-text">安装Elasticsearch</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#安装Logstash"><span class="toc-number">1.3.</span> <span class="toc-text">安装Logstash</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Kibana的安装"><span class="toc-number">1.4.</span> <span class="toc-text">Kibana的安装</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#yum-安装"><span class="toc-number">1.5.</span> <span class="toc-text">yum 安装</span></a></li></ol></li></ol>
-    </div>
-    
-    <div class="back-top iconfont-archer">&#xe639;</div>
-    <div class="sidebar sidebar-hide">
-    <ul class="sidebar-tabs sidebar-tabs-active-0">
-        <li class="sidebar-tab-archives"><span class="iconfont-archer">&#xe67d;</span><span class="tab-name">Archive</span></li>
-        <li class="sidebar-tab-tags"><span class="iconfont-archer">&#xe61b;</span><span class="tab-name">Tag</span></li>
-        <li class="sidebar-tab-categories"><span class="iconfont-archer">&#xe666;</span><span class="tab-name">Cate</span></li>
-    </ul>
-    <div class="sidebar-content sidebar-content-show-archive">
-          <div class="sidebar-panel-archives">
-    <!-- 在ejs中将archive按照时间排序 -->
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    <div class="total-and-search">
-        <div class="total-archive">
-        Total : 14
-        </div>
-        <!-- search  -->
-        
-    </div>
-    
-    <div class="post-archive">
-    
-    
-    
-    
-    <div class="archive-year"> 2019 </div>
-    <ul class="year-list">
-    
-    
-        <li class="archive-post-item">
-            <span class="archive-post-date">01/28</span><a class="archive-post-title" href= "/2019/01/Android逆向逻辑修改入门/" >Android逆向逻辑修改入门</a>
-        </li>
-    
-    
-        <li class="archive-post-item">
-            <span class="archive-post-date">01/22</span><a class="archive-post-title" href= "/2019/01/Android-逆向Smali语言初识/" >Android 逆向Smali语言初识</a>
-        </li>
-    
-    
-    
-    
-    
-        </ul>
-    
-    <div class="archive-year"> 2018 </div>
-    <ul class="year-list">
-    
-    
-        <li class="archive-post-item">
-            <span class="archive-post-date">11/04</span><a class="archive-post-title" href= "/2018/11/ELK搭建使用/" >ELK搭建使用</a>
-        </li>
-    
-    
-        <li class="archive-post-item">
-            <span class="archive-post-date">10/22</span><a class="archive-post-title" href= "/2018/10/Apache中ModSecurity安装配置/" >Apache中ModSecurity安装配置</a>
-        </li>
-    
-    
-        <li class="archive-post-item">
-            <span class="archive-post-date">10/09</span><a class="archive-post-title" href= "/2018/10/Apache和Nginx安全配置/" >Apache和Nginx安全配置</a>
-        </li>
-    
-    
-        <li class="archive-post-item">
-            <span class="archive-post-date">10/05</span><a class="archive-post-title" href= "/2018/10/XSS-GAME记录/" >XSS GAME记录</a>
-        </li>
-    
-    
-        <li class="archive-post-item">
-            <span class="archive-post-date">09/28</span><a class="archive-post-title" href= "/2018/09/批量获取数据库权限/" >批量获取数据库权限</a>
-        </li>
-    
-    
-        <li class="archive-post-item">
-            <span class="archive-post-date">09/27</span><a class="archive-post-title" href= "/2018/09/基于scrapy的备份文件扫描/" >基于scrapy的备份文件扫描</a>
-        </li>
-    
-    
-        <li class="archive-post-item">
-            <span class="archive-post-date">09/25</span><a class="archive-post-title" href= "/2018/09/使用docker创建镜像/" >使用docker创建镜像</a>
-        </li>
-    
-    
-        <li class="archive-post-item">
-            <span class="archive-post-date">09/20</span><a class="archive-post-title" href= "/2018/09/关于Thefatrat免杀使用/" >关于Thefatrat免杀使用</a>
-        </li>
-    
-    
-        <li class="archive-post-item">
-            <span class="archive-post-date">09/18</span><a class="archive-post-title" href= "/2018/09/表达式注入/" >表达式注入</a>
-        </li>
-    
-    
-        <li class="archive-post-item">
-            <span class="archive-post-date">09/18</span><a class="archive-post-title" href= "/2018/09/zoomeye接口实现/" >zoomeye接口实现</a>
-        </li>
-    
-    
-        <li class="archive-post-item">
-            <span class="archive-post-date">09/18</span><a class="archive-post-title" href= "/2018/09/对意外发现的某站点测试/" >对意外发现的某站点测试</a>
-        </li>
-    
-    
-        <li class="archive-post-item">
-            <span class="archive-post-date">09/18</span><a class="archive-post-title" href= "/2018/09/新的开始！/" >新的开始！</a>
-        </li>
-    
+      </div>  
     </div>
   </div>
-        <div class="sidebar-panel-tags">
-    <div class="sidebar-tags-name">
-    
-        <span class="sidebar-tag-name" data-tags="移动安全"><span class="iconfont-archer">&#xe606;</span>移动安全</span>
-    
-        <span class="sidebar-tag-name" data-tags="web安全"><span class="iconfont-archer">&#xe606;</span>web安全</span>
-    
-        <span class="sidebar-tag-name" data-tags="python"><span class="iconfont-archer">&#xe606;</span>python</span>
-    
-        <span class="sidebar-tag-name" data-tags="渗透测试"><span class="iconfont-archer">&#xe606;</span>渗透测试</span>
-    
-    </div>
-    <div class="iconfont-archer sidebar-tags-empty">&#xe678;</div>
-    <div class="tag-load-fail" style="display: none; color: #ccc; font-size: 0.6rem;">
-    缺失模块。<br/>
-    1、请确保node版本大于6.2<br/>
-    2、在博客根目录（注意不是archer根目录）执行以下命令：<br/>
-    <span style="color: #f75357; font-size: 1rem; line-height: 2rem;">npm i hexo-generator-json-content --save</span><br/>
-    3、在根目录_config.yml里添加配置：
-    <pre style="color: #787878; font-size: 0.6rem;">
-jsonContent:
-  meta: false
-  pages: false
-  posts:
-    title: true
-    date: true
-    path: true
-    text: false
-    raw: false
-    content: false
-    slug: false
-    updated: false
-    comments: false
-    link: false
-    permalink: false
-    excerpt: false
-    categories: true
-    tags: true</pre>
-    </div> 
-    <div class="sidebar-tags-list"></div>
+  <!-- TOC -->
+  
+      <div class="">
+        <div id="toc">
+          <p class="toc-title"><i class="material-icons" style="vertical-align:middle">toc</i>Toc:</p> 
+          <div id="tocbot"></div>
+        </div>
+      </div>
+  
 </div>
-        <div class="sidebar-panel-categories">
-    <div class="sidebar-categories-name">
+
+
+<!-- Comments -->
+<div class="row">
+    <div class="col-md-8 offset-md-2">
     
-    </div>
-    <div class="iconfont-archer sidebar-categories-empty">&#xe678;</div>
-    <div class="sidebar-categories-list"></div>
-</div>
-    </div>
-</div> 
-    <script>
-    var siteMeta = {
-        root: "/",
-        author: "Misaki"
-    }
-</script>
-    <!-- CDN failover -->
-    <script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js"></script>
-    <script type="text/javascript">
-        if (typeof window.$ === 'undefined')
-        {
-            console.warn('jquery load from jsdelivr failed, will load local script')
-            document.write('<script src="/lib/jquery.min.js">\x3C/script>')
-        }
+        
+            <div class="disqus" style="width:100%">
+    <div id="disqus_thread"></div>
+    <script>               
+        var disqus_shortname = '';
+        var disqus_config = function () {
+            this.page.url = '/2018/11/ELK搭建使用/'; 
+            this.page.identifier = '/2018/11/ELK搭建使用/';
+        };
+        (function() { 
+            var d = document, s = d.createElement('script');
+            s.type = 'text/javascript';
+            s.src = '//'+disqus_shortname+'.disqus.com/embed.js';
+            s.setAttribute('data-timestamp', +new Date());
+            (d.head || d.body).appendChild(s);
+        })();
     </script>
-    <script src="/scripts/main.js"></script>
-    <!-- algolia -->
-    
-    <!-- busuanzi  -->
-    
-    <script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
-    
-    <!-- CNZZ  -->
+    <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>                                
+</div>
+        
     
     </div>
-    <!-- async load share.js -->
-    
-        <script src="/scripts/share.js" async></script>    
-     
-    </body>
+</div>
+  
+
+<footer class="footer footer-default">
+        <div class="container">
+          <div class="float-left" style="padding: 15px 0;">
+              <b>不努力一下，怎么知道自己比别人差呢？</b>
+          </div>
+          <!--<div class="copyright float-right">
+            &copy;
+            <script>
+              document.write(new Date().getFullYear())
+            </script>&nbsp;<a href="https://hexo.io/zh-cn/" target="_blank">HEXO</a>&nbsp;<i class="material-icons">favorite_border</i>
+            <a href="https://github.com/invom/Material-T" target="_blank">Material-T</a>
+          </div>--!>
+        </div>
+</footer>
+      <!--   Core JS Files   -->
+      <script src="/js/core/jquery.min.js?v=3.2.1"></script>
+      <script src="/js/main.js"></script>
+      <script src="/js/core/popper.min.js"></script>
+      <script src="/js/core/bootstrap-material-design.min.js"></script>
+      <script src="/js/plugins/moment.min.js"></script>
+      <!-- Control Center for Material Kit: parallax effects, scripts for the example pages etc -->
+      <script src="/js/material-kit.min.js?v=2.0.5"></script>
+      
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.4.2/tocbot.min.js"></script>
+        <script src="/js/post.js"></script>
+        <script src="/js/plugins/prettify.js"></script>
+        <script>
+            $(document).ready(function(){
+                $('pre').addClass('prettyprint linenums');
+                prettyPrint();
+            })
+        </script>
+      
+</body>
 </html>
-
-

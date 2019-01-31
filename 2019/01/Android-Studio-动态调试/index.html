@@ -19,7 +19,7 @@
     <meta name="description" content="One way to choose one">
     <meta name="author" content="Misaki">
     <meta name="keywords" content="">
-    <title>Android逆向逻辑修改入门 ~ Misaki&#39;s Blog</title>
+    <title>Android Studio 动态调试 ~ Misaki&#39;s Blog</title>
     <link rel="stylesheet" href="/css/Material_Icons.css">
     <!-- <link rel="stylesheet" href="/css/font-awesome.css"> -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css">
@@ -85,8 +85,8 @@
   <div class="page-header header-filter" data-parallax="true" style="background-image: url('/img/post-banner.jpg'); height: 70vh;">
     
       <div class="container">
-        <h1 class="title text-center post_title">Android逆向逻辑修改入门</h1>
-        <p class="text-center"><b>Monday, January 28th 2019, 4:28 pm</b></p>
+        <h1 class="title text-center post_title">Android Studio 动态调试</h1>
+        <p class="text-center"><b>Tuesday, January 29th 2019, 4:47 pm</b></p>
       </div>
     
   </div>
@@ -100,83 +100,29 @@
       <div class="container">
         <div class="section">
           <div class="post_content">
-              <h3 id="Android-逻辑判断修改"><a href="#Android-逻辑判断修改" class="headerlink" title="Android 逻辑判断修改"></a>Android 逻辑判断修改</h3><p>使用AS创建一个工程，利用生成工程的初始代码来做。</p>
-<p>创建新的layout，在mainactivity中添加新的layout标识。在显示界面的时候加一个判断逻辑，完成后类似如下</p>
-<pre><code>if(a==1) {
-            setContentView(R.layout.activity_main);
-        }
-        else
-            setContentView(R.layout.activity_main2);
-    }
-</code></pre><p>于是乎，当a为1的时候显示activity_main界面字段。不为1显示activity_main2字段。</p>
-<p>一般情况下，对于有些需要内购，或者某些情况才给你显示的界面的时候，界面不是从后端返回而是返回json参数由前端接收显示的时候，可以从前端修改逻辑来绕过判断。</p>
-<p>生成smali代码，其中主要部分为下：</p>
-<pre><code>.method protected onCreate(Landroid/os/Bundle;)V
-    .registers 4
-    .param p1, &quot;savedInstanceState&quot;    # Landroid/os/Bundle;
+              <h3 id="Android-Studio-动态调试"><a href="#Android-Studio-动态调试" class="headerlink" title="Android Studio 动态调试"></a>Android Studio 动态调试</h3><p>调试仍然使用我们喜闻乐见的Android Studio，不过使用的是AS3，AS在3.0版本后便不在使用DDMS，调试smali上有点不适应，不过我们仍然可以在配置SDK后，在命令行输入“monitor”来打开DDMS。</p>
+<p>apk使用我们自己生成的一个简单的登陆判断界面来做测试。</p>
+<p>使用网上的一段登陆代码如下</p>
+<p><img src="\2019\01\Android-Studio-动态调试\1548750208555.png" alt="1548750208555"></p>
+<p>生成APK后，利用AK反编译为smali代码。</p>
+<p><img src="\2019\01\Android-Studio-动态调试\1548750320824.png" alt="1548750320824"></p>
+<p>然后用AS打开反编译后的文件夹，当然在利用AS调试smali的时候，需要安装ideasmali插件，具体可以百度插件名即可下载。</p>
+<p>调试的时候需要我们进行端口的转发，可以先用DDMS查看一下端口是否是8700（一般默认为8700），因为启动AS后会占有相应的端口，导致无法打开DDMS。</p>
+<p>具体使用方式为：打开DDMS。在CMD命令行输入以下内容，其中package为包名。MainActivity是需要调试的activity名，具体看情况修改。</p>
+<pre><code>adb shell am start -D -n package/.MainActivity
+</code></pre><p>可以看到手机端或者模拟器端已经以调试的方式启动我们相应的程序了。在DDMS中就可以看到一只红色的小蜘蛛了。后面有一个端口默认应该是8700。然后查看进程PID，假设为1980。</p>
+<pre><code>adb forward tcp:8700 jdwp:1980
+</code></pre><p>进行端口转发到。转发的时候要先关闭DDMS，不然显示端口被占用。</p>
+<p>在使用AS打开我们需要的文件后，如以下内容。</p>
+<p><img src="\2019\01\Android-Studio-动态调试\1548750452683.png" alt="1548750452683"></p>
+<p>配置远程调试参数，修改端口为8700.</p>
+<p><img src="\2019\01\Android-Studio-动态调试\1548750876061.png" alt="1548750876061"></p>
+<p>然后在需要的地方设置断点，此处在账户密码的判断处下断点。启动调试，然后就可以看到界面显示到我们断点前的地方了。在模拟器上输入账号密码后，就可以看到断点被执行。</p>
+<p><img src="\2019\01\Android-Studio-动态调试\1548751037753.png" alt="1548751037753"></p>
+<p>可以看到下面两部分第一部分为为v0赋值为admin，调用String类的equals方法来判断v0参数和p1对象值是否相同，并把结果赋值给v0，一个布尔值。第二部分，判断v0是否为0，等于0跳转到:cond_0处。不等于0则继续，同样为v0赋值一个字符串为12345，调用方法判断是否相同，以下则和上面基本一致。</p>
+<p><img src="\2019\01\Android-Studio-动态调试\1548751160949.png" alt="1548751160949"></p>
+<p>此时，需要做些什么修改，判断，以后参数变化，可以在下面的variables查看，上图中的参数就是在模拟器中输入的参数显示。</p>
 
-    .prologue
-    .line 17
-    invoke-super {p0, p1}, Landroid/support/v7/app/AppCompatActivity;-&gt;onCreate(Landroid/os/Bundle;)V
-
-    .line 18
-    const/4 v0, 0x0
-
-    .line 19
-    .local v0, &quot;a&quot;:I
-    const/4 v1, 0x1
-
-    if-ne v0, v1, :cond_e
-
-    .line 20
-    const v1, 0x7f09001c
-
-    invoke-virtual {p0, v1}, Lcom/example/user/application/MainActivity;-&gt;setContentView(I)V
-
-    .line 24
-    :goto_d
-    return-void
-
-    .line 23
-    :cond_e
-    const v1, 0x7f09001d
-
-    invoke-virtual {p0, v1}, Lcom/example/user/application/MainActivity;-&gt;setContentView(I)V
-
-    goto :goto_d
-.end method
-</code></pre><p>整体的代码相当简单轻松，来看判断代码处。</p>
-<pre><code>.line 18
-    const/4 v0, 0x0
-
-    .line 19
-    .local v0, &quot;a&quot;:I
-    const/4 v1, 0x1
-
-    if-ne v0, v1, :cond_e
-
-</code></pre><p>其中if-ne，逻辑显示v0不等于v1，跳转到cond_e标签处。</p>
-<h4 id="修改一："><a href="#修改一：" class="headerlink" title="修改一："></a>修改一：</h4><p>直接修改if-ne判断形式，修改为if-eq，这样只要不完成正常的逻辑操作，都会跳转到我们想看的界面。</p>
-<h4 id="修改二："><a href="#修改二：" class="headerlink" title="修改二："></a>修改二：</h4><p>由于判断处是根据参数a的值和1做对比，所以我们直接对a重赋值(以上的a赋值可以粗略的看为是请求获取的值)。</p>
-<pre><code>.line 18
-    const/4 v0, 0x0
-
-    .line 19
-    .local v0, &quot;a&quot;:I
-    const/4 v1, 0x1
-
-    const/4 v0, 0x1
-    if-ne v0, v1, :cond_e
-</code></pre><h4 id="修改三："><a href="#修改三：" class="headerlink" title="修改三："></a>修改三：</h4><p>利用强制跳转，在需要去查看，或者执行下去的地方添加标签，goto_1，然后在判断执行前强制跳转进去。</p>
-<pre><code> const/4 v1, 0x1
-
-    goto :goto_1
-    if-ne v0, v1, :cond_0
-
-    .line 20
-    :goto_1
-    const v1, 0x7f09001c
-</code></pre>
           </div>
           <br><br>
           <div>
@@ -213,8 +159,8 @@
     <script>               
         var disqus_shortname = '';
         var disqus_config = function () {
-            this.page.url = '/2019/01/Android逆向逻辑修改入门/'; 
-            this.page.identifier = '/2019/01/Android逆向逻辑修改入门/';
+            this.page.url = '/2019/01/Android-Studio-动态调试/'; 
+            this.page.identifier = '/2019/01/Android-Studio-动态调试/';
         };
         (function() { 
             var d = document, s = d.createElement('script');

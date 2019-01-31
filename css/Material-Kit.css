@@ -1,24 +1,3 @@
-.post-card {
-  margin-top: 2rem;
-  word-break: break-all;
-}
-.post-card i {
-  vertical-align: middle;
-}
-.post-index-img {
-  display: block;
-  width: 100%;
-  height: 160px;
-  background-repeat: no-repeat;
-  background-size: cover;
-  border-radius: 6px;
-  box-shadow: 0 16px 38px -12px rgba(0,0,0,0.56), 0 4px 25px 0 rgba(0,0,0,0.12), 0 8px 10px -5px rgba(0,0,0,0.2);
-}
-/*
- =========================================================
- * Material Kit
- =========================================================
- */
 /*
 
  =========================================================
@@ -33,6 +12,7 @@
  * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
  */
+/*     brand Colors              */
 .carousel.carousel-full-nagivation .left {
   cursor: url("../../img/arrow-left.png"), url("../../img/arrow-left.cur"), default !important;
 }
@@ -9615,6 +9595,7 @@ label {
   border-radius: 6px;
   box-shadow: 0 16px 24px 2px rgba(0,0,0,0.14), 0 6px 30px 5px rgba(0,0,0,0.12), 0 8px 10px -5px rgba(0,0,0,0.2);
 }
+/*           Animations              */
 .animation-transition-general,
 .carousel .carousel-indicators li {
   -webkit-transition: all 300ms linear;
@@ -14647,6 +14628,10 @@ footer .pull-center {
   z-index: 1;
   cursor: pointer;
 }
+/* Functional styling;
+ * These styles are required for noUiSlider to function.
+ * You don't need to change these rules to apply your design.
+ */
 .noUi-target,
 .noUi-target * {
   -webkit-touch-callout: none;
@@ -14705,11 +14690,16 @@ footer .pull-center {
 .noUi-state-drag * {
   cursor: inherit !important;
 }
+/* Painting and performance;
+ * Browsers can paint handles in their own layer.
+ */
 .noUi-base,
 .noUi-handle {
   -webkit-transform: translate3d(0, 0, 0);
   transform: translate3d(0, 0, 0);
 }
+/* Slider size and handle placement;
+ */
 .noUi-horizontal {
   height: 2px;
   margin: 15px 0;
@@ -14743,6 +14733,8 @@ footer .pull-center {
   background: #fff;
   box-shadow: 0 2px 2px 0 rgba(0,0,0,0.14), 0 3px 1px -2px rgba(0,0,0,0.12), 0 1px 5px 0 rgba(0,0,0,0.2);
 }
+/* Styling;
+ */
 .noUi-target {
   background: #c8c8c8;
   border-radius: 4px;
@@ -14752,6 +14744,8 @@ footer .pull-center {
   -webkit-transition: background 450ms;
   transition: background 450ms;
 }
+/* Handles and cursors;
+ */
 .noUi-draggable {
   cursor: w-resize;
 }
@@ -14784,6 +14778,8 @@ footer .pull-center {
 .noUi-vertical .noUi-handle:after {
   top: 17px;
 }
+/* Disabled state;
+ */
 [disabled] .noUi-connect {
   background: #b8b8b8;
 }
