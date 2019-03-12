@@ -105,30 +105,30 @@
 <p>首先看第一关，此网站需要科学上网。</p>
 <p><a href="https://xss-game.appspot.com/level1" target="_blank" rel="noopener">https://xss-game.appspot.com/level1</a></p>
 <p>页面可以看到所用的html代码和js，以及后端的py代码，简单尝试一下，可以发现是写入页面。</p>
-<p><img src="\2018\09\XSS-GAME记录\1538223721639.png" alt="1538223721639"></p>
+<p><img src="\2018\10\XSS-GAME记录\1538223721639.png" alt="1538223721639"></p>
 <p>并且从code中可以看到，没有过滤，直接</p>
 <pre><code>&lt;script&gt;alert(2)&lt;/script&gt;
 </code></pre><p>第二关，留言框，post提交数据，直接插入图片。</p>
-<p><img src="\2018\09\XSS-GAME记录\1538223859770.png" alt="1538223859770"></p>
+<p><img src="\2018\10\XSS-GAME记录\1538223859770.png" alt="1538223859770"></p>
 <pre><code>&lt;img src=@ onerror=alert(2)&gt;
 </code></pre><p>第三关，从链接猜测是锚点xss，尝试修改锚点，发现写入页面。</p>
-<p><img src="\2018\09\XSS-GAME记录\1538223944364.png" alt="1538223944364"></p>
+<p><img src="\2018\10\XSS-GAME记录\1538223944364.png" alt="1538223944364"></p>
 <p>但是尝试后发现，并不是直接写入如上图所示页面那么简单，而是写入了img标签</p>
-<p><img src="\2018\09\XSS-GAME记录\1538224035186.png" alt="1538224035186"></p>
+<p><img src="\2018\10\XSS-GAME记录\1538224035186.png" alt="1538224035186"></p>
 <p>查看其中的js代码，然后使用如下payload即可。</p>
-<p><img src="\2018\09\XSS-GAME记录\1538224072534.png" alt="1538224072534"></p>
+<p><img src="\2018\10\XSS-GAME记录\1538224072534.png" alt="1538224072534"></p>
 <pre><code>&#39; onerror=alert(2) &#39;
 </code></pre><p>第四关，点击页面按钮后显示如下，猜测是在timer的xss，查看页面代码。</p>
-<p><img src="\2018\09\XSS-GAME记录\1538224180436.png" alt="1538224180436"></p>
+<p><img src="\2018\10\XSS-GAME记录\1538224180436.png" alt="1538224180436"></p>
 <p>在timer.html页面下可以发现如下代码，基本可以断定是写入img标签的xss，直接使用onload事件，使用连字符直接alert()。</p>
-<p><img src="\2018\09\XSS-GAME记录\1538224258940.png" alt="1538224258940"></p>
+<p><img src="\2018\10\XSS-GAME记录\1538224258940.png" alt="1538224258940"></p>
 <pre><code>&#39;-alert(2)-&#39;
 </code></pre><p>第五关，访问后是一个登陆后的页面，这里我们先退出页面。</p>
-<p><img src="\2018\09\XSS-GAME记录\1538225436230.png" alt="1538225436230"></p>
+<p><img src="\2018\10\XSS-GAME记录\1538225436230.png" alt="1538225436230"></p>
 <p>sign up后可以看到，有输入email的地方，和next两个参数输入点，一开始以为是输入框的问题，尝试多次发现没有写入页面。</p>
-<p><img src="\2018\09\XSS-GAME记录\1538225475401.png" alt="1538225475401"></p>
+<p><img src="\2018\10\XSS-GAME记录\1538225475401.png" alt="1538225475401"></p>
 <p>然后再signup.html页面下发现如下内容</p>
-<p><img src="\2018\09\XSS-GAME记录\1538225564747.png" alt="1538225564747"></p>
+<p><img src="\2018\10\XSS-GAME记录\1538225564747.png" alt="1538225564747"></p>
 <p>初步判断是next参数的问题，也就是next写入img标签，尝试如下，必须点击next，一开始点击GO，一直没触发。</p>
 <pre><code>javascript:alert(2)
 </code></pre>
@@ -139,7 +139,7 @@
                     <p>原文作者：<a href="">Misaki</a>
                     <p>原文链接：<a href="/2018/10/XSS-GAME记录/">/2018/10/XSS-GAME记录/</a>
                     <p>发表日期：<a href="/2018/10/XSS-GAME记录/">October 5th 2018, 8:05:20 pm</a>
-                    <p>更新日期：<a href="/2018/10/XSS-GAME记录/">September 30th 2018, 9:15:41 pm</a>
+                    <p>更新日期：<a href="/2018/10/XSS-GAME记录/">March 12th 2019, 10:43:55 am</a>
                     <p>版权声明：本文采用<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">知识共享署名-非商业性使用 4.0 国际许可协议</a>进行许可</p>
                 </div>
               

