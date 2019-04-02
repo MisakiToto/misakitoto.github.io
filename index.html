@@ -98,6 +98,33 @@
             
             
                 <div class="col-md-11">
+                    <a href="/2019/04/逆向修改手机内核，绕过反调试/" class="h3 title" target="_self">逆向修改手机内核，绕过反调试</a>
+                    
+                    <p>逆向修改手机内核，绕过反调试Android 应用反调试里最常用的一种反调试方法是查看/proc/self/status的信息，如果 TracerPid 不为 0，就判断为正在被调试。因此修改手机的TracePid,让其值恒为零。
+一、  提取 zImage 内核文件查找boot文件位置
+find / | grep boot
+
+cd /dev/blo...</p>
+                    
+                    
+                    <p class="h6">
+                        <i class="material-icons">date_range</i>2019-04-02
+                        
+                            <i class="material-icons">bookmark_border</i>
+                                
+                                    移动安全 &nbsp;
+                                
+                        
+                    </p>
+                    
+                </div>
+        </div>
+       
+        
+        <div class="row post-card">
+            
+            
+                <div class="col-md-11">
                     <a href="/2019/03/IDA动态调试/" class="h3 title" target="_self">IDA动态调试</a>
                     
                     <p>IDA 动态调试通常在APP逆向和破解时，某些重要的函数会以so文件的形式进行加载，所以，在想获得关键操作逻辑和修改某些函数时，就需要IDA来进行操作啦。以下使用IDA版本7.0，小米手机
@@ -199,35 +226,6 @@ Windows权限提升基础没有多少人谈论严重的Windows权限升级，这
                     <p>原文链接：https://xax007.github.io/2019-01-13-post-exploitation-file-transfer-tips/
 在红队渗透测试当中往往需要最大化利用当前的环境绕过重兵防守的系统的防火墙、IDS、IPS等报警和监控系统进行文件传输，本文列出了多种利用操作系统默认自带的工具进行文件传输的方法。
 搭建 HTT...</p>
-                    
-                    
-                    <p class="h6">
-                        <i class="material-icons">date_range</i>2019-03-08
-                        
-                            <i class="material-icons">bookmark_border</i>
-                                
-                                    web安全 &nbsp;
-                                
-                        
-                    </p>
-                    
-                </div>
-        </div>
-       
-        
-        <div class="row post-card">
-            
-            
-                <div class="col-md-11">
-                    <a href="/2019/03/渗透之权限维持/" class="h3 title" target="_self">渗透之权限维持</a>
-                    
-                    <p>原文链接：渗透之权限维持杂谈
-0x01 MSFpersistence
-msf内置的后渗透权限维持工具persistence
-
-
-Metsvc它是通过在已经获得shell的目标主机上开启了一个服务来提供后门的功能。run Metsvc -h
-Scheduleme &amp; Schtasksabusemsf中自动利用计划任务的后门程序，后面会聊到li...</p>
                     
                     
                     <p class="h6">
