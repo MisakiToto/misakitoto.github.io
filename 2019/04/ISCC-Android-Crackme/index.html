@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+
+
+
+
+
+
+
+
+
+<head>
+    <meta charset="utf-8" />
+    <link rel="apple-touch-icon" sizes="76x76" href="/favicon.ico">
+    <link rel="icon" type="image/png" href="/favicon.ico">
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0, shrink-to-fit=no" name="viewport" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <meta name="description" content="One way to choose one">
+    <meta name="author" content="Misaki">
+    <meta name="keywords" content="">
+    <title>ISCC Android Crackme ~ Misaki&#39;s Blog</title>
+    <link rel="stylesheet" href="/css/Material_Icons.css">
+    <!-- <link rel="stylesheet" href="/css/font-awesome.css"> -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/css/main.css">
+    
+        <link rel="stylesheet" href="/css/post.css">
+        
+            <link rel="stylesheet" href="/css/Prettify/tomorrow-night-eighties.min.css">
+        
+    
+</head>
+
+<body class=" sidebar-collapse">
+<nav class="navbar navbar-transparent navbar-color-on-scroll fixed-top navbar-expand-lg" color-on-scroll="100" id="sectionsNav">
+    <div class="container">
+        <div class="navbar-translate">
+            <a class="navbar-brand" href="/">
+                Misaki&#39;s Blog</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="navbar-toggler-icon"></span>
+                <span class="navbar-toggler-icon"></span>
+                <span class="navbar-toggler-icon"></span>
+            </button>
+        </div>
+            <div class="collapse navbar-collapse">
+                <ul class="navbar-nav ml-auto">
+                    
+                        
+                            <li class="nav-item">
+                                <a class="nav-link" href="/archives/">
+                                    archives
+                                </a>
+                            </li>
+                        
+                            <li class="nav-item">
+                                <a class="nav-link" href="/about/">
+                                    about
+                                </a>
+                            </li>
+                        
+                    
+                    
+                        
+                            <li class="nav-item">
+                                <a class="nav-link" rel="tooltip" title="" data-placement="bottom" href="https://github.com/MisakiKata" target="_blank" data-original-title="See me here">
+                                    <i class="fa fa-github"></i>
+                                </a>
+                            </li>
+                        
+                            <li class="nav-item">
+                                <a class="nav-link" rel="tooltip" title="" data-placement="bottom" href="https://www.t00ls.net/members-profile-12179.html" target="_blank" data-original-title="See me here">
+                                    <i class="fa fa-twitch"></i>
+                                </a>
+                            </li>
+                        
+                    
+                </ul>
+            </div>
+    </div>
+</nav>
+    
+  <div class="page-header header-filter" data-parallax="true" style="background-image: url('/img/post-banner.jpg'); height: 70vh;">
+    
+      <div class="container">
+        <h1 class="title text-center post_title">ISCC Android Crackme</h1>
+        <p class="text-center"><b>Tuesday, April 30th 2019, 9:47 am</b></p>
+      </div>
+    
+  </div>
+
+  
+  
+  
+    <div class="row" style="margin: 0 0 0; z-index: 999;">
+  <div class="col-md-8 offset-md-1">
+    <div class="main main-raised">
+      <div class="container">
+        <div class="section">
+          <div class="post_content">
+              <h3 id="ISCC-Android-Crackme"><a href="#ISCC-Android-Crackme" class="headerlink" title="ISCC Android Crackme"></a>ISCC Android Crackme</h3><p>此为2013年ISCC的一道移动题，相对简单的题，懂点 ARM 指令就差不多了。对于新入手安卓逆向可以做做看来练手。要求是注册为企业版程序。以下分析是建立在伪代码基础上，然后分析修改点，修改ARM汇编。</p>
+<p>题目下载：<a href="\2019\04\ISCC-Android-Crackme\crackme.apk">APP</a></p>
+<p>通过反编译代码简单查看功能逻辑，首先是从onCreate函数开始，函数一开始就调用了MyApp的m变量，查看对应的反编译代码。</p>
+<p><img src="\2019\04\ISCC-Android-Crackme\1556518317348.png" alt="1556518317348"></p>
+<p>MyApp是一个native方法的调用，调用了三个方法。</p>
+<p>分别是initSN()、saveSN()、work()。并且执行了initSN方法，因此函数应该是注册码的对比和效验功能。</p>
+<p><img src="\2019\04\ISCC-Android-Crackme\1556518441133.png" alt="1556518441133"></p>
+<p>然后在回到以上的代码执行，点击按钮“执行功能”，进入toast弹出界面，通过判断m值来执行是否触发注册方法，默认为0触发，如果注册成功则调用work()函数来做执行功能。查看doRegister，点击确认后，程序进入com.bfs.crackme1.RegActivity类下，</p>
+<p><img src="\2019\04\ISCC-Android-Crackme\1556519314726.png" alt="1556519314726"></p>
+<p>方法判断是否输入注册码，调用saveSN来保存输入的注册码，然后弹窗关闭自身线程。到此，也基本确认了initSN的方法和上文判断一致。</p>
+<p><img src="\2019\04\ISCC-Android-Crackme\1556520139524.png" alt="1556520139524"></p>
+<p>看完基本的Java层函数现在来看so文件的相关代码实现和流程。</p>
+<p>查看so的一些函数表，可以看到定义了JNI_Onload，Java层执行System.loadLibrary()后，将执行此函数。同样从函数表中可以看出加密处理为MD5。查看JNI_Onload做了什么处理。</p>
+<p><img src="\2019\04\ISCC-Android-Crackme\1556520638909.png" alt="1556520638909"></p>
+<p>查看伪代码，使用RegisterNatives实现JNI，而RegisterNatives是来做什么处理的，可以查看如下文章：</p>
+<p><a href="https://blog.csdn.net/qiuxiaolong007/article/details/7860610" target="_blank" rel="noopener">JNI：使用RegisterNatives方法传递和使用Java自定义类</a></p>
+<p>而此处的作用基本可以看到是用来自定义函数命名，不然native中的函数名为Java_com_bfs_crackme1_MainActivity_initSN这种类型，下面只有n1、n2、n3来代替以上方法。</p>
+<p><img src="\2019\04\ISCC-Android-Crackme\1556520977389.png" alt="1556520977389"></p>
+<p>查看n1方法，读取sdcard下的reg.dat文件，来进行MD5效对，要求进行企业版注册，能看到的是注册成功将使用setValue进行对v1的赋值，其中按照MainActivity文件中的判断，猜测3为企业版MD5值。</p>
+<p><img src="\2019\04\ISCC-Android-Crackme\1556522659413.png" alt="1556522659413"></p>
+<p>n2则为如下，读写的形式来对reg.dat 进行重写。</p>
+<p><img src="\2019\04\ISCC-Android-Crackme\1556524534479.png" alt="1556524534479"></p>
+<p>work函数则为如下：</p>
+<p><img src="\2019\04\ISCC-Android-Crackme\1556525011606.png" alt="1556525011606"></p>
+<p>至此，函数名则分析清楚，n1对应initSN，n2对应saveSN，n3对应work。根据函数流程可以大概猜出判断行为：n2保存来自输入的参数的MD5-&gt;n1读取参数进行对应是否为注册值-&gt;注册成功则set到内存一个值-&gt;由work来读取这个值判断注册是否成功以及功能执行。</p>
+<p>所以理论上说，patch点有如下处：</p>
+<p>1、修改reg.dat为企业版的注册码，修改Java层代码让其不走注册函数。</p>
+<p>2、解密MD5值，直接输入注册</p>
+<p>3、修改n1，让其返回值永远为3</p>
+<p>4、修改work函数获取的v2值。</p>
+<p>修改时，发现第一种并不行，Java层参数值修改后，可能n2做了其他相关处理，第二种是可行，毕竟都获取到了注册码，但需要解密成功，此MD5只是简单的32345678。</p>
+<p>第三种修改n1：</p>
+<p>输入肯定为错误或者不输入值，因此只需要修改值为空或者其他未知情况下的返回值。</p>
+<pre><code>.text:0000133C                 CMP     R0, #0
+.text:00001340                 MOVEQ   R1, #4
+.text:00001344                 MOV     R0, R7
+.text:00001348                 MOVNE   R1, R8
+</code></pre><p>修改为：</p>
+<pre><code>.text:0000133C                 MOV     R0, #3
+.text:00001340                 MOVEQ   R1, #3
+.text:00001344                 MOV     R0, R7
+.text:00001348                 MOVNE   R1, R8
+</code></pre><p>让其在未输入的情况下返回企业版的返回值。修改编译安装后，打开即为企业版。</p>
+<p>第四种修改work:</p>
+<pre><code>.text:000014A0 10 40 2D E9                                     STMFD   SP!, {R4,LR}
+.text:000014A4 00 40 A0 E1                                     MOV     R4, R0
+.text:000014A8 6F FF FF EB                                     BL      n1
+.text:000014AC 04 00 A0 E1                                     MOV     R0, R4
+.text:000014B0 35 FF FF EB                                     BL      getValue
+.text:000014B8 00 00 50 E3                                     CMP     R0, #0
+</code></pre><p>增加一条指令，修改为:</p>
+<pre><code>.text:000014A0 10 40 2D E9                                     STMFD   SP!, {R4,LR}
+.text:000014A4 00 40 A0 E1                                     MOV     R4, R0
+.text:000014A8 6F FF FF EB                                     BL      n1
+.text:000014AC 04 00 A0 E1                                     MOV     R0, R4
+.text:000014B0 35 FF FF EB                                     BL      getValue
+.text:000014B4 03 00 A0 E3                                     MOV     R0, #3
+.text:000014B8 00 00 50 E3                                     CMP     R0, #0             
+</code></pre><p>这样达到从getvalue获取返回值后，重新修改v2的值为3，让其无论什么情况下都自动判断为已注册企业版。</p>
+<p>网上其他的分析文章，同样是修改n1函数，只不过修改方式是同时修改几个mov语句，让其都赋值3来跳转判断。</p>
+<p>详细文章：<a href="http://ju.outofmemory.cn/entry/33818" target="_blank" rel="noopener">简单Android CrackMe分析</a></p>
+
+          </div>
+          <br><br>
+              
+                <div class="license-wrapper">
+                    <p>原文作者：<a href="">Misaki</a>
+                    <p>原文链接：<a href="/2019/04/ISCC-Android-Crackme/">/2019/04/ISCC-Android-Crackme/</a>
+                    <p>发表日期：<a href="/2019/04/ISCC-Android-Crackme/">April 30th 2019, 9:47:32 am</a>
+                    <p>更新日期：<a href="/2019/04/ISCC-Android-Crackme/">April 30th 2019, 9:58:48 am</a>
+                    <p>版权声明：本文采用<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">知识共享署名-非商业性使用 4.0 国际许可协议</a>进行许可</p>
+                </div>
+              
+          <br><br>
+          <div>
+              <p>
+                       
+                      <span class="badge badge-default">#&nbsp;移动安全</span>
+                      &nbsp;
+                      
+              </p>
+          </div>
+        </div>
+      </div>  
+    </div>
+  </div>
+  <!-- TOC -->
+  
+      <div class="">
+        <div id="toc">
+          <p class="toc-title"><i class="material-icons" style="vertical-align:middle">toc</i>Toc:</p> 
+          <div id="tocbot"></div>
+        </div>
+      </div>
+  
+</div>
+
+
+<!-- Comments -->
+<div class="row">
+    <div class="col-md-8 offset-md-2">
+    
+        
+            <div class="disqus" style="width:100%">
+    <div id="disqus_thread"></div>
+    <script>               
+        var disqus_shortname = '';
+        var disqus_config = function () {
+            this.page.url = '/2019/04/ISCC-Android-Crackme/'; 
+            this.page.identifier = '/2019/04/ISCC-Android-Crackme/';
+        };
+        (function() { 
+            var d = document, s = d.createElement('script');
+            s.type = 'text/javascript';
+            s.src = '//'+disqus_shortname+'.disqus.com/embed.js';
+            s.setAttribute('data-timestamp', +new Date());
+            (d.head || d.body).appendChild(s);
+        })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>                                
+</div>
+        
+    
+    </div>
+</div>
+  
+
+<footer class="footer footer-default">
+        <div class="container">
+          <div class="float-left" style="padding: 15px 0;">
+              <b>不努力一下，怎么知道自己比别人差呢？</b>
+          </div>
+        </div>
+</footer>
+      <!--   Core JS Files   -->
+      <script src="/js/core/jquery.min.js?v=3.2.1"></script>
+      <script src="/js/main.js"></script>
+      <script src="/js/core/popper.min.js"></script>
+      <script src="/js/core/bootstrap-material-design.min.js"></script>
+      <script src="/js/plugins/moment.min.js"></script>
+      <!-- Control Center for Material Kit: parallax effects, scripts for the example pages etc -->
+      <script src="/js/material-kit.min.js?v=2.0.5"></script>
+      
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.4.2/tocbot.min.js"></script>
+        <script src="/js/post.js"></script>
+        <script src="/js/plugins/prettify.js"></script>
+        <script>
+            $(document).ready(function(){
+                $('pre').addClass('prettyprint linenums');
+                prettyPrint();
+            })
+        </script>
+      
+</body>
+</html>
