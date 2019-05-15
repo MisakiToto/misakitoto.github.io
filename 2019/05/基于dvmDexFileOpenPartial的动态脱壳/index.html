@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+
+
+
+
+
+
+
+
+
+<head>
+    <meta charset="utf-8" />
+    <link rel="apple-touch-icon" sizes="76x76" href="/favicon.ico">
+    <link rel="icon" type="image/png" href="/favicon.ico">
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0, shrink-to-fit=no" name="viewport" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <meta name="description" content="One way to choose one">
+    <meta name="author" content="Misaki">
+    <meta name="keywords" content="">
+    <title>基于dvmDexFileOpenPartial的动态脱壳 ~ Misaki&#39;s Blog</title>
+    <link rel="stylesheet" href="/css/Material_Icons.css">
+    <!-- <link rel="stylesheet" href="/css/font-awesome.css"> -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/css/main.css">
+    
+        <link rel="stylesheet" href="/css/post.css">
+        
+            <link rel="stylesheet" href="/css/Prettify/tomorrow-night-eighties.min.css">
+        
+    
+</head>
+
+<body class=" sidebar-collapse">
+<nav class="navbar navbar-transparent navbar-color-on-scroll fixed-top navbar-expand-lg" color-on-scroll="100" id="sectionsNav">
+    <div class="container">
+        <div class="navbar-translate">
+            <a class="navbar-brand" href="/">
+                Misaki&#39;s Blog</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="navbar-toggler-icon"></span>
+                <span class="navbar-toggler-icon"></span>
+                <span class="navbar-toggler-icon"></span>
+            </button>
+        </div>
+            <div class="collapse navbar-collapse">
+                <ul class="navbar-nav ml-auto">
+                    
+                        
+                            <li class="nav-item">
+                                <a class="nav-link" href="/archives/">
+                                    archives
+                                </a>
+                            </li>
+                        
+                            <li class="nav-item">
+                                <a class="nav-link" href="/about/">
+                                    about
+                                </a>
+                            </li>
+                        
+                    
+                    
+                        
+                            <li class="nav-item">
+                                <a class="nav-link" rel="tooltip" title="" data-placement="bottom" href="https://github.com/MisakiKata" target="_blank" data-original-title="See me here">
+                                    <i class="fa fa-github"></i>
+                                </a>
+                            </li>
+                        
+                            <li class="nav-item">
+                                <a class="nav-link" rel="tooltip" title="" data-placement="bottom" href="https://www.t00ls.net/members-profile-12179.html" target="_blank" data-original-title="See me here">
+                                    <i class="fa fa-twitch"></i>
+                                </a>
+                            </li>
+                        
+                    
+                </ul>
+            </div>
+    </div>
+</nav>
+    
+  <div class="page-header header-filter" data-parallax="true" style="background-image: url('/img/post-banner.jpg'); height: 70vh;">
+    
+      <div class="container">
+        <h1 class="title text-center post_title">基于dvmDexFileOpenPartial的动态脱壳</h1>
+        <p class="text-center"><b>Wednesday, May 15th 2019, 2:25 pm</b></p>
+      </div>
+    
+  </div>
+
+  
+  
+  
+    <div class="row" style="margin: 0 0 0; z-index: 999;">
+  <div class="col-md-8 offset-md-1">
+    <div class="main main-raised">
+      <div class="container">
+        <div class="section">
+          <div class="post_content">
+              <h3 id="1、dvmDexFileOpenPartial脱壳原理"><a href="#1、dvmDexFileOpenPartial脱壳原理" class="headerlink" title="1、dvmDexFileOpenPartial脱壳原理"></a>1、dvmDexFileOpenPartial脱壳原理</h3><p>基于libdvm.so下dvmDexFileOpenPartial的文件脱壳，当然如果是新版的加固方式一般不可行，因为会基本会重写dvmDexFileOpenPartial方法。如此，先了解一下libdvm.so的方法dvmDexFileOpenPartial是干什么的。</p>
+<p>加密dex文件在软件运行时，必然会解密加载到内存中运行，而dvmDexFileOpenPartial方法的参数：</p>
+<p>int dvmDexFileOpenPartial(const void* addr, int len, DvmDex** ppDvmDex)</p>
+<p>第一个参数代表dex文件的基地址，第二个参数代表dex文件的长度，第三个参数代表出参，dex文件的类，方法等信息。</p>
+<p>方法的源码解读：<a href="http://www.blogfshare.com/load-dex-source.html" target="_blank" rel="noopener">从源码看Dex Dump于dvmDexFileOpenPartial原理</a></p>
+<p>断点脱壳原理分析:<a href="https://www.cnblogs.com/jiaoxiake/p/6813127.html" target="_blank" rel="noopener">dvmDexFileOpenPartial断点脱壳原理分析</a></p>
+<p>示例APP：<a href="https://github.com/eternalsakura/ctf_pwn/tree/master/android%E9%80%86%E5%90%91" target="_blank" rel="noopener">jscrack</a></p>
+<p>由于使用的Android 4.4.4的环境，加载模式为Dalvik虚拟机模式，libdvm.so则是此模式下的文件，当然在Android 5.0以上取消了Dalvik模式，自然也不存在libdvm.so文件。dalvik虚拟机会把dex文件优化为odex文件,dvmDexFileOpenPartial则用来解析内存中优化过的dex文件，此时dex已经加载进内存，所以就可以dump出来了。</p>
+<h3 id="2、示例演示"><a href="#2、示例演示" class="headerlink" title="2、示例演示"></a>2、示例演示</h3><p>首先调试模式启动APP，</p>
+<pre><code>adb forward tcp:23946 tcp:23946          #IDA端口转发
+adb shell am start -D -n 包名/activity名  #调试模式启动APP 
+adb shell ps | grep 包名                  #获取APP的PID
+adb forward tcp:8700 jdwp:pid            #进程端口转发
+</code></pre><p><img src="\2019\05\基于dvmDexFileOpenPartial的动态脱壳\1557899006483.png" alt="1557899006483"></p>
+<p>然后调整IDA的调试选项，如下：</p>
+<p><img src="\2019\05\基于dvmDexFileOpenPartial的动态脱壳\1557899051732.png" alt="1557899051732"></p>
+<p>选择对应的进程后，页面跳转，选择modules下的libdvm.so中的dvmDexFileOpenPartial方法，如下：</p>
+<p><img src="\2019\05\基于dvmDexFileOpenPartial的动态脱壳\1557899178517.png" alt="1557899178517"></p>
+<p>找到方法后，在其第一行下断点，如下情形。</p>
+<p><img src="\2019\05\基于dvmDexFileOpenPartial的动态脱壳\1557899194095.png" alt="1557899194095"></p>
+<p>然后转发jdb。此处jdb不可过早转发，不然下一步运行不到指定地址，将会跳过调试模式进入软件内。</p>
+<pre><code>jdb -connect com.sun.jdi.SocketAttach:hostname=127.0.0.1,port=8700
+</code></pre><p>附加完成后可以看到CMD卡在回车处暂无回显，在IDA下运行F9到指定断点处自动下断。</p>
+<p><img src="\2019\05\基于dvmDexFileOpenPartial的动态脱壳\1557899222926.png" alt="1557899222926"></p>
+<p>单步运行F8一次即可，可以看到寄存器窗口中R0,R1的地址值。</p>
+<p><img src="\2019\05\基于dvmDexFileOpenPartial的动态脱壳\1557899257190.png" alt="1557899257190"></p>
+<p>在file选项中点击script command运行如下脚本。则可以在D盘下看到dump出来的dex文件。</p>
+<pre><code>static main(void){
+auto fp, dex_addr, end_addr;
+fp = fopen(&quot;D:\\dump.dex&quot;, &quot;wb&quot;);
+end_addr = R0 + R1;
+for ( dex_addr=R0; dex_addr &lt; end_addr; dex_addr ++ )
+fputc(Byte(dex_addr), fp);
+}
+</code></pre><p>选择jadx打开dex文件，可以看到源码已dump成功。</p>
+<p><img src="\2019\05\基于dvmDexFileOpenPartial的动态脱壳\1557899587774.png" alt="1557899587774"></p>
+<h3 id="3、系统差异"><a href="#3、系统差异" class="headerlink" title="3、系统差异"></a>3、系统差异</h3><p>此处使用Android 4.4.4，如果使用Android 5.0以上不存在lindvm.so，则需要在libart.so中对Openmemory函数下断，同样操作，保存R1,R2的值，R1代表基地址，R2代表长度。</p>
+<p>脚本为</p>
+<pre><code>static main(void){   
+auto fp, dex_addr, end_addr;   
+fp = fopen(&quot;D:\\dump.dex&quot;, &quot;wb&quot;);  
+end_addr = R1 + R2;   
+for ( dex_addr=R1; dex_addr &lt; end_addr; dex_addr ++ )       
+fputc(Byte(dex_addr), fp);
+}
+</code></pre><p>参考文章：</p>
+<p><a href="https://www.52pojie.cn/thread-778654-1-1.html" target="_blank" rel="noopener">IDA动态调试脱壳步骤</a></p>
+
+          </div>
+          <br><br>
+              
+                <div class="license-wrapper">
+                    <p>原文作者：<a href="">Misaki</a>
+                    <p>原文链接：<a href="/2019/05/基于dvmDexFileOpenPartial的动态脱壳/">/2019/05/基于dvmDexFileOpenPartial的动态脱壳/</a>
+                    <p>发表日期：<a href="/2019/05/基于dvmDexFileOpenPartial的动态脱壳/">May 15th 2019, 2:25:33 pm</a>
+                    <p>更新日期：<a href="/2019/05/基于dvmDexFileOpenPartial的动态脱壳/">May 15th 2019, 2:29:44 pm</a>
+                    <p>版权声明：本文采用<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">知识共享署名-非商业性使用 4.0 国际许可协议</a>进行许可</p>
+                </div>
+              
+          <br><br>
+          <div>
+              <p>
+                       
+                      <span class="badge badge-default">#&nbsp;移动安全</span>
+                      &nbsp;
+                      
+              </p>
+          </div>
+        </div>
+      </div>  
+    </div>
+  </div>
+  <!-- TOC -->
+  
+      <div class="">
+        <div id="toc">
+          <p class="toc-title"><i class="material-icons" style="vertical-align:middle">toc</i>Toc:</p> 
+          <div id="tocbot"></div>
+        </div>
+      </div>
+  
+</div>
+
+
+<!-- Comments -->
+<div class="row">
+    <div class="col-md-8 offset-md-2">
+    
+        
+            <div class="disqus" style="width:100%">
+    <div id="disqus_thread"></div>
+    <script>               
+        var disqus_shortname = '';
+        var disqus_config = function () {
+            this.page.url = '/2019/05/基于dvmDexFileOpenPartial的动态脱壳/'; 
+            this.page.identifier = '/2019/05/基于dvmDexFileOpenPartial的动态脱壳/';
+        };
+        (function() { 
+            var d = document, s = d.createElement('script');
+            s.type = 'text/javascript';
+            s.src = '//'+disqus_shortname+'.disqus.com/embed.js';
+            s.setAttribute('data-timestamp', +new Date());
+            (d.head || d.body).appendChild(s);
+        })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>                                
+</div>
+        
+    
+    </div>
+</div>
+  
+
+<footer class="footer footer-default">
+        <div class="container">
+          <div class="float-left" style="padding: 15px 0;">
+              <b>假如今天的你被生活辜负了，别伤心，因为明天生活还会继续辜负你！</b>
+          </div>
+          <div align="right" style="padding: 15px 0;">
+              <i class="iconfont icon-love" ></i>
+              <a href="https://github.com/0x2e/Material-T" target="_blank"> <b>Material-T</b></a>
+          </div>
+        </div>
+</footer>
+      <!--   Core JS Files   -->
+      <script src="/js/core/jquery.min.js?v=3.2.1"></script>
+      <script src="/js/main.js"></script>
+      <script src="/js/core/popper.min.js"></script>
+      <script src="/js/core/bootstrap-material-design.min.js"></script>
+      <script src="/js/plugins/moment.min.js"></script>
+      <script src="/js/material-kit.min.js?v=2.0.5"></script>
+      
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.4.2/tocbot.min.js"></script>
+        <script src="/js/post.js"></script>
+        <script src="/js/plugins/prettify.js"></script>
+        <script>
+            $(document).ready(function(){
+                $('pre').addClass('prettyprint linenums');
+                prettyPrint();
+            })
+        </script>
+      
+</body>
+</html>
