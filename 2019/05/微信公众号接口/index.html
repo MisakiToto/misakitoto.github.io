@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+
+
+
+
+
+
+
+
+
+<head>
+    <meta charset="utf-8" />
+    <link rel="apple-touch-icon" sizes="76x76" href="/favicon.ico">
+    <link rel="icon" type="image/png" href="/favicon.ico">
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0, shrink-to-fit=no" name="viewport" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <meta name="description" content="One way to choose one">
+    <meta name="author" content="Misaki">
+    <meta name="keywords" content="">
+    <title>微信公众号接口 ~ Misaki&#39;s Blog</title>
+    <link rel="stylesheet" href="/css/Material_Icons.css">
+    <!-- <link rel="stylesheet" href="/css/font-awesome.css"> -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/css/main.css">
+    
+        <link rel="stylesheet" href="/css/post.css">
+        
+            <link rel="stylesheet" href="/css/Prettify/tomorrow-night-eighties.min.css">
+        
+    
+</head>
+
+<body class=" sidebar-collapse">
+<nav class="navbar navbar-transparent navbar-color-on-scroll fixed-top navbar-expand-lg" color-on-scroll="100" id="sectionsNav">
+    <div class="container">
+        <div class="navbar-translate">
+            <a class="navbar-brand" href="/">
+                Misaki&#39;s Blog</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="navbar-toggler-icon"></span>
+                <span class="navbar-toggler-icon"></span>
+                <span class="navbar-toggler-icon"></span>
+            </button>
+        </div>
+            <div class="collapse navbar-collapse">
+                <ul class="navbar-nav ml-auto">
+                    
+                        
+                            <li class="nav-item">
+                                <a class="nav-link" href="/archives/">
+                                    archives
+                                </a>
+                            </li>
+                        
+                            <li class="nav-item">
+                                <a class="nav-link" href="/about/">
+                                    about
+                                </a>
+                            </li>
+                        
+                    
+                    
+                        
+                            <li class="nav-item">
+                                <a class="nav-link" rel="tooltip" title="" data-placement="bottom" href="https://github.com/MisakiKata" target="_blank" data-original-title="See me here">
+                                    <i class="fa fa-github"></i>
+                                </a>
+                            </li>
+                        
+                            <li class="nav-item">
+                                <a class="nav-link" rel="tooltip" title="" data-placement="bottom" href="https://www.t00ls.net/members-profile-12179.html" target="_blank" data-original-title="See me here">
+                                    <i class="fa fa-twitch"></i>
+                                </a>
+                            </li>
+                        
+                    
+                </ul>
+            </div>
+    </div>
+</nav>
+    
+  <div class="page-header header-filter" data-parallax="true" style="background-image: url('/img/post-banner.jpg'); height: 70vh;">
+    
+      <div class="container">
+        <h1 class="title text-center post_title">微信公众号接口</h1>
+        <p class="text-center"><b>Monday, May 27th 2019, 11:32 am</b></p>
+      </div>
+    
+  </div>
+
+  
+  
+  
+    <div class="row" style="margin: 0 0 0; z-index: 999;">
+  <div class="col-md-8 offset-md-1">
+    <div class="main main-raised">
+      <div class="container">
+        <div class="section">
+          <div class="post_content">
+              <p>在一个偶然的机会获取到了一对微信AppId与Secret，于是整理了一下常用和有用的微信公众号信息获取的接口，以下是部分微信接口调用示例和说明。</p>
+<h3 id="1、平台开发者获取access-token"><a href="#1、平台开发者获取access-token" class="headerlink" title="1、平台开发者获取access_token"></a>1、平台开发者获取access_token</h3><p>access_token是公众号的全局唯一接口调用凭据，公众号调用各接口时都需使用access_token。access_token的有效期目前为2个小时，需定时刷新，重复获取将导致上次获取的access_token失效。</p>
+<h4 id="a、接口调用请求说明"><a href="#a、接口调用请求说明" class="headerlink" title="a、接口调用请求说明"></a>a、接口调用请求说明</h4><pre><code>http请求方式: GET
+https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&amp;appid=APPID&amp;secret=APPSECRET
+</code></pre><h4 id="b、参数说明"><a href="#b、参数说明" class="headerlink" title="b、参数说明"></a>b、参数说明</h4><pre><code>参数               是否必须                说明
+grant_type           是        获取access_token填写client_credential
+appid               是        第三方用户唯一凭证
+secret               是        第三方用户唯一凭证密钥，即appsecret
+</code></pre><h4 id="c、返回说明"><a href="#c、返回说明" class="headerlink" title="c、返回说明"></a>c、返回说明</h4><pre><code>微信会返回下述JSON数据包给公众号：
+{&quot;access_token&quot;:&quot;ACCESS_TOKEN&quot;,&quot;expires_in&quot;:7200}
+</code></pre><h3 id="2、获取微信服务器IP地址"><a href="#2、获取微信服务器IP地址" class="headerlink" title="2、获取微信服务器IP地址"></a>2、获取微信服务器IP地址</h3><p>如果公众号基于安全等考虑，需要获知微信服务器的IP地址列表，以便进行相关限制，可以通过该接口获得微信服务器IP地址列表或者IP网段信息。</p>
+<h4 id="a、接口调用请求说明-1"><a href="#a、接口调用请求说明-1" class="headerlink" title="a、接口调用请求说明"></a>a、接口调用请求说明</h4><pre><code>http请求方式: GET
+https://api.weixin.qq.com/cgi-bin/getcallbackip?access_token=ACCESS_TOKEN
+</code></pre><h4 id="b、参数说明-1"><a href="#b、参数说明-1" class="headerlink" title="b、参数说明"></a>b、参数说明</h4><pre><code>参数                 是否必须            说明
+access_token          是            公众号的access_token
+</code></pre><h4 id="c、返回说明-1"><a href="#c、返回说明-1" class="headerlink" title="c、返回说明"></a>c、返回说明</h4><pre><code>正常情况下，微信会返回下述JSON数据包给公众号：
+{
+    &quot;ip_list&quot;: [
+        &quot;127.0.0.1&quot;, 
+        &quot;127.0.0.2&quot;, 
+        &quot;101.226.103.0/25&quot;
+    ]
+}
+</code></pre><h3 id="3、自定义菜单查询接口"><a href="#3、自定义菜单查询接口" class="headerlink" title="3、自定义菜单查询接口"></a>3、自定义菜单查询接口</h3><p>使用接口创建自定义菜单后，开发者还可使用接口查询自定义菜单的结构。另外请注意，在设置了个性化菜单后，使用本自定义菜单查询接口可以获取默认菜单和全部个性化菜单信息。</p>
+<h4 id="a、请求说明"><a href="#a、请求说明" class="headerlink" title="a、请求说明"></a>a、请求说明</h4><pre><code>http请求方式：GET
+https://api.weixin.qq.com/cgi-bin/menu/get?access_token=ACCESS_TOKEN
+</code></pre><h4 id="b、参数说明-2"><a href="#b、参数说明-2" class="headerlink" title="b、参数说明"></a>b、参数说明</h4><pre><code>参数                 是否必须            说明
+access_token          是            公众号的access_token
+</code></pre><h4 id="c、返回说明-2"><a href="#c、返回说明-2" class="headerlink" title="c、返回说明"></a>c、返回说明</h4><pre><code>对应创建接口，正确的Json返回结果:
+{
+    &quot;menu&quot;: {
+        &quot;button&quot;: [
+            {
+                &quot;type&quot;: &quot;click&quot;, 
+                &quot;name&quot;: &quot;今日歌曲&quot;, 
+                &quot;key&quot;: &quot;V1001_TODAY_MUSIC&quot;, 
+                &quot;sub_button&quot;: [ ]
+            }, 
+            {
+                &quot;name&quot;: &quot;菜单&quot;, 
+                &quot;sub_button&quot;: [
+                    {
+                        &quot;type&quot;: &quot;view&quot;, 
+                        &quot;name&quot;: &quot;搜索&quot;, 
+                        &quot;url&quot;: &quot;http://www.soso.com/&quot;, 
+                        &quot;sub_button&quot;: [ ]
+                    }
+                ]
+            }
+        ]
+    }
+}
+</code></pre><h3 id="4、自定义菜单删除接口"><a href="#4、自定义菜单删除接口" class="headerlink" title="4、自定义菜单删除接口"></a>4、自定义菜单删除接口</h3><p>使用接口创建自定义菜单后，开发者还可使用接口删除当前使用的自定义菜单。另请注意，在个性化菜单时，调用此接口会删除默认菜单及全部个性化菜单。</p>
+<h4 id="a、请求说明-1"><a href="#a、请求说明-1" class="headerlink" title="a、请求说明"></a>a、请求说明</h4><pre><code>http请求方式：GET
+https://api.weixin.qq.com/cgi-bin/menu/delete?access_token=ACCESS_TOKEN
+</code></pre><h4 id="b、参数说明-3"><a href="#b、参数说明-3" class="headerlink" title="b、参数说明"></a>b、参数说明</h4><pre><code>参数                 是否必须            说明
+access_token          是            公众号的access_token
+</code></pre><h4 id="c、返回说明-3"><a href="#c、返回说明-3" class="headerlink" title="c、返回说明"></a>c、返回说明</h4><pre><code>对应创建接口，正确的Json返回结果:
+{&quot;errcode&quot;:0,&quot;errmsg&quot;:&quot;ok&quot;}
+</code></pre><h3 id="5、添加客服帐号"><a href="#5、添加客服帐号" class="headerlink" title="5、添加客服帐号"></a>5、<strong>添加客服帐号</strong></h3><p>开发者可以通过本接口为公众号添加客服账号，每个公众号最多添加10个客服账号。</p>
+<h4 id="a、接口调用请求"><a href="#a、接口调用请求" class="headerlink" title="a、接口调用请求"></a>a、接口调用请求</h4><pre><code>http请求方式: POST
+https://api.weixin.qq.com/customservice/kfaccount/add?access_token=ACCESS_TOKEN
+</code></pre><h4 id="b、POST数据示例"><a href="#b、POST数据示例" class="headerlink" title="b、POST数据示例"></a>b、POST数据示例</h4><pre><code>{
+     &quot;kf_account&quot; : &quot;test1@test&quot;,
+     &quot;nickname&quot; : &quot;客服1&quot;,
+     &quot;password&quot; : &quot;pswmd5&quot;,
+}
+</code></pre><h4 id="c、返回说明-4"><a href="#c、返回说明-4" class="headerlink" title="c、返回说明"></a>c、返回说明</h4><pre><code>正确时的JSON返回结果
+{
+     &quot;errcode&quot; : 0,
+     &quot;errmsg&quot; : &quot;ok&quot;,
+}
+</code></pre><h3 id="6、获取所有客服账号"><a href="#6、获取所有客服账号" class="headerlink" title="6、获取所有客服账号"></a>6、<strong>获取所有客服账号</strong></h3><p>开发者通过本接口，获取公众号中所设置的客服基本信息，包括客服工号、客服昵称、客服登录账号。</p>
+<h4 id="a、接口调用请求-1"><a href="#a、接口调用请求-1" class="headerlink" title="a、接口调用请求"></a>a、接口调用请求</h4><pre><code>http请求方式: GET
+https://api.weixin.qq.com/cgi-bin/customservice/getkflist?access_token=ACCESS_TOKEN
+</code></pre><h4 id="b、返回说明"><a href="#b、返回说明" class="headerlink" title="b、返回说明"></a>b、返回说明</h4><pre><code>{
+    &quot;kf_list&quot;: [
+        {
+            &quot;kf_account&quot;: &quot;test1@test&quot;, 
+            &quot;kf_nick&quot;: &quot;ntest1&quot;, 
+            &quot;kf_id&quot;: &quot;1001&quot;
+            &quot;kf_headimgurl&quot;: &quot; http://mmbiz.qpic.cn/mmbiz/4whpV1VZl2iccsvYbHvnphkyGtnvjfUS8Ym0GSaLic0FD3vN0V8PILcibEGb2fPfEOmw/0&quot;
+        }, 
+        {
+            &quot;kf_account&quot;: &quot;test2@test&quot;, 
+            &quot;kf_nick&quot;: &quot;ntest2&quot;, 
+            &quot;kf_id&quot;: &quot;1002&quot;
+            &quot;kf_headimgurl&quot;: &quot; http://mmbiz.qpic.cn/mmbiz/4whpV1VZl2iccsvYbHvnphkyGtnvjfUS8Ym0GSaLic0FD3vN0V8PILcibEGb2fPfEOmw /0&quot;
+        }
+    ]
+}
+</code></pre><h3 id="7、修改客服帐号"><a href="#7、修改客服帐号" class="headerlink" title="7、修改客服帐号"></a>7、<strong>修改客服帐号</strong></h3><p>开发者可以通过本接口为公众号修改客服账号。</p>
+<h4 id="a、接口调用请求-2"><a href="#a、接口调用请求-2" class="headerlink" title="a、接口调用请求"></a>a、接口调用请求</h4><pre><code>http请求方式: POST
+https://api.weixin.qq.com/customservice/kfaccount/update?access_token=ACCESS_TOKEN
+</code></pre><h4 id="b、POST数据示例-1"><a href="#b、POST数据示例-1" class="headerlink" title="b、POST数据示例"></a>b、POST数据示例</h4><pre><code>{
+     &quot;kf_account&quot; : &quot;test1@test&quot;,
+     &quot;nickname&quot; : &quot;客服1&quot;,
+     &quot;password&quot; : &quot;pswmd5&quot;,
+}
+</code></pre><h4 id="c、返回说明-5"><a href="#c、返回说明-5" class="headerlink" title="c、返回说明"></a>c、返回说明</h4><pre><code>正确时的JSON返回结果
+{
+     &quot;errcode&quot; : 0,
+     &quot;errmsg&quot; : &quot;ok&quot;,
+}
+</code></pre><h3 id="8、删除客服帐号"><a href="#8、删除客服帐号" class="headerlink" title="8、删除客服帐号"></a>8、<strong>删除客服帐号</strong></h3><p>开发者可以通过该接口为公众号删除客服帐号。</p>
+<h5 id="a、接口调用请求-3"><a href="#a、接口调用请求-3" class="headerlink" title="a、接口调用请求"></a>a、接口调用请求</h5><pre><code>http请求方式: GET
+https://api.weixin.qq.com/customservice/kfaccount/del?access_token=ACCESS_TOKEN
+</code></pre><h4 id="b、POST数据示例-2"><a href="#b、POST数据示例-2" class="headerlink" title="b、POST数据示例"></a>b、POST数据示例</h4><pre><code>{
+     &quot;kf_account&quot; : &quot;test1@test&quot;,
+     &quot;nickname&quot; : &quot;客服1&quot;,
+     &quot;password&quot; : &quot;pswmd5&quot;,
+}
+</code></pre><h4 id="c、返回说明-6"><a href="#c、返回说明-6" class="headerlink" title="c、返回说明"></a>c、返回说明</h4><pre><code>正确时的JSON返回结果
+{
+     &quot;errcode&quot; : 0,
+     &quot;errmsg&quot; : &quot;ok&quot;,
+}
+</code></pre><h3 id="9、用户授权登陆第三方应用"><a href="#9、用户授权登陆第三方应用" class="headerlink" title="9、用户授权登陆第三方应用"></a>9、用户授权登陆第三方应用</h3><p>第三方使用网站应用授权登录前请注意已获取相应网页授权作用域（scope=snsapi_login）。</p>
+<h4 id="第一步"><a href="#第一步" class="headerlink" title="第一步"></a>第一步</h4><pre><code>https://open.weixin.qq.com/connect/qrconnect?appid=APPID&amp;redirect_uri=REDIRECT_URI&amp;response_type=code&amp;scope=SCOPE&amp;state=STATE#wechat_redirect
+</code></pre><h5 id="参数说明"><a href="#参数说明" class="headerlink" title="参数说明"></a><strong>参数说明</strong></h5><pre><code>参数              是否必须                    说明
+appid              是                    应用唯一标识
+redirect_uri      是             请使用urlEncode对链接进行处理
+response_type      是                       填code
+scope              是           应用授权作用域，拥有多个作用域用逗号（,）分隔，网页应用目前仅填写snsapi_login即
+state              否           用于保持请求和回调的状态，授权请求后原样带回给第三方。该参数可用于防止csrf攻击（跨站请求伪造攻击），建议第三方带上该参数，可设置为简单的随机数加session进行校验
+</code></pre><h5 id="返回说明"><a href="#返回说明" class="headerlink" title="返回说明"></a><strong>返回说明</strong></h5><pre><code>用户允许授权后，将会重定向到redirect_uri的网址上，并且带上code和state参数
+redirect_uri?code=CODE&amp;state=STATE
+</code></pre><h4 id="第二步"><a href="#第二步" class="headerlink" title="第二步"></a><strong>第二步</strong></h4><pre><code>通过code获取access_token
+https://api.weixin.qq.com/sns/oauth2/access_token?appid=APPID&amp;secret=SECRET&amp;code=CODE&amp;grant_type=authorization_code
+</code></pre><h5 id="参数说明-1"><a href="#参数说明-1" class="headerlink" title="参数说明"></a><strong>参数说明</strong></h5><pre><code>参数                是否必须         说明
+appid               是      应用唯一标识，在微信开放平台提交应用审核通过后获得
+secret               是      应用密钥AppSecret，在微信开放平台提交应用审核通过后获得
+code               是      填写第一步获取的code参数
+grant_type           是      填authorization_code
+</code></pre><h5 id="返回说明-1"><a href="#返回说明-1" class="headerlink" title="返回说明"></a><strong>返回说明</strong></h5><pre><code>正确的返回：
+{ 
+&quot;access_token&quot;:&quot;ACCESS_TOKEN&quot;, 
+&quot;expires_in&quot;:7200, 
+&quot;refresh_token&quot;:&quot;REFRESH_TOKEN&quot;,
+&quot;openid&quot;:&quot;OPENID&quot;, 
+&quot;scope&quot;:&quot;SCOPE&quot;,
+&quot;unionid&quot;: &quot;o6_bmasdasdsad6_2sgVt7hMZOPfL&quot;
+}
+</code></pre><h4 id="第三步"><a href="#第三步" class="headerlink" title="第三步"></a><strong>第三步</strong></h4><pre><code>获取access_token后，进行接口调用，有以下前提：
+1. access_token有效且未超时；
+2. 微信用户已授权给第三方应用帐号相应接口作用域（scope）。
+</code></pre><h5 id="接口作用域（scope），能调用的接口有以下"><a href="#接口作用域（scope），能调用的接口有以下" class="headerlink" title="接口作用域（scope），能调用的接口有以下"></a>接口作用域（scope），能调用的接口有以下</h5><p>其中snsapi_base属于基础接口，若应用已拥有其它scope权限，则默认拥有snsapi_base的权限。</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">授权作用域（scope）</th>
+<th style="text-align:left">接口</th>
+<th style="text-align:left">接口说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">snsapi_base</td>
+<td style="text-align:left">/sns/oauth2/access_token</td>
+<td style="text-align:left">通过code换取access_token、refresh_token和已授权scope</td>
+</tr>
+<tr>
+<td style="text-align:left">snsapi_base</td>
+<td style="text-align:left">/sns/oauth2/refresh_token</td>
+<td style="text-align:left">刷新或续期access_token使用</td>
+</tr>
+<tr>
+<td style="text-align:left">snsapi_base</td>
+<td style="text-align:left">/sns/auth</td>
+<td style="text-align:left">检查access_token有效性</td>
+</tr>
+<tr>
+<td style="text-align:left">snsapi_userinfo</td>
+<td style="text-align:left">/sns/userinfo</td>
+<td style="text-align:left">获取用户个人信息</td>
+</tr>
+</tbody>
+</table>
+<h5 id="拉取用户信息-需scope为-snsapi-userinfo"><a href="#拉取用户信息-需scope为-snsapi-userinfo" class="headerlink" title="拉取用户信息(需scope为 snsapi_userinfo)"></a><strong>拉取用户信息(需scope为 snsapi_userinfo)</strong></h5><pre><code>http：GET
+https://api.weixin.qq.com/sns/userinfo?access_token=ACCESS_TOKEN&amp;openid=OPENID&amp;lang=zh_CN 
+</code></pre><h5 id="参数说明-2"><a href="#参数说明-2" class="headerlink" title="参数说明"></a>参数说明</h5><pre><code>参数                       描述
+access_token     网页授权接口调用凭证,注意：此access_token与基础支持的access_token不同
+openid                用户的唯一标识
+lang             返回国家地区语言版本，zh_CN 简体，zh_TW 繁体，en 英语
+</code></pre><h5 id="返回说明-2"><a href="#返回说明-2" class="headerlink" title="返回说明"></a>返回说明</h5><pre><code>正确时返回的JSON数据包如下：
+{&quot;openid&quot;:&quot; OPENID&quot;,  
+ &quot; nickname&quot;: NICKNAME,   
+ &quot;sex&quot;:&quot;1&quot;,   
+ &quot;province&quot;:&quot;PROVINCE&quot;   
+ &quot;city&quot;:&quot;CITY&quot;,   
+ &quot;country&quot;:&quot;COUNTRY&quot;,    
+ &quot;headimgurl&quot;:    &quot;http://wx.qlogo.cn/mmopen/g3MonUZtNHkdmzicIlibx6iaFqAc56vxLSUfpb6n5WKSYVY0ChQKkiaJSgQ1dZuTOgvLLrhJbERQQ4eMsv84eavHiaiceqxibJxCfHe/46&quot;,  
+&quot;privilege&quot;:[ &quot;PRIVILEGE1&quot; &quot;PRIVILEGE2&quot;     ],    
+&quot;unionid&quot;: &quot;o6_bmasdasdsad6_2sgVt7hMZOPfL&quot; 
+} 
+</code></pre><h5 id="检验授权凭证（access-token）是否有效"><a href="#检验授权凭证（access-token）是否有效" class="headerlink" title="检验授权凭证（access_token）是否有效"></a><strong>检验授权凭证（access_token）是否有效</strong></h5><pre><code>http：GET
+https://api.weixin.qq.com/sns/auth?access_token=ACCESS_TOKEN&amp;openid=OPENID 
+</code></pre><h5 id="参数说明-3"><a href="#参数说明-3" class="headerlink" title="参数说明"></a>参数说明</h5><pre><code>参数                             描述
+access_token      网页授权接口调用凭证,注意：此access_token与基础支持的access_token不同
+openid                    用户的唯一标识    
+</code></pre><h5 id="返回说明-3"><a href="#返回说明-3" class="headerlink" title="返回说明"></a>返回说明</h5><pre><code>正确的JSON返回结果：
+{ &quot;errcode&quot;:0,&quot;errmsg&quot;:&quot;ok&quot;} 
+错误时的JSON返回示例：
+{ &quot;errcode&quot;:40003,&quot;errmsg&quot;:&quot;invalid openid&quot;}
+</code></pre><h3 id="10、批量获取用户基本信息"><a href="#10、批量获取用户基本信息" class="headerlink" title="10、批量获取用户基本信息"></a>10、批量获取用户基本信息</h3><h4 id="请求说明"><a href="#请求说明" class="headerlink" title="请求说明"></a>请求说明</h4><pre><code>http请求方式: POST
+https://api.weixin.qq.com/cgi-bin/user/info/batchget?access_token=ACCESS_TOKEN
+</code></pre><h4 id="POST数据示例"><a href="#POST数据示例" class="headerlink" title="POST数据示例"></a>POST数据示例</h4><pre><code>{
+   &quot;user_list&quot;: [
+       {
+           &quot;openid&quot;: &quot;otvxTs4dckWG7imySrJd6jSi0CWE&quot;, 
+           &quot;lang&quot;: &quot;zh-CN&quot;
+       }, 
+       {
+           &quot;openid&quot;: &quot;otvxTs_JZ6SEiP0imdhpi50fuSZg&quot;, 
+           &quot;lang&quot;: &quot;zh-CN&quot;
+       }
+   ]
+}
+</code></pre><h4 id="返回说明-4"><a href="#返回说明-4" class="headerlink" title="返回说明"></a>返回说明</h4><pre><code>{
+  &quot;user_info_list&quot;: [
+      {
+          &quot;subscribe&quot;: 1, 
+          &quot;openid&quot;: &quot;otvxTs4dckWG7imySrJd6jSi0CWE&quot;, 
+          &quot;nickname&quot;: &quot;iWithery&quot;, 
+          &quot;sex&quot;: 1, 
+          &quot;language&quot;: &quot;zh_CN&quot;, 
+          &quot;city&quot;: &quot;Jieyang&quot;, 
+          &quot;province&quot;: &quot;Guangdong&quot;, 
+          &quot;country&quot;: &quot;China&quot;, 
+          &quot;headimgurl&quot;: &quot;http://wx.qlogo.cn/mmopen/xbIQx1GRqdvyqkMMhEaGOX802l1CyqMJNgUzKP8MeAeHFicRDSnZH7FY4XB7p8XHXIf6uJA2SCun
+
+TPicGKezDC4saKISzRj3nz/0&quot;,
+
+          &quot;subscribe_time&quot;: 1434093047, 
+          &quot;unionid&quot;: &quot;oR5GjjgEhCMJFyzaVZdrxZ2zRRF4&quot;, 
+          &quot;remark&quot;: &quot;&quot;, 
+          &quot;groupid&quot;: 0,
+
+          &quot;tagid_list&quot;:[128,2]
+
+      }, 
+      {
+          &quot;subscribe&quot;: 0, 
+          &quot;openid&quot;: &quot;otvxTs_JZ6SEiP0imdhpi50fuSZg&quot;, 
+          &quot;unionid&quot;: &quot;oR5GjjjrbqBZbrnPwwmSxFukE41U&quot;, 
+      }
+  ]
+}
+</code></pre><h3 id="11、获取微信公众号用户列表"><a href="#11、获取微信公众号用户列表" class="headerlink" title="11、获取微信公众号用户列表"></a>11、获取微信公众号用户列表</h3><h4 id="调用请求说明"><a href="#调用请求说明" class="headerlink" title="调用请求说明"></a>调用请求说明</h4><pre><code>http请求方式: GET（请使用https协议）
+https://api.weixin.qq.com/cgi-bin/user/get?access_token=ACCESS_TOKEN&amp;next_openid=NEXT_OPENID
+</code></pre><h4 id="参数说明-4"><a href="#参数说明-4" class="headerlink" title="参数说明"></a>参数说明</h4><pre><code>参数                    是否必须          说明
+access_token           是          调用接口凭证
+next_openid               是         第一个拉取的OPENID，不填默认从头开始拉取
+</code></pre><h4 id="返回说明-5"><a href="#返回说明-5" class="headerlink" title="返回说明"></a>返回说明</h4><pre><code>正确时返回JSON数据包：
+{&quot;total&quot;:2,&quot;count&quot;:2,&quot;data&quot;:{&quot;openid&quot;:[&quot;&quot;,&quot;OPENID1&quot;,&quot;OPENID2&quot;]},&quot;next_openid&quot;:&quot;NEXT_OPENID&quot;}
+</code></pre><h4 id="参数说明-5"><a href="#参数说明-5" class="headerlink" title="参数说明"></a>参数说明</h4><pre><code>参数                  说明
+total         关注该公众账号的总用户数
+count         拉取的OPENID个数，最大值为10000
+data         列表数据，OPENID的列表
+next_openid     拉取列表的最后一个用户的OPENID
+</code></pre><h3 id="12、企业新版微信客服"><a href="#12、企业新版微信客服" class="headerlink" title="12、企业新版微信客服"></a>12、企业新版微信客服</h3><h4 id="获取客服基本信息"><a href="#获取客服基本信息" class="headerlink" title="获取客服基本信息"></a><strong>获取客服基本信息</strong></h4><pre><code>http请求方式: GET
+https://api.weixin.qq.com/cgi-bin/customservice/getkflist?access_token=ACCESS_TOKEN
+</code></pre><h4 id="返回说明-6"><a href="#返回说明-6" class="headerlink" title="返回说明"></a><strong>返回说明</strong></h4><p>返回数据示例（正确时的JSON返回结果）：</p>
+<pre><code>{
+    &quot;kf_list&quot; : [
+       {
+          &quot;kf_account&quot; : &quot;test1@test&quot;,
+          &quot;kf_headimgurl&quot; : &quot;http://mmbiz.qpic.cn/mmbiz/4whpV1VZl2iccsvYbHvnphkyGtnvjfUS8Ym0GSaLic0FD3vN0V8PILcibEGb2fPfEOmw/0&quot;,
+          &quot;kf_id&quot; : &quot;1001&quot;,
+          &quot;kf_nick&quot; : &quot;ntest1&quot;,
+          &quot;kf_wx&quot; : &quot;kfwx1&quot;
+       },
+       {
+          &quot;kf_account&quot; : &quot;test3@test&quot;,
+          &quot;kf_headimgurl&quot; : &quot;http://mmbiz.qpic.cn/mmbiz/4whpV1VZl2iccsvYbHvnphkyGtnvjfUS8Ym0GSaLic0FD3vN0V8PILcibEGb2fPfEOmw/0&quot;,
+          &quot;kf_id&quot; : &quot;1003&quot;,
+          &quot;kf_nick&quot; : &quot;ntest3&quot;,
+          &quot;invite_wx&quot; : &quot;kfwx3&quot;,
+          &quot;invite_expire_time&quot; : 123456789,
+          &quot;invite_status&quot; : &quot;waiting&quot;
+       }
+    ]
+ }
+
+</code></pre><h4 id="参数说明-6"><a href="#参数说明-6" class="headerlink" title="参数说明"></a><strong>参数说明</strong></h4><pre><code>参数                                          说明
+kf_account               完整客服帐号，格式为：帐号前缀@公众号微信号
+kf_nick                                    客服昵称
+kf_id                                    客服编号
+kf_headimgurl                             客服头像
+kf_wx                     如果客服帐号已绑定了客服人员微信号，则此处显示微信号
+invite_wx               如果客服帐号尚未绑定微信号，但是已经发起了一个绑定邀请，则此处显示绑定邀请的微信号
+invite_expire_time        如果客服帐号尚未绑定微信号，但是已经发起过一个绑定邀请，邀请的过期时间，为unix 时间戳
+invite_status           邀请的状态，有等待确认“waiting”，被拒绝“rejected”，过期“expired”
+</code></pre><h3 id="13、获取聊天记录"><a href="#13、获取聊天记录" class="headerlink" title="13、获取聊天记录"></a>13、<strong>获取聊天记录</strong></h3><h4 id="调用说明"><a href="#调用说明" class="headerlink" title="调用说明"></a>调用说明</h4><pre><code>http请求方式: POST
+https://api.weixin.qq.com/customservice/msgrecord/getmsglist?access_token=ACCESS_TOKEN
+</code></pre><h4 id="POST数据示例如下："><a href="#POST数据示例如下：" class="headerlink" title="POST数据示例如下："></a>POST数据示例如下：</h4><pre><code> {
+    &quot;starttime&quot; : 987654321,
+    &quot;endtime&quot; : 987654321,
+    &quot;msgid&quot; : 1,
+    &quot;number&quot; : 10000
+}
+</code></pre><h4 id="参数说明-7"><a href="#参数说明-7" class="headerlink" title="参数说明"></a><strong>参数说明</strong></h4><pre><code>参数                        说明
+starttime           起始时间，unix时间戳
+endtime            结束时间，unix时间戳，每次查询时段不能超过24小时
+msgid               消息id顺序从小到大，从1开始
+number               每次获取条数，最多10000条
+</code></pre><h4 id="返回说明-7"><a href="#返回说明-7" class="headerlink" title="返回说明"></a><strong>返回说明</strong></h4><pre><code>{
+    &quot;recordlist&quot; : [
+       {
+          &quot;openid&quot; : &quot;oDF3iY9WMaswOPWjCIp_f3Bnpljk&quot;,
+          &quot;opercode&quot; : 2002,
+          &quot;text&quot; : &quot; 您好，客服test1为您服务。&quot;,
+          &quot;time&quot; : 1400563710,
+          &quot;worker&quot; : &quot;test1@test&quot;
+       },
+       {
+          &quot;openid&quot; : &quot;oDF3iY9WMaswOPWjCIp_f3Bnpljk&quot;,
+          &quot;opercode&quot; : 2003,
+          &quot;text&quot; : &quot;你好，有什么事情？&quot;,
+          &quot;time&quot; : 1400563731,
+          &quot;worker&quot; : &quot;test1@test&quot;
+       }
+    ],
+     &quot;number&quot;:2,
+     &quot;msgid&quot;:20165267
+ }
+</code></pre><h4 id="参数说明-8"><a href="#参数说明-8" class="headerlink" title="参数说明"></a><strong>参数说明</strong></h4><pre><code>参数                               说明
+worker                完整客服帐号，格式为：帐号前缀@公众号微信号
+openid                          用户标识
+opercode            操作码，2002（客服发送信息），2003（客服接收消息）
+text                           聊天记录
+time                      操作时间，unix时间戳
+</code></pre><p>参考资料：</p>
+<p>1、<a href="https://www.w3cschool.cn/weixinkaifawendang/f5ej1q84.html" target="_blank" rel="noopener">微信公众平台开发概述</a></p>
+<p>2、<a href="https://open.weixin.qq.com/cgi-bin/showdocument?action=dir_list&amp;t=resource/res_list&amp;verify=1&amp;id=1417674108&amp;token=&amp;lang=zh_CN" target="_blank" rel="noopener">微信开放平台</a></p>
+
+          </div>
+          <br><br>
+              
+                <div class="license-wrapper">
+                    <p>原文作者：<a href="">Misaki</a>
+                    <p>原文链接：<a href="/2019/05/微信公众号接口/">/2019/05/微信公众号接口/</a>
+                    <p>发表日期：<a href="/2019/05/微信公众号接口/">May 27th 2019, 11:32:58 am</a>
+                    <p>更新日期：<a href="/2019/05/微信公众号接口/">May 27th 2019, 11:33:38 am</a>
+                    <p>版权声明：本文采用<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">知识共享署名-非商业性使用 4.0 国际许可协议</a>进行许可</p>
+                </div>
+              
+          <br><br>
+          <div>
+              <p>
+                       
+                      <span class="badge badge-default">#&nbsp;web安全</span>
+                      &nbsp;
+                      
+              </p>
+          </div>
+        </div>
+      </div>  
+    </div>
+  </div>
+  <!-- TOC -->
+  
+      <div class="">
+        <div id="toc">
+          <p class="toc-title"><i class="material-icons" style="vertical-align:middle">toc</i>Toc:</p> 
+          <div id="tocbot"></div>
+        </div>
+      </div>
+  
+</div>
+
+
+<!-- Comments -->
+<div class="row">
+    <div class="col-md-8 offset-md-2">
+    
+        
+            <div class="disqus" style="width:100%">
+    <div id="disqus_thread"></div>
+    <script>               
+        var disqus_shortname = '';
+        var disqus_config = function () {
+            this.page.url = '/2019/05/微信公众号接口/'; 
+            this.page.identifier = '/2019/05/微信公众号接口/';
+        };
+        (function() { 
+            var d = document, s = d.createElement('script');
+            s.type = 'text/javascript';
+            s.src = '//'+disqus_shortname+'.disqus.com/embed.js';
+            s.setAttribute('data-timestamp', +new Date());
+            (d.head || d.body).appendChild(s);
+        })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>                                
+</div>
+        
+    
+    </div>
+</div>
+  
+
+<footer class="footer footer-default">
+        <div class="container">
+          <div class="float-left" style="padding: 15px 0;">
+              <b>假如今天的你被生活辜负了，别伤心，因为明天生活还会继续辜负你！</b>
+          </div>
+          <div align="right" style="padding: 15px 0;">
+              <i class="iconfont icon-love" ></i>
+              <a href="https://github.com/0x2e/Material-T" target="_blank"> <b>Material-T</b></a>
+          </div>
+        </div>
+</footer>
+      <!--   Core JS Files   -->
+      <script src="/js/core/jquery.min.js?v=3.2.1"></script>
+      <script src="/js/main.js"></script>
+      <script src="/js/core/popper.min.js"></script>
+      <script src="/js/core/bootstrap-material-design.min.js"></script>
+      <script src="/js/plugins/moment.min.js"></script>
+      <script src="/js/material-kit.min.js?v=2.0.5"></script>
+      
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.4.2/tocbot.min.js"></script>
+        <script src="/js/post.js"></script>
+        <script src="/js/plugins/prettify.js"></script>
+        <script>
+            $(document).ready(function(){
+                $('pre').addClass('prettyprint linenums');
+                prettyPrint();
+            })
+        </script>
+      
+</body>
+</html>
