@@ -242,8 +242,8 @@ N1:从头部查找查找&quot;.&quot;号,获得&quot;.asp;xxxx.jpg&quot;
 N2:查找&quot;;&quot;号,如果有则内存截断
 N3:查找&quot;/&quot;,如果有则内存截断
 </code></pre><p>因此，.asp将最终被保存下来，IIS6只简单地根据扩展名来识别，所以从脚本映射表中里查找脚本与扩展名对比，并利用asp.dll来解析。导致最终的问题产生。</p>
-<p>对于此问题，微软并不认为这是一个漏洞，同样也没退出IIS6.0解析漏洞的补丁。因此在IIS6.0的网站下，此问题仍然可以尝试是否存在。</p>
-<h3 id="0x05-2、Nginx-解析漏洞"><a href="#0x05-2、Nginx-解析漏洞" class="headerlink" title="0x05-2、Nginx 解析漏洞"></a>0x05-2、Nginx 解析漏洞</h3><p>​        Nginx是一个高性能的<a href="https://baike.baidu.com/item/HTTP" target="_blank" rel="noopener">HTTP</a>和<a href="https://baike.baidu.com/item/反向代理/7793488" target="_blank" rel="noopener">反向代理</a>web服务器，同时也提供了IMAP/POP3/SMTP服务。Nginx是由伊戈尔·赛索耶夫为俄罗斯访问量第二的Rambler.ru站点开发的。</p>
+<p>对于此问题，微软并不认为这是一个漏洞，同样也没推出IIS6.0解析漏洞的补丁。因此在IIS6.0的网站下，此问题仍然可以尝试是否存在。</p>
+<h3 id="0x05-2、Nginx-解析漏洞"><a href="#0x05-2、Nginx-解析漏洞" class="headerlink" title="0x05-2、Nginx 解析漏洞"></a>0x05-2、Nginx 解析漏洞</h3><p>​        Nginx是一个高性能的HTTP和反向代理web服务器，同时也提供了IMAP/POP3/SMTP服务。Nginx是由伊戈尔·赛索耶夫为俄罗斯访问量第二的Rambler.ru站点开发的。</p>
 <p>​        在低版本Nginx中存在一个由PHP-CGI导致的文件解析漏洞。为什么是由于PHP-CGI的原因呢，因为在PHP的配置文件中有一个关键的选项cgi.fix_pathinfo在本机中位于php.ini配置文件中，默认是开启的，当URL中有不存在的文件时，PHP就会默认向前解析。</p>
 <p>​        普遍的做法是在Nginx配置文件中通过正则匹配设置SCRIPT_FILENAME。访问 ”<a href="http://www.xx.com/phpinfo.jpg/1.php”" target="_blank" rel="noopener">www.xx.com/phpinfo.jpg/1.php”</a> 这个URL时，$fastcgi_script_name会被设置为“phpinfo.jpg/1.php”，然后构造成SCRIPT_FILENAME传递给PHP-CGI，但是PHP为什么会接受这样的参数，并将phpinfo.jpg作为PHP文件解析呢?这就要说到fix_pathinfo这个选项了。如果开启了这个选项，那么就会触发在PHP中的如下逻辑：PHP会认为SCRIPT_FILENAME是phpinfo.jpg，而1.php是PATH_INFO，所以就会将phpinfo.jpg作为PHP文件来解析了</p>
 <p>​        在默认Fast-CGI开启状况下上传名字为xx.jpg,内容为:<br><code>&lt;?PHP fputs(fopen(&#39;shell.php&#39;,&#39;w&#39;),&#39;&lt;?php eval($_POST[cmd])?&gt;&#39;);?&gt;</code></p>
@@ -478,7 +478,7 @@ weblogic_1  | *  password assigned to an admin-level user.  For *
                     <p>原文作者：<a href="">Misaki</a>
                     <p>原文链接：<a href="/2019/05/文件上传漏洞/">/2019/05/文件上传漏洞/</a>
                     <p>发表日期：<a href="/2019/05/文件上传漏洞/">May 30th 2019, 2:11:55 pm</a>
-                    <p>更新日期：<a href="/2019/05/文件上传漏洞/">June 3rd 2019, 9:37:21 am</a>
+                    <p>更新日期：<a href="/2019/05/文件上传漏洞/">June 3rd 2019, 9:40:56 am</a>
                     <p>版权声明：本文采用<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">知识共享署名-非商业性使用 4.0 国际许可协议</a>进行许可</p>
                 </div>
               
