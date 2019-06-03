@@ -111,13 +111,13 @@
 编辑器文件上传
 ......
 </code></pre><p>例如如下编辑器上传点：</p>
-<p><img src="https://misakikata.github.io/2019/05/文件上传漏洞/1559525399747.png" alt="1559525399747"></p>
+<p><img src="/2019/05/文件上传漏洞/1559525399747.png" alt="1559525399747"></p>
 <p>文件管理处文件上传：</p>
-<p><img src="https://misakikata.github.io/2019/05/文件上传漏洞/1559525465670.png" alt="1559525465670"></p>
+<p><img src="/2019/05/文件上传漏洞/1559525465670.png" alt="1559525465670"></p>
 <p>前台用户发表文章处文件上传：</p>
-<p><img src="https://misakikata.github.io/2019/05/文件上传漏洞/1559525540726.png" alt="1559525540726"></p>
+<p><img src="/2019/05/文件上传漏洞/1559525540726.png" alt="1559525540726"></p>
 <p>个人头像处文件上传：</p>
-<p><img src="https://misakikata.github.io/2019/05/文件上传漏洞/1559525602088.png" alt="1559525602088"></p>
+<p><img src="/2019/05/文件上传漏洞/1559525602088.png" alt="1559525602088"></p>
 <h3 id="0x04-2、后缀绕过"><a href="#0x04-2、后缀绕过" class="headerlink" title="0x04-2、后缀绕过"></a>0x04-2、后缀绕过</h3><pre><code>PHP:
 php2、php3、php5、phtml、pht(是否解析需要根据配置文件中设置类型来决定)
 ASP：
@@ -253,7 +253,7 @@ N3:查找&quot;/&quot;,如果有则内存截断
 <p>​        Apache 在1.x和2.x版本中存在解析漏洞，例如如下地址格式：</p>
 <pre><code>www.xxxx.com/apache.php.bbb.aaa
 </code></pre><p>Apache从右至左开始判断后缀，若aaa非可识别后缀，再判断bbb，直到找到可识别后缀为止，然后将该可识别后缀进解析，因此如上地址解析为访问apache.php文件。</p>
-<p>​        那么为什么会产生此问题原因，在Apache的官方网站上，有一句这么关于“<em>extension</em>”的解释：</p>
+<p>​        那么为什么会产生此问题原因，在Apache的官方网站上，有一句这么关于“extension”的解释：</p>
 <pre><code>地址：http://httpd.apache.org/docs/current/mod/directive-dict.html
 
 extension
@@ -478,7 +478,7 @@ weblogic_1  | *  password assigned to an admin-level user.  For *
                     <p>原文作者：<a href="">Misaki</a>
                     <p>原文链接：<a href="/2019/05/文件上传漏洞/">/2019/05/文件上传漏洞/</a>
                     <p>发表日期：<a href="/2019/05/文件上传漏洞/">May 30th 2019, 2:11:55 pm</a>
-                    <p>更新日期：<a href="/2019/05/文件上传漏洞/">June 3rd 2019, 9:40:56 am</a>
+                    <p>更新日期：<a href="/2019/05/文件上传漏洞/">June 3rd 2019, 9:45:03 am</a>
                     <p>版权声明：本文采用<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">知识共享署名-非商业性使用 4.0 国际许可协议</a>进行许可</p>
                 </div>
               
