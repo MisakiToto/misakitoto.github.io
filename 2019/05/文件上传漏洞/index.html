@@ -443,7 +443,7 @@ weblogic_1  | *  password assigned to an admin-level user.  For *
 <p><img src="\2019\05\文件上传漏洞\1559187113513.png" alt="1559187113513"></p>
 <p>选择文件上传，由于2.4.3在文件配置已经进行了后缀的限制，默认限制为：</p>
 <pre><code>array(&#39;html&#39;,&#39;htm&#39;,&#39;php&#39;,&#39;php2&#39;,&#39;php3&#39;,&#39;php4&#39;,&#39;php5&#39;,&#39;phtml&#39;,&#39;pwml&#39;,&#39;inc&#39;,&#39;asp&#39;,&#39;aspx&#39;,&#39;ascx&#39;,&#39;jsp&#39;,&#39;cfm&#39;,&#39;cfc&#39;,&#39;pl&#39;,&#39;bat&#39;,&#39;exe&#39;,&#39;com&#39;,&#39;dll&#39;,&#39;vbs&#39;,&#39;js&#39;,&#39;reg&#39;,&#39;cgi&#39;,&#39;htaccess&#39;,&#39;asis&#39;,&#39;sh&#39;,&#39;shtml&#39;,&#39;shtm&#39;,&#39;phtm&#39;) 
-</code></pre><p>这时候可以利用空格绕过，先上传一个JPG的图片，抓包修改后缀，添加空格如下：</p>
+</code></pre><p>对于此处漏洞我们采用空格绕过，先上传一个JPG的图片，抓包修改后缀，添加空格如下：</p>
 <p><img src="\2019\05\文件上传漏洞\1559195350373.png" alt="1559195350373"></p>
 <p>访问上传产生的路径文件，路径会显示在页面中：</p>
 <pre><code>http://localhost/fckeditor/editor/filemanager/browser/default/connectors/uploads/file/05091707156.php
@@ -478,7 +478,7 @@ weblogic_1  | *  password assigned to an admin-level user.  For *
                     <p>原文作者：<a href="">Misaki</a>
                     <p>原文链接：<a href="/2019/05/文件上传漏洞/">/2019/05/文件上传漏洞/</a>
                     <p>发表日期：<a href="/2019/05/文件上传漏洞/">May 30th 2019, 2:11:55 pm</a>
-                    <p>更新日期：<a href="/2019/05/文件上传漏洞/">June 3rd 2019, 9:45:03 am</a>
+                    <p>更新日期：<a href="/2019/05/文件上传漏洞/">June 3rd 2019, 9:50:18 am</a>
                     <p>版权声明：本文采用<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">知识共享署名-非商业性使用 4.0 国际许可协议</a>进行许可</p>
                 </div>
               
