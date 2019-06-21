@@ -141,10 +141,11 @@ cat /proc/kallsyms |grep __task_pid_nr_ns
 <p>修改完成后，刷入手机，利用SDK自带的fastboot。</p>
 <pre><code>adb reboot bootloader   # 启动fastboot模式
 
-fastboot flash recovery boot.img   #输入boot
+fastboot flash boot boot.img   #刷入boot分区
 
 fastboot reboot  #重启
 </code></pre><p><img src="\2019\04\逆向修改手机内核，绕过反调试\1554186828423.png" alt="1554186828423"></p>
+<h4 id="调试查看"><a href="#调试查看" class="headerlink" title="调试查看"></a>调试查看</h4><p><img src="\2019\04\逆向修改手机内核，绕过反调试\1554187063866.png" alt="1554187063866"></p>
 <p>如想使用修改函数操作指令的方式可以参考原作者方式：</p>
 <p>1、<a href="https://www.jianshu.com/p/91aa37f3a972" target="_blank" rel="noopener">逆向修改手机内核，绕过反调试</a></p>
 <p>2、<a href="https://www.xmsec.cc/re-modify-kernel-bypass-antidebug/" target="_blank" rel="noopener">逆向修改内核，绕过TracerPID反调试</a></p>
@@ -156,7 +157,7 @@ fastboot reboot  #重启
                     <p>原文作者：<a href="">Misaki</a>
                     <p>原文链接：<a href="/2019/04/逆向修改手机内核，绕过反调试/">/2019/04/逆向修改手机内核，绕过反调试/</a>
                     <p>发表日期：<a href="/2019/04/逆向修改手机内核，绕过反调试/">April 2nd 2019, 1:59:49 pm</a>
-                    <p>更新日期：<a href="/2019/04/逆向修改手机内核，绕过反调试/">May 21st 2019, 9:03:23 am</a>
+                    <p>更新日期：<a href="/2019/04/逆向修改手机内核，绕过反调试/">June 21st 2019, 11:35:13 am</a>
                     <p>版权声明：本文采用<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">知识共享署名-非商业性使用 4.0 国际许可协议</a>进行许可</p>
                 </div>
               
