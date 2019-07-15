@@ -19,7 +19,7 @@
     <meta name="description" content="One way to choose one">
     <meta name="author" content="Misaki">
     <meta name="keywords" content="">
-    <title>逆向函数分析引用 ~ Misaki&#39;s Blog</title>
+    <title>Redis 主从复制 ~ Misaki&#39;s Blog</title>
     <link rel="stylesheet" href="/css/Material_Icons.css">
     <!-- <link rel="stylesheet" href="/css/font-awesome.css"> -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css">
@@ -91,8 +91,8 @@
   <div class="page-header header-filter" data-parallax="true" style="background-image: url('/img/post-banner.jpg'); height: 70vh;">
     
       <div class="container">
-        <h1 class="title text-center post_title">逆向函数分析引用</h1>
-        <p class="text-center"><b>Tuesday, July 9th 2019, 4:56 pm</b></p>
+        <h1 class="title text-center post_title">Redis 主从复制</h1>
+        <p class="text-center"><b>Monday, July 15th 2019, 10:16 am</b></p>
       </div>
     
   </div>
@@ -106,104 +106,34 @@
       <div class="container">
         <div class="section">
           <div class="post_content">
-              <p>代码编译，使用代码如下:</p>
-<pre><code>#include &lt;stdio.h&gt;
-#include &lt;string.h&gt;
-int fun1()
-{
-    int a;
-    int b;
-    b=10;
-    a=b++;
-    return a;
-}
-int fun2(int a,int b)
-{
-    return a+b+fun1();
-}
-int fun3(int a,int b,int c,int d,int e,int f,int g,int h)
-{
-    if(a+b+c &lt; d+e+f){
-        return a+b+c+fun2(a,f);
-    }else if(a+b+c &gt; d+e+f){
-        return a+b+c+fun2(b,e);
-    }else{
-        return 0;
-    }
-}
-
-int main()
-{
-    int tmp;
-    printf(&quot;%d&quot;,fun3(1,2,3,4,5,6,7,8));
-    return 0;
-}
-</code></pre><p>makefile文件同之前的基本一致</p>
-<pre><code>#设置目录
-NDK_ROOT=D:\Androidstudio-sdk\android-ndk-r14b
-TOOLCHAINS_ROOT=$(NDK_ROOT)\toolchains\arm-linux-androideabi-4.9\prebuilt\windows-x86_64
-TOOLCHAINS_PREFIX=$(TOOLCHAINS_ROOT)\bin\arm-linux-androideabi
-TOOLCHAINS_INCLUDE=$(TOOLCHAINS_ROOT)\lib\gcc\arm-linux-androideabi\4.9.x\include-fixed
-PLATFORM_ROOT=$(NDK_ROOT)\platforms\android-14\arch-arm
-PLATFORM_INCLUDE=$(PLATFORM_ROOT)\usr\include
-PLATFORM_LIB=$(PLATFORM_ROOT)\usr\lib
-MODULE_NAME=app6
-BUILD_TYPE=c
-PATH_ANDROID=/data/local/tmp/
-RM=del
-FLAGS=-I$(TOOLCHAINS_INCLUDE) \
-    -I$(PLATFORM_INCLUDE) \
-    -L$(PLATFORM_LIB) \
-    -nostdlib \
-    -lgcc \
-    -Bdynamic \
-    -lc    \
-    -O0
-OBJS=$(MODULE_NAME).o \
-    $(PLATFORM_LIB)\crtbegin_dynamic.o \
-    $(PLATFORM_LIB)\crtend_android.o
-all:
-    $(TOOLCHAINS_PREFIX)-gcc $(FLAGS) -c $(MODULE_NAME).$(BUILD_TYPE) -o $(MODULE_NAME).o -pie -fPIE
-    $(TOOLCHAINS_PREFIX)-gcc $(FLAGS) -S $(MODULE_NAME).$(BUILD_TYPE) -o $(MODULE_NAME).S -pie -fPIE
-    $(TOOLCHAINS_PREFIX)-gcc $(FLAGS) $(OBJS) -o $(MODULE_NAME) -pie -fPIE
-clean:
-    $(RM) *.o
-install:
-    adb push $(MODULE_NAME) $(PATH_ANDROID)
-    adb shell chmod 755 $(PATH_ANDROID)$(MODULE_NAME)
-    adb shell $(PATH_ANDROID)$(MODULE_NAME)
-</code></pre><p>编译后如下，会生成一个无后缀的可执行文件。丢到IDA中。点击main函数，如下：</p>
-<p><img src="\2019\07\逆向函数分析引用\1562658661016.png" alt="1562658661016"></p>
-<p>其中已经简单分析函数参数的引用，开头可以看到，参数[sp]，意思是第五个参数引用，若后面还有其他参数则以四个字节为参数引用存储。关于寄存器的含义</p>
-<pre><code>r0-r3    用作传入函数参数，传出函数返回值。在子程序调用之间，可以将 r0-r3 用于任何用途。
-r4-r11   被用来存放函数的局部变量。如果被调用函数使用了这些寄存器，它在返回之前必须恢复这些寄存器的值。
-r12      是内部调用暂时寄存器 ip。它在过程链接胶合代码（例如，交互操作胶合代码）中用于此角色。
-r13      是栈指针 sp。它不能用于任何其它用途。sp 中存放的值在退出被调用函数时必须与进入时的值相同。
-r14      是链接寄存器 lr。如果您保存了返回地址，则可以在调用之间将 r14 用于其它用途，程序返回时要恢复
-r15      是程序计数器 PC。它不能用于任何其它用途。
-</code></pre><p>详细介绍参考：<a href="https://www.veryarm.com/36274.html" target="_blank" rel="noopener">https://www.veryarm.com/36274.html</a></p>
-<p>到BL指令，BL指令是有返回的跳转，表示子程序的返回通过LR寄存器保存，保存的地址值就是下一条指令的地址值。如下的fun3函数中，对于多参数并没有使用栈来保存，而是使用R0-R3寄存器来循环的调用。</p>
-<p><img src="\2019\07\逆向函数分析引用\1562659401125.png" alt="1562659401125"></p>
-<p>判断结束后进入不同的分支，走到如图中的两部分分支的时候出现了一个新的子程序调用，fun2。</p>
-<p><img src="\2019\07\逆向函数分析引用\1562659598100.png" alt="1562659598100"></p>
-<p>点击fun2，其中又调用了fun1函数，同样点击fun1。</p>
-<p><img src="\2019\07\逆向函数分析引用\1562659844246.png" alt="1562659844246"></p>
-<p>通过fun1就可以看到函数的具体操作行为，其中最后返回值BX，带状态切换返回，其中的LR则为fun2的函数MOV的地址值，返回到fun2中继续执行。</p>
-<p><img src="\2019\07\逆向函数分析引用\1562659872641.png" alt="1562659872641"></p>
-<p>而fun2中的最后代码也对应了开头的两个汇编语句，恢复sp指令值，将栈内容恢复到寄存器中。获取到参数值后，回到MOV指令中其中注释的fun1和fun2代表当前分支的输入参数。最后都执行到loc_4B8，结果保存到R0中返回，最后也是恢复sp和寄存器。</p>
-<p><img src="\2019\07\逆向函数分析引用\1562662004752.png" alt="1562662004752"></p>
-<p>这时候再看main函数最后执行，获取的fun3返回赋值给R2，至于LDR和ADD，代表了读取unk_5C8标记处的参数字段，点击则可以看到是“%d”，也就是R3代表“%d”,R1代表参数返回值。由printf来输出。最后返回0。结束函数执行。</p>
-<p><img src="\2019\07\逆向函数分析引用\1562662154590.png" alt="1562662154590"></p>
-<p>此汇编分析主要是函数调用和返回之间的联系，希望也可以为后面的读取APP so文件打下基础把。</p>
+              <h3 id="Redis主从复制"><a href="#Redis主从复制" class="headerlink" title="Redis主从复制"></a>Redis主从复制</h3><p>redis主从复制，前几天分享的新版redis未授权利用的新型方式。</p>
+<p>什么是主从复制，<a href="http://blog.itpub.net/31545684/viewspace-2213629/" target="_blank" rel="noopener">http://blog.itpub.net/31545684/viewspace-2213629/</a></p>
+<p>通过redis命令来设置主从机</p>
+<pre><code>127.0.0.1:6379&gt; slaveof 192.168.253.131 6379
+</code></pre><p>被设置的主机将通过SYNC来和主机通信， 通过日志可以看到请求的sync连接。</p>
+<p>首先需要一个高版本的redis服务，<a href="https://redis.io/download。下载后按照官网给的安装步骤来安装。" target="_blank" rel="noopener">https://redis.io/download。下载后按照官网给的安装步骤来安装。</a></p>
+<p>安装后修改redis.conf文件来执行redis，修改文件中的绑定本地地址的参数项，开启任意地址访问。</p>
+<p><img src="\2019\07\Redis-主从复制\1563024704044.png" alt="1563024704044"></p>
+<p>执行命令：<code>src/redis-server ./redis.conf</code>，开启redis成功。</p>
+<p><img src="\2019\07\Redis-主从复制\1563023912222.png" alt="1563023912222"></p>
+<p>下载脚本：<a href="https://github.com/Dliv3/redis-rogue-server。启动执行脚本" target="_blank" rel="noopener">https://github.com/Dliv3/redis-rogue-server。启动执行脚本</a></p>
+<p>脚本执行完后显示：</p>
+<p><img src="\2019\07\Redis-主从复制\1563025997123.png" alt="1563025997123"></p>
+<p>同时可以看到redis日志中加载了so文件：</p>
+<p><img src="\2019\07\Redis-主从复制\1563026034882.png" alt="1563026034882"></p>
+<p>连接redis执行命令：</p>
+<p><img src="\2019\07\Redis-主从复制\1563026095498.png" alt="1563026095498"></p>
+<p>所以在未授权访问和弱密码登陆的情况下此问题才可以利用。</p>
+<p>原文章：<a href="https://paper.seebug.org/975/" target="_blank" rel="noopener">https://paper.seebug.org/975/</a></p>
 
           </div>
           <br><br>
               
                 <div class="license-wrapper">
                     <p>原文作者：<a href="">Misaki</a>
-                    <p>原文链接：<a href="/2019/07/逆向函数分析引用/">/2019/07/逆向函数分析引用/</a>
-                    <p>发表日期：<a href="/2019/07/逆向函数分析引用/">July 9th 2019, 4:56:32 pm</a>
-                    <p>更新日期：<a href="/2019/07/逆向函数分析引用/">July 9th 2019, 4:59:59 pm</a>
+                    <p>原文链接：<a href="/2019/07/Redis-主从复制/">/2019/07/Redis-主从复制/</a>
+                    <p>发表日期：<a href="/2019/07/Redis-主从复制/">July 15th 2019, 10:16:27 am</a>
+                    <p>更新日期：<a href="/2019/07/Redis-主从复制/">July 15th 2019, 10:37:01 am</a>
                     <p>版权声明：本文采用<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">知识共享署名-非商业性使用 4.0 国际许可协议</a>进行许可</p>
                 </div>
               
@@ -211,7 +141,7 @@ r15      是程序计数器 PC。它不能用于任何其它用途。
           <div>
               <p>
                        
-                      <span class="badge badge-default">#&nbsp;移动安全</span>
+                      <span class="badge badge-default">#&nbsp;web安全</span>
                       &nbsp;
                       
               </p>
@@ -242,8 +172,8 @@ r15      是程序计数器 PC。它不能用于任何其它用途。
     <script>               
         var disqus_shortname = '';
         var disqus_config = function () {
-            this.page.url = '/2019/07/逆向函数分析引用/'; 
-            this.page.identifier = '/2019/07/逆向函数分析引用/';
+            this.page.url = '/2019/07/Redis-主从复制/'; 
+            this.page.identifier = '/2019/07/Redis-主从复制/';
         };
         (function() { 
             var d = document, s = d.createElement('script');
