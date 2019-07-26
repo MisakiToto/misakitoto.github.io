@@ -19,7 +19,7 @@
     <meta name="description" content="One way to choose one">
     <meta name="author" content="Misaki">
     <meta name="keywords" content="">
-    <title>Android 代码插桩 ~ Misaki&#39;s Blog</title>
+    <title>结构体链表逆向 ~ Misaki&#39;s Blog</title>
     <link rel="stylesheet" href="/css/Material_Icons.css">
     <!-- <link rel="stylesheet" href="/css/font-awesome.css"> -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css">
@@ -91,8 +91,8 @@
   <div class="page-header header-filter" data-parallax="true" style="background-image: url('/img/post-banner.jpg'); height: 70vh;">
     
       <div class="container">
-        <h1 class="title text-center post_title">Android 代码插桩</h1>
-        <p class="text-center"><b>Thursday, February 14th 2019, 5:51 pm</b></p>
+        <h1 class="title text-center post_title">结构体链表逆向</h1>
+        <p class="text-center"><b>Friday, July 26th 2019, 5:23 pm</b></p>
       </div>
     
   </div>
@@ -106,48 +106,67 @@
       <div class="container">
         <div class="section">
           <div class="post_content">
-              <h3 id="何为代码插桩"><a href="#何为代码插桩" class="headerlink" title="何为代码插桩"></a>何为代码插桩</h3><p>​    最早是由J.C. Huang 教授提出的，它是在保证被测程序原有逻辑完整性的基础上在程序中插入一些探针（又称为“探测仪”，本质上就是进行信息采集的代码段，可以是赋值语或采集覆盖信息的函数调用，通过探针的执行并抛出程序运行的特征数据，通过对这些数据的分析，可以获得程序的控制流和数据流信息，进而得到逻辑覆盖等动态信息，从而实现测试目的的方法。</p>
-<p>​    何为安卓插桩测试，插桩测试提供了一种通过 <code>am instrument</code> 命令启动的特殊测试执行环境，其中目标应用进程会重启并使用基本的应用上下文进行初始化，并在应用进程虚拟机内启动插桩线程。您的测试代码在此插桩线程上开始执行，并附带一个 <code>Instrumentation</code> 实例，该实例可提供对应用上下文和 API 的访问权限，以操纵接受测试的应用进程。</p>
-<p>详细内容可以查看谷歌的插桩测试框架和方式：<a href="https://source.android.google.cn/compatibility/tests/development/instrumentation.md" target="_blank" rel="noopener">插桩测试</a></p>
-<h3 id="Log插桩"><a href="#Log插桩" class="headerlink" title="Log插桩"></a>Log插桩</h3><p>此处，仅利用打印Log的方式来表示如何进行插桩。代码使用之前调试的代码，尝试来打印输入的字符串。</p>
-<p>反编译后如下代码：</p>
-<p><img src="\2019\02\Android-代码插桩\1550137101280.png" alt="1550137101280"></p>
-<p>分析代码可以看到，如果需要打印输出，则实际获取到字符串的代码为</p>
-<pre><code>Name.getText().toString().trim()
-</code></pre><p>因此，需要在onClick函数中打印输出，函数需要在按钮事件中触发，按钮相关的事件代码在MainActivity$1中。</p>
-<p><img src="\2019\02\Android-代码插桩\1550137282454.png" alt="1550137282454"></p>
-<p>在MainActivity$1中查看onClick函数。</p>
-<p><img src="\2019\02\Android-代码插桩\1550137354347.png" alt="1550137354347"></p>
-<p>假设，需要打印输入的name变量。则需要在如下添加：</p>
-<pre><code>iget-object v1, p0, Lcom/example/user/application/MainActivity$1;-&gt;this$0:Lcom/example/user/application/MainActivity;
+              <h3 id="结构体链表逆向"><a href="#结构体链表逆向" class="headerlink" title="结构体链表逆向"></a>结构体链表逆向</h3><p>同样使用如下的C代码：</p>
+<pre><code>#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+typedef struct _student
+{
+    char name[32];
+    int age;
+    struct _student * next;
+}T_student;
 
-    iget-object v1, v1, Lcom/example/user/application/MainActivity;-&gt;Name:Landroid/widget/EditText;
 
-    invoke-virtual {v1}, Landroid/widget/EditText;-&gt;getText()Landroid/text/Editable;
+T_student * head = NULL;
 
-    move-result-object v1
+void Insert(const char *name,int age)
+{
+    T_student * newnode;
+    newnode = (T_student *)malloc(sizeof(T_student));
+    newnode-&gt;age = age;
+    newnode-&gt;next = head;
+    strcpy(newnode-&gt;name,name);
+    head = newnode;
+}
+void PrintStudent()
+{
+    T_student * tmp;
+    tmp = head;
+    while(tmp)
+    {
+        printf(&quot;name:%s age:%d\n&quot;,tmp-&gt;name,tmp-&gt;age);
+        tmp=tmp-&gt;next;
+    }
+}
 
-    invoke-virtual {v1}, Ljava/lang/Object;-&gt;toString()Ljava/lang/String;
+int  main()
+{
+    Insert(&quot;Panda&quot;,15);
+    Insert(&quot;Dog&quot;,3);
+    Insert(&quot;Cat&quot;,2);
+    Insert(&quot;XiaoMing&quot;,20);
+    PrintStudent();
+}
 
-    move-result-object v1
-</code></pre><p>此内容为上图中关于带入name的smali代码，意思是，从MainActivity获取实例对象。赋值给v1寄存器，然后再调用getText()函数和toString()函数。</p>
-<p>在添加</p>
-<pre><code>const-string v0, &quot;message&quot;
- invoke-static {v0, v1}, Landroid/util/Log;-&gt;i(Ljava/lang/String;Ljava/lang/String;)I
-</code></pre><p>意思是调用Log.i函数打印输入，如上添加内容换算成Java代码类似于</p>
-<pre><code>Log.i(&quot;message&quot;,Name.getText().toString());
-</code></pre><p>回编译安装运行，监听日志输出，点击按钮事件可以看到如下的日志输出。</p>
-<p><img src="\2019\02\Android-代码插桩\1550137723095.png" alt="1550137723095"></p>
-<p>此种形式可以用在获取函数变量值和某些动态生成的参数中，来理解程序运行的结果和函数运行的方式。</p>
+</code></pre><p>按照惯例，编译把文件丢到IDA，找到main函数，点开。可以看到调用了四次insert函数和PrintStudent函数。</p>
+<p><img src="\2019\07\结构体链表逆向\1564122124023.png" alt="1564122124023"></p>
+<p>点到insert函数中查看函数实现。传入两个参数后，后面调用了malloc函数来分配内存空间，R3就可以看做是malloc分配来的内存并且指向此块内存的指针。其后使用dest来表示这个指针。var_14把内存数据存入dest加偏移量为32的地址上。也就是把第二个int参数存入相应地址。获取head变量，LDR把head变量当作地址来加载其上的数据，head同样可能是指针。而后会把第一个参数和head指针数据同样存入到结构体对应的地址上。只是第一个参数使用了strcpy来复制，顺便一提可能会产生数据覆盖。最后指针dest存到head的地址上，由head来表示基地址。</p>
+<p><img src="\2019\07\结构体链表逆向\1564123321051.png" alt="1564123321051"></p>
+<p>后面再看一下PrintStudent函数。将head的地址值存到新的指针中。以下仍然使用*head表示存入的地址上的数据。判断值为指针是否为0，从而进行遍历，到此为止基本可以看到前面的结构体存入参数和head赋值，完成了一个链表的结构。此处是遍历链表判断是否遍历完成。</p>
+<p>获取到第一个第二个参数后，var_8指针由参数三来进行下一个结构体的查询。</p>
+<p><img src="\2019\07\结构体链表逆向\1564130434725.png" alt="1564130434725"></p>
+<p>实现大致如下，当执行第一次insert函数时，写入一个结构体，并且把结构体的基地址写入head指针，第二次执行insert函数时，把head指针写入第二个结构体的第三个参数也就是结构体的指向下一个节点的指针。完成一个链表的创建。按照执行顺序，从后往前执行，第三个参数也就是节点的指针是前一个结构体的基地址。直到遍历完成，指针为null。</p>
+<p><img src="\2019\07\结构体链表逆向\1564132058549.png" alt="1564132058549"></p>
+<p>至此，结构体链表的分析就算完成了。无名侠的这个课程也算是结束了，不得不说多看几遍还是有不少的收获。</p>
 
           </div>
           <br><br>
               
                 <div class="license-wrapper">
                     <p>原文作者：<a href="">Misaki</a>
-                    <p>原文链接：<a href="/2019/02/Android-代码插桩/">/2019/02/Android-代码插桩/</a>
-                    <p>发表日期：<a href="/2019/02/Android-代码插桩/">February 14th 2019, 5:51:20 pm</a>
-                    <p>更新日期：<a href="/2019/02/Android-代码插桩/">July 26th 2019, 5:56:26 pm</a>
+                    <p>原文链接：<a href="/2019/07/结构体链表逆向/">/2019/07/结构体链表逆向/</a>
+                    <p>发表日期：<a href="/2019/07/结构体链表逆向/">July 26th 2019, 5:23:50 pm</a>
+                    <p>更新日期：<a href="/2019/07/结构体链表逆向/">July 26th 2019, 5:56:41 pm</a>
                     <p>版权声明：本文采用<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">知识共享署名-非商业性使用 4.0 国际许可协议</a>进行许可</p>
                 </div>
               
@@ -186,8 +205,8 @@
     <script>               
         var disqus_shortname = '';
         var disqus_config = function () {
-            this.page.url = '/2019/02/Android-代码插桩/'; 
-            this.page.identifier = '/2019/02/Android-代码插桩/';
+            this.page.url = '/2019/07/结构体链表逆向/'; 
+            this.page.identifier = '/2019/07/结构体链表逆向/';
         };
         (function() { 
             var d = document, s = d.createElement('script');
