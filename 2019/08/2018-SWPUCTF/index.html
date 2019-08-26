@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+
+
+
+
+
+
+
+
+
+<head>
+    <meta charset="utf-8" />
+    <link rel="apple-touch-icon" sizes="76x76" href="/favicon.ico">
+    <link rel="icon" type="image/png" href="/favicon.ico">
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0, shrink-to-fit=no" name="viewport" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <meta name="description" content="One way to choose one">
+    <meta name="author" content="Misaki">
+    <meta name="keywords" content="">
+    <title>2018 SWPUCTF ~ Misaki&#39;s Blog</title>
+    <link rel="stylesheet" href="/css/Material_Icons.css">
+    <!-- <link rel="stylesheet" href="/css/font-awesome.css"> -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/css/main.css">
+    
+        <link rel="stylesheet" href="/css/post.css">
+        
+            <link rel="stylesheet" href="/css/Prettify/tomorrow-night-eighties.min.css">
+        
+    
+</head>
+
+<body class=" sidebar-collapse">
+<nav class="navbar navbar-transparent navbar-color-on-scroll fixed-top navbar-expand-lg" color-on-scroll="100" id="sectionsNav">
+    <div class="container">
+        <div class="navbar-translate">
+            <a class="navbar-brand" href="/">
+                Misaki&#39;s Blog</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="navbar-toggler-icon"></span>
+                <span class="navbar-toggler-icon"></span>
+                <span class="navbar-toggler-icon"></span>
+            </button>
+        </div>
+            <div class="collapse navbar-collapse">
+                <ul class="navbar-nav ml-auto">
+                    
+                        
+                            <li class="nav-item">
+                                <a class="nav-link" href="/archives/">
+                                    archives
+                                </a>
+                            </li>
+                        
+                            <li class="nav-item">
+                                <a class="nav-link" href="/about/">
+                                    about
+                                </a>
+                            </li>
+                        
+                    
+                    
+                        
+                            <li class="nav-item">
+                                <a class="nav-link" rel="tooltip" title="" data-placement="bottom" href="https://github.com/MisakiKata" target="_blank" data-original-title="See me here">
+                                    <i class="fa fa-github"></i>
+                                </a>
+                            </li>
+                        
+                            <li class="nav-item">
+                                <a class="nav-link" rel="tooltip" title="" data-placement="bottom" href="https://www.t00ls.net/members-profile-12179.html" target="_blank" data-original-title="See me here">
+                                    <i class="fa fa-twitch"></i>
+                                </a>
+                            </li>
+                        
+                            <li class="nav-item">
+                                <a class="nav-link" rel="tooltip" title="" data-placement="bottom" href="https://misakikata.github.io/atom.xml" target="_blank" data-original-title="See me here">
+                                    <i class="fa fa-rss"></i>
+                                </a>
+                            </li>
+                        
+                    
+                </ul>
+            </div>
+    </div>
+</nav>
+    
+  <div class="page-header header-filter" data-parallax="true" style="background-image: url('/img/post-banner.jpg'); height: 70vh;">
+    
+      <div class="container">
+        <h1 class="title text-center post_title">2018 SWPUCTF</h1>
+        <p class="text-center"><b>Monday, August 26th 2019, 5:54 pm</b></p>
+      </div>
+    
+  </div>
+
+  
+  
+  
+    <div class="row" style="margin: 0 0 0; z-index: 999;">
+  <div class="col-md-8 offset-md-1">
+    <div class="main main-raised">
+      <div class="container">
+        <div class="section">
+          <div class="post_content">
+              <p>某日在GitHub中看到了一些CTF使用的安卓逆向分析题，其中一个是SWPUCTF，是个没怎么听过的CTF。虽然我不怎么了解CTF。23333</p>
+<p>于是，抽时间分析看看是否可以做出来。两个APK。</p>
+<h3 id="app-debug1-apk"><a href="#app-debug1-apk" class="headerlink" title="app-debug1.apk"></a>app-debug1.apk</h3><p>把apk丢到AK中，反编译，结果中有一个目录是assert/timg_2.zip。讲道理，第一反应看到这个，肯定是多多少少有点关系的，本以为是做了代码抽取，动态加载。</p>
+<p><img src="\2019\08\2018-SWPUCTF\1566788175183.png" alt="1566788175183"></p>
+<p>但是这并不是一个zip包，使用010editor查看，发现真不是一个zip包，而是一个完整的jpg格式文件。</p>
+<p><img src="\2019\08\2018-SWPUCTF\1566788301451.png" alt="1566788301451"></p>
+<p>而在文件nextcontent.class中也发现了这个所谓的zip包被当作jpg来读取。</p>
+<p><img src="\2019\08\2018-SWPUCTF\1566788437235.png" alt="1566788437235"></p>
+<p>直接修改为jpg格式图片，打开。</p>
+<p><img src="\2019\08\2018-SWPUCTF\1566788351717.png" alt="1566788351717"></p>
+<p>嗯。。。。这就。。。肯定是姿势不对，换一种方式。</p>
+<p>既然此处是纯JAVA层文件，是对输入的密码的效验，那么采用调试的方式来做。</p>
+<p>此处采用jeb调试，其中，对密码效验的关键方法为check。</p>
+<p>方法开始先判断长度是否为12位，然后判断是否长度为0。</p>
+<p>先修改check下：</p>
+<pre><code>00000000  const/16            v5, 12
+00000004  const/4             v2, 0
+00000006  invoke-virtual      String-&gt;toCharArray()[C, p1
+0000000C  move-result-object  v1
+0000000E  array-length        v3, v1
+00000010  if-eq               v3, v5, :16  #if-ne  或者添加const/16  v3, 0xc
+</code></pre><p>在修改mainactivity类中onclick方法下的</p>
+<pre><code>0000001E  new-instance        v0, Check
+00000022  invoke-direct       Check-&gt;&lt;init&gt;()V, v0
+00000028  invoke-virtual      Check-&gt;checkPassword(String)Z, v0, v2
+0000002E  move-result         v3
+00000030  if-eqz              v3, :72  #修改为if-nez
+</code></pre><p>重编译安装，输入任意值跳到第二部分，此时显示图片，但是图片上并没有相应的字符串。</p>
+<p>继续调试第二部分。调试的时候发现jeb仍然是不好用，于是改用Androidstudio。在mainactivity2$1.smail文件中找到了读取第二个输入并且做对比的地方。</p>
+<pre><code>.method public onClick(Landroid/view/View;)V
+    .locals 3
+    .param p1, &quot;v&quot;    # Landroid/view/View;
+
+    .prologue
+    .line 29
+    iget-object v2, p0, Lcom/example/test/ctf02/MainActivity2$1;-&gt;this$0:Lcom/example/test/ctf02/MainActivity2;
+
+    iget-object v2, v2, Lcom/example/test/ctf02/MainActivity2;-&gt;editText:Landroid/widget/EditText;
+
+    invoke-virtual {v2}, Landroid/widget/EditText;-&gt;getText()Landroid/text/Editable;
+
+    move-result-object v2
+
+    const-string v2, &quot;android.is.very.fun&quot;  #增加
+
+    invoke-virtual {v2}, Ljava/lang/Object;-&gt;toString()Ljava/lang/String;
+
+    move-result-object v1
+
+    .line 30
+    .local v1, &quot;str&quot;:Ljava/lang/String;
+    new-instance v0, Landroid/content/Intent;
+
+    invoke-direct {v0, v1}, Landroid/content/Intent;-&gt;&lt;init&gt;(Ljava/lang/String;)V
+
+    .line 31
+    .local v0, &quot;intent&quot;:Landroid/content/Intent;
+    iget-object v2, p0, Lcom/example/test/ctf02/MainActivity2$1;-&gt;this$0:Lcom/example/test/ctf02/MainActivity2;
+
+    invoke-virtual {v2, v0}, Lcom/example/test/ctf02/MainActivity2;-&gt;sendBroadcast(Landroid/content/Intent;)V
+
+    .line 32
+    return-void
+.end method
+</code></pre><p>获取了Broadcast组件，在mainfast.xml文件中有关于这个组件的定义，于是在上把v2修改为组件名字符串。</p>
+<p>重编译安装，第一个输入只需要随便输入几个不重复的字母，跳到第二个输入，只需要点击确认，就会弹出写有flag的图片。</p>
+<p><img src="\2019\08\2018-SWPUCTF\1566800681246.png" alt="1566800681246"></p>
+<h3 id="app-debug2-apk"><a href="#app-debug2-apk" class="headerlink" title="app-debug2.apk"></a>app-debug2.apk</h3><p>同样，丢到AK中反编译，反编译内容如下，其中包含JNI.smail文件，所以大概率是分析so文件。</p>
+<p><img src="\2019\08\2018-SWPUCTF\1566801125774.png" alt="1566801125774"></p>
+<p>在MainActivity$1.smali中看到了jni的调用getResult方法。</p>
+<pre><code>.method public onClick(Landroid/view/View;)V
+    .locals 3
+    .param p1, &quot;v&quot;    # Landroid/view/View;
+
+    .prologue
+    .line 24
+    iget-object v2, p0, Lcom/example/test/ctf03/MainActivity$1;-&gt;this$0:Lcom/example/test/ctf03/MainActivity;
+
+    iget-object v2, v2, Lcom/example/test/ctf03/MainActivity;-&gt;pwd:Landroid/widget/EditText;
+
+    invoke-virtual {v2}, Landroid/widget/EditText;-&gt;getText()Landroid/text/Editable;
+
+    move-result-object v2
+
+    invoke-virtual {v2}, Ljava/lang/Object;-&gt;toString()Ljava/lang/String;
+
+    move-result-object v1
+
+    .line 25
+    .local v1, &quot;str&quot;:Ljava/lang/String;
+    invoke-static {v1}, Lcom/example/test/ctf03/JNI;-&gt;getResult(Ljava/lang/String;)I
+
+    move-result v0
+
+    .line 26
+    .local v0, &quot;result&quot;:I
+    iget-object v2, p0, Lcom/example/test/ctf03/MainActivity$1;-&gt;this$0:Lcom/example/test/ctf03/MainActivity;
+
+    invoke-virtual {v2, v0}, Lcom/example/test/ctf03/MainActivity;-&gt;Show(I)V
+
+    .line 27
+    return-void
+.end method
+</code></pre><p>使用IDA打开lib目录下的libNative.so文件。</p>
+<p>在Exports中找到对应的方法，在F5一下查看伪代码</p>
+<p><img src="\2019\08\2018-SWPUCTF\1566801664205.png" alt="1566801664205"></p>
+<p><img src="\2019\08\2018-SWPUCTF\1566804309855.png" alt="1566804309855"></p>
+<p>此处先判断是否是长度为15位，然后用malloc申请三个长度为一字节的变量来初始化。至于Init函数是做什么用的。在如下处，点击进入，看到其中又调用了Init函数，再点击进入。</p>
+<pre><code>.text:000011B0                 MOV             R3, R8  ; char *
+.text:000011B2                 BLX             j__Z4InitPcS_S_PKci
+</code></pre><p>在如下地址处：</p>
+<p><img src="\2019\08\2018-SWPUCTF\1566804524606.png" alt="1566804524606"></p>
+<p>不过，并没看懂这是啥意思。。。。先继续往下看。</p>
+<p>后面使用了First函数进行处理，如下处。</p>
+<pre><code>.text:000011B6                 MOV             R0, R6  ; char *
+.text:000011B8                 BLX             j__Z5FirstPc ; First(char *)
+.text:000011BC                 CBZ             R0, loc_11DA
+</code></pre><p>点击到函数内找到First函数，查看F5</p>
+<pre><code>signed int __fastcall First(char *a1)
+{
+  int v1; // r1@1
+  int v2; // r0@3
+  signed int v3; // r1@3
+
+  v1 = 0;
+  do
+  {
+    a1[v1] = 2 * a1[v1] ^ 0x80;
+    ++v1;
+  }
+  while ( v1 != 4 );
+  v2 = strcmp(a1, &quot;LN^dl&quot;);
+  v3 = 0;
+  if ( !v2 )
+    v3 = 1;
+  return v3;
+}
+</code></pre><p>把传进来的字符串进行按位乘2和0x80异或，如果等于LN^dl，返回v3为1，不等于则返回v3为0。那么此处需要v3等不等于0呢，查看主要函数的下一步判断是if非，跳转到LABEL_14处，那么需要v3不为0，也就是a1等于LN^dl。同样代表了传入的字符串要乘2异或0x80后等于LN^dl。</p>
+<p><img src="\2019\08\2018-SWPUCTF\1566805704718.png" alt="1566805704718"></p>
+<p>其中需要v4跟一个字符串对于，字符串为以下</p>
+<pre><code>0x20, 0x35, 0x2D, 0x16, 0x61
+</code></pre><p><img src="\2019\08\2018-SWPUCTF\1566807615894.png" alt="1566807615894"></p>
+<p>整体的逻辑就是先分成三个字符串，然后判断第一个异或处理后是否为LN^dl，是的话对下一个字符串异或，对比相等，继续处理最后一个字符串，等于AFBo}则返回需要的1。那么就剩下一个Init不确定意义，根据分配的大小和函数的内容，猜测应该是把15位的字符串，每一位分配给三个字符串组，毕竟Init中有一个循环操作，且标志增加。也就是</p>
+<pre><code>123456分配两组：
+135  246
+</code></pre><p>尝试写脚本反向异或出原字符串。</p>
+<pre><code>str1 = &quot;LN^dl&quot;   #v3
+str2 = [0x20, 0x35, 0x2D, 0x16, 0x61]   #v4
+str3 = &quot;AFBo}&quot;   #v5
+
+flagstr1 = &#39;&#39;
+flagstr2 = &#39;&#39;
+flagstr3 = &#39;&#39;
+
+i = 0
+while i&lt;=4:
+    flagstr =  str2[i] ^ ord(str3[i])
+    flagstr3 = flagstr3 + chr(flagstr)
+    i+=1
+
+print(flagstr3)   #原字符串后部分
+
+
+i= 0
+while i&lt;=4:
+    flagstr =  ord(str1[i]) ^ str2[i] 
+    flagstr2 = flagstr2 + chr(flagstr)
+    i+=1
+
+print(flagstr2)   #原字符串中间部分
+
+
+i=0
+while i&lt;=4:
+    flagstr = (ord(str1[i])^ 0x80 ) // 2
+    flagstr1 = flagstr1 + chr(flagstr) 
+    i+=1
+
+print(flagstr1)    #原字符串开始部分
+
+flagstr = &#39;&#39;
+for x in range(len(str1)):
+    flagstr4 = flagstr1[x]+flagstr2[x]+flagstr3[x]
+    flagstr = flagstr + flagstr4
+
+print(flagstr)
+</code></pre><p>但是结果很怪，肯定是后面出了问题，但是理论上异或处理是错的，不该只出现在最后一位上，后面找了<a href="https://www.anquanke.com/post/id/168338#h3-20" target="_blank" rel="noopener">官方的WP</a>，看了别人的Java版poc，感觉也一样。莫非是一些编码和语言上处理的差别？暂时没处理掉此问题。</p>
+<p><img src="\2019\08\2018-SWPUCTF\1566812912519.png" alt="1566812912519"></p>
+
+          </div>
+          <br><br>
+              
+                <div class="license-wrapper">
+                    <p>原文作者：<a href="">Misaki</a>
+                    <p>原文链接：<a href="/2019/08/2018-SWPUCTF/">/2019/08/2018-SWPUCTF/</a>
+                    <p>发表日期：<a href="/2019/08/2018-SWPUCTF/">August 26th 2019, 5:54:14 pm</a>
+                    <p>更新日期：<a href="/2019/08/2018-SWPUCTF/">August 26th 2019, 5:55:50 pm</a>
+                    <p>版权声明：本文采用<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">知识共享署名-非商业性使用 4.0 国际许可协议</a>进行许可</p>
+                </div>
+              
+          <br><br>
+          <div>
+              <p>
+                       
+                      <span class="badge badge-default">#&nbsp;Android逆向</span>
+                      &nbsp;
+                      
+              </p>
+          </div>
+        </div>
+      </div>  
+    </div>
+  </div>
+  <!-- TOC -->
+  
+      <div class="">
+        <div id="toc">
+          <p class="toc-title"><i class="material-icons" style="vertical-align:middle">toc</i>Toc:</p> 
+          <div id="tocbot"></div>
+        </div>
+      </div>
+  
+</div>
+
+
+<!-- Comments -->
+<div class="row">
+    <div class="col-md-8 offset-md-2">
+    
+        
+            <div class="disqus" style="width:100%">
+    <div id="disqus_thread"></div>
+    <script>               
+        var disqus_shortname = '';
+        var disqus_config = function () {
+            this.page.url = '/2019/08/2018-SWPUCTF/'; 
+            this.page.identifier = '/2019/08/2018-SWPUCTF/';
+        };
+        (function() { 
+            var d = document, s = d.createElement('script');
+            s.type = 'text/javascript';
+            s.src = '//'+disqus_shortname+'.disqus.com/embed.js';
+            s.setAttribute('data-timestamp', +new Date());
+            (d.head || d.body).appendChild(s);
+        })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>                                
+</div>
+        
+    
+    </div>
+</div>
+  
+
+<footer class="footer footer-default">
+        <div class="container">
+          <div class="float-left" style="padding: 15px 0;">
+              <b>假如今天的你被生活辜负了，别伤心，因为明天生活还会继续辜负你！</b>
+          </div>
+          <div align="right" style="padding: 15px 0;">
+              <i class="iconfont icon-love" ></i>
+              <a href="https://github.com/0x2e/Material-T" target="_blank"> <b>Material-T</b></a>
+          </div>
+        </div>
+</footer>
+      <!--   Core JS Files   -->
+      <script src="/js/core/jquery.min.js?v=3.2.1"></script>
+      <script src="/js/main.js"></script>
+      <script src="/js/core/popper.min.js"></script>
+      <script src="/js/core/bootstrap-material-design.min.js"></script>
+      <script src="/js/plugins/moment.min.js"></script>
+      <script src="/js/material-kit.min.js?v=2.0.5"></script>
+      
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.4.2/tocbot.min.js"></script>
+        <script src="/js/post.js"></script>
+        <script src="/js/plugins/prettify.js"></script>
+        <script>
+            $(document).ready(function(){
+                $('pre').addClass('prettyprint linenums');
+                prettyPrint();
+            })
+        </script>
+      
+</body>
+</html>
