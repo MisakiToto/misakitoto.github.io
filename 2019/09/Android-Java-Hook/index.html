@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+
+
+
+
+
+
+
+
+
+<head>
+    <meta charset="utf-8" />
+    <link rel="apple-touch-icon" sizes="76x76" href="/favicon.ico">
+    <link rel="icon" type="image/png" href="/favicon.ico">
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0, shrink-to-fit=no" name="viewport" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <meta name="description" content="One way to choose one">
+    <meta name="author" content="Misaki">
+    <meta name="keywords" content="">
+    <title>Android Java Hook ~ Misaki&#39;s Blog</title>
+    <link rel="stylesheet" href="/css/Material_Icons.css">
+    <!-- <link rel="stylesheet" href="/css/font-awesome.css"> -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/css/main.css">
+    
+        <link rel="stylesheet" href="/css/post.css">
+        
+            <link rel="stylesheet" href="/css/Prettify/tomorrow-night-eighties.min.css">
+        
+    
+</head>
+
+<body class=" sidebar-collapse">
+<nav class="navbar navbar-transparent navbar-color-on-scroll fixed-top navbar-expand-lg" color-on-scroll="100" id="sectionsNav">
+    <div class="container">
+        <div class="navbar-translate">
+            <a class="navbar-brand" href="/">
+                Misaki&#39;s Blog</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="navbar-toggler-icon"></span>
+                <span class="navbar-toggler-icon"></span>
+                <span class="navbar-toggler-icon"></span>
+            </button>
+        </div>
+            <div class="collapse navbar-collapse">
+                <ul class="navbar-nav ml-auto">
+                    
+                        
+                            <li class="nav-item">
+                                <a class="nav-link" href="/archives/">
+                                    archives
+                                </a>
+                            </li>
+                        
+                            <li class="nav-item">
+                                <a class="nav-link" href="/about/">
+                                    about
+                                </a>
+                            </li>
+                        
+                    
+                    
+                        
+                            <li class="nav-item">
+                                <a class="nav-link" rel="tooltip" title="" data-placement="bottom" href="https://github.com/MisakiKata" target="_blank" data-original-title="See me here">
+                                    <i class="fa fa-github"></i>
+                                </a>
+                            </li>
+                        
+                            <li class="nav-item">
+                                <a class="nav-link" rel="tooltip" title="" data-placement="bottom" href="https://www.t00ls.net/members-profile-12179.html" target="_blank" data-original-title="See me here">
+                                    <i class="fa fa-twitch"></i>
+                                </a>
+                            </li>
+                        
+                            <li class="nav-item">
+                                <a class="nav-link" rel="tooltip" title="" data-placement="bottom" href="https://misakikata.github.io/atom.xml" target="_blank" data-original-title="See me here">
+                                    <i class="fa fa-rss"></i>
+                                </a>
+                            </li>
+                        
+                    
+                </ul>
+            </div>
+    </div>
+</nav>
+    
+  <div class="page-header header-filter" data-parallax="true" style="background-image: url('/img/post-banner.jpg'); height: 70vh;">
+    
+      <div class="container">
+        <h1 class="title text-center post_title">Android Java Hook</h1>
+        <p class="text-center"><b>Monday, September 16th 2019, 8:52 am</b></p>
+      </div>
+    
+  </div>
+
+  
+  
+  
+    <div class="row" style="margin: 0 0 0; z-index: 999;">
+  <div class="col-md-8 offset-md-1">
+    <div class="main main-raised">
+      <div class="container">
+        <div class="section">
+          <div class="post_content">
+              <p>使用Inspeckage尝试hook其中的加密函数<br>环境：夜神模拟器<br>Inspeckage 2.3<br>某收件APP</p>
+<h3 id="获取关键参数"><a href="#获取关键参数" class="headerlink" title="获取关键参数"></a>获取关键参数</h3><p>安装app后，抓包看到如下参数</p>
+<p><img src="https://i.loli.net/2019/09/14/GQ56bvhFKjCupSg.png" alt="1568449534566.png"><br>在AK中搜索其中关键词fm和sign，搜索中发现sign过多，于是尝试搜索FM，搜索中发现如下class文件。</p>
+<p><img src="https://i.loli.net/2019/09/14/M5sxOIrNcWGRgmn.png" alt="1568449857454.png"><br>打开Java源代码，在其中的一个void类型的b函数中发现关键。</p>
+<p><img src="https://i.loli.net/2019/09/14/mZKoIc56aDSHOvQ.png" alt="1568449940990.png"><br>打开对应文件的sha256函数</p>
+<p><img src="https://i.loli.net/2019/09/14/9uC4LD8gSOwnRil.png" alt="1568450012586.png"><br>基本可以确定加密算法为这个，对其中的三个参数加盐来sha256</p>
+<p>paramString1对应了localObject5，也就是timestamp</p>
+<p>paramString2对应了localObject4，也就是nonce</p>
+<p>paramString3对应了localObject2，也是其中暂不得知道为何的参数</p>
+<p>这几个参数，其中sign是不得知为什么参数，其他一个为uuid，一个为时间戳，于是我们尝试hook这个函数。</p>
+<h3 id="配置HOOK"><a href="#配置HOOK" class="headerlink" title="配置HOOK"></a>配置HOOK</h3><p>在Inspeckage的界面中选着HOOK，点击找到左侧加载出来的函数方法</p>
+<p><img src="https://i.loli.net/2019/09/14/ba7BqJAEGkZ2i9F.png" alt="1568450695050.png"><br>点击后如下，添加</p>
+<p><img src="https://i.loli.net/2019/09/14/X8CN1PsOvVF3BDc.png" alt="1568450719164.png"><br>在模拟器中做一个请求，此处仍然使用之前的登陆请求，hook到的参数和结果</p>
+<p><img src="https://i.loli.net/2019/09/14/kYxs6lBRUhZvGgH.png" alt="1568450803357.png"><br>其中result就是抓包到的请求sign参数，可以看到参数paramString3为一串拼接的字符串，其中密码为MD5加密，在hash选项中可以看到加密的原参数，和sha256用到的salt值</p>
+<h3 id="加密尝试"><a href="#加密尝试" class="headerlink" title="加密尝试"></a>加密尝试</h3><p><img src="https://i.loli.net/2019/09/14/HOJcxiyjPNzKupB.png" alt="1568451215940.png"><br>那么尝试使用在线加密，从hook到的结果得知，paramString3就是请求中的FM字段</p>
+<p><img src="https://i.loli.net/2019/09/14/x4fbPqWNnzLDApj.png" alt="1568451631004.png"><br>和请求中携带的sign参数对比为相同参数</p>
+<p><img src="https://i.loli.net/2019/09/14/LQAYhwpBTN4HJbP.png" alt="1568451683666.png"><br>本以为会到此为止，但是当仔细查看hook的参数时发现，paramString3中的参数均是缺少标签对的，例如</p>
+<pre><code>&lt;root&gt;123&lt;/root&gt;&lt;sign&gt;123&lt;/sign&gt;
+他只显示
+123&lt;/root&gt;123&lt;/sign&gt;
+</code></pre><p>暂没查到原因。</p>
+
+          </div>
+          <br><br>
+              
+                <div class="license-wrapper">
+                    <p>原文作者：<a href="">Misaki</a>
+                    <p>原文链接：<a href="/2019/09/Android-Java-Hook/">/2019/09/Android-Java-Hook/</a>
+                    <p>发表日期：<a href="/2019/09/Android-Java-Hook/">September 16th 2019, 8:52:55 am</a>
+                    <p>更新日期：<a href="/2019/09/Android-Java-Hook/">September 16th 2019, 8:55:47 am</a>
+                    <p>版权声明：本文采用<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">知识共享署名-非商业性使用 4.0 国际许可协议</a>进行许可</p>
+                </div>
+              
+          <br><br>
+          <div>
+              <p>
+                       
+                      <span class="badge badge-default">#&nbsp;Android逆向</span>
+                      &nbsp;
+                      
+              </p>
+          </div>
+        </div>
+      </div>  
+    </div>
+  </div>
+  <!-- TOC -->
+  
+      <div class="">
+        <div id="toc">
+          <p class="toc-title"><i class="material-icons" style="vertical-align:middle">toc</i>Toc:</p> 
+          <div id="tocbot"></div>
+        </div>
+      </div>
+  
+</div>
+
+
+<!-- Comments -->
+<div class="row">
+    <div class="col-md-8 offset-md-2">
+    
+        
+            <div class="disqus" style="width:100%">
+    <div id="disqus_thread"></div>
+    <script>               
+        var disqus_shortname = '';
+        var disqus_config = function () {
+            this.page.url = '/2019/09/Android-Java-Hook/'; 
+            this.page.identifier = '/2019/09/Android-Java-Hook/';
+        };
+        (function() { 
+            var d = document, s = d.createElement('script');
+            s.type = 'text/javascript';
+            s.src = '//'+disqus_shortname+'.disqus.com/embed.js';
+            s.setAttribute('data-timestamp', +new Date());
+            (d.head || d.body).appendChild(s);
+        })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>                                
+</div>
+        
+    
+    </div>
+</div>
+  
+
+<footer class="footer footer-default">
+        <div class="container">
+          <div class="float-left" style="padding: 15px 0;">
+              <b>假如今天的你被生活辜负了，别伤心，因为明天生活还会继续辜负你！</b>
+          </div>
+          <div align="right" style="padding: 15px 0;">
+              <i class="iconfont icon-love" ></i>
+              <a href="https://github.com/0x2e/Material-T" target="_blank"> <b>Material-T</b></a>
+          </div>
+        </div>
+</footer>
+      <!--   Core JS Files   -->
+      <script src="/js/core/jquery.min.js?v=3.2.1"></script>
+      <script src="/js/main.js"></script>
+      <script src="/js/core/popper.min.js"></script>
+      <script src="/js/core/bootstrap-material-design.min.js"></script>
+      <script src="/js/plugins/moment.min.js"></script>
+      <script src="/js/material-kit.min.js?v=2.0.5"></script>
+      
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.4.2/tocbot.min.js"></script>
+        <script src="/js/post.js"></script>
+        <script src="/js/plugins/prettify.js"></script>
+        <script>
+            $(document).ready(function(){
+                $('pre').addClass('prettyprint linenums');
+                prettyPrint();
+            })
+        </script>
+      
+<script src="/live2d-widget/autoload.js"></script>
+</body>
+</html>
