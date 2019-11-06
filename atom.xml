@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="/"/>
-  <updated>2019-10-15T09:22:42.778Z</updated>
+  <updated>2019-11-06T04:41:49.864Z</updated>
   <id>/</id>
   
   <author>
@@ -15,6 +15,54 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>GitHub-Monitor</title>
+    <link href="/2019/11/GitHub-Monitor/"/>
+    <id>/2019/11/GitHub-Monitor/</id>
+    <published>2019-11-06T04:41:49.000Z</published>
+    <updated>2019-11-06T04:41:49.864Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="GITHUB-MONTIOR"><a href="#GITHUB-MONTIOR" class="headerlink" title="GITHUB_MONTIOR"></a>GITHUB_MONTIOR</h2><blockquote><p>  python3 + Django 2.2.6 + supervisord</p></blockquote><ol><li>环境由简单的Django完成，外加一个HTML展示模板</li><li>GitHub的爬虫由supervisord来维护，需要修改配置文件内的信息，可以改成/var/run路径</li><li>pip安装如下的文件即可</li></ol><p>爬虫需要账号密码模拟登陆，进程为五分钟一次。是否扫描根据任务数据里保存的时间来做判断。</p><p>修改任务只需要在编辑里输入任务名，直接输入其他参数更新即可。</p><p>数据库采用MySQL5.7。</p><pre><code>python3 manager.py createsuperuserpython3 manager.py makemigrationspython3 manager.py migrate登陆后台添加一个可以登陆前端的账号即可。</code></pre><p>地址：<a href="https://github.com/MisakiKata/github_monitor" target="_blank" rel="noopener">https://github.com/MisakiKata/github_monitor</a></p><p>首界面</p><p><img src="https://user-images.githubusercontent.com/27627614/68268529-83d12080-0091-11ea-8956-988a74a77da4.png" alt="1573011489137"></p><p>全部信息<img src="https://user-images.githubusercontent.com/27627614/68268531-8764a780-0091-11ea-8269-0288c1c879cb.png" alt="1573011512652"></p><p>未处理信息</p><p><img src="https://user-images.githubusercontent.com/27627614/68268533-8764a780-0091-11ea-8231-30c8635d2067.png" alt="1573011525234"></p><p>界面由于对js了解较少，没有采用比较nodejs类前端框架，当然也可以修改为自己喜欢的界面。</p><p>食用简单，望喜欢。</p>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h2 id=&quot;GITHUB-MONTIOR&quot;&gt;&lt;a href=&quot;#GITHUB-MONTIOR&quot; class=&quot;headerlink&quot; title=&quot;GITHUB_MONTIOR&quot;&gt;&lt;/a&gt;GITHUB_MONTIOR&lt;/h2&gt;&lt;blockquote&gt;
+&lt;p&gt;  python3
+      
+    
+    </summary>
+    
+    
+      <category term="python" scheme="/tags/python/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>2018SUSCTF-Mobile题</title>
+    <link href="/2019/10/2018SUSCTF-Mobile%E9%A2%98/"/>
+    <id>/2019/10/2018SUSCTF-Mobile题/</id>
+    <published>2019-10-23T08:29:20.000Z</published>
+    <updated>2019-10-23T08:29:20.575Z</updated>
+    
+    <content type="html"><![CDATA[<h3 id="BabyAndroid"><a href="#BabyAndroid" class="headerlink" title="BabyAndroid"></a>BabyAndroid</h3><p>常规，JEB反编译</p><p><img src="https://i.loli.net/2019/10/23/XkQ8eD4UpbhTJ27.png" alt="1571714446839.png"></p><p>根据输入的字符串长度，第一位和97异或，后面跟v0的字符异或，把结果字符串转入a函数中。a函数首先把给出的常量字符串转为数组，把传入的字符串转化为bytes数组，再根据数组长度把每一位做for中&amp;和左移计算，结果为3267347723651E492C1D7E117C1946325D02432D493B0B62067B则为真。所以逆推，由于一次计算拼接两位，所以按照两位为一个字符计算。其中含有字母，调试得知是对应的十六进制数。</p><pre><code>#coding:utf-8strs = &quot;3267347723651E492C1D7E117C1946325D02432D493B0B62067B&quot;num = []for i in range(0, len(strs)):    num.append(strs[i])   #52nums = []id = 0while id &lt; 52:    for i in range(0,200):        if str((i &amp; 0xF0) &gt;&gt; 4) == num[id]:            if hex(i &amp; 15).replace(&#39;0x&#39;,&#39;&#39;).upper() == num[id+1]:                nums.append(i)                break    id = id + 2flag = []for i in range(0, len(nums)):    if i == 0:        first = nums[i] ^ 97        flag.append(first)    else:        sc = nums[i] ^ nums[i-1]        flag.append(sc)text = &#39;&#39;for i in flag:    text = text + chr(i)print(text)&gt;&gt;&gt; SUSCTF{We1come_to_Andr0id}</code></pre><p>后来看了其他资料，才发现a函数下面的for循环就是找16进制对应的十进制数，如</p><pre><code>&gt;&gt;&gt; int(&#39;32&#39;,16)50其中是利用50找到对应的十进制32.</code></pre><p>这个点卡了N久，看到一份别人的poc写的是相当简洁了。</p><h3 id="CrackMe"><a href="#CrackMe" class="headerlink" title="CrackMe"></a>CrackMe</h3><p>又是一个native层的APP。</p><p><img src="https://i.loli.net/2019/10/23/KqBnWwjlIS5kEY3.png" alt="1571734248316.png"></p><p>IDA打开伪代码</p><p><img src="https://i.loli.net/2019/10/23/hRUCb7HDjaY8VXx.png" alt="1571801738496.png"></p><p>根据汇编得知，中间for循环处操作的是数组</p><p><img src="https://i.loli.net/2019/10/23/UQV7blA3npsyeIh.png" alt="1571815444600.png"></p><p>其中v11是给出的数据块，按照int型，四位一个字段，正好28个字段。</p><p><img src="https://i.loli.net/2019/10/23/nfDS2o1K7k9pbvu.png" alt="1571815444618.png"></p><p>按照Java层逻辑和伪代码写出c代码为</p><pre><code>#include &lt;stdio.h&gt;#include &lt;stdlib.h&gt;int main(){    int v11[28] = {0x571a9693,0x23a96034,0x6a943d8c,0x1f9222ed,0x73887c81,0x5c13a257,0x26407522,0x13646a3a,0x2139537f,0x35415c5f,0x321304b7,0x238a8c26,0xd7307f6,0x622d5268,0x7c3d2e04,0x72198f7e,0x7df76af2,0x4e8431aa,0x28650861,0xfd8e3e9,0x196c1f1a,0x5fe8ab3,0x1231495d,0x5359d998,0x35fcfde0,0x3b2d0dd4,0x61113e45,0x314c57b8};   //小端字节序    int v0[28] = {0};    int string[28] = {0};   //未定义,引入的参数变量    int i;    for (i=0; i&lt;28; i++){        if (i == 0){            v0[i] = string[i] ^ 0xFF;        }        else{            v0[i] = string[i] ^ string[i-1];        }    }    srand(0x133ED6B);    int v4[28] = {0};    for (i=0; i&lt;28; i++){        v4[i] = v0[i] - rand();        if (v11[i] != v4[i]){            int v10 = 0;            return v10;        }    int v10 = 1;    printf(&quot;%c&quot;,v10);    return v10;    }}</code></pre><p>也就是我们需要反向求出string的值</p><pre><code>#include &lt;stdio.h&gt;#include &lt;stdlib.h&gt;int main(){    int v11[28] = {0x571a9693,0x23a96034,0x6a943d8c,0x1f9222ed,0x73887c81,0x5c13a257,0x26407522,0x13646a3a,0x2139537f,0x35415c5f,0x321304b7,0x238a8c26,0xd7307f6,0x622d5268,0x7c3d2e04,0x72198f7e,0x7df76af2,0x4e8431aa,0x28650861,0xfd8e3e9,0x196c1f1a,0x5fe8ab3,0x1231495d,0x5359d998,0x35fcfde0,0x3b2d0dd4,0x61113e45,0x314c57b8};    int v0[28] = {0};    srand(0x133ED6B);    for (int i=0; i&lt;28; i++){        v0[i] = v11[i] - rand();    }    int string[28] = {0};    for (int i=0; i&lt;28; i++){        if (i==0)            string[i] = v0[i] ^ 0xFF;        else{            string[i] = v0[i] ^ v0[i-1];        }    }    for (int i=0; i&lt;28; i++){        printf(&quot;%c&quot;, string[i]);    }    return 0;}</code></pre><p>但是尴尬的是算出来的是乱码</p><p><img src="https://i.loli.net/2019/10/23/qsJkNPHWw4FOmLV.png" alt="1571816373431.png"></p><p>然后没有找到这题的wp….也没找到其他问题的存在点。就这样吧，毕竟是汇编渣渣。</p>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h3 id=&quot;BabyAndroid&quot;&gt;&lt;a href=&quot;#BabyAndroid&quot; class=&quot;headerlink&quot; title=&quot;BabyAndroid&quot;&gt;&lt;/a&gt;BabyAndroid&lt;/h3&gt;&lt;p&gt;常规，JEB反编译&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;https:/
+      
+    
+    </summary>
+    
+    
+      <category term="Android逆向" scheme="/tags/Android%E9%80%86%E5%90%91/"/>
+    
+  </entry>
   
   <entry>
     <title>DevSecOps</title>
@@ -445,52 +493,6 @@ int fun1()
       
       
         &lt;h3 id=&quot;1、dvmDexFileOpenPartial脱壳原理&quot;&gt;&lt;a href=&quot;#1、dvmDexFileOpenPartial脱壳原理&quot; class=&quot;headerlink&quot; title=&quot;1、dvmDexFileOpenPartial脱壳原理&quot;&gt;&lt;/a&gt;1、dvm
-      
-    
-    </summary>
-    
-    
-      <category term="Android逆向" scheme="/tags/Android%E9%80%86%E5%90%91/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>ISCC Android Crackme</title>
-    <link href="/2019/04/ISCC-Android-Crackme/"/>
-    <id>/2019/04/ISCC-Android-Crackme/</id>
-    <published>2019-04-30T01:47:32.000Z</published>
-    <updated>2019-07-26T09:56:02.225Z</updated>
-    
-    <content type="html"><![CDATA[<h3 id="ISCC-Android-Crackme"><a href="#ISCC-Android-Crackme" class="headerlink" title="ISCC Android Crackme"></a>ISCC Android Crackme</h3><p>此为2013年ISCC的一道移动题，相对简单的题，懂点 ARM 指令就差不多了。对于新入手安卓逆向可以做做看来练手。要求是注册为企业版程序。以下分析是建立在伪代码基础上，然后分析修改点，修改ARM汇编。</p><p>题目下载：<a href="\2019\04\ISCC-Android-Crackme\crackme.apk">APP</a></p><p>通过反编译代码简单查看功能逻辑，首先是从onCreate函数开始，函数一开始就调用了MyApp的m变量，查看对应的反编译代码。</p><p><img src="\2019\04\ISCC-Android-Crackme\1556518317348.png" alt="1556518317348"></p><p>MyApp是一个native方法的调用，调用了三个方法。</p><p>分别是initSN()、saveSN()、work()。并且执行了initSN方法，因此函数应该是注册码的对比和效验功能。</p><p><img src="\2019\04\ISCC-Android-Crackme\1556518441133.png" alt="1556518441133"></p><p>然后在回到以上的代码执行，点击按钮“执行功能”，进入toast弹出界面，通过判断m值来执行是否触发注册方法，默认为0触发，如果注册成功则调用work()函数来做执行功能。查看doRegister，点击确认后，程序进入com.bfs.crackme1.RegActivity类下，</p><p><img src="\2019\04\ISCC-Android-Crackme\1556519314726.png" alt="1556519314726"></p><p>方法判断是否输入注册码，调用saveSN来保存输入的注册码，然后弹窗关闭自身线程。到此，也基本确认了initSN的方法和上文判断一致。</p><p><img src="\2019\04\ISCC-Android-Crackme\1556520139524.png" alt="1556520139524"></p><p>看完基本的Java层函数现在来看so文件的相关代码实现和流程。</p><p>查看so的一些函数表，可以看到定义了JNI_Onload，Java层执行System.loadLibrary()后，将执行此函数。同样从函数表中可以看出加密处理为MD5。查看JNI_Onload做了什么处理。</p><p><img src="\2019\04\ISCC-Android-Crackme\1556520638909.png" alt="1556520638909"></p><p>查看伪代码，使用RegisterNatives实现JNI，而RegisterNatives是来做什么处理的，可以查看如下文章：</p><p><a href="https://blog.csdn.net/qiuxiaolong007/article/details/7860610" target="_blank" rel="noopener">JNI：使用RegisterNatives方法传递和使用Java自定义类</a></p><p>而此处的作用基本可以看到是用来自定义函数命名，不然native中的函数名为Java_com_bfs_crackme1_MainActivity_initSN这种类型，下面只有n1、n2、n3来代替以上方法。</p><p><img src="\2019\04\ISCC-Android-Crackme\1556520977389.png" alt="1556520977389"></p><p>查看n1方法，读取sdcard下的reg.dat文件，来进行MD5效对，要求进行企业版注册，能看到的是注册成功将使用setValue进行对v1的赋值，其中按照MainActivity文件中的判断，猜测3为企业版MD5值。</p><p><img src="\2019\04\ISCC-Android-Crackme\1556522659413.png" alt="1556522659413"></p><p>n2则为如下，读写的形式来对reg.dat 进行重写。</p><p><img src="\2019\04\ISCC-Android-Crackme\1556524534479.png" alt="1556524534479"></p><p>work函数则为如下：</p><p><img src="\2019\04\ISCC-Android-Crackme\1556525011606.png" alt="1556525011606"></p><p>至此，函数名则分析清楚，n1对应initSN，n2对应saveSN，n3对应work。根据函数流程可以大概猜出判断行为：n2保存来自输入的参数的MD5-&gt;n1读取参数进行对应是否为注册值-&gt;注册成功则set到内存一个值-&gt;由work来读取这个值判断注册是否成功以及功能执行。</p><p>所以理论上说，patch点有如下处：</p><p>1、修改reg.dat为企业版的注册码，修改Java层代码让其不走注册函数。</p><p>2、解密MD5值，直接输入注册</p><p>3、修改n1，让其返回值永远为3</p><p>4、修改work函数获取的v2值。</p><p>修改时，发现第一种并不行，Java层参数值修改后，可能n2做了其他相关处理，第二种是可行，毕竟都获取到了注册码，但需要解密成功，此MD5只是简单的32345678。</p><p>第三种修改n1：</p><p>输入肯定为错误或者不输入值，因此只需要修改值为空或者其他未知情况下的返回值。</p><pre><code>.text:0000133C                 CMP     R0, #0.text:00001340                 MOVEQ   R1, #4.text:00001344                 MOV     R0, R7.text:00001348                 MOVNE   R1, R8</code></pre><p>修改为：</p><pre><code>.text:0000133C                 MOV     R0, #3.text:00001340                 MOVEQ   R1, #3.text:00001344                 MOV     R0, R7.text:00001348                 MOVNE   R1, R8</code></pre><p>让其在未输入的情况下返回企业版的返回值。修改编译安装后，打开即为企业版。</p><p>第四种修改work:</p><pre><code>.text:000014A0 10 40 2D E9                                     STMFD   SP!, {R4,LR}.text:000014A4 00 40 A0 E1                                     MOV     R4, R0.text:000014A8 6F FF FF EB                                     BL      n1.text:000014AC 04 00 A0 E1                                     MOV     R0, R4.text:000014B0 35 FF FF EB                                     BL      getValue.text:000014B8 00 00 50 E3                                     CMP     R0, #0</code></pre><p>增加一条指令，修改为:</p><pre><code>.text:000014A0 10 40 2D E9                                     STMFD   SP!, {R4,LR}.text:000014A4 00 40 A0 E1                                     MOV     R4, R0.text:000014A8 6F FF FF EB                                     BL      n1.text:000014AC 04 00 A0 E1                                     MOV     R0, R4.text:000014B0 35 FF FF EB                                     BL      getValue.text:000014B4 03 00 A0 E3                                     MOV     R0, #3.text:000014B8 00 00 50 E3                                     CMP     R0, #0             </code></pre><p>这样达到从getvalue获取返回值后，重新修改v2的值为3，让其无论什么情况下都自动判断为已注册企业版。</p><p>网上其他的分析文章，同样是修改n1函数，只不过修改方式是同时修改几个mov语句，让其都赋值3来跳转判断。</p><p>详细文章：<a href="http://ju.outofmemory.cn/entry/33818" target="_blank" rel="noopener">简单Android CrackMe分析</a></p>]]></content>
-    
-    <summary type="html">
-    
-      
-      
-        &lt;h3 id=&quot;ISCC-Android-Crackme&quot;&gt;&lt;a href=&quot;#ISCC-Android-Crackme&quot; class=&quot;headerlink&quot; title=&quot;ISCC Android Crackme&quot;&gt;&lt;/a&gt;ISCC Android Crackme&lt;/h3&gt;&lt;
-      
-    
-    </summary>
-    
-    
-      <category term="Android逆向" scheme="/tags/Android%E9%80%86%E5%90%91/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>APP解密参数sign</title>
-    <link href="/2019/04/APP%E8%A7%A3%E5%AF%86%E5%8F%82%E6%95%B0sign/"/>
-    <id>/2019/04/APP解密参数sign/</id>
-    <published>2019-04-18T08:34:21.000Z</published>
-    <updated>2019-07-26T09:56:16.713Z</updated>
-    
-    <content type="html"><![CDATA[<h3 id="APP解密参数sign"><a href="#APP解密参数sign" class="headerlink" title="APP解密参数sign"></a>APP解密参数sign</h3><p>APP是公司自己的业务APP，没有加固，只做了代码混淆。本以为要对加密字段进行so文件的逆向，查看后发现是Java层的加密，相对较简单。</p><p>首先抓包查看加密字段和相关参数值，可以看到一共有四个参数，其中sign是加密验证完整性字段</p><p><img src="\2019\04\APP解密参数sign\1555574089554.png" alt="1555574089554"></p><p>利用AK逆向APP包，搜索sign字段信息，但是搜索结果过多，查找较困难，但是sign是一个data参数字段，因此尝试更换其他字段搜索。</p><p><img src="\2019\04\APP解密参数sign\1555574535666.png" alt="1555574535666"></p><p>搜索reqData字段可以看到，搜索结果就smali文件存在，第一个为程序包，查看代码，利用jd来查看反编译Java代码。</p><p><img src="\2019\04\APP解密参数sign\1555574610824.png" alt="1555574610824"></p><p>搜索字段，可以看到如下所示，以下字段可以看出，程序对其四个字段的获取都有代表的变量，而我们只需要获取sign的变量，localObject2。</p><p>变量的值来源为t包的b方法，可以明显看到，值为nonce，tiestamp, localObject1, t.f的相加值。而localObject1为reqData的值。</p><p><img src="\2019\04\APP解密参数sign\1555575022131.png" alt="1555575022131"></p><p>查看t.b的方法，方法如下，对字段进行sha-256加密。查看a方法</p><pre><code>public static String b(String paramString)  {    return a(paramString, &quot;SHA-256&quot;);  }</code></pre><p>其中t.a的执行为对指定的参数进行指定的加密，利用传入参数来确定。</p><pre><code>public static String a(String paramString1, String paramString2)  {    try    {      paramString2 = MessageDigest.getInstance(paramString2);      paramString2.update(paramString1.getBytes());      paramString1 = a(paramString2.digest());      return paramString1;    }    catch (Exception paramString1)    {      paramString1.printStackTrace();    }    return null;  }</code></pre><p>而t.f代表的是一段加密公钥，此处不在列出，利用在线工具查看加密结果是否一致。可以看到加密后的参数和抓到的包结果一致。</p><p><img src="\2019\04\APP解密参数sign\1555575489330.png" alt="1555575489330"></p><p>那么就可以利用我们自己生成加密参数的方式来进行测试，例如如下脚本，通过判断响应返回的字段来获取参数值，查看是否越权等信息。</p><pre><code>#coding : utf-8import hashlibimport requestsheaders = {    &#39;Content-Type&#39;: &#39;application/x-www-form-urlencoded&#39;,    &#39;Accept-Encoding&#39;: &#39;gzip, deflate&#39;,    &#39;Cookie&#39;: &#39;JSESSIONID=xxxxxxx&#39;,    &#39;User-Agent&#39;: &#39;okhttp/3.4.1&#39;}for i in range(60200000, 60295558):    sha = &#39;MIICdgIBADAN.....TMK63hMPgm25mbCD0vKhsQtcSDlzVwtOOoNlW5E8CQQDNXVwGolFCqU9lb5147AHc+&lt;INF&gt;&lt;action&gt;...&lt;/action&gt;&lt;hostId&gt;&#39;+str(i)+&#39;&lt;/hostId&gt;&lt;ver&gt;27&lt;/ver&gt;&lt;transNo&gt;1555571421812&lt;/transNo&gt;&lt;deviceType&gt;0&lt;/deviceType&gt;&lt;verNm&gt;3.3.1&lt;/verNm&gt;&lt;/INF&gt;LE8I2QTAFHJM3M.....1555571421812&#39;    h = hashlib.sha256(sha)    sha256 = h.hexdigest()    data = &#39;reqData=&lt;INF&gt;&lt;action&gt;.....&lt;/action&gt;&lt;hostId&gt;&#39;+str(i)+&#39;&lt;/hostId&gt;&lt;ver&gt;27&lt;/ver&gt;&lt;transNo&gt;1555571421812&lt;/transNo&gt;&lt;deviceType&gt;0&lt;/deviceType&gt;&lt;verNm&gt;3.3.1&lt;/verNm&gt;&lt;/INF&gt;&amp;nonce=LE8I2QTAFHJM3MO.....&amp;timestamp=1555571421812&amp;sign=&#39;+sha256    r = requests.post(&#39;http://xxxxxx/api&#39;, data = data, headers=headers)    if &#39;xxxxxx&#39; in r.text:        print i</code></pre>]]></content>
-    
-    <summary type="html">
-    
-      
-      
-        &lt;h3 id=&quot;APP解密参数sign&quot;&gt;&lt;a href=&quot;#APP解密参数sign&quot; class=&quot;headerlink&quot; title=&quot;APP解密参数sign&quot;&gt;&lt;/a&gt;APP解密参数sign&lt;/h3&gt;&lt;p&gt;APP是公司自己的业务APP，没有加固，只做了代码混淆。本以为要对加
       
     
     </summary>
