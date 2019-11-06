@@ -104,6 +104,40 @@
             
             
                 <div class="col-md-11">
+                    <a href="/2019/11/AI-WEB 1.0/" class="h3 title" target="_self">VulnHub AI WEB 1.0</a>
+                    
+                    <p>加载虚拟机后，由于没有账号暂不登录，通过虚拟机网段，查询DHCP分配的地址。
+扫描端口发现只有80的对外开放端口，访问发现
+
+扫描路径发现robots文件。其中两个路径文件，看样子是文件上传的地址。
+
+访问其中地址，403
+
+介于是403尝试访问上一级发现
+
+尝试输入1，发现显示admin用户，那就是说可能这是个注入点。
+
+检查是否存在注入，发现存...</p>
+                    
+                    
+                    <p class="h6">
+                        <i class="material-icons">date_range</i>2019-11-06
+                        
+                            <i class="material-icons">bookmark_border</i>
+                                
+                                    web安全 &nbsp;
+                                
+                        
+                    </p>
+                    
+                </div>
+        </div>
+       
+        
+        <div class="row post-card">
+            
+            
+                <div class="col-md-11">
                     <a href="/2019/11/GitHub-Monitor/" class="h3 title" target="_self">GitHub-Monitor</a>
                     
                     <p>GITHUB_MONTIOR
@@ -226,32 +260,6 @@ net g...</p>
                     
                     <p class="h6">
                         <i class="material-icons">date_range</i>2019-10-11
-                        
-                            <i class="material-icons">bookmark_border</i>
-                                
-                                    web安全 &nbsp;
-                                
-                        
-                    </p>
-                    
-                </div>
-        </div>
-       
-        
-        <div class="row post-card">
-            
-            
-                <div class="col-md-11">
-                    <a href="/2019/09/CVE-2019-10392-Jenkins-2k19认证远程RCE/" class="h3 title" target="_self">CVE-2019-10392 Jenkins 2k19认证远程RCE</a>
-                    
-                    <p>CVE-2019-10392 Jenkins 2k19认证远程RCE使用以下命令在本地使用Docker启动了Jenkins实例：
-docker run -p 8080:8080 -p 50000:50000 jenkins/jenkins:lts-alpine
-版本为：Jenkins 2.176.3
-git客户端：http://updates.je...</p>
-                    
-                    
-                    <p class="h6">
-                        <i class="material-icons">date_range</i>2019-09-16
                         
                             <i class="material-icons">bookmark_border</i>
                                 
