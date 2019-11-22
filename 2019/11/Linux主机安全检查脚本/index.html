@@ -19,7 +19,7 @@
     <meta name="description" content="One way to choose one">
     <meta name="author" content="Misaki">
     <meta name="keywords" content="">
-    <title>GitHub-Monitor ~ Misaki&#39;s Blog</title>
+    <title>Linux主机安全检查脚本 ~ Misaki&#39;s Blog</title>
     <link rel="stylesheet" href="/css/Material_Icons.css">
     <!-- <link rel="stylesheet" href="/css/font-awesome.css"> -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css">
@@ -97,8 +97,8 @@
   <div class="page-header header-filter" data-parallax="true" style="background-image: url('/img/post-banner.jpg'); height: 70vh;">
     
       <div class="container">
-        <h1 class="title text-center post_title">GitHub-Monitor</h1>
-        <p class="text-center"><b>Wednesday, November 6th 2019, 12:41 pm</b></p>
+        <h1 class="title text-center post_title">Linux主机安全检查脚本</h1>
+        <p class="text-center"><b>Friday, November 22nd 2019, 3:36 pm</b></p>
       </div>
     
   </div>
@@ -112,38 +112,36 @@
       <div class="container">
         <div class="section">
           <div class="post_content">
-              <h2 id="GITHUB-MONTIOR"><a href="#GITHUB-MONTIOR" class="headerlink" title="GITHUB_MONTIOR"></a>GITHUB_MONTIOR</h2><blockquote>
-<p>  python3 + Django 2.2.6 + supervisord</p>
-</blockquote>
-<ol>
-<li>环境由简单的Django完成，外加一个HTML展示模板</li>
-<li>GitHub的爬虫由supervisord来维护，需要修改配置文件内的信息，可以改成/var/run路径</li>
-<li>pip安装如下的文件即可</li>
-</ol>
-<p>爬虫需要账号密码模拟登陆，进程为五分钟一次。是否扫描根据任务数据里保存的时间来做判断。</p>
-<p>修改任务只需要在编辑里输入任务名，直接输入其他参数更新即可。</p>
-<p>数据库采用MySQL5.7。</p>
-<pre><code>python3 manager.py createsuperuser
-python3 manager.py makemigrations
-python3 manager.py migrate
-登陆后台添加一个可以登陆前端的账号即可。
-</code></pre><p>地址：<a href="https://github.com/MisakiKata/github_monitor" target="_blank" rel="noopener">https://github.com/MisakiKata/github_monitor</a></p>
-<p>首界面</p>
-<p><img src="https://user-images.githubusercontent.com/27627614/68268529-83d12080-0091-11ea-8956-988a74a77da4.png" alt="1573011489137"></p>
-<p>全部信息<img src="https://user-images.githubusercontent.com/27627614/68268531-8764a780-0091-11ea-8269-0288c1c879cb.png" alt="1573011512652"></p>
-<p>未处理信息</p>
-<p><img src="https://user-images.githubusercontent.com/27627614/68268533-8764a780-0091-11ea-8231-30c8635d2067.png" alt="1573011525234"></p>
-<p>界面由于对js了解较少，没有采用比较nodejs类前端框架，当然也可以修改为自己喜欢的界面。</p>
-<p>食用简单，望喜欢。</p>
+              <h3 id="检查项"><a href="#检查项" class="headerlink" title="检查项"></a>检查项</h3><pre><code>0.检测命令是否被修改
+1.获取网络连接
+2.查看对外开放端口
+3.查看是否存在高危端口
+4.查看启动项
+5.查看定时任务
+6.查看调度任务
+7.检测cpu异常进程
+8.检测特权用户
+9.查看登陆用户
+10.可登录用户
+11.最近修改过的文件
+12.查看是否存在可疑命令
+13.root是否允许远程登陆
+14.检查是否存在可疑脚本
+15.日志文件打包
+16.查看登陆到主机的用户
+17.检查磁盘使用量
+</code></pre><p>以上检查项按照比较关心的项来写，在Ubuntu主机上测试，个别命令可能centos不带，需要提前安装。</p>
+<h3 id="地址"><a href="#地址" class="headerlink" title="地址"></a>地址</h3><p>项目地址：<a href="https://github.com/MisakiKata/Linuxcheck" target="_blank" rel="noopener">https://github.com/MisakiKata/Linuxcheck</a></p>
+<h3 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h3><p>其中还包括一批后门端口，利用来自：<a href="https://github.com/T0xst/linux/blob/master/checkrules/dangerstcpports.dat" target="_blank" rel="noopener">port列表</a></p>
 
           </div>
           <br><br>
               
                 <div class="license-wrapper">
                     <p>原文作者：<a href="">Misaki</a>
-                    <p>原文链接：<a href="/2019/11/GitHub-Monitor/">/2019/11/GitHub-Monitor/</a>
-                    <p>发表日期：<a href="/2019/11/GitHub-Monitor/">November 6th 2019, 12:41:49 pm</a>
-                    <p>更新日期：<a href="/2019/11/GitHub-Monitor/">November 6th 2019, 12:41:49 pm</a>
+                    <p>原文链接：<a href="/2019/11/Linux主机安全检查脚本/">/2019/11/Linux主机安全检查脚本/</a>
+                    <p>发表日期：<a href="/2019/11/Linux主机安全检查脚本/">November 22nd 2019, 3:36:57 pm</a>
+                    <p>更新日期：<a href="/2019/11/Linux主机安全检查脚本/">November 22nd 2019, 3:42:57 pm</a>
                     <p>版权声明：本文采用<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">知识共享署名-非商业性使用 4.0 国际许可协议</a>进行许可</p>
                 </div>
               
@@ -151,7 +149,7 @@ python3 manager.py migrate
           <div>
               <p>
                        
-                      <span class="badge badge-default">#&nbsp;python</span>
+                      <span class="badge badge-default">#&nbsp;shell</span>
                       &nbsp;
                       
               </p>
@@ -182,8 +180,8 @@ python3 manager.py migrate
     <script>               
         var disqus_shortname = '';
         var disqus_config = function () {
-            this.page.url = '/2019/11/GitHub-Monitor/'; 
-            this.page.identifier = '/2019/11/GitHub-Monitor/';
+            this.page.url = '/2019/11/Linux主机安全检查脚本/'; 
+            this.page.identifier = '/2019/11/Linux主机安全检查脚本/';
         };
         (function() { 
             var d = document, s = d.createElement('script');
