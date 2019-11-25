@@ -145,15 +145,32 @@
 <p>修改时，发现第一种并不行，Java层参数值修改后，可能n2做了其他相关处理，第二种是可行，毕竟都获取到了注册码，但需要解密成功，此MD5只是简单的32345678。</p>
 <p>第三种修改n1：</p>
 <p>输入肯定为错误或者不输入值，因此只需要修改值为空或者其他未知情况下的返回值。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">.text:0000133C                 CMP     R0, #0</span><br><span class="line">.text:00001340                 MOVEQ   R1, #4</span><br><span class="line">.text:00001344                 MOV     R0, R7</span><br><span class="line">.text:00001348                 MOVNE   R1, R8</span><br></pre></td></tr></table></figure>
-<p>修改为：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">.text:0000133C                 MOV     R0, #3</span><br><span class="line">.text:00001340                 MOVEQ   R1, #3</span><br><span class="line">.text:00001344                 MOV     R0, R7</span><br><span class="line">.text:00001348                 MOVNE   R1, R8</span><br></pre></td></tr></table></figure>
-<p>让其在未输入的情况下返回企业版的返回值。修改编译安装后，打开即为企业版。</p>
+<pre><code>.text:0000133C                 CMP     R0, #0
+.text:00001340                 MOVEQ   R1, #4
+.text:00001344                 MOV     R0, R7
+.text:00001348                 MOVNE   R1, R8
+</code></pre><p>修改为：</p>
+<pre><code>.text:0000133C                 MOV     R0, #3
+.text:00001340                 MOVEQ   R1, #3
+.text:00001344                 MOV     R0, R7
+.text:00001348                 MOVNE   R1, R8
+</code></pre><p>让其在未输入的情况下返回企业版的返回值。修改编译安装后，打开即为企业版。</p>
 <p>第四种修改work:</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">.text:000014A0 10 40 2D E9                                     STMFD   SP!, &#123;R4,LR&#125;</span><br><span class="line">.text:000014A4 00 40 A0 E1                                     MOV     R4, R0</span><br><span class="line">.text:000014A8 6F FF FF EB                                     BL      n1</span><br><span class="line">.text:000014AC 04 00 A0 E1                                     MOV     R0, R4</span><br><span class="line">.text:000014B0 35 FF FF EB                                     BL      getValue</span><br><span class="line">.text:000014B8 00 00 50 E3                                     CMP     R0, #0</span><br></pre></td></tr></table></figure>
-<p>增加一条指令，修改为:</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">.text:000014A0 10 40 2D E9                                     STMFD   SP!, &#123;R4,LR&#125;</span><br><span class="line">.text:000014A4 00 40 A0 E1                                     MOV     R4, R0</span><br><span class="line">.text:000014A8 6F FF FF EB                                     BL      n1</span><br><span class="line">.text:000014AC 04 00 A0 E1                                     MOV     R0, R4</span><br><span class="line">.text:000014B0 35 FF FF EB                                     BL      getValue</span><br><span class="line">.text:000014B4 03 00 A0 E3                                     MOV     R0, #3</span><br><span class="line">.text:000014B8 00 00 50 E3                                     CMP     R0, #0</span><br></pre></td></tr></table></figure>
-<p>这样达到从getvalue获取返回值后，重新修改v2的值为3，让其无论什么情况下都自动判断为已注册企业版。</p>
+<pre><code>.text:000014A0 10 40 2D E9                                     STMFD   SP!, {R4,LR}
+.text:000014A4 00 40 A0 E1                                     MOV     R4, R0
+.text:000014A8 6F FF FF EB                                     BL      n1
+.text:000014AC 04 00 A0 E1                                     MOV     R0, R4
+.text:000014B0 35 FF FF EB                                     BL      getValue
+.text:000014B8 00 00 50 E3                                     CMP     R0, #0
+</code></pre><p>增加一条指令，修改为:</p>
+<pre><code>.text:000014A0 10 40 2D E9                                     STMFD   SP!, {R4,LR}
+.text:000014A4 00 40 A0 E1                                     MOV     R4, R0
+.text:000014A8 6F FF FF EB                                     BL      n1
+.text:000014AC 04 00 A0 E1                                     MOV     R0, R4
+.text:000014B0 35 FF FF EB                                     BL      getValue
+.text:000014B4 03 00 A0 E3                                     MOV     R0, #3
+.text:000014B8 00 00 50 E3                                     CMP     R0, #0             
+</code></pre><p>这样达到从getvalue获取返回值后，重新修改v2的值为3，让其无论什么情况下都自动判断为已注册企业版。</p>
 <p>网上其他的分析文章，同样是修改n1函数，只不过修改方式是同时修改几个mov语句，让其都赋值3来跳转判断。</p>
 <p>详细文章：<a href="http://ju.outofmemory.cn/entry/33818" target="_blank" rel="noopener">简单Android CrackMe分析</a></p>
 

@@ -161,7 +161,17 @@ app-debug1.apk把apk丢到AK中，反编译，结果中有一个目录是assert/
                     <a href="/2019/07/结构体链表逆向/" class="h3 title" target="_self">结构体链表逆向</a>
                     
                     <p>结构体链表逆向同样使用如下的C代码：
-12345678910111213141516171819202122232425262728293031323334353637383940#include &lt;stdio.h&gt;#include &lt;stdlib.h&gt;typedef struct _student&#123;	char n...</p>
+#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+typedef struct _student
+{
+    char name[32];
+    int age;
+    struct _student * next;
+}T_student;
+
+
+T_stu...</p>
                     
                     
                     <p class="h6">
@@ -185,7 +195,15 @@ app-debug1.apk把apk丢到AK中，反编译，结果中有一个目录是assert/
                     <a href="/2019/07/ARM数组重定向/" class="h3 title" target="_self">ARM数组重定向</a>
                     
                     <p>ARM数组重定向使用如下的C代码做演示，代码是无名侠的一份数组演示代码。如下：
-12345678910111213141516171819202122232425262728293031323334353637383940414243444546474849505152#include &lt;stdio.h&gt;// Arraysint g_T...</p>
+#include &lt;stdio.h&gt;
+// Arrays
+
+int g_Table[100];
+int g_Table2[100];
+
+void PrintAddr()
+{
+    printf(&quot;g_Table:0x%x\ng_Table2:%x...</p>
                     
                     
                     <p class="h6">
@@ -211,8 +229,8 @@ app-debug1.apk把apk丢到AK中，反编译，结果中有一个目录是assert/
                     <p>Redis主从复制redis主从复制，前几天分享的新版redis未授权利用的新型方式。
 什么是主从复制，http://blog.itpub.net/31545684/viewspace-2213629/
 通过redis命令来设置主从机
-1127.0.0.1:6379&gt; slaveof 192.168.253.131 6379
-被设置的主机将通...</p>
+127.0.0.1:6379&gt; slaveof 192.168.253.131 6379
+被设置的主机将通过...</p>
                     
                     
                     <p class="h6">

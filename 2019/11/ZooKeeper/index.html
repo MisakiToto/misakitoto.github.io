@@ -134,58 +134,300 @@
 </ul>
 <h2 id="Java环境"><a href="#Java环境" class="headerlink" title="Java环境"></a>Java环境</h2><p>最新版zookeeper需要Java1.8.211以上。</p>
 <p>比如利用源安装</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">yum install java-1.8.0-openjdk.x86_64</span><br><span class="line">java -version</span><br><span class="line">openjdk version &quot;1.8.0_232&quot;</span><br></pre></td></tr></table></figure>
-<h2 id="ZooKeeper"><a href="#ZooKeeper" class="headerlink" title="ZooKeeper"></a>ZooKeeper</h2><p>地址：<a href="https://mirrors.tuna.tsinghua.edu.cn/apache/zookeeper/zookeeper-3.5.6/apache-zookeeper-3.5.6-bin.tar.gz" target="_blank" rel="noopener">https://mirrors.tuna.tsinghua.edu.cn/apache/zookeeper/zookeeper-3.5.6/apache-zookeeper-3.5.6-bin.tar.gz</a></p>
+<pre><code>yum install java-1.8.0-openjdk.x86_64
+java -version
+openjdk version &quot;1.8.0_232&quot;
+</code></pre><h2 id="ZooKeeper"><a href="#ZooKeeper" class="headerlink" title="ZooKeeper"></a>ZooKeeper</h2><p>地址：<a href="https://mirrors.tuna.tsinghua.edu.cn/apache/zookeeper/zookeeper-3.5.6/apache-zookeeper-3.5.6-bin.tar.gz" target="_blank" rel="noopener">https://mirrors.tuna.tsinghua.edu.cn/apache/zookeeper/zookeeper-3.5.6/apache-zookeeper-3.5.6-bin.tar.gz</a></p>
 <p>解压缩，进入conf目录修改zoo-sample.cfg文件为zoo.cfg文件。</p>
 <p>打开文件，修改路径，类似如下</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"># The number of milliseconds of each tick</span><br><span class="line">tickTime=2000</span><br><span class="line"># The number of ticks that the initial</span><br><span class="line"># synchronization phase can take</span><br><span class="line">initLimit=10</span><br><span class="line"># The number of ticks that can pass between</span><br><span class="line"># sending a request and getting an acknowledgement</span><br><span class="line">syncLimit=5</span><br><span class="line"># the directory where the snapshot is stored.</span><br><span class="line"># do not use /tmp for storage, /tmp here is just</span><br><span class="line"># example sakes.</span><br><span class="line">dataDir=/data/zookeeper</span><br><span class="line"># the port at which the clients will connect</span><br><span class="line">clientPort=2181</span><br><span class="line"># the maximum number of client connections.</span><br><span class="line"># increase this if you need to handle more clients</span><br><span class="line">#maxClientCnxns=60</span><br><span class="line">#</span><br><span class="line"># Be sure to read the maintenance section of the</span><br><span class="line"># administrator guide before turning on autopurge.</span><br><span class="line">#</span><br><span class="line"># http://zookeeper.apache.org/doc/current/zookeeperAdmin.html#sc_maintenance</span><br><span class="line">#</span><br><span class="line"># The number of snapshots to retain in dataDir</span><br><span class="line">#autopurge.snapRetainCount=3</span><br><span class="line"># Purge task interval in hours</span><br><span class="line"># Set to &quot;0&quot; to disable auto purge feature</span><br><span class="line">#autopurge.purgeInterval=1</span><br></pre></td></tr></table></figure>
-<p>保存，到bin目录下执行</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">[root@VM_0_6_centos bin]# ./zkServer.sh start</span><br><span class="line">/usr/bin/java</span><br><span class="line">ZooKeeper JMX enabled by default</span><br><span class="line">Using config: /root/apache-zookeeper-3.5.6-bin/bin/../conf/zoo.cfg</span><br><span class="line">Starting zookeeper ... STARTED</span><br></pre></td></tr></table></figure>
-<p>开始服务后，启动cli端。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[root@VM_0_6_centos bin]# ./zkCli.sh </span><br><span class="line">/usr/bin/java</span><br><span class="line">Connecting to localhost:2181</span><br></pre></td></tr></table></figure>
-<h3 id="创建Znode节点"><a href="#创建Znode节点" class="headerlink" title="创建Znode节点"></a>创建Znode节点</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">create /path /data</span><br><span class="line"></span><br><span class="line">eg: [zk: localhost:2181(CONNECTED) 4] create /datapp zookapp</span><br><span class="line">	Created /datapp</span><br></pre></td></tr></table></figure>
-<h3 id="创建顺序节点"><a href="#创建顺序节点" class="headerlink" title="创建顺序节点"></a>创建顺序节点</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">create -e /path /data</span><br><span class="line"></span><br><span class="line">eg: [zk: localhost:2181(CONNECTED) 5] create -s /datapp zookapp</span><br><span class="line">	Created /datapp0000000003</span><br></pre></td></tr></table></figure>
-<h3 id="删除节点"><a href="#删除节点" class="headerlink" title="删除节点"></a>删除节点</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">[zk: localhost:2181(CONNECTED) 6] delete /datapp </span><br><span class="line">[zk: localhost:2181(CONNECTED) 7] ls /datapp</span><br><span class="line">Node does not exist: /datapp</span><br><span class="line"></span><br><span class="line">#删除带子节点的节点</span><br><span class="line">[zk: localhost:2181(CONNECTED) 30] ls /datapp</span><br><span class="line">[sec]</span><br><span class="line">[zk: localhost:2181(CONNECTED) 33] deleteall /datapp</span><br><span class="line">[zk: localhost:2181(CONNECTED) 34]</span><br></pre></td></tr></table></figure>
-<h3 id="获取数据"><a href="#获取数据" class="headerlink" title="获取数据"></a>获取数据</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">[zk: localhost:2181(CONNECTED) 11] get /datapp </span><br><span class="line">zookapp</span><br><span class="line">[zk: localhost:2181(CONNECTED) 13] get -s /datapp    #查看全部数据</span><br><span class="line">zookapp</span><br><span class="line">cZxid = 0xc</span><br><span class="line">ctime = Thu Nov 07 11:10:41 CST 2019</span><br><span class="line">mZxid = 0xc</span><br><span class="line">mtime = Thu Nov 07 11:10:41 CST 2019</span><br><span class="line">pZxid = 0xc</span><br><span class="line">cversion = 0</span><br><span class="line">dataVersion = 0</span><br><span class="line">aclVersion = 0</span><br><span class="line">ephemeralOwner = 0x0</span><br><span class="line">dataLength = 7</span><br><span class="line">numChildren = 0</span><br><span class="line">[zk: localhost:2181(CONNECTED) 18] set /datapp zookupdate   #设置更改</span><br><span class="line"></span><br><span class="line">WATCHER::</span><br><span class="line"></span><br><span class="line">WatchedEvent state:SyncConnected type:NodeDataChanged path:/datapp</span><br><span class="line">[zk: localhost:2181(CONNECTED) 19] get -w /datapp    #查看更改</span><br><span class="line">zookupdate</span><br><span class="line">[zk: localhost:2181(CONNECTED) 20] set /datapp cversion=1</span><br><span class="line"></span><br><span class="line">WATCHER::</span><br><span class="line"></span><br><span class="line">WatchedEvent state:SyncConnected type:NodeDataChanged path:/datapp</span><br><span class="line">[zk: localhost:2181(CONNECTED) 21] get -w /datapp</span><br><span class="line">cversion=1</span><br></pre></td></tr></table></figure>
-<h3 id="设置数据"><a href="#设置数据" class="headerlink" title="设置数据"></a>设置数据</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">[zk: localhost:2181(CONNECTED) 18] set /datapp zookupdate</span><br><span class="line"></span><br><span class="line">WATCHER::</span><br><span class="line"></span><br><span class="line">WatchedEvent state:SyncConnected type:NodeDataChanged path:/datapp</span><br><span class="line">[zk: localhost:2181(CONNECTED) 19] get -w /datapp</span><br><span class="line">zookupdate</span><br></pre></td></tr></table></figure>
-<h3 id="创建子节点"><a href="#创建子节点" class="headerlink" title="创建子节点"></a>创建子节点</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">[zk: localhost:2181(CONNECTED) 28] create /datapp zookapp</span><br><span class="line">Created /datapp</span><br><span class="line">[zk: localhost:2181(CONNECTED) 29] create /datapp/sec zookapp2</span><br><span class="line">Created /datapp/sec</span><br><span class="line">[zk: localhost:2181(CONNECTED) 30] ls /datapp</span><br><span class="line">[sec]</span><br><span class="line">[zk: localhost:2181(CONNECTED) 31] get /datapp</span><br><span class="line">zookapp</span><br><span class="line">[zk: localhost:2181(CONNECTED) 32] get /datapp/sec</span><br><span class="line">zookapp2</span><br></pre></td></tr></table></figure>
-<h2 id="Zookeeper集群部署"><a href="#Zookeeper集群部署" class="headerlink" title="Zookeeper集群部署"></a>Zookeeper集群部署</h2><p>此处利用一台主机模拟两个zookeeper部署，在root目录下创建两个文件夹， 一个为zookeeper1，一个为zookeeper2。而实际环境中最小需要三个节点，最好是奇数节点。</p>
+<pre><code># The number of milliseconds of each tick
+tickTime=2000
+# The number of ticks that the initial
+# synchronization phase can take
+initLimit=10
+# The number of ticks that can pass between
+# sending a request and getting an acknowledgement
+syncLimit=5
+# the directory where the snapshot is stored.
+# do not use /tmp for storage, /tmp here is just
+# example sakes.
+dataDir=/data/zookeeper
+# the port at which the clients will connect
+clientPort=2181
+# the maximum number of client connections.
+# increase this if you need to handle more clients
+#maxClientCnxns=60
+#
+# Be sure to read the maintenance section of the
+# administrator guide before turning on autopurge.
+#
+# http://zookeeper.apache.org/doc/current/zookeeperAdmin.html#sc_maintenance
+#
+# The number of snapshots to retain in dataDir
+#autopurge.snapRetainCount=3
+# Purge task interval in hours
+# Set to &quot;0&quot; to disable auto purge feature
+#autopurge.purgeInterval=1
+</code></pre><p>保存，到bin目录下执行</p>
+<pre><code>[root@VM_0_6_centos bin]# ./zkServer.sh start
+/usr/bin/java
+ZooKeeper JMX enabled by default
+Using config: /root/apache-zookeeper-3.5.6-bin/bin/../conf/zoo.cfg
+Starting zookeeper ... STARTED
+</code></pre><p>开始服务后，启动cli端。</p>
+<pre><code>[root@VM_0_6_centos bin]# ./zkCli.sh 
+/usr/bin/java
+Connecting to localhost:2181
+</code></pre><h3 id="创建Znode节点"><a href="#创建Znode节点" class="headerlink" title="创建Znode节点"></a>创建Znode节点</h3><pre><code>create /path /data
+
+eg: [zk: localhost:2181(CONNECTED) 4] create /datapp zookapp
+    Created /datapp
+</code></pre><h3 id="创建顺序节点"><a href="#创建顺序节点" class="headerlink" title="创建顺序节点"></a>创建顺序节点</h3><pre><code>create -e /path /data
+
+eg: [zk: localhost:2181(CONNECTED) 5] create -s /datapp zookapp
+    Created /datapp0000000003
+</code></pre><h3 id="删除节点"><a href="#删除节点" class="headerlink" title="删除节点"></a>删除节点</h3><pre><code>[zk: localhost:2181(CONNECTED) 6] delete /datapp 
+[zk: localhost:2181(CONNECTED) 7] ls /datapp
+Node does not exist: /datapp
+
+#删除带子节点的节点
+[zk: localhost:2181(CONNECTED) 30] ls /datapp
+[sec]
+[zk: localhost:2181(CONNECTED) 33] deleteall /datapp
+[zk: localhost:2181(CONNECTED) 34] 
+</code></pre><h3 id="获取数据"><a href="#获取数据" class="headerlink" title="获取数据"></a>获取数据</h3><pre><code>[zk: localhost:2181(CONNECTED) 11] get /datapp 
+zookapp
+[zk: localhost:2181(CONNECTED) 13] get -s /datapp    #查看全部数据
+zookapp
+cZxid = 0xc
+ctime = Thu Nov 07 11:10:41 CST 2019
+mZxid = 0xc
+mtime = Thu Nov 07 11:10:41 CST 2019
+pZxid = 0xc
+cversion = 0
+dataVersion = 0
+aclVersion = 0
+ephemeralOwner = 0x0
+dataLength = 7
+numChildren = 0
+[zk: localhost:2181(CONNECTED) 18] set /datapp zookupdate   #设置更改
+
+WATCHER::
+
+WatchedEvent state:SyncConnected type:NodeDataChanged path:/datapp
+[zk: localhost:2181(CONNECTED) 19] get -w /datapp    #查看更改
+zookupdate
+[zk: localhost:2181(CONNECTED) 20] set /datapp cversion=1
+
+WATCHER::
+
+WatchedEvent state:SyncConnected type:NodeDataChanged path:/datapp
+[zk: localhost:2181(CONNECTED) 21] get -w /datapp
+cversion=1
+</code></pre><h3 id="设置数据"><a href="#设置数据" class="headerlink" title="设置数据"></a>设置数据</h3><pre><code>[zk: localhost:2181(CONNECTED) 18] set /datapp zookupdate
+
+WATCHER::
+
+WatchedEvent state:SyncConnected type:NodeDataChanged path:/datapp
+[zk: localhost:2181(CONNECTED) 19] get -w /datapp
+zookupdate
+</code></pre><h3 id="创建子节点"><a href="#创建子节点" class="headerlink" title="创建子节点"></a>创建子节点</h3><pre><code>[zk: localhost:2181(CONNECTED) 28] create /datapp zookapp
+Created /datapp
+[zk: localhost:2181(CONNECTED) 29] create /datapp/sec zookapp2
+Created /datapp/sec
+[zk: localhost:2181(CONNECTED) 30] ls /datapp
+[sec]
+[zk: localhost:2181(CONNECTED) 31] get /datapp
+zookapp
+[zk: localhost:2181(CONNECTED) 32] get /datapp/sec
+zookapp2
+</code></pre><h2 id="Zookeeper集群部署"><a href="#Zookeeper集群部署" class="headerlink" title="Zookeeper集群部署"></a>Zookeeper集群部署</h2><p>此处利用一台主机模拟两个zookeeper部署，在root目录下创建两个文件夹， 一个为zookeeper1，一个为zookeeper2。而实际环境中最小需要三个节点，最好是奇数节点。</p>
 <p>创建data目录，在conf配置文件中修改如下，端口由于是在一台主机上，所以需要不同的端口，正常形式下，可以设置为不同IP同端口。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"># The number of milliseconds of each tick</span><br><span class="line">tickTime=2000</span><br><span class="line"># The number of ticks that the initial</span><br><span class="line"># synchronization phase can take</span><br><span class="line">initLimit=10</span><br><span class="line"># The number of ticks that can pass between</span><br><span class="line"># sending a request and getting an acknowledgement</span><br><span class="line">syncLimit=5</span><br><span class="line"># the directory where the snapshot is stored.</span><br><span class="line"># do not use /tmp for storage, /tmp here is just</span><br><span class="line"># example sakes.</span><br><span class="line">dataDir=/data/zookeeper1</span><br><span class="line"># the port at which the clients will connect</span><br><span class="line">clientPort=2181</span><br><span class="line"># the maximum number of client connections.</span><br><span class="line"># increase this if you need to handle more clients</span><br><span class="line">#maxClientCnxns=60</span><br><span class="line">#</span><br><span class="line"># Be sure to read the maintenance section of the</span><br><span class="line"># administrator guide before turning on autopurge.</span><br><span class="line">#</span><br><span class="line"># http://zookeeper.apache.org/doc/current/zookeeperAdmin.html#sc_maintenance</span><br><span class="line">#</span><br><span class="line"># The number of snapshots to retain in dataDir</span><br><span class="line">#autopurge.snapRetainCount=3</span><br><span class="line"># Purge task interval in hours</span><br><span class="line"># Set to &quot;0&quot; to disable auto purge feature</span><br><span class="line">#autopurge.purgeInterval=1</span><br><span class="line">server.1=127.0.0.1:7788:8890</span><br><span class="line">server.2=127.0.0.1:7789:8891</span><br></pre></td></tr></table></figure>
-<h3 id="创建data-myid文件"><a href="#创建data-myid文件" class="headerlink" title="创建data/myid文件"></a>创建data/myid文件</h3><p>创建文件myid，写入配置文件中的server名。文件的存在位置跟配置文件中的dataDir一致。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[root@VM_0_6_centos zookeeper1]# echo &quot;1&quot; &gt; myid</span><br><span class="line">[root@VM_0_6_centos zookeeper1]# ls</span><br><span class="line">myid</span><br></pre></td></tr></table></figure>
-<p>分别启动后查看状态可以发现，已经选举了一个为leader</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">[root@VM_0_6_centos zookeeper2]# ./bin/zkServer.sh status</span><br><span class="line">/usr/bin/java</span><br><span class="line">ZooKeeper JMX enabled by default</span><br><span class="line">Using config: /root/zookeeper2/bin/../conf/zoo.cfg</span><br><span class="line">Client port found: 2182. Client address: localhost.</span><br><span class="line">Mode: leader</span><br><span class="line"></span><br><span class="line">[root@VM_0_6_centos zookeeper1]# ./bin/zkServer.sh status</span><br><span class="line">/usr/bin/java</span><br><span class="line">ZooKeeper JMX enabled by default</span><br><span class="line">Using config: /root/zookeeper1/bin/../conf/zoo.cfg</span><br><span class="line">Client port found: 2181. Client address: localhost.</span><br><span class="line">Mode: follower</span><br></pre></td></tr></table></figure>
-<p>在leader端修改数据，新建znode节点</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">[zk: localhost:2181(CONNECTED) 0] create /datapp idsign</span><br><span class="line">Created /datapp</span><br><span class="line">[zk: localhost:2181(CONNECTED) 1] </span><br><span class="line"></span><br><span class="line">follow端</span><br><span class="line">[zk: localhost:2181(CONNECTED) 0] get /datapp</span><br><span class="line">idsign</span><br><span class="line">[zk: localhost:2181(CONNECTED) 1]</span><br></pre></td></tr></table></figure>
-<p>follow端修改数据，leader端同步到数据，向其他follow写入数据</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">[zk: localhost:2181(CONNECTED) 1] set /datapp idsign=xxxx</span><br><span class="line"></span><br><span class="line">[zk: localhost:2181(CONNECTED) 0] get /datapp</span><br><span class="line">idsign=xxxx</span><br><span class="line">[zk: localhost:2181(CONNECTED) 1]</span><br></pre></td></tr></table></figure>
-<h2 id="ZooKeeper-API"><a href="#ZooKeeper-API" class="headerlink" title="ZooKeeper API"></a>ZooKeeper API</h2><p>官方提供了绑定Java和C的API，此处不做使用解释。以下以python的API使用为例。</p>
+<pre><code># The number of milliseconds of each tick
+tickTime=2000
+# The number of ticks that the initial
+# synchronization phase can take
+initLimit=10
+# The number of ticks that can pass between
+# sending a request and getting an acknowledgement
+syncLimit=5
+# the directory where the snapshot is stored.
+# do not use /tmp for storage, /tmp here is just
+# example sakes.
+dataDir=/data/zookeeper1
+# the port at which the clients will connect
+clientPort=2181
+# the maximum number of client connections.
+# increase this if you need to handle more clients
+#maxClientCnxns=60
+#
+# Be sure to read the maintenance section of the
+# administrator guide before turning on autopurge.
+#
+# http://zookeeper.apache.org/doc/current/zookeeperAdmin.html#sc_maintenance
+#
+# The number of snapshots to retain in dataDir
+#autopurge.snapRetainCount=3
+# Purge task interval in hours
+# Set to &quot;0&quot; to disable auto purge feature
+#autopurge.purgeInterval=1
+server.1=127.0.0.1:7788:8890
+server.2=127.0.0.1:7789:8891
+</code></pre><h3 id="创建data-myid文件"><a href="#创建data-myid文件" class="headerlink" title="创建data/myid文件"></a>创建data/myid文件</h3><p>创建文件myid，写入配置文件中的server名。文件的存在位置跟配置文件中的dataDir一致。</p>
+<pre><code>[root@VM_0_6_centos zookeeper1]# echo &quot;1&quot; &gt; myid
+[root@VM_0_6_centos zookeeper1]# ls
+myid
+</code></pre><p>分别启动后查看状态可以发现，已经选举了一个为leader</p>
+<pre><code>[root@VM_0_6_centos zookeeper2]# ./bin/zkServer.sh status
+/usr/bin/java
+ZooKeeper JMX enabled by default
+Using config: /root/zookeeper2/bin/../conf/zoo.cfg
+Client port found: 2182. Client address: localhost.
+Mode: leader
+
+[root@VM_0_6_centos zookeeper1]# ./bin/zkServer.sh status
+/usr/bin/java
+ZooKeeper JMX enabled by default
+Using config: /root/zookeeper1/bin/../conf/zoo.cfg
+Client port found: 2181. Client address: localhost.
+Mode: follower
+</code></pre><p>在leader端修改数据，新建znode节点</p>
+<pre><code>[zk: localhost:2181(CONNECTED) 0] create /datapp idsign
+Created /datapp
+[zk: localhost:2181(CONNECTED) 1] 
+
+follow端
+[zk: localhost:2181(CONNECTED) 0] get /datapp
+idsign
+[zk: localhost:2181(CONNECTED) 1]
+</code></pre><p>follow端修改数据，leader端同步到数据，向其他follow写入数据</p>
+<pre><code>[zk: localhost:2181(CONNECTED) 1] set /datapp idsign=xxxx
+
+[zk: localhost:2181(CONNECTED) 0] get /datapp
+idsign=xxxx
+[zk: localhost:2181(CONNECTED) 1] 
+</code></pre><h2 id="ZooKeeper-API"><a href="#ZooKeeper-API" class="headerlink" title="ZooKeeper API"></a>ZooKeeper API</h2><p>官方提供了绑定Java和C的API，此处不做使用解释。以下以python的API使用为例。</p>
 <p>Java版文档：<a href="http://zookeeper.apache.org/doc/r3.3.3/api/org/apache/zookeeper/ZooKeeper.html" target="_blank" rel="noopener">http://zookeeper.apache.org/doc/r3.3.3/api/org/apache/zookeeper/ZooKeeper.html</a></p>
 <p>Java示例：<a href="https://blog.csdn.net/u013468915/article/details/80878490" target="_blank" rel="noopener">https://blog.csdn.net/u013468915/article/details/80878490</a></p>
 <p>python版文档：<a href="https://kazoo.readthedocs.io/en/latest/install.html" target="_blank" rel="noopener">https://kazoo.readthedocs.io/en/latest/install.html</a></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pip install kazoo  #安装kazoo</span><br></pre></td></tr></table></figure>
-<p>连接到ZooKeeper</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">from kazoo.client import KazooClient</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">zk = KazooClient(hosts=&apos;106.54.181.187:2181&apos;)   #连接</span><br><span class="line">zk.start()</span><br></pre></td></tr></table></figure>
-<p>节点状态</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">from kazoo.client import KazooState</span><br><span class="line"></span><br><span class="line">def my_listener(state):</span><br><span class="line">    if state == KazooState.LOST:</span><br><span class="line">        print(&apos;ZooKeeper Lost&apos;)                     # 状态为丢失时</span><br><span class="line">    elif state == KazooState.SUSPENDED:</span><br><span class="line">        print(&apos;ZooKeeper Suspended&apos;)                # 状态为暂停</span><br><span class="line">    else:</span><br><span class="line">        print(&apos;ZooKeeper Connect&apos;)                  # 状态为连接中</span><br><span class="line"></span><br><span class="line">zk.add_listener(my_listener)</span><br></pre></td></tr></table></figure>
-<p>Zookeeper 3.4及更高版本支持只读模式。 必须为Zookeeper集群中的服务器打开此模式，客户端才能使用它。 要将这种模式与Kazoo一起使用，应在read_only选项设置为True的情况下调用KazooClient。 这将使客户端连接到已变为只读的Zookeeper节点，并且客户端将继续扫描其他可读写的节点。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">from kazoo.client import KazooClient</span><br><span class="line">from kazoo.client import KazooState</span><br><span class="line">from kazoo.client import KeeperState</span><br><span class="line"></span><br><span class="line">zk = KazooClient(hosts=&apos;127.0.0.1:2181&apos;, read_only=True)</span><br><span class="line">zk.start()</span><br><span class="line"></span><br><span class="line">@zk.add_listener</span><br><span class="line">def watch_for_ro(state):</span><br><span class="line">    if state == KazooState.CONNECTED:</span><br><span class="line">        if zk.client_state == KeeperState.CONNECTED_RO:</span><br><span class="line">            print(&quot;Read only mode!&quot;)</span><br><span class="line">        else:</span><br><span class="line">            print(&quot;Read/Write mode!&quot;)</span><br></pre></td></tr></table></figure>
-<p>创建节点，使用的方法有<code>ensure_path()</code>和<code>create()</code></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"># 确定路径，在必要时创建</span><br><span class="line">zk.ensure_path(&quot;/my/favorite&quot;)</span><br><span class="line"></span><br><span class="line"># 用数据创建一个节点</span><br><span class="line">zk.create(&quot;/my/favorite/node&quot;, b&quot;a value&quot;)</span><br></pre></td></tr></table></figure>
-<p>读取节点信息</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">exists() 检查节点是否存在。</span><br><span class="line">get() 在ZnodeStat结构中获取节点的数据以及详细的节点信息。</span><br><span class="line">get_children() 获取给定节点的子级列表</span><br><span class="line"></span><br><span class="line">eg:</span><br><span class="line">if zk.exists(&quot;/my/favorite&quot;):         #判断/my/favorite是否存在</span><br><span class="line"></span><br><span class="line">data, stat = zk.get(&quot;/my/favorite&quot;)        #查看节点信息</span><br><span class="line">print(&quot;Version: %s, data: %s&quot; % (stat.version, data.decode(&quot;utf-8&quot;)))</span><br><span class="line"></span><br><span class="line">children = zk.get_children(&quot;/my/favorite&quot;)  #查看节点的子节点信息</span><br><span class="line">print(&quot;There are %s children with names %s&quot; % (len(children), children))</span><br></pre></td></tr></table></figure>
-<p>更新节点信息</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">zk.set(&quot;/my/favorite&quot;, b&quot;some data&quot;)</span><br></pre></td></tr></table></figure>
-<p>删除节点信息</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">zk.delete(&quot;/my/favorite/node&quot;, recursive=True)</span><br></pre></td></tr></table></figure>
-<p>重试命令</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">result = zk.retry(zk.get, &quot;/path/to/node&quot;)</span><br><span class="line">相当于执行</span><br><span class="line">zk.get(&apos;/path/to/node&apos;)</span><br></pre></td></tr></table></figure>
-<p>利用如上信息，编写操作ZooKeeper的Python脚本</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line">#coding:utf-8</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">from kazoo.client import KazooClient</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">class zoocon:</span><br><span class="line">    def __init__(self):</span><br><span class="line">        self.zk = KazooClient(hosts=&apos;106.54.181.187:2181&apos;)   #连接</span><br><span class="line">        self.zk.start()</span><br><span class="line">        self.path = &apos;/datapp&apos;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    def get_data(self):</span><br><span class="line">        res = self.zk.get(self.path)</span><br><span class="line">        print(res)</span><br><span class="line"></span><br><span class="line">    def exist(self):</span><br><span class="line">        self.zk.exists(self.path)</span><br><span class="line">        return True</span><br><span class="line"></span><br><span class="line">    def create_data(self):</span><br><span class="line">        self.zk.create(self.path, b&apos;signapp&apos;)</span><br><span class="line"></span><br><span class="line">    def close(self):</span><br><span class="line">        self.zk.close()</span><br><span class="line"></span><br><span class="line">    def delete(self):</span><br><span class="line">        self.zk.delete(self.path, recursive=True)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">if __name__ == &apos;__main__&apos;:</span><br><span class="line">    zks = zoocon()</span><br><span class="line">    if zks.exist():</span><br><span class="line">        zks.delete()</span><br><span class="line">        zks.close()</span><br><span class="line">        print &apos;path delete&apos;</span><br><span class="line">    else:</span><br><span class="line">        zks.create_data()</span><br><span class="line">        zks.get_data()</span><br><span class="line">        zks.close()</span><br></pre></td></tr></table></figure>
-<p>服务端存在datapp节点，运行后删除节点，当在服务器查看时，显示如下</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[zk: localhost:2181(CONNECTED) 0] get /datapp</span><br><span class="line">org.apache.zookeeper.KeeperException$NoNodeException: KeeperErrorCode = NoNode for /datapp</span><br></pre></td></tr></table></figure>
+<pre><code>pip install kazoo  #安装kazoo
+</code></pre><p>连接到ZooKeeper</p>
+<pre><code>from kazoo.client import KazooClient
 
+
+zk = KazooClient(hosts=&#39;106.54.181.187:2181&#39;)   #连接
+zk.start()
+
+
+</code></pre><p>节点状态</p>
+<pre><code>from kazoo.client import KazooState
+
+def my_listener(state):
+    if state == KazooState.LOST:
+        print(&#39;ZooKeeper Lost&#39;)                     # 状态为丢失时
+    elif state == KazooState.SUSPENDED:
+        print(&#39;ZooKeeper Suspended&#39;)                # 状态为暂停
+    else:
+        print(&#39;ZooKeeper Connect&#39;)                  # 状态为连接中
+
+zk.add_listener(my_listener)
+
+</code></pre><p>Zookeeper 3.4及更高版本支持只读模式。 必须为Zookeeper集群中的服务器打开此模式，客户端才能使用它。 要将这种模式与Kazoo一起使用，应在read_only选项设置为True的情况下调用KazooClient。 这将使客户端连接到已变为只读的Zookeeper节点，并且客户端将继续扫描其他可读写的节点。</p>
+<pre><code>from kazoo.client import KazooClient
+from kazoo.client import KazooState
+from kazoo.client import KeeperState
+
+zk = KazooClient(hosts=&#39;127.0.0.1:2181&#39;, read_only=True)
+zk.start()
+
+@zk.add_listener
+def watch_for_ro(state):
+    if state == KazooState.CONNECTED:
+        if zk.client_state == KeeperState.CONNECTED_RO:
+            print(&quot;Read only mode!&quot;)
+        else:
+            print(&quot;Read/Write mode!&quot;)
+
+</code></pre><p>创建节点，使用的方法有<code>ensure_path()</code>和<code>create()</code></p>
+<pre><code># 确定路径，在必要时创建
+zk.ensure_path(&quot;/my/favorite&quot;)
+
+# 用数据创建一个节点
+zk.create(&quot;/my/favorite/node&quot;, b&quot;a value&quot;)
+
+</code></pre><p>读取节点信息</p>
+<pre><code>exists() 检查节点是否存在。
+get() 在ZnodeStat结构中获取节点的数据以及详细的节点信息。
+get_children() 获取给定节点的子级列表
+
+eg:
+if zk.exists(&quot;/my/favorite&quot;):         #判断/my/favorite是否存在
+
+data, stat = zk.get(&quot;/my/favorite&quot;)        #查看节点信息
+print(&quot;Version: %s, data: %s&quot; % (stat.version, data.decode(&quot;utf-8&quot;)))
+
+children = zk.get_children(&quot;/my/favorite&quot;)  #查看节点的子节点信息
+print(&quot;There are %s children with names %s&quot; % (len(children), children))
+
+</code></pre><p>更新节点信息</p>
+<pre><code>zk.set(&quot;/my/favorite&quot;, b&quot;some data&quot;)
+
+</code></pre><p>删除节点信息</p>
+<pre><code>zk.delete(&quot;/my/favorite/node&quot;, recursive=True)
+
+</code></pre><p>重试命令</p>
+<pre><code>result = zk.retry(zk.get, &quot;/path/to/node&quot;)
+相当于执行
+zk.get(&#39;/path/to/node&#39;)
+
+</code></pre><p>利用如上信息，编写操作ZooKeeper的Python脚本</p>
+<pre><code>#coding:utf-8
+
+
+from kazoo.client import KazooClient
+
+
+class zoocon:
+    def __init__(self):
+        self.zk = KazooClient(hosts=&#39;106.54.181.187:2181&#39;)   #连接
+        self.zk.start()
+        self.path = &#39;/datapp&#39;
+
+
+    def get_data(self):
+        res = self.zk.get(self.path)
+        print(res)
+
+    def exist(self):
+        self.zk.exists(self.path)
+        return True
+
+    def create_data(self):
+        self.zk.create(self.path, b&#39;signapp&#39;)
+
+    def close(self):
+        self.zk.close()
+
+    def delete(self):
+        self.zk.delete(self.path, recursive=True)
+
+
+if __name__ == &#39;__main__&#39;:
+    zks = zoocon()
+    if zks.exist():
+        zks.delete()
+        zks.close()
+        print &#39;path delete&#39;
+    else:
+        zks.create_data()
+        zks.get_data()
+        zks.close()
+
+</code></pre><p>服务端存在datapp节点，运行后删除节点，当在服务器查看时，显示如下</p>
+<pre><code>[zk: localhost:2181(CONNECTED) 0] get /datapp
+org.apache.zookeeper.KeeperException$NoNodeException: KeeperErrorCode = NoNode for /datapp
+
+</code></pre>
           </div>
           <br><br>
               

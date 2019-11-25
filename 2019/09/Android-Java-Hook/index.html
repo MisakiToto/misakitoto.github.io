@@ -129,8 +129,10 @@
 <h3 id="加密尝试"><a href="#加密尝试" class="headerlink" title="加密尝试"></a>加密尝试</h3><p><img src="https://i.loli.net/2019/09/14/HOJcxiyjPNzKupB.png" alt="1568451215940.png"><br>那么尝试使用在线加密，从hook到的结果得知，paramString3就是请求中的FM字段</p>
 <p><img src="https://i.loli.net/2019/09/14/x4fbPqWNnzLDApj.png" alt="1568451631004.png"><br>和请求中携带的sign参数对比为相同参数</p>
 <p><img src="https://i.loli.net/2019/09/14/LQAYhwpBTN4HJbP.png" alt="1568451683666.png"><br>本以为会到此为止，但是当仔细查看hook的参数时发现，paramString3中的参数均是缺少标签对的，例如</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&lt;root&gt;123&lt;/root&gt;&lt;sign&gt;123&lt;/sign&gt;</span><br><span class="line">他只显示</span><br><span class="line">123&lt;/root&gt;123&lt;/sign&gt;</span><br></pre></td></tr></table></figure>
-<p>暂没查到原因。</p>
+<pre><code>&lt;root&gt;123&lt;/root&gt;&lt;sign&gt;123&lt;/sign&gt;
+他只显示
+123&lt;/root&gt;123&lt;/sign&gt;
+</code></pre><p>暂没查到原因。</p>
 
           </div>
           <br><br>

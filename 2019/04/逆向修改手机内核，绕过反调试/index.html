@@ -114,13 +114,19 @@
           <div class="post_content">
               <h3 id="逆向修改手机内核，绕过反调试"><a href="#逆向修改手机内核，绕过反调试" class="headerlink" title="逆向修改手机内核，绕过反调试"></a>逆向修改手机内核，绕过反调试</h3><p>Android 应用反调试里最常用的一种反调试方法是查看/proc/self/status的信息，如果 TracerPid 不为 0，就判断为正在被调试。因此修改手机的TracePid,让其值恒为零。</p>
 <h4 id="一、-提取-zImage-内核文件"><a href="#一、-提取-zImage-内核文件" class="headerlink" title="一、  提取 zImage 内核文件"></a>一、  提取 zImage 内核文件</h4><p>查找boot文件位置</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">find / | grep boot</span><br><span class="line"></span><br><span class="line">cd /dev/block/platform/7824900.sdhci/by-name/</span><br><span class="line"></span><br><span class="line">将boot导出为boot.img</span><br><span class="line">dd if=/dev/block/mmcblk0p22 of=/sdcard/boot.img</span><br></pre></td></tr></table></figure>
-<p><img src="\2019\04\逆向修改手机内核，绕过反调试\1554185489216.png" alt="1554185489216"></p>
+<pre><code>find / | grep boot
+
+cd /dev/block/platform/7824900.sdhci/by-name/
+
+将boot导出为boot.img
+dd if=/dev/block/mmcblk0p22 of=/sdcard/boot.img
+</code></pre><p><img src="\2019\04\逆向修改手机内核，绕过反调试\1554185489216.png" alt="1554185489216"></p>
 <p>把boot转移到可以下载的目录，由于adb权限问题，复制到sd卡目录下。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">adb pull /sdcard/boot.img d:\a</span><br></pre></td></tr></table></figure>
-<p>然后下载bootimg解压boot文件：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">git clone https://github.com/pbatard/bootimg-tools.git</span><br><span class="line">make</span><br></pre></td></tr></table></figure>
-<p><img src="\2019\04\逆向修改手机内核，绕过反调试\1554185769689.png" alt="1554185769689"></p>
+<pre><code>adb pull /sdcard/boot.img d:\a
+</code></pre><p>然后下载bootimg解压boot文件：</p>
+<pre><code>git clone https://github.com/pbatard/bootimg-tools.git
+make
+</code></pre><p><img src="\2019\04\逆向修改手机内核，绕过反调试\1554185769689.png" alt="1554185769689"></p>
 <p>此时已经生成二进制文件，在mkbootimg目录下，进入此目录使用unmkbootimg，提取kernel</p>
 <p><img src="\2019\04\逆向修改手机内核，绕过反调试\1554185817995.png" alt="1554185817995"></p>
 <p>提取原始zImage</p>
@@ -133,16 +139,24 @@
 <p>点击OK后，确定进入ARM，然后弹出此对话框，填入0xc0008000</p>
 <p><img src="\2019\04\逆向修改手机内核，绕过反调试\1554186088780.png" alt="1554186088780"></p>
 <p>原文要求修改函数指令来达到修改的效果，但在修改过程中发现，对不同kernel，最后查到的对应proc_pid_status函数操作指令不一致。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">echo 0 &gt; /proc/sys/kernel/kptr_restrict</span><br><span class="line">关闭符号屏蔽</span><br><span class="line">再输入以下命令查看这两函数的地址</span><br><span class="line">cat /proc/kallsyms |grep proc_pid_status</span><br><span class="line">cat /proc/kallsyms |grep __task_pid_nr_ns</span><br></pre></td></tr></table></figure>
-<p><img src="\2019\04\逆向修改手机内核，绕过反调试\1554187063821.png" alt="1554187063821"></p>
+<pre><code>echo 0 &gt; /proc/sys/kernel/kptr_restrict
+关闭符号屏蔽
+再输入以下命令查看这两函数的地址
+cat /proc/kallsyms |grep proc_pid_status
+cat /proc/kallsyms |grep __task_pid_nr_ns
+</code></pre><p><img src="\2019\04\逆向修改手机内核，绕过反调试\1554187063821.png" alt="1554187063821"></p>
 <p>为了避免修改出错刷入手机成砖的风险，采用了另一方式，shift+f12来打开字符串窗口，查找TracerPid，修改其后的占位符，把%d修改为0和%09(30  09)。</p>
 <p><img src="\2019\04\逆向修改手机内核，绕过反调试\1554186414392.png" alt="1554186414392"></p>
 <p>其对应的Hex窗口修改为如下所示：</p>
 <p><img src="\2019\04\逆向修改手机内核，绕过反调试\1554186447080.png" alt="1554186447080"></p>
 <p>使用<code>gzip -n -f -9 zImage</code>压缩修改后的内核裸文件，压缩后会比原来的小，必须比原来的文件小才可以。得到zImage.gz，我们使用010分别打开zImage.gz和boot.img，搜索1F 8B 08 00。按下insert键，将010改为overwrite，注意这里必须是覆盖，这样就不用考虑插入后大小的问题了，把zImage.gz的内容复制到boot.img的相应位置。boot.img会有两个1F 8B 08 00，修改第一个，把其中的十六进制改为zImage.gz文件的十六进制值，在edit选项中进行覆写。</p>
 <p>修改完成后，刷入手机，利用SDK自带的fastboot。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">adb reboot bootloader   # 启动fastboot模式</span><br><span class="line"></span><br><span class="line">fastboot flash boot boot.img   #刷入boot分区</span><br><span class="line"></span><br><span class="line">fastboot reboot  #重启</span><br></pre></td></tr></table></figure>
-<p><img src="\2019\04\逆向修改手机内核，绕过反调试\1554186828423.png" alt="1554186828423"></p>
+<pre><code>adb reboot bootloader   # 启动fastboot模式
+
+fastboot flash boot boot.img   #刷入boot分区
+
+fastboot reboot  #重启
+</code></pre><p><img src="\2019\04\逆向修改手机内核，绕过反调试\1554186828423.png" alt="1554186828423"></p>
 <h4 id="调试查看"><a href="#调试查看" class="headerlink" title="调试查看"></a>调试查看</h4><p><img src="\2019\04\逆向修改手机内核，绕过反调试\1554187063866.png" alt="1554187063866"></p>
 <p>如想使用修改函数操作指令的方式可以参考原作者方式：</p>
 <p>1、<a href="https://www.jianshu.com/p/91aa37f3a972" target="_blank" rel="noopener">逆向修改手机内核，绕过反调试</a></p>

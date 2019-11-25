@@ -112,8 +112,25 @@
       <div class="container">
         <div class="section">
           <div class="post_content">
-              <h3 id="检查项"><a href="#检查项" class="headerlink" title="检查项"></a>检查项</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">0.检测命令是否被修改</span><br><span class="line">1.获取网络连接</span><br><span class="line">2.查看对外开放端口</span><br><span class="line">3.查看是否存在高危端口</span><br><span class="line">4.查看启动项</span><br><span class="line">5.查看定时任务</span><br><span class="line">6.查看调度任务</span><br><span class="line">7.检测cpu异常进程</span><br><span class="line">8.检测特权用户</span><br><span class="line">9.查看登陆用户</span><br><span class="line">10.可登录用户</span><br><span class="line">11.最近修改过的文件</span><br><span class="line">12.查看是否存在可疑命令</span><br><span class="line">13.root是否允许远程登陆</span><br><span class="line">14.检查是否存在可疑脚本</span><br><span class="line">15.日志文件打包</span><br><span class="line">16.查看登陆到主机的用户</span><br><span class="line">17.检查磁盘使用量</span><br></pre></td></tr></table></figure>
-<p>以上检查项按照比较关心的项来写，在Ubuntu主机上测试，个别命令可能centos不带，需要提前安装。</p>
+              <h3 id="检查项"><a href="#检查项" class="headerlink" title="检查项"></a>检查项</h3><pre><code>0.检测命令是否被修改
+1.获取网络连接
+2.查看对外开放端口
+3.查看是否存在高危端口
+4.查看启动项
+5.查看定时任务
+6.查看调度任务
+7.检测cpu异常进程
+8.检测特权用户
+9.查看登陆用户
+10.可登录用户
+11.最近修改过的文件
+12.查看是否存在可疑命令
+13.root是否允许远程登陆
+14.检查是否存在可疑脚本
+15.日志文件打包
+16.查看登陆到主机的用户
+17.检查磁盘使用量
+</code></pre><p>以上检查项按照比较关心的项来写，在Ubuntu主机上测试，个别命令可能centos不带，需要提前安装。</p>
 <h3 id="地址"><a href="#地址" class="headerlink" title="地址"></a>地址</h3><p>项目地址：<a href="https://github.com/MisakiKata/Linuxcheck" target="_blank" rel="noopener">https://github.com/MisakiKata/Linuxcheck</a></p>
 <h3 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h3><p>其中还包括一批后门端口，利用来自：<a href="https://github.com/T0xst/linux/blob/master/checkrules/dangerstcpports.dat" target="_blank" rel="noopener">port列表</a></p>
 

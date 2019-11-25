@@ -121,10 +121,10 @@
 <p>然后用AS打开反编译后的文件夹，当然在利用AS调试smali的时候，需要安装ideasmali插件，具体可以百度插件名即可下载。</p>
 <p>调试的时候需要我们进行端口的转发，可以先用DDMS查看一下端口是否是8700（一般默认为8700），因为启动AS后会占有相应的端口，导致无法打开DDMS。</p>
 <p>具体使用方式为：打开DDMS。在CMD命令行输入以下内容，其中package为包名。MainActivity是需要调试的activity名，具体看情况修改。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">adb shell am start -D -n package/.MainActivity</span><br></pre></td></tr></table></figure>
-<p>可以看到手机端或者模拟器端已经以调试的方式启动我们相应的程序了。在DDMS中就可以看到一只红色的小蜘蛛了。后面有一个端口默认应该是8700。然后查看进程PID，假设为1980。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">adb forward tcp:8700 jdwp:1980</span><br></pre></td></tr></table></figure>
-<p>进行端口转发到。转发的时候要先关闭DDMS，不然显示端口被占用。</p>
+<pre><code>adb shell am start -D -n package/.MainActivity
+</code></pre><p>可以看到手机端或者模拟器端已经以调试的方式启动我们相应的程序了。在DDMS中就可以看到一只红色的小蜘蛛了。后面有一个端口默认应该是8700。然后查看进程PID，假设为1980。</p>
+<pre><code>adb forward tcp:8700 jdwp:1980
+</code></pre><p>进行端口转发到。转发的时候要先关闭DDMS，不然显示端口被占用。</p>
 <p>在使用AS打开我们需要的文件后，如以下内容。</p>
 <p><img src="\2019\01\Android-Studio-动态调试\1548750452683.png" alt="1548750452683"></p>
 <p>配置远程调试参数，修改端口为8700.</p>

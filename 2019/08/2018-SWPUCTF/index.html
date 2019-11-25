@@ -127,42 +127,178 @@
 <p>此处采用jeb调试，其中，对密码效验的关键方法为check。</p>
 <p>方法开始先判断长度是否为12位，然后判断是否长度为0。</p>
 <p>先修改check下：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">00000000  const/16            v5, 12</span><br><span class="line">00000004  const/4             v2, 0</span><br><span class="line">00000006  invoke-virtual      String-&gt;toCharArray()[C, p1</span><br><span class="line">0000000C  move-result-object  v1</span><br><span class="line">0000000E  array-length        v3, v1</span><br><span class="line">00000010  if-eq               v3, v5, :16  #if-ne  或者添加const/16  v3, 0xc</span><br></pre></td></tr></table></figure>
-<p>在修改mainactivity类中onclick方法下的</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">0000001E  new-instance        v0, Check</span><br><span class="line">00000022  invoke-direct       Check-&gt;&lt;init&gt;()V, v0</span><br><span class="line">00000028  invoke-virtual      Check-&gt;checkPassword(String)Z, v0, v2</span><br><span class="line">0000002E  move-result         v3</span><br><span class="line">00000030  if-eqz              v3, :72  #修改为if-nez</span><br></pre></td></tr></table></figure>
-<p>重编译安装，输入任意值跳到第二部分，此时显示图片，但是图片上并没有相应的字符串。</p>
+<pre><code>00000000  const/16            v5, 12
+00000004  const/4             v2, 0
+00000006  invoke-virtual      String-&gt;toCharArray()[C, p1
+0000000C  move-result-object  v1
+0000000E  array-length        v3, v1
+00000010  if-eq               v3, v5, :16  #if-ne  或者添加const/16  v3, 0xc
+</code></pre><p>在修改mainactivity类中onclick方法下的</p>
+<pre><code>0000001E  new-instance        v0, Check
+00000022  invoke-direct       Check-&gt;&lt;init&gt;()V, v0
+00000028  invoke-virtual      Check-&gt;checkPassword(String)Z, v0, v2
+0000002E  move-result         v3
+00000030  if-eqz              v3, :72  #修改为if-nez
+</code></pre><p>重编译安装，输入任意值跳到第二部分，此时显示图片，但是图片上并没有相应的字符串。</p>
 <p>继续调试第二部分。调试的时候发现jeb仍然是不好用，于是改用Androidstudio。在mainactivity2$1.smail文件中找到了读取第二个输入并且做对比的地方。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line">.method public onClick(Landroid/view/View;)V</span><br><span class="line">    .locals 3</span><br><span class="line">    .param p1, &quot;v&quot;    # Landroid/view/View;</span><br><span class="line"></span><br><span class="line">    .prologue</span><br><span class="line">    .line 29</span><br><span class="line">    iget-object v2, p0, Lcom/example/test/ctf02/MainActivity2$1;-&gt;this$0:Lcom/example/test/ctf02/MainActivity2;</span><br><span class="line"></span><br><span class="line">    iget-object v2, v2, Lcom/example/test/ctf02/MainActivity2;-&gt;editText:Landroid/widget/EditText;</span><br><span class="line"></span><br><span class="line">    invoke-virtual &#123;v2&#125;, Landroid/widget/EditText;-&gt;getText()Landroid/text/Editable;</span><br><span class="line"></span><br><span class="line">    move-result-object v2</span><br><span class="line">    </span><br><span class="line">    const-string v2, &quot;android.is.very.fun&quot;  #增加</span><br><span class="line"></span><br><span class="line">    invoke-virtual &#123;v2&#125;, Ljava/lang/Object;-&gt;toString()Ljava/lang/String;</span><br><span class="line"></span><br><span class="line">    move-result-object v1</span><br><span class="line"></span><br><span class="line">    .line 30</span><br><span class="line">    .local v1, &quot;str&quot;:Ljava/lang/String;</span><br><span class="line">    new-instance v0, Landroid/content/Intent;</span><br><span class="line"></span><br><span class="line">    invoke-direct &#123;v0, v1&#125;, Landroid/content/Intent;-&gt;&lt;init&gt;(Ljava/lang/String;)V</span><br><span class="line"></span><br><span class="line">    .line 31</span><br><span class="line">    .local v0, &quot;intent&quot;:Landroid/content/Intent;</span><br><span class="line">    iget-object v2, p0, Lcom/example/test/ctf02/MainActivity2$1;-&gt;this$0:Lcom/example/test/ctf02/MainActivity2;</span><br><span class="line"></span><br><span class="line">    invoke-virtual &#123;v2, v0&#125;, Lcom/example/test/ctf02/MainActivity2;-&gt;sendBroadcast(Landroid/content/Intent;)V</span><br><span class="line"></span><br><span class="line">    .line 32</span><br><span class="line">    return-void</span><br><span class="line">.end method</span><br></pre></td></tr></table></figure>
-<p>获取了Broadcast组件，在mainfast.xml文件中有关于这个组件的定义，于是在上把v2修改为组件名字符串。</p>
+<pre><code>.method public onClick(Landroid/view/View;)V
+    .locals 3
+    .param p1, &quot;v&quot;    # Landroid/view/View;
+
+    .prologue
+    .line 29
+    iget-object v2, p0, Lcom/example/test/ctf02/MainActivity2$1;-&gt;this$0:Lcom/example/test/ctf02/MainActivity2;
+
+    iget-object v2, v2, Lcom/example/test/ctf02/MainActivity2;-&gt;editText:Landroid/widget/EditText;
+
+    invoke-virtual {v2}, Landroid/widget/EditText;-&gt;getText()Landroid/text/Editable;
+
+    move-result-object v2
+
+    const-string v2, &quot;android.is.very.fun&quot;  #增加
+
+    invoke-virtual {v2}, Ljava/lang/Object;-&gt;toString()Ljava/lang/String;
+
+    move-result-object v1
+
+    .line 30
+    .local v1, &quot;str&quot;:Ljava/lang/String;
+    new-instance v0, Landroid/content/Intent;
+
+    invoke-direct {v0, v1}, Landroid/content/Intent;-&gt;&lt;init&gt;(Ljava/lang/String;)V
+
+    .line 31
+    .local v0, &quot;intent&quot;:Landroid/content/Intent;
+    iget-object v2, p0, Lcom/example/test/ctf02/MainActivity2$1;-&gt;this$0:Lcom/example/test/ctf02/MainActivity2;
+
+    invoke-virtual {v2, v0}, Lcom/example/test/ctf02/MainActivity2;-&gt;sendBroadcast(Landroid/content/Intent;)V
+
+    .line 32
+    return-void
+.end method
+</code></pre><p>获取了Broadcast组件，在mainfast.xml文件中有关于这个组件的定义，于是在上把v2修改为组件名字符串。</p>
 <p>重编译安装，第一个输入只需要随便输入几个不重复的字母，跳到第二个输入，只需要点击确认，就会弹出写有flag的图片。</p>
 <p><img src="\2019\08\2018-SWPUCTF\1566800681246.png" alt="1566800681246"></p>
 <h3 id="app-debug2-apk"><a href="#app-debug2-apk" class="headerlink" title="app-debug2.apk"></a>app-debug2.apk</h3><p>同样，丢到AK中反编译，反编译内容如下，其中包含JNI.smail文件，所以大概率是分析so文件。</p>
 <p><img src="\2019\08\2018-SWPUCTF\1566801125774.png" alt="1566801125774"></p>
 <p>在MainActivity$1.smali中看到了jni的调用getResult方法。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line">.method public onClick(Landroid/view/View;)V</span><br><span class="line">    .locals 3</span><br><span class="line">    .param p1, &quot;v&quot;    # Landroid/view/View;</span><br><span class="line"></span><br><span class="line">    .prologue</span><br><span class="line">    .line 24</span><br><span class="line">    iget-object v2, p0, Lcom/example/test/ctf03/MainActivity$1;-&gt;this$0:Lcom/example/test/ctf03/MainActivity;</span><br><span class="line"></span><br><span class="line">    iget-object v2, v2, Lcom/example/test/ctf03/MainActivity;-&gt;pwd:Landroid/widget/EditText;</span><br><span class="line"></span><br><span class="line">    invoke-virtual &#123;v2&#125;, Landroid/widget/EditText;-&gt;getText()Landroid/text/Editable;</span><br><span class="line"></span><br><span class="line">    move-result-object v2</span><br><span class="line"></span><br><span class="line">    invoke-virtual &#123;v2&#125;, Ljava/lang/Object;-&gt;toString()Ljava/lang/String;</span><br><span class="line"></span><br><span class="line">    move-result-object v1</span><br><span class="line"></span><br><span class="line">    .line 25</span><br><span class="line">    .local v1, &quot;str&quot;:Ljava/lang/String;</span><br><span class="line">    invoke-static &#123;v1&#125;, Lcom/example/test/ctf03/JNI;-&gt;getResult(Ljava/lang/String;)I</span><br><span class="line"></span><br><span class="line">    move-result v0</span><br><span class="line"></span><br><span class="line">    .line 26</span><br><span class="line">    .local v0, &quot;result&quot;:I</span><br><span class="line">    iget-object v2, p0, Lcom/example/test/ctf03/MainActivity$1;-&gt;this$0:Lcom/example/test/ctf03/MainActivity;</span><br><span class="line"></span><br><span class="line">    invoke-virtual &#123;v2, v0&#125;, Lcom/example/test/ctf03/MainActivity;-&gt;Show(I)V</span><br><span class="line"></span><br><span class="line">    .line 27</span><br><span class="line">    return-void</span><br><span class="line">.end method</span><br></pre></td></tr></table></figure>
-<p>使用IDA打开lib目录下的libNative.so文件。</p>
+<pre><code>.method public onClick(Landroid/view/View;)V
+    .locals 3
+    .param p1, &quot;v&quot;    # Landroid/view/View;
+
+    .prologue
+    .line 24
+    iget-object v2, p0, Lcom/example/test/ctf03/MainActivity$1;-&gt;this$0:Lcom/example/test/ctf03/MainActivity;
+
+    iget-object v2, v2, Lcom/example/test/ctf03/MainActivity;-&gt;pwd:Landroid/widget/EditText;
+
+    invoke-virtual {v2}, Landroid/widget/EditText;-&gt;getText()Landroid/text/Editable;
+
+    move-result-object v2
+
+    invoke-virtual {v2}, Ljava/lang/Object;-&gt;toString()Ljava/lang/String;
+
+    move-result-object v1
+
+    .line 25
+    .local v1, &quot;str&quot;:Ljava/lang/String;
+    invoke-static {v1}, Lcom/example/test/ctf03/JNI;-&gt;getResult(Ljava/lang/String;)I
+
+    move-result v0
+
+    .line 26
+    .local v0, &quot;result&quot;:I
+    iget-object v2, p0, Lcom/example/test/ctf03/MainActivity$1;-&gt;this$0:Lcom/example/test/ctf03/MainActivity;
+
+    invoke-virtual {v2, v0}, Lcom/example/test/ctf03/MainActivity;-&gt;Show(I)V
+
+    .line 27
+    return-void
+.end method
+</code></pre><p>使用IDA打开lib目录下的libNative.so文件。</p>
 <p>在Exports中找到对应的方法，在F5一下查看伪代码</p>
 <p><img src="\2019\08\2018-SWPUCTF\1566801664205.png" alt="1566801664205"></p>
 <p><img src="\2019\08\2018-SWPUCTF\1566804309855.png" alt="1566804309855"></p>
 <p>此处先判断是否是长度为15位，然后用malloc申请三个长度为一字节的变量来初始化。至于Init函数是做什么用的。在如下处，点击进入，看到其中又调用了Init函数，再点击进入。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">.text:000011B0                 MOV             R3, R8  ; char *</span><br><span class="line">.text:000011B2                 BLX             j__Z4InitPcS_S_PKci</span><br></pre></td></tr></table></figure>
-<p>在如下地址处：</p>
+<pre><code>.text:000011B0                 MOV             R3, R8  ; char *
+.text:000011B2                 BLX             j__Z4InitPcS_S_PKci
+</code></pre><p>在如下地址处：</p>
 <p><img src="\2019\08\2018-SWPUCTF\1566804524606.png" alt="1566804524606"></p>
 <p>不过，并没看懂这是啥意思。。。。先继续往下看。</p>
 <p>后面使用了First函数进行处理，如下处。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">.text:000011B6                 MOV             R0, R6  ; char *</span><br><span class="line">.text:000011B8                 BLX             j__Z5FirstPc ; First(char *)</span><br><span class="line">.text:000011BC                 CBZ             R0, loc_11DA</span><br></pre></td></tr></table></figure>
-<p>点击到函数内找到First函数，查看F5</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">signed int __fastcall First(char *a1)</span><br><span class="line">&#123;</span><br><span class="line">  int v1; // r1@1</span><br><span class="line">  int v2; // r0@3</span><br><span class="line">  signed int v3; // r1@3</span><br><span class="line"></span><br><span class="line">  v1 = 0;</span><br><span class="line">  do</span><br><span class="line">  &#123;</span><br><span class="line">    a1[v1] = 2 * a1[v1] ^ 0x80;</span><br><span class="line">    ++v1;</span><br><span class="line">  &#125;</span><br><span class="line">  while ( v1 != 4 );</span><br><span class="line">  v2 = strcmp(a1, &quot;LN^dl&quot;);</span><br><span class="line">  v3 = 0;</span><br><span class="line">  if ( !v2 )</span><br><span class="line">    v3 = 1;</span><br><span class="line">  return v3;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>把传进来的字符串进行按位乘2和0x80异或，如果等于LN^dl，返回v3为1，不等于则返回v3为0。那么此处需要v3等不等于0呢，查看主要函数的下一步判断是if非，跳转到LABEL_14处，那么需要v3不为0，也就是a1等于LN^dl。同样代表了传入的字符串要乘2异或0x80后等于LN^dl。</p>
+<pre><code>.text:000011B6                 MOV             R0, R6  ; char *
+.text:000011B8                 BLX             j__Z5FirstPc ; First(char *)
+.text:000011BC                 CBZ             R0, loc_11DA
+</code></pre><p>点击到函数内找到First函数，查看F5</p>
+<pre><code>signed int __fastcall First(char *a1)
+{
+  int v1; // r1@1
+  int v2; // r0@3
+  signed int v3; // r1@3
+
+  v1 = 0;
+  do
+  {
+    a1[v1] = 2 * a1[v1] ^ 0x80;
+    ++v1;
+  }
+  while ( v1 != 4 );
+  v2 = strcmp(a1, &quot;LN^dl&quot;);
+  v3 = 0;
+  if ( !v2 )
+    v3 = 1;
+  return v3;
+}
+</code></pre><p>把传进来的字符串进行按位乘2和0x80异或，如果等于LN^dl，返回v3为1，不等于则返回v3为0。那么此处需要v3等不等于0呢，查看主要函数的下一步判断是if非，跳转到LABEL_14处，那么需要v3不为0，也就是a1等于LN^dl。同样代表了传入的字符串要乘2异或0x80后等于LN^dl。</p>
 <p><img src="\2019\08\2018-SWPUCTF\1566805704718.png" alt="1566805704718"></p>
 <p>其中需要v4跟一个字符串对于，字符串为以下</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">0x20, 0x35, 0x2D, 0x16, 0x61</span><br></pre></td></tr></table></figure>
-<p><img src="\2019\08\2018-SWPUCTF\1566807615894.png" alt="1566807615894"></p>
+<pre><code>0x20, 0x35, 0x2D, 0x16, 0x61
+</code></pre><p><img src="\2019\08\2018-SWPUCTF\1566807615894.png" alt="1566807615894"></p>
 <p>整体的逻辑就是先分成三个字符串，然后判断第一个异或处理后是否为LN^dl，是的话对下一个字符串异或，对比相等，继续处理最后一个字符串，等于AFBo}则返回需要的1。那么就剩下一个Init不确定意义，根据分配的大小和函数的内容，猜测应该是把15位的字符串，每一位分配给三个字符串组，毕竟Init中有一个循环操作，且标志增加。也就是</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">123456分配两组：</span><br><span class="line">135  246</span><br></pre></td></tr></table></figure>
-<p>尝试写脚本反向异或出原字符串。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line">str1 = &quot;LN^dl&quot;   #v3</span><br><span class="line">str2 = [0x20, 0x35, 0x2D, 0x16, 0x61]   #v4</span><br><span class="line">str3 = &quot;AFBo&#125;&quot;   #v5</span><br><span class="line"></span><br><span class="line">flagstr1 = &apos;&apos;</span><br><span class="line">flagstr2 = &apos;&apos;</span><br><span class="line">flagstr3 = &apos;&apos;</span><br><span class="line"></span><br><span class="line">i = 0</span><br><span class="line">while i&lt;=4:</span><br><span class="line">    flagstr =  str2[i] ^ ord(str3[i])</span><br><span class="line">    flagstr3 = flagstr3 + chr(flagstr)</span><br><span class="line">    i+=1</span><br><span class="line"></span><br><span class="line">print(flagstr3)   #原字符串后部分</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">i= 0</span><br><span class="line">while i&lt;=4:</span><br><span class="line">    flagstr =  ord(str1[i]) ^ str2[i] </span><br><span class="line">    flagstr2 = flagstr2 + chr(flagstr)</span><br><span class="line">    i+=1</span><br><span class="line"></span><br><span class="line">print(flagstr2)   #原字符串中间部分</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">i=0</span><br><span class="line">while i&lt;=4:</span><br><span class="line">    flagstr = (ord(str1[i])^ 0x80 ) // 2</span><br><span class="line">    flagstr1 = flagstr1 + chr(flagstr) </span><br><span class="line">    i+=1</span><br><span class="line"></span><br><span class="line">print(flagstr1)    #原字符串开始部分</span><br><span class="line"></span><br><span class="line">flagstr = &apos;&apos;</span><br><span class="line">for x in range(len(str1)):</span><br><span class="line">    flagstr4 = flagstr1[x]+flagstr2[x]+flagstr3[x]</span><br><span class="line">    flagstr = flagstr + flagstr4</span><br><span class="line"></span><br><span class="line">print(flagstr)</span><br></pre></td></tr></table></figure>
-<p>但是结果很怪，肯定是后面出了问题，但是理论上异或处理是错的，不该只出现在最后一位上，后面找了<a href="https://www.anquanke.com/post/id/168338#h3-20" target="_blank" rel="noopener">官方的WP</a>，看了别人的Java版poc，感觉也一样。莫非是一些编码和语言上处理的差别？暂时没处理掉此问题。</p>
+<pre><code>123456分配两组：
+135  246
+</code></pre><p>尝试写脚本反向异或出原字符串。</p>
+<pre><code>str1 = &quot;LN^dl&quot;   #v3
+str2 = [0x20, 0x35, 0x2D, 0x16, 0x61]   #v4
+str3 = &quot;AFBo}&quot;   #v5
+
+flagstr1 = &#39;&#39;
+flagstr2 = &#39;&#39;
+flagstr3 = &#39;&#39;
+
+i = 0
+while i&lt;=4:
+    flagstr =  str2[i] ^ ord(str3[i])
+    flagstr3 = flagstr3 + chr(flagstr)
+    i+=1
+
+print(flagstr3)   #原字符串后部分
+
+
+i= 0
+while i&lt;=4:
+    flagstr =  ord(str1[i]) ^ str2[i] 
+    flagstr2 = flagstr2 + chr(flagstr)
+    i+=1
+
+print(flagstr2)   #原字符串中间部分
+
+
+i=0
+while i&lt;=4:
+    flagstr = (ord(str1[i])^ 0x80 ) // 2
+    flagstr1 = flagstr1 + chr(flagstr) 
+    i+=1
+
+print(flagstr1)    #原字符串开始部分
+
+flagstr = &#39;&#39;
+for x in range(len(str1)):
+    flagstr4 = flagstr1[x]+flagstr2[x]+flagstr3[x]
+    flagstr = flagstr + flagstr4
+
+print(flagstr)
+</code></pre><p>但是结果很怪，肯定是后面出了问题，但是理论上异或处理是错的，不该只出现在最后一位上，后面找了<a href="https://www.anquanke.com/post/id/168338#h3-20" target="_blank" rel="noopener">官方的WP</a>，看了别人的Java版poc，感觉也一样。莫非是一些编码和语言上处理的差别？暂时没处理掉此问题。</p>
 <p><img src="\2019\08\2018-SWPUCTF\1566812912519.png" alt="1566812912519"></p>
 
           </div>

@@ -113,14 +113,81 @@
         <div class="section">
           <div class="post_content">
               <p>代码编译，使用代码如下:</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line">#include &lt;string.h&gt;</span><br><span class="line">int fun1()</span><br><span class="line">&#123;</span><br><span class="line">	int a;</span><br><span class="line">	int b;</span><br><span class="line">    b=10;</span><br><span class="line">    a=b++;</span><br><span class="line">	return a;</span><br><span class="line">&#125;</span><br><span class="line">int fun2(int a,int b)</span><br><span class="line">&#123;</span><br><span class="line">	return a+b+fun1();</span><br><span class="line">&#125;</span><br><span class="line">int fun3(int a,int b,int c,int d,int e,int f,int g,int h)</span><br><span class="line">&#123;</span><br><span class="line">    if(a+b+c &lt; d+e+f)&#123;</span><br><span class="line">        return a+b+c+fun2(a,f);</span><br><span class="line">    &#125;else if(a+b+c &gt; d+e+f)&#123;</span><br><span class="line">        return a+b+c+fun2(b,e);</span><br><span class="line">    &#125;else&#123;</span><br><span class="line">        return 0;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">int main()</span><br><span class="line">&#123;</span><br><span class="line">	int tmp;</span><br><span class="line">    printf(&quot;%d&quot;,fun3(1,2,3,4,5,6,7,8));</span><br><span class="line">	return 0;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>makefile文件同之前的基本一致</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line">#设置目录</span><br><span class="line">NDK_ROOT=D:\Androidstudio-sdk\android-ndk-r14b</span><br><span class="line">TOOLCHAINS_ROOT=$(NDK_ROOT)\toolchains\arm-linux-androideabi-4.9\prebuilt\windows-x86_64</span><br><span class="line">TOOLCHAINS_PREFIX=$(TOOLCHAINS_ROOT)\bin\arm-linux-androideabi</span><br><span class="line">TOOLCHAINS_INCLUDE=$(TOOLCHAINS_ROOT)\lib\gcc\arm-linux-androideabi\4.9.x\include-fixed</span><br><span class="line">PLATFORM_ROOT=$(NDK_ROOT)\platforms\android-14\arch-arm</span><br><span class="line">PLATFORM_INCLUDE=$(PLATFORM_ROOT)\usr\include</span><br><span class="line">PLATFORM_LIB=$(PLATFORM_ROOT)\usr\lib</span><br><span class="line">MODULE_NAME=app6</span><br><span class="line">BUILD_TYPE=c</span><br><span class="line">PATH_ANDROID=/data/local/tmp/</span><br><span class="line">RM=del</span><br><span class="line">FLAGS=-I$(TOOLCHAINS_INCLUDE) \</span><br><span class="line">    -I$(PLATFORM_INCLUDE) \</span><br><span class="line">    -L$(PLATFORM_LIB) \</span><br><span class="line">    -nostdlib \</span><br><span class="line">    -lgcc \</span><br><span class="line">    -Bdynamic \</span><br><span class="line">    -lc    \</span><br><span class="line">    -O0</span><br><span class="line">OBJS=$(MODULE_NAME).o \</span><br><span class="line">    $(PLATFORM_LIB)\crtbegin_dynamic.o \</span><br><span class="line">    $(PLATFORM_LIB)\crtend_android.o</span><br><span class="line">all:</span><br><span class="line">    $(TOOLCHAINS_PREFIX)-gcc $(FLAGS) -c $(MODULE_NAME).$(BUILD_TYPE) -o $(MODULE_NAME).o -pie -fPIE</span><br><span class="line">    $(TOOLCHAINS_PREFIX)-gcc $(FLAGS) -S $(MODULE_NAME).$(BUILD_TYPE) -o $(MODULE_NAME).S -pie -fPIE</span><br><span class="line">    $(TOOLCHAINS_PREFIX)-gcc $(FLAGS) $(OBJS) -o $(MODULE_NAME) -pie -fPIE</span><br><span class="line">clean:</span><br><span class="line">    $(RM) *.o</span><br><span class="line">install:</span><br><span class="line">    adb push $(MODULE_NAME) $(PATH_ANDROID)</span><br><span class="line">    adb shell chmod 755 $(PATH_ANDROID)$(MODULE_NAME)</span><br><span class="line">    adb shell $(PATH_ANDROID)$(MODULE_NAME)</span><br></pre></td></tr></table></figure>
-<p>编译后如下，会生成一个无后缀的可执行文件。丢到IDA中。点击main函数，如下：</p>
+<pre><code>#include &lt;stdio.h&gt;
+#include &lt;string.h&gt;
+int fun1()
+{
+    int a;
+    int b;
+    b=10;
+    a=b++;
+    return a;
+}
+int fun2(int a,int b)
+{
+    return a+b+fun1();
+}
+int fun3(int a,int b,int c,int d,int e,int f,int g,int h)
+{
+    if(a+b+c &lt; d+e+f){
+        return a+b+c+fun2(a,f);
+    }else if(a+b+c &gt; d+e+f){
+        return a+b+c+fun2(b,e);
+    }else{
+        return 0;
+    }
+}
+
+int main()
+{
+    int tmp;
+    printf(&quot;%d&quot;,fun3(1,2,3,4,5,6,7,8));
+    return 0;
+}
+</code></pre><p>makefile文件同之前的基本一致</p>
+<pre><code>#设置目录
+NDK_ROOT=D:\Androidstudio-sdk\android-ndk-r14b
+TOOLCHAINS_ROOT=$(NDK_ROOT)\toolchains\arm-linux-androideabi-4.9\prebuilt\windows-x86_64
+TOOLCHAINS_PREFIX=$(TOOLCHAINS_ROOT)\bin\arm-linux-androideabi
+TOOLCHAINS_INCLUDE=$(TOOLCHAINS_ROOT)\lib\gcc\arm-linux-androideabi\4.9.x\include-fixed
+PLATFORM_ROOT=$(NDK_ROOT)\platforms\android-14\arch-arm
+PLATFORM_INCLUDE=$(PLATFORM_ROOT)\usr\include
+PLATFORM_LIB=$(PLATFORM_ROOT)\usr\lib
+MODULE_NAME=app6
+BUILD_TYPE=c
+PATH_ANDROID=/data/local/tmp/
+RM=del
+FLAGS=-I$(TOOLCHAINS_INCLUDE) \
+    -I$(PLATFORM_INCLUDE) \
+    -L$(PLATFORM_LIB) \
+    -nostdlib \
+    -lgcc \
+    -Bdynamic \
+    -lc    \
+    -O0
+OBJS=$(MODULE_NAME).o \
+    $(PLATFORM_LIB)\crtbegin_dynamic.o \
+    $(PLATFORM_LIB)\crtend_android.o
+all:
+    $(TOOLCHAINS_PREFIX)-gcc $(FLAGS) -c $(MODULE_NAME).$(BUILD_TYPE) -o $(MODULE_NAME).o -pie -fPIE
+    $(TOOLCHAINS_PREFIX)-gcc $(FLAGS) -S $(MODULE_NAME).$(BUILD_TYPE) -o $(MODULE_NAME).S -pie -fPIE
+    $(TOOLCHAINS_PREFIX)-gcc $(FLAGS) $(OBJS) -o $(MODULE_NAME) -pie -fPIE
+clean:
+    $(RM) *.o
+install:
+    adb push $(MODULE_NAME) $(PATH_ANDROID)
+    adb shell chmod 755 $(PATH_ANDROID)$(MODULE_NAME)
+    adb shell $(PATH_ANDROID)$(MODULE_NAME)
+</code></pre><p>编译后如下，会生成一个无后缀的可执行文件。丢到IDA中。点击main函数，如下：</p>
 <p><img src="\2019\07\逆向函数分析引用\1562658661016.png" alt="1562658661016"></p>
 <p>其中已经简单分析函数参数的引用，开头可以看到，参数[sp]，意思是第五个参数引用，若后面还有其他参数则以四个字节为参数引用存储。关于寄存器的含义</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">r0-r3    用作传入函数参数，传出函数返回值。在子程序调用之间，可以将 r0-r3 用于任何用途。</span><br><span class="line">r4-r11   被用来存放函数的局部变量。如果被调用函数使用了这些寄存器，它在返回之前必须恢复这些寄存器的值。</span><br><span class="line">r12      是内部调用暂时寄存器 ip。它在过程链接胶合代码（例如，交互操作胶合代码）中用于此角色。</span><br><span class="line">r13      是栈指针 sp。它不能用于任何其它用途。sp 中存放的值在退出被调用函数时必须与进入时的值相同。</span><br><span class="line">r14      是链接寄存器 lr。如果您保存了返回地址，则可以在调用之间将 r14 用于其它用途，程序返回时要恢复</span><br><span class="line">r15      是程序计数器 PC。它不能用于任何其它用途。</span><br></pre></td></tr></table></figure>
-<p>详细介绍参考：<a href="https://www.veryarm.com/36274.html" target="_blank" rel="noopener">https://www.veryarm.com/36274.html</a></p>
+<pre><code>r0-r3    用作传入函数参数，传出函数返回值。在子程序调用之间，可以将 r0-r3 用于任何用途。
+r4-r11   被用来存放函数的局部变量。如果被调用函数使用了这些寄存器，它在返回之前必须恢复这些寄存器的值。
+r12      是内部调用暂时寄存器 ip。它在过程链接胶合代码（例如，交互操作胶合代码）中用于此角色。
+r13      是栈指针 sp。它不能用于任何其它用途。sp 中存放的值在退出被调用函数时必须与进入时的值相同。
+r14      是链接寄存器 lr。如果您保存了返回地址，则可以在调用之间将 r14 用于其它用途，程序返回时要恢复
+r15      是程序计数器 PC。它不能用于任何其它用途。
+</code></pre><p>详细介绍参考：<a href="https://www.veryarm.com/36274.html" target="_blank" rel="noopener">https://www.veryarm.com/36274.html</a></p>
 <p>到BL指令，BL指令是有返回的跳转，表示子程序的返回通过LR寄存器保存，保存的地址值就是下一条指令的地址值。如下的fun3函数中，对于多参数并没有使用栈来保存，而是使用R0-R3寄存器来循环的调用。</p>
 <p><img src="\2019\07\逆向函数分析引用\1562659401125.png" alt="1562659401125"></p>
 <p>判断结束后进入不同的分支，走到如图中的两部分分支的时候出现了一个新的子程序调用，fun2。</p>

@@ -114,21 +114,24 @@
           <div class="post_content">
               <h3 id="IDA-动态调试"><a href="#IDA-动态调试" class="headerlink" title="IDA 动态调试"></a>IDA 动态调试</h3><p>通常在APP逆向和破解时，某些重要的函数会以so文件的形式进行加载，所以，在想获得关键操作逻辑和修改某些函数时，就需要IDA来进行操作啦。以下使用IDA版本7.0，小米手机</p>
 <h4 id="1、上传Android-Server"><a href="#1、上传Android-Server" class="headerlink" title="1、上传Android_Server"></a>1、上传Android_Server</h4><p>文件存放在安装目录下的dbgsrv目录中，7.0以后版本多了几个其他版本的Android_server文件，上传Android_server文件到手机目录中，并提升执行权限。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">adb push android_server /data/local/tmp/</span><br><span class="line">chmod 755 android_server</span><br><span class="line">adb forward tcp:23946 tcp:23946</span><br></pre></td></tr></table></figure>
-<p>执行后就可以显示正在监听23946端口，如果报错，一般是使用位数和系统不一致。</p>
+<pre><code>adb push android_server /data/local/tmp/
+chmod 755 android_server
+adb forward tcp:23946 tcp:23946
+</code></pre><p>执行后就可以显示正在监听23946端口，如果报错，一般是使用位数和系统不一致。</p>
 <h4 id="2、调试启动APP"><a href="#2、调试启动APP" class="headerlink" title="2、调试启动APP"></a>2、调试启动APP</h4><p>以调试模式启动app</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">adb shell am start -D -n 包名/.MainActivity</span><br></pre></td></tr></table></figure>
-<p>手机界面显示等待调试中，便可以进行下一步了。</p>
+<pre><code>adb shell am start -D -n 包名/.MainActivity
+</code></pre><p>手机界面显示等待调试中，便可以进行下一步了。</p>
 <h4 id="3、查看APP-PID"><a href="#3、查看APP-PID" class="headerlink" title="3、查看APP PID"></a>3、查看APP PID</h4><p>调试进程进行端口转发，查看进程对应PID。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">adb shell ps | grep 包名</span><br><span class="line">adb forward tcp:8700 jdwp:pid</span><br></pre></td></tr></table></figure>
-<p>8700端口一般为默认的本地调试端口，如果不一致，可以在DDMS中查看。</p>
+<pre><code>adb shell ps | grep 包名
+adb forward tcp:8700 jdwp:pid
+</code></pre><p>8700端口一般为默认的本地调试端口，如果不一致，可以在DDMS中查看。</p>
 <h4 id="4、IDA附加进程"><a href="#4、IDA附加进程" class="headerlink" title="4、IDA附加进程"></a>4、IDA附加进程</h4><p>附加进程调试时，有时候需要对，如下的选项进行勾选，一般在需要动态加载so文件，调试JNI_onload函数的时候需要，对于一般调试静态函数的，需要拦取执行后断点的，可能连调试模式启动app都不需要。</p>
 <p><img src="\2019\03\IDA动态调试\1553850211516.png" alt="1553850211516"></p>
 <p>选择后，便可以在attach to process选项中查看到相应的可调试进程了。如果没有进程可能是你的APP不能调试，需要添加可调试参数。或者直接修改ro.debuggable=1。</p>
 <p><img src="\2019\03\IDA动态调试\1553850356604.png" alt="1553850356604"></p>
 <h4 id="5、JDB附加"><a href="#5、JDB附加" class="headerlink" title="5、JDB附加"></a>5、JDB附加</h4><p>执行jdb附加</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">jdb -connect com.sun.jdi.SocketAttach:hostname=127.0.0.1,port=8700</span><br></pre></td></tr></table></figure>
-<h4 id="6、调试选择"><a href="#6、调试选择" class="headerlink" title="6、调试选择"></a>6、调试选择</h4><p>选择完成后，进入调试状态，在右边的modules栏可以看到加载进来的so文件。选择需要调试的so文件，如果没有看到需要的so文件，说明so文件是动态加载的，这时候F9运行，就可以看到相应的so文件了。</p>
+<pre><code>jdb -connect com.sun.jdi.SocketAttach:hostname=127.0.0.1,port=8700
+</code></pre><h4 id="6、调试选择"><a href="#6、调试选择" class="headerlink" title="6、调试选择"></a>6、调试选择</h4><p>选择完成后，进入调试状态，在右边的modules栏可以看到加载进来的so文件。选择需要调试的so文件，如果没有看到需要的so文件，说明so文件是动态加载的，这时候F9运行，就可以看到相应的so文件了。</p>
 <p>选择相应的so文件后，会显示so文件中的函数，选择对于函数即可。</p>
 <p><img src="\2019\03\IDA动态调试\1553850903002.png" alt="1553850903002"></p>
 <h4 id="7、调试断点"><a href="#7、调试断点" class="headerlink" title="7、调试断点"></a>7、调试断点</h4><p>如选择对于的JNI_Onload 函数，这时候界面会跳转到函数的起始位置，当然也可以使用基地址加偏移地址的方式寻找。找到函数位置后就可以F2下断点了。</p>
