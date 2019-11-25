@@ -114,89 +114,22 @@
           <div class="post_content">
               <p>Scrapy，Python开发的一个快速、高层次的屏幕抓取和web抓取框架，用于抓取web站点并从页面中提取结构化的数据。Scrapy用途广泛，可以用于数据挖掘、监测和自动测试。</p>
 <p>首先生成项目文件</p>
-<pre><code>scrapy startproject spiderdata
-</code></pre><p>生成成功后，会有以下目录结构，首先在spiderdata中的spider目录创建我们的spider文件。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">scrapy startproject spiderdata</span><br></pre></td></tr></table></figure>
+<p>生成成功后，会有以下目录结构，首先在spiderdata中的spider目录创建我们的spider文件。</p>
 <p><img src="\2018\09\基于scrapy的备份文件扫描\1538017021874.png" alt="1538017021874"></p>
 <p>备份文件扫描文件名，有两个选择，一是基于字典，二是根据url的备份文件名，从以往发现备份文件的结果上看，两种方式都是经常存在使用的。</p>
 <p>于是创建backup文件，用来生成备份文件名，创建一个列表用来存储字典文件名，另外创建一个方法用来基于url生成备份文件名。</p>
-<pre><code>#coding:utf-8
-
-import urlparse
-
-class backup(object):
-    def __init__(self, url):
-        self.url = url
-        self.list2 = [&#39;/db.zip&#39;, &#39;/fdsa.rar&#39;, &#39;/ftp.rar&#39;, &#39;/gg.rar&#39;, &#39;/hdocs.rar&#39;, &#39;/hdocs.zip&#39;, &#39;/a.zip&#39;, &#39;/web.zip&#39;,
-                      &#39;/web.rar&#39;, &#39;/1.rar&#39;, &#39;/bbs.rar&#39;, &#39;/www.root.rar&#39;,
-                      &#39;/123.rar&#39;, &#39;/data.rar&#39;, &#39;/bak.rar&#39;, &#39;/oa.rar&#39;, &#39;/admin.rar&#39;, &#39;/www.rar&#39;, &#39;/2014.rar&#39;,
-                      &#39;/2015.rar&#39;, &#39;/2016.rar&#39;, &#39;/2014.zip&#39;, &#39;/2015.zip&#39;, &#39;/2016.zip&#39;,
-                      &#39;/2017.zip&#39;, &#39;/1.zip&#39;, &#39;/1.gz&#39;, &#39;/1.tar.gz&#39;, &#39;/2.zip&#39;, &#39;/2.rar&#39;, &#39;/123.rar&#39;, &#39;/123.zip&#39;, &#39;/a.rar&#39;,
-                      &#39;/a.zip&#39;, &#39;/admin.rar&#39;, &#39;/back.rar&#39;, &#39;/backup.rar&#39;, &#39;/bak.rar&#39;,
-                      &#39;/bbs.rar&#39;, &#39;/bbs.zip&#39;, &#39;/beifen.rar&#39;, &#39;/beifen.zip&#39;, &#39;/beian.rar&#39;, &#39;/data.rar&#39;, &#39;/data.zip&#39;,
-                      &#39;/HYTop.rar&#39;, &#39;/root.rar&#39;, &#39;/Release.rar&#39;, &#39;/Release.zip&#39;, &#39;/sql.rar&#39;,
-                      &#39;/test.rar&#39;, &#39;/template.rar&#39;, &#39;/template.zip&#39;, &#39;/upfile.rar&#39;, &#39;/vip.rar&#39;, &#39;/wangzhan.rar&#39;,
-                      &#39;/wangzhan.zip&#39;, &#39;/web.rar&#39;, &#39;/web.zip&#39;, &#39;/website.rar&#39;, &#39;/www.rar&#39;,
-                      &#39;/www.zip&#39;, &#39;/wwwroot.rar&#39;, &#39;/wwwroot.zip&#39;, &#39;/wz.rar&#39;]
-
-    def backup(self):
-        list_a = []
-        parse = urlparse.urlparse(self.url)
-        name = parse.netloc.split(&#39;.&#39;)
-        name_url = parse.netloc.replace(&#39;.&#39;, &#39;&#39;)
-        for i in [&#39;.rar&#39;, &#39;.zip&#39;, &#39;.tar.gz&#39;, &#39;.7z&#39;]:
-            list_a.append(parse.scheme + &#39;://&#39; + parse.netloc + &#39;/&#39; + parse.netloc + i)   #http://www.baidu.com/www.baidu.com.zip
-            if &#39;www&#39; in name:
-                list_a.append(self.url + &#39;/&#39; + name[1] + i)   #http://www.baidu.com/baidu.zip
-                list_a.append(self.url + &#39;/&#39; + &#39;&#39;.join(name[1:]) + i)     #http://www.baidu.com/baiducom.zip
-            else:
-                list_a.append(self.url + &#39;/&#39; + name[0] + i)       #http://www.baidu.com/baidu.zip
-            list_a.append(self.url + &#39;/&#39; + name_url + i)     #http://www.baidu.com/wwwbaiducom.zip
-        for x in self.list2:
-            list_a.append(self.url + x)
-        return list_a
-</code></pre><p>在spider的爬虫文件中使用以下代码</p>
-<pre><code>#coding:utf-8
-
-import scrapy
-from backup import backup
-from ..items import SpiderdateItem
-
-class spiderdata(scrapy.Spider):
-
-    name = &quot;spiderdata&quot;
-    content_type = [&#39;application/x-rar&#39;,&#39;application/x-gzip&#39;,&#39;application/zip&#39;,&#39;application/octet-stream&#39;,&#39;application/x-7z-compressed&#39;]
-
-    def start_requests(self):
-        with open(&#39;ip.txt&#39;,&#39;r&#39;) as f:
-            for i in f.readlines():
-                ip = i.strip(&#39;\n&#39;)
-                back = backup(ip)
-                url_ip = back.backup()
-                for x in url_ip:
-                    yield scrapy.Request(x, callback=self.parse,dont_filter=True)
-
-    def parse(self, response):
-        item = SpiderdateItem()
-        if response.headers[&#39;Content-Type&#39;] in self.content_type:
-            print &quot;[&quot; + str(response.status) + &quot;]&quot; + u&#39; 检测到存在备份文件的URL: &#39;+ response.url
-            item[&#39;url&#39;] = response.url
-            yield item
-</code></pre><p>调用之前创建的备份文件名函数，使用start_requests来生成一个可迭代对象。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line">#coding:utf-8</span><br><span class="line"></span><br><span class="line">import urlparse</span><br><span class="line"></span><br><span class="line">class backup(object):</span><br><span class="line">    def __init__(self, url):</span><br><span class="line">        self.url = url</span><br><span class="line">        self.list2 = [&apos;/db.zip&apos;, &apos;/fdsa.rar&apos;, &apos;/ftp.rar&apos;, &apos;/gg.rar&apos;, &apos;/hdocs.rar&apos;, &apos;/hdocs.zip&apos;, &apos;/a.zip&apos;, &apos;/web.zip&apos;,</span><br><span class="line">                      &apos;/web.rar&apos;, &apos;/1.rar&apos;, &apos;/bbs.rar&apos;, &apos;/www.root.rar&apos;,</span><br><span class="line">                      &apos;/123.rar&apos;, &apos;/data.rar&apos;, &apos;/bak.rar&apos;, &apos;/oa.rar&apos;, &apos;/admin.rar&apos;, &apos;/www.rar&apos;, &apos;/2014.rar&apos;,</span><br><span class="line">                      &apos;/2015.rar&apos;, &apos;/2016.rar&apos;, &apos;/2014.zip&apos;, &apos;/2015.zip&apos;, &apos;/2016.zip&apos;,</span><br><span class="line">                      &apos;/2017.zip&apos;, &apos;/1.zip&apos;, &apos;/1.gz&apos;, &apos;/1.tar.gz&apos;, &apos;/2.zip&apos;, &apos;/2.rar&apos;, &apos;/123.rar&apos;, &apos;/123.zip&apos;, &apos;/a.rar&apos;,</span><br><span class="line">                      &apos;/a.zip&apos;, &apos;/admin.rar&apos;, &apos;/back.rar&apos;, &apos;/backup.rar&apos;, &apos;/bak.rar&apos;,</span><br><span class="line">                      &apos;/bbs.rar&apos;, &apos;/bbs.zip&apos;, &apos;/beifen.rar&apos;, &apos;/beifen.zip&apos;, &apos;/beian.rar&apos;, &apos;/data.rar&apos;, &apos;/data.zip&apos;,</span><br><span class="line">                      &apos;/HYTop.rar&apos;, &apos;/root.rar&apos;, &apos;/Release.rar&apos;, &apos;/Release.zip&apos;, &apos;/sql.rar&apos;,</span><br><span class="line">                      &apos;/test.rar&apos;, &apos;/template.rar&apos;, &apos;/template.zip&apos;, &apos;/upfile.rar&apos;, &apos;/vip.rar&apos;, &apos;/wangzhan.rar&apos;,</span><br><span class="line">                      &apos;/wangzhan.zip&apos;, &apos;/web.rar&apos;, &apos;/web.zip&apos;, &apos;/website.rar&apos;, &apos;/www.rar&apos;,</span><br><span class="line">                      &apos;/www.zip&apos;, &apos;/wwwroot.rar&apos;, &apos;/wwwroot.zip&apos;, &apos;/wz.rar&apos;]</span><br><span class="line"></span><br><span class="line">    def backup(self):</span><br><span class="line">        list_a = []</span><br><span class="line">        parse = urlparse.urlparse(self.url)</span><br><span class="line">        name = parse.netloc.split(&apos;.&apos;)</span><br><span class="line">        name_url = parse.netloc.replace(&apos;.&apos;, &apos;&apos;)</span><br><span class="line">        for i in [&apos;.rar&apos;, &apos;.zip&apos;, &apos;.tar.gz&apos;, &apos;.7z&apos;]:</span><br><span class="line">            list_a.append(parse.scheme + &apos;://&apos; + parse.netloc + &apos;/&apos; + parse.netloc + i)   #http://www.baidu.com/www.baidu.com.zip</span><br><span class="line">            if &apos;www&apos; in name:</span><br><span class="line">                list_a.append(self.url + &apos;/&apos; + name[1] + i)   #http://www.baidu.com/baidu.zip</span><br><span class="line">                list_a.append(self.url + &apos;/&apos; + &apos;&apos;.join(name[1:]) + i)     #http://www.baidu.com/baiducom.zip</span><br><span class="line">            else:</span><br><span class="line">                list_a.append(self.url + &apos;/&apos; + name[0] + i)       #http://www.baidu.com/baidu.zip</span><br><span class="line">            list_a.append(self.url + &apos;/&apos; + name_url + i)     #http://www.baidu.com/wwwbaiducom.zip</span><br><span class="line">        for x in self.list2:</span><br><span class="line">            list_a.append(self.url + x)</span><br><span class="line">        return list_a</span><br></pre></td></tr></table></figure>
+<p>在spider的爬虫文件中使用以下代码</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">#coding:utf-8</span><br><span class="line"></span><br><span class="line">import scrapy</span><br><span class="line">from backup import backup</span><br><span class="line">from ..items import SpiderdateItem</span><br><span class="line"></span><br><span class="line">class spiderdata(scrapy.Spider):</span><br><span class="line"></span><br><span class="line">    name = &quot;spiderdata&quot;</span><br><span class="line">    content_type = [&apos;application/x-rar&apos;,&apos;application/x-gzip&apos;,&apos;application/zip&apos;,&apos;application/octet-stream&apos;,&apos;application/x-7z-compressed&apos;]</span><br><span class="line"></span><br><span class="line">    def start_requests(self):</span><br><span class="line">        with open(&apos;ip.txt&apos;,&apos;r&apos;) as f:</span><br><span class="line">            for i in f.readlines():</span><br><span class="line">                ip = i.strip(&apos;\n&apos;)</span><br><span class="line">                back = backup(ip)</span><br><span class="line">                url_ip = back.backup()</span><br><span class="line">                for x in url_ip:</span><br><span class="line">                    yield scrapy.Request(x, callback=self.parse,dont_filter=True)</span><br><span class="line"></span><br><span class="line">    def parse(self, response):</span><br><span class="line">        item = SpiderdateItem()</span><br><span class="line">        if response.headers[&apos;Content-Type&apos;] in self.content_type:</span><br><span class="line">            print &quot;[&quot; + str(response.status) + &quot;]&quot; + u&apos; 检测到存在备份文件的URL: &apos;+ response.url</span><br><span class="line">            item[&apos;url&apos;] = response.url</span><br><span class="line">            yield item</span><br></pre></td></tr></table></figure>
+<p>调用之前创建的备份文件名函数，使用start_requests来生成一个可迭代对象。</p>
 <p>数据通过item来保存本地，所以在items中创建一个参数，并且在settings中开启item管道。</p>
-<pre><code>url = scrapy.Field()
-</code></pre><p>在piplines中创建本地文件保存文件，创建一次文件对象，写入后根据 爬虫关闭后再关闭本地文件。</p>
-<pre><code>    def __init__(self):
-        self.f = open(&quot;url.txt&quot;,&#39;w&#39;)
-
-    def process_item(self, item, spider):
-        self.f.write(item[&#39;url&#39;].encode(&quot;utf-8&quot;)+&#39;\n&#39;)
-        return item
-
-    def close_spider(self, spider):
-        self.f.close()
-</code></pre><p>因此只需在spiderdata中创建ip.txt文件即可，写入需要检测的url，另外如果不想看到scrapy的log输出，可以用在setting中添加如下：</p>
-<pre><code>LOG_LEVEL = &#39;WARNING&#39;
-</code></pre><p>只显示warning级的log输出.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">url = scrapy.Field()</span><br></pre></td></tr></table></figure>
+<p>在piplines中创建本地文件保存文件，创建一次文件对象，写入后根据 爬虫关闭后再关闭本地文件。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">def __init__(self):</span><br><span class="line">    self.f = open(&quot;url.txt&quot;,&apos;w&apos;)</span><br><span class="line"></span><br><span class="line">def process_item(self, item, spider):</span><br><span class="line">    self.f.write(item[&apos;url&apos;].encode(&quot;utf-8&quot;)+&apos;\n&apos;)</span><br><span class="line">    return item</span><br><span class="line"></span><br><span class="line">def close_spider(self, spider):</span><br><span class="line">    self.f.close()</span><br></pre></td></tr></table></figure>
+<p>因此只需在spiderdata中创建ip.txt文件即可，写入需要检测的url，另外如果不想看到scrapy的log输出，可以用在setting中添加如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">LOG_LEVEL = &apos;WARNING&apos;</span><br></pre></td></tr></table></figure>
+<p>只显示warning级的log输出.</p>
 
           </div>
           <br><br>

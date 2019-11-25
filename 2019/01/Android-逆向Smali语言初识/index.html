@@ -127,118 +127,13 @@
 <li>[              数组类型 </li>
 </ul>
 <p>常见的代码含义：</p>
-<pre><code>#表示当前代码在源java文件中的行数。
-.line
-  .line 34
-
-#表示来自公共方法methodAReturn返回值是一个对象com.bolex.AA
-method
-.method public methodAReturn(Lcom/bolex/AA;Lcom/bolex/AA;)Lcom/bolex/AA;
-
-#表示该函数上需要使用3个寄存器
-registers
-.registers 3
-
-#表示接收两个入参都是AA对象，并标记寄存器p1和p2
-param
-    .param p1, &quot;mAA&quot;    # Lcom/bolex/AA;
-    .param p2, &quot;sAA&quot;    # Lcom/bolex/AA;
-
-#表示函数内执行的起始标记
-.prologue
-    .prologue
-
-#表示 返回寄存器上p1对象
-return-object
-  return-object p1
-#表示函数结束标记
-.end method
-
-#创建一个AA对象
-new-instance
- new-instance v0, Lcom/bolex/AA;
-
-#表示使用无参构造方法直接调用
-invoke-direct
- invoke-direct {v0}, Lcom/bolex/AA;-&gt;&lt;init&gt;()V
-
-#表示为虚拟方法
-invoke-virtual
-
- #数组操作指令
-    #new-array构造指定类型I也就是int类型并且把值赋给v0
-    # v0=new int[8];
-    new-array v0,v0,[ I
-
-    #array-length 获取给定v0寄存器中数组的长度并将值赋给v1寄存器，数组长度就是数组的个数。v1=v0,也就是说v1=8
-    array-length v1,v0
-
-    # 方法调用指令 
-    #new-instance v1,... 构造一个指定类型对象的新实例，并将对象引用赋值给v1寄存器。
-    #L表示java类型中的任何类，
-    # StringBuilder对象是动态对象，允许扩充它所封装的字符串中字符的数量，但是您可以为它可容纳的最大字符数指定一个值。相当于是一个string的升级版。
-    new-instance v1,Ljava/lang/StringBuilder;
-
-    # 方法调用指令
-    #&lt;init&gt;:在实例创建出来的时候调用，包括调用new操作符；
-    new-direct v1,Ljava/lang/StringBuilder;-&gt;&lt;init&gt;( )v
-
-    # 跳转指令   if (v0!=0)
-    #if-nez 的意思就是 not equal zero 如果v0不等于0，那么就继续向下执行，如果等于0就跳转到标号名为cond_0的位置。
-    if-nez v0, : cond_0 
-
-    # goto的含义就是强行跳转到标号名为goto_0的地方
-    goto :goto_0
-
-    #标号cond_0
-    ：cond_0
-
-    # 数据转换指令
-    #把int型变量转变为float变量
-    int-to-float v2,v2
-
-    # 数据运算指令
-    # 相当于 v2+=v2，第一个v2是寄存器，第二个和第三个是数据
-    add-float v2,v2,v2
-</code></pre><h4 id="Java编译dex文件"><a href="#Java编译dex文件" class="headerlink" title="Java编译dex文件"></a>Java编译dex文件</h4><p>以下用常见的hello world来表示smali语法结构。</p>
-<pre><code>public class firedt {
-    public static void main(String[] args){
-        System.out.println(&quot;hello world&quot;);
-    }
-}
-</code></pre><p>在AS中打开代码，安装java2smali插件后，在build-&gt;compile to smali编译为smali代码。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br></pre></td><td class="code"><pre><span class="line">#表示当前代码在源java文件中的行数。</span><br><span class="line">.line</span><br><span class="line">  .line 34</span><br><span class="line"></span><br><span class="line">#表示来自公共方法methodAReturn返回值是一个对象com.bolex.AA</span><br><span class="line">method</span><br><span class="line">.method public methodAReturn(Lcom/bolex/AA;Lcom/bolex/AA;)Lcom/bolex/AA;</span><br><span class="line"></span><br><span class="line">#表示该函数上需要使用3个寄存器</span><br><span class="line">registers</span><br><span class="line">.registers 3</span><br><span class="line"></span><br><span class="line">#表示接收两个入参都是AA对象，并标记寄存器p1和p2</span><br><span class="line">param</span><br><span class="line">    .param p1, &quot;mAA&quot;    # Lcom/bolex/AA;</span><br><span class="line">    .param p2, &quot;sAA&quot;    # Lcom/bolex/AA;</span><br><span class="line"></span><br><span class="line">#表示函数内执行的起始标记</span><br><span class="line">.prologue</span><br><span class="line">    .prologue</span><br><span class="line"></span><br><span class="line">#表示 返回寄存器上p1对象</span><br><span class="line">return-object</span><br><span class="line">  return-object p1</span><br><span class="line">#表示函数结束标记</span><br><span class="line">.end method</span><br><span class="line"></span><br><span class="line">#创建一个AA对象</span><br><span class="line">new-instance</span><br><span class="line"> new-instance v0, Lcom/bolex/AA;</span><br><span class="line"></span><br><span class="line">#表示使用无参构造方法直接调用</span><br><span class="line">invoke-direct</span><br><span class="line"> invoke-direct &#123;v0&#125;, Lcom/bolex/AA;-&gt;&lt;init&gt;()V</span><br><span class="line"></span><br><span class="line">#表示为虚拟方法</span><br><span class="line">invoke-virtual</span><br><span class="line"> </span><br><span class="line"> #数组操作指令</span><br><span class="line">    #new-array构造指定类型I也就是int类型并且把值赋给v0</span><br><span class="line">    # v0=new int[8];</span><br><span class="line">    new-array v0,v0,[ I</span><br><span class="line"></span><br><span class="line">    #array-length 获取给定v0寄存器中数组的长度并将值赋给v1寄存器，数组长度就是数组的个数。v1=v0,也就是说v1=8</span><br><span class="line">    array-length v1,v0</span><br><span class="line"></span><br><span class="line">    # 方法调用指令 </span><br><span class="line">    #new-instance v1,... 构造一个指定类型对象的新实例，并将对象引用赋值给v1寄存器。</span><br><span class="line">    #L表示java类型中的任何类，</span><br><span class="line">    # StringBuilder对象是动态对象，允许扩充它所封装的字符串中字符的数量，但是您可以为它可容纳的最大字符数指定一个值。相当于是一个string的升级版。</span><br><span class="line">    new-instance v1,Ljava/lang/StringBuilder;</span><br><span class="line"></span><br><span class="line">    # 方法调用指令</span><br><span class="line">    #&lt;init&gt;:在实例创建出来的时候调用，包括调用new操作符；</span><br><span class="line">    new-direct v1,Ljava/lang/StringBuilder;-&gt;&lt;init&gt;( )v</span><br><span class="line"></span><br><span class="line">    # 跳转指令   if (v0!=0)</span><br><span class="line">    #if-nez 的意思就是 not equal zero 如果v0不等于0，那么就继续向下执行，如果等于0就跳转到标号名为cond_0的位置。</span><br><span class="line">    if-nez v0, : cond_0 </span><br><span class="line"></span><br><span class="line">    # goto的含义就是强行跳转到标号名为goto_0的地方</span><br><span class="line">    goto :goto_0</span><br><span class="line">    </span><br><span class="line">    #标号cond_0</span><br><span class="line">    ：cond_0</span><br><span class="line"></span><br><span class="line">    # 数据转换指令</span><br><span class="line">    #把int型变量转变为float变量</span><br><span class="line">    int-to-float v2,v2</span><br><span class="line"></span><br><span class="line">    # 数据运算指令</span><br><span class="line">    # 相当于 v2+=v2，第一个v2是寄存器，第二个和第三个是数据</span><br><span class="line">    add-float v2,v2,v2</span><br></pre></td></tr></table></figure>
+<h4 id="Java编译dex文件"><a href="#Java编译dex文件" class="headerlink" title="Java编译dex文件"></a>Java编译dex文件</h4><p>以下用常见的hello world来表示smali语法结构。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">public class firedt &#123;</span><br><span class="line">    public static void main(String[] args)&#123;</span><br><span class="line">        System.out.println(&quot;hello world&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>在AS中打开代码，安装java2smali插件后，在build-&gt;compile to smali编译为smali代码。</p>
 <p>编译完成后的代码为以下，并对关键代码进行注释含义：</p>
-<pre><code>.class public Lfiredt;    #定义一个firedt类
-.super Ljava/lang/Object;    #继承object类
-.source &quot;firedt.java&quot;       #由firedt.java编译来 
-
-
-# direct methods
-.method public constructor &lt;init&gt;()V     
-    .registers 1             #注册一个寄存器
-
-    .prologue   #代码开始
-    .line 1            #第一行
-    invoke-direct {p0}, Ljava/lang/Object;-&gt;&lt;init&gt;()V 
-
-    return-void
-.end method
-
-.method public static main([Ljava/lang/String;)V   #说明一个main的静态方法，类型为void
-    .registers 3   
-
-    .prologue
-    .line 3
-    sget-object v0, Ljava/lang/System;-&gt;out:Ljava/io/PrintStream;   #获取变量对象保存到v0
-
-    const-string v1, &quot;hello world&quot;   #赋值一个字符串v1=hello world
-
-    invoke-virtual {v0, v1}, Ljava/io/PrintStream;-&gt;println(Ljava/lang/String;)V   #调用printstream的println方法把v0赋值v1
-
-    .line 4   
-    return-void
-.end method  #方法结束，一个method对应一个end method
-</code></pre><h3 id="参考资料："><a href="#参考资料：" class="headerlink" title="参考资料："></a>参考资料：</h3><ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">.class public Lfiredt;    #定义一个firedt类</span><br><span class="line">.super Ljava/lang/Object;    #继承object类</span><br><span class="line">.source &quot;firedt.java&quot;       #由firedt.java编译来 </span><br><span class="line"></span><br><span class="line"></span><br><span class="line"># direct methods</span><br><span class="line">.method public constructor &lt;init&gt;()V     </span><br><span class="line">    .registers 1             #注册一个寄存器</span><br><span class="line"></span><br><span class="line">    .prologue   #代码开始</span><br><span class="line">    .line 1            #第一行</span><br><span class="line">    invoke-direct &#123;p0&#125;, Ljava/lang/Object;-&gt;&lt;init&gt;()V </span><br><span class="line"></span><br><span class="line">    return-void</span><br><span class="line">.end method</span><br><span class="line"></span><br><span class="line">.method public static main([Ljava/lang/String;)V   #说明一个main的静态方法，类型为void</span><br><span class="line">    .registers 3   </span><br><span class="line"></span><br><span class="line">    .prologue</span><br><span class="line">    .line 3</span><br><span class="line">    sget-object v0, Ljava/lang/System;-&gt;out:Ljava/io/PrintStream;   #获取变量对象保存到v0</span><br><span class="line"></span><br><span class="line">    const-string v1, &quot;hello world&quot;   #赋值一个字符串v1=hello world</span><br><span class="line"></span><br><span class="line">    invoke-virtual &#123;v0, v1&#125;, Ljava/io/PrintStream;-&gt;println(Ljava/lang/String;)V   #调用printstream的println方法把v0赋值v1</span><br><span class="line"></span><br><span class="line">    .line 4   </span><br><span class="line">    return-void</span><br><span class="line">.end method  #方法结束，一个method对应一个end method</span><br></pre></td></tr></table></figure>
+<h3 id="参考资料："><a href="#参考资料：" class="headerlink" title="参考资料："></a>参考资料：</h3><ol>
 <li><p><a href="https://blog.csdn.net/qq373432361/article/details/49557579" target="_blank" rel="noopener">smali语法中文参考文档</a></p>
 </li>
 <li><p><a href="https://www.52pojie.cn/thread-687375-1-1.html" target="_blank" rel="noopener">逆向之Smali入门学习</a></p>

@@ -119,140 +119,46 @@
 <h4 id="安装Elasticsearch"><a href="#安装Elasticsearch" class="headerlink" title="安装Elasticsearch"></a>安装Elasticsearch</h4><p>下载elasticsearch ，</p>
 <p>wget  <a href="https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-6.4.2.tar.gz" target="_blank" rel="noopener">https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-6.4.2.tar.gz</a></p>
 <p>修改解压文件中的config/elasticsearch.yml 文件</p>
-<pre><code># 这里指定的是集群名称，需要修改为对应的，开启了自发现功能后，ES会按照此集群名称进行集群发现
-
-cluster.name: es_cluster
-node.name: es_cluster_1 
-
-# 数据目录
-
-path.data: /data/data
-
-# log 目录
-
-path.logs: /data/logs
-
-# 修改一下ES的监听地址，这样别的机器也可以访问
-
-network.host: 192.168.253.139
-
-# 默认的端口号
-
-http.port: 9200
-discovery.zen.ping.unicast.hosts: [&quot;192.168.253.138&quot;, &quot;192.168.253.139&quot;]
-</code></pre><p>在使用中可能会因为系统内存等问题导致启动失败，所以可以预调整系统参数。</p>
-<pre><code>设置内核参数
-
-vi /etc/sysctl.conf
-# 增加以下参数
-vm.max_map_count=655360
-执行以下命令，确保生效配置生效：
-
-sysctl -p
-设置资源参数
-
-vi /etc/security/limits.conf
-# 修改
-* soft nofile 65536
-* hard nofile 131072
-* soft nproc 65536
-* hard nproc 131072
-设置用户资源参数
-
-vi /etc/security/limits.d/20-nproc.conf
-# 设置elk用户参数
-elk    soft    nproc     65536
-</code></pre><p>启动elk需要非root用户，所以创建elk用户。</p>
-<pre><code>useradd elk         #创建用户elk
-groupadd elk        #创建组elk
-useradd elk -g elk  #将用户添加到组
-
-mkdir  -pv  /data/{data,logs} # 创建数据和日志目录
-
-# 修改文件所有者
-chown -R elk:elk /data/
-chown -R elk:elk /etc/elasticsearch/
-</code></pre><p>切换到elk用户，启动服务</p>
-<pre><code>启动文件  /etc/elasticsearch/bin/elasticsearch
-服务器要关闭防火墙
-systemctl stop firewalld.service
-</code></pre><p>这时候可以看到log输出，节点正常启动.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"># 这里指定的是集群名称，需要修改为对应的，开启了自发现功能后，ES会按照此集群名称进行集群发现</span><br><span class="line"></span><br><span class="line">cluster.name: es_cluster</span><br><span class="line">node.name: es_cluster_1 </span><br><span class="line"></span><br><span class="line"># 数据目录</span><br><span class="line"></span><br><span class="line">path.data: /data/data</span><br><span class="line"></span><br><span class="line"># log 目录</span><br><span class="line"></span><br><span class="line">path.logs: /data/logs</span><br><span class="line"></span><br><span class="line"># 修改一下ES的监听地址，这样别的机器也可以访问</span><br><span class="line"></span><br><span class="line">network.host: 192.168.253.139</span><br><span class="line"></span><br><span class="line"># 默认的端口号</span><br><span class="line"></span><br><span class="line">http.port: 9200</span><br><span class="line">discovery.zen.ping.unicast.hosts: [&quot;192.168.253.138&quot;, &quot;192.168.253.139&quot;]</span><br></pre></td></tr></table></figure>
+<p>在使用中可能会因为系统内存等问题导致启动失败，所以可以预调整系统参数。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">设置内核参数</span><br><span class="line"></span><br><span class="line">vi /etc/sysctl.conf</span><br><span class="line"># 增加以下参数</span><br><span class="line">vm.max_map_count=655360</span><br><span class="line">执行以下命令，确保生效配置生效：</span><br><span class="line"></span><br><span class="line">sysctl -p</span><br><span class="line">设置资源参数</span><br><span class="line"></span><br><span class="line">vi /etc/security/limits.conf</span><br><span class="line"># 修改</span><br><span class="line">* soft nofile 65536</span><br><span class="line">* hard nofile 131072</span><br><span class="line">* soft nproc 65536</span><br><span class="line">* hard nproc 131072</span><br><span class="line">设置用户资源参数</span><br><span class="line"></span><br><span class="line">vi /etc/security/limits.d/20-nproc.conf</span><br><span class="line"># 设置elk用户参数</span><br><span class="line">elk    soft    nproc     65536</span><br></pre></td></tr></table></figure>
+<p>启动elk需要非root用户，所以创建elk用户。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">useradd elk         #创建用户elk</span><br><span class="line">groupadd elk        #创建组elk</span><br><span class="line">useradd elk -g elk  #将用户添加到组</span><br><span class="line"></span><br><span class="line">mkdir  -pv  /data/&#123;data,logs&#125; # 创建数据和日志目录</span><br><span class="line"></span><br><span class="line"># 修改文件所有者</span><br><span class="line">chown -R elk:elk /data/</span><br><span class="line">chown -R elk:elk /etc/elasticsearch/</span><br></pre></td></tr></table></figure>
+<p>切换到elk用户，启动服务</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">启动文件  /etc/elasticsearch/bin/elasticsearch</span><br><span class="line">服务器要关闭防火墙</span><br><span class="line">systemctl stop firewalld.service</span><br></pre></td></tr></table></figure>
+<p>这时候可以看到log输出，节点正常启动.</p>
 <p><img src="\2018\11\ELK搭建使用\1540283021102.png" alt="1540283021102"></p>
 <p>用浏览器访问，同时可以正常使用</p>
 <p><img src="\2018\11\ELK搭建使用\1540283045137.png" alt="1540283045137"></p>
 <h4 id="安装Logstash"><a href="#安装Logstash" class="headerlink" title="安装Logstash"></a>安装Logstash</h4><p>下载解压</p>
 <p>wget  <a href="https://artifacts.elastic.co/downloads/logstash/logstash-6.4.2.tar.gz" target="_blank" rel="noopener">https://artifacts.elastic.co/downloads/logstash/logstash-6.4.2.tar.gz</a></p>
 <p>在解压后目录执行</p>
-<pre><code>/usr/share/logstash/bin/logstash -e &#39;input { stdin { } } output { stdout {} }&#39;
-</code></pre><p>在命令行输入什么内容讲原样输出，比如：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/usr/share/logstash/bin/logstash -e &apos;input &#123; stdin &#123; &#125; &#125; output &#123; stdout &#123;&#125; &#125;&apos;</span><br></pre></td></tr></table></figure>
+<p>在命令行输入什么内容讲原样输出，比如：</p>
 <p><img src="\2018\11\ELK搭建使用\1540283339125.png" alt="1540283339125"></p>
 <p>显示正常以后再去修改配置文件，需要自己添加，创建如下内容文件。</p>
-<pre><code>cat logstash-simple.conf
-
-input{
-    file {
-          path =&gt; &quot;/var/log/httpd/*&quot;
-          start_position =&gt; beginning
-     }
-}
-
-output {
-    stdout { codec=&gt; rubydebug }
-    elasticsearch {
-          hosts =&gt; &quot;192.168.253.132:9200&quot;
-          protocol =&gt; &quot;http&quot;
-          index  =&gt; &quot;logstash-%{+YYYY-MM}&quot;
-    }
-}
-</code></pre><p>开启服务，执行如下命令：</p>
-<pre><code>/usr/share/logstash/bin/logstash  -f /usr/share/logstash/config/logstash-simple.conf 
-</code></pre><p>我们可以查看 ES 是否接收到了数据：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">cat logstash-simple.conf</span><br><span class="line"></span><br><span class="line">input&#123;</span><br><span class="line">    file &#123;</span><br><span class="line">          path =&gt; &quot;/var/log/httpd/*&quot;</span><br><span class="line">          start_position =&gt; beginning</span><br><span class="line">     &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">output &#123;</span><br><span class="line">    stdout &#123; codec=&gt; rubydebug &#125;</span><br><span class="line">    elasticsearch &#123;</span><br><span class="line">          hosts =&gt; &quot;192.168.253.132:9200&quot;</span><br><span class="line">          protocol =&gt; &quot;http&quot;</span><br><span class="line">          index  =&gt; &quot;logstash-%&#123;+YYYY-MM&#125;&quot;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>开启服务，执行如下命令：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/usr/share/logstash/bin/logstash  -f /usr/share/logstash/config/logstash-simple.conf</span><br></pre></td></tr></table></figure>
+<p>我们可以查看 ES 是否接收到了数据：</p>
 <p><img src="\2018\11\ELK搭建使用\1541323006347.png" alt="1541323006347"></p>
 <h4 id="Kibana的安装"><a href="#Kibana的安装" class="headerlink" title="Kibana的安装"></a>Kibana的安装</h4><p>wget <a href="https://artifacts.elastic.co/downloads/kibana/kibana-6.4.2-linux-x86_64.tar.gz" target="_blank" rel="noopener">https://artifacts.elastic.co/downloads/kibana/kibana-6.4.2-linux-x86_64.tar.gz</a></p>
-<pre><code>编辑kibana.yml配置文件
-vi /usr/share/kibana/config/kibana.yml 
-
-修改以下参数：
-server.port: 5601           #开启默认端口5601，本文修改默认端口为5602
-server.host: “192.168.253.139”   #站点地址
-elasticsearch.url: http://192.168.253.139:9200   #指向elasticsearch服务的ip地址
-kibana.index: “.kibana”
-</code></pre><p>启动</p>
-<pre><code>执行以下命令启动：
-/usr/share/kibana/bin/kibana
-</code></pre><p>测试浏览器访问</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">编辑kibana.yml配置文件</span><br><span class="line">vi /usr/share/kibana/config/kibana.yml </span><br><span class="line"></span><br><span class="line">修改以下参数：</span><br><span class="line">server.port: 5601           #开启默认端口5601，本文修改默认端口为5602</span><br><span class="line">server.host: “192.168.253.139”   #站点地址</span><br><span class="line">elasticsearch.url: http://192.168.253.139:9200   #指向elasticsearch服务的ip地址</span><br><span class="line">kibana.index: “.kibana”</span><br></pre></td></tr></table></figure>
+<p>启动</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">执行以下命令启动：</span><br><span class="line">/usr/share/kibana/bin/kibana</span><br></pre></td></tr></table></figure>
+<p>测试浏览器访问</p>
 <p>访问：<a href="http://192.168.253.139:5602" target="_blank" rel="noopener">http://192.168.253.139:5602</a></p>
 <p><img src="\2018\11\ELK搭建使用\1541323089099.png" alt="1541323089099"></p>
 <p>正常启动后，需要配置索引，设置logstash-* ，添加索引和Available fields后，点击Discover就可以看到logstash传输过来的日志信息。</p>
 <p><img src="\2018\11\ELK搭建使用\1541323158320.png" alt="1541323158320"></p>
 <p>然后可以手动添加fields参数或者创建图表。</p>
 <h4 id="yum-安装"><a href="#yum-安装" class="headerlink" title="yum 安装"></a>yum 安装</h4><p>以上安装方式为下载配置安装，可以使用yum安装。</p>
-<pre><code># 导入私钥
-rpm --import https://artifacts.elastic.co/GPG-KEY-elasticsearch
-
-# 添加yum源
-vim /etc/yum.repos.d/es.repo
-</code></pre><p>yum源内容：</p>
-<pre><code>[elasticsearch-6.x]
-name=Elasticsearch repository for 6.x packages
-baseurl=https://artifacts.elastic.co/packages/6.x/yum
-gpgcheck=1
-gpgkey=https://artifacts.elastic.co/GPG-KEY-elasticsearch
-enabled=1
-autorefresh=1
-type=rpm-md
-</code></pre><p>执行安装：</p>
-<pre><code># 安装java + ELK
-yum install java-1.8.0-openjdk.x86_64 elasticsearch.noarch kibana.x86_64 logstash.noarch -y
-
-# 修改配置文件
-vi /etc/logstash/logstash.yml
-vi /etc/elasticsearch/elasticsearch.yml
-vi /etc/kibana/kibana.yml
-
-# 启动服务
-systemctl start logstash.service elasticsearch.service kibana.service
-</code></pre><p>配置文件和上文相同修改，如若无法访问，关闭防火墙 。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"># 导入私钥</span><br><span class="line">rpm --import https://artifacts.elastic.co/GPG-KEY-elasticsearch</span><br><span class="line"></span><br><span class="line"># 添加yum源</span><br><span class="line">vim /etc/yum.repos.d/es.repo</span><br></pre></td></tr></table></figure>
+<p>yum源内容：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">[elasticsearch-6.x]</span><br><span class="line">name=Elasticsearch repository for 6.x packages</span><br><span class="line">baseurl=https://artifacts.elastic.co/packages/6.x/yum</span><br><span class="line">gpgcheck=1</span><br><span class="line">gpgkey=https://artifacts.elastic.co/GPG-KEY-elasticsearch</span><br><span class="line">enabled=1</span><br><span class="line">autorefresh=1</span><br><span class="line">type=rpm-md</span><br></pre></td></tr></table></figure>
+<p>执行安装：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"># 安装java + ELK</span><br><span class="line">yum install java-1.8.0-openjdk.x86_64 elasticsearch.noarch kibana.x86_64 logstash.noarch -y</span><br><span class="line"></span><br><span class="line"># 修改配置文件</span><br><span class="line">vi /etc/logstash/logstash.yml</span><br><span class="line">vi /etc/elasticsearch/elasticsearch.yml</span><br><span class="line">vi /etc/kibana/kibana.yml</span><br><span class="line"></span><br><span class="line"># 启动服务</span><br><span class="line">systemctl start logstash.service elasticsearch.service kibana.service</span><br></pre></td></tr></table></figure>
+<p>配置文件和上文相同修改，如若无法访问，关闭防火墙 。</p>
 <p>参考链接：</p>
 <p><a href="https://blog.csdn.net/KingBoyWorld/article/details/78555120" target="_blank" rel="noopener">https://blog.csdn.net/KingBoyWorld/article/details/78555120</a></p>
 <p><a href="https://www.cnblogs.com/yuhuLin/p/7018858.html" target="_blank" rel="noopener">https://www.cnblogs.com/yuhuLin/p/7018858.html</a></p>

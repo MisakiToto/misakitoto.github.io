@@ -121,11 +121,8 @@
 <p>示例APP：<a href="https://github.com/eternalsakura/ctf_pwn/tree/master/android%E9%80%86%E5%90%91" target="_blank" rel="noopener">jscrack</a></p>
 <p>由于使用的Android 4.4.4的环境，加载模式为Dalvik虚拟机模式，libdvm.so则是此模式下的文件，当然在Android 5.0以上取消了Dalvik模式，自然也不存在libdvm.so文件。dalvik虚拟机会把dex文件优化为odex文件,dvmDexFileOpenPartial则用来解析内存中优化过的dex文件，此时dex已经加载进内存，所以就可以dump出来了。</p>
 <h3 id="2、示例演示"><a href="#2、示例演示" class="headerlink" title="2、示例演示"></a>2、示例演示</h3><p>首先调试模式启动APP，</p>
-<pre><code>adb forward tcp:23946 tcp:23946          #IDA端口转发
-adb shell am start -D -n 包名/activity名  #调试模式启动APP 
-adb shell ps | grep 包名                  #获取APP的PID
-adb forward tcp:8700 jdwp:pid            #进程端口转发
-</code></pre><p><img src="\2019\05\基于dvmDexFileOpenPartial的动态脱壳\1557899006483.png" alt="1557899006483"></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">adb forward tcp:23946 tcp:23946          #IDA端口转发</span><br><span class="line">adb shell am start -D -n 包名/activity名  #调试模式启动APP </span><br><span class="line">adb shell ps | grep 包名                  #获取APP的PID</span><br><span class="line">adb forward tcp:8700 jdwp:pid            #进程端口转发</span><br></pre></td></tr></table></figure>
+<p><img src="\2019\05\基于dvmDexFileOpenPartial的动态脱壳\1557899006483.png" alt="1557899006483"></p>
 <p>然后调整IDA的调试选项，如下：</p>
 <p><img src="\2019\05\基于dvmDexFileOpenPartial的动态脱壳\1557899051732.png" alt="1557899051732"></p>
 <p>选择对应的进程后，页面跳转，选择modules下的libdvm.so中的dvmDexFileOpenPartial方法，如下：</p>
@@ -133,31 +130,19 @@ adb forward tcp:8700 jdwp:pid            #进程端口转发
 <p>找到方法后，在其第一行下断点，如下情形。</p>
 <p><img src="\2019\05\基于dvmDexFileOpenPartial的动态脱壳\1557899194095.png" alt="1557899194095"></p>
 <p>然后转发jdb。此处jdb不可过早转发，不然下一步运行不到指定地址，将会跳过调试模式进入软件内。</p>
-<pre><code>jdb -connect com.sun.jdi.SocketAttach:hostname=127.0.0.1,port=8700
-</code></pre><p>附加完成后可以看到CMD卡在回车处暂无回显，在IDA下运行F9到指定断点处自动下断。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">jdb -connect com.sun.jdi.SocketAttach:hostname=127.0.0.1,port=8700</span><br></pre></td></tr></table></figure>
+<p>附加完成后可以看到CMD卡在回车处暂无回显，在IDA下运行F9到指定断点处自动下断。</p>
 <p><img src="\2019\05\基于dvmDexFileOpenPartial的动态脱壳\1557899222926.png" alt="1557899222926"></p>
 <p>单步运行F8一次即可，可以看到寄存器窗口中R0,R1的地址值。</p>
 <p><img src="\2019\05\基于dvmDexFileOpenPartial的动态脱壳\1557899257190.png" alt="1557899257190"></p>
 <p>在file选项中点击script command运行如下脚本。则可以在D盘下看到dump出来的dex文件。</p>
-<pre><code>static main(void){
-auto fp, dex_addr, end_addr;
-fp = fopen(&quot;D:\\dump.dex&quot;, &quot;wb&quot;);
-end_addr = R0 + R1;
-for ( dex_addr=R0; dex_addr &lt; end_addr; dex_addr ++ )
-fputc(Byte(dex_addr), fp);
-}
-</code></pre><p>选择jadx打开dex文件，可以看到源码已dump成功。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">static main(void)&#123;</span><br><span class="line">auto fp, dex_addr, end_addr;</span><br><span class="line">fp = fopen(&quot;D:\\dump.dex&quot;, &quot;wb&quot;);</span><br><span class="line">end_addr = R0 + R1;</span><br><span class="line">for ( dex_addr=R0; dex_addr &lt; end_addr; dex_addr ++ )</span><br><span class="line">fputc(Byte(dex_addr), fp);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>选择jadx打开dex文件，可以看到源码已dump成功。</p>
 <p><img src="\2019\05\基于dvmDexFileOpenPartial的动态脱壳\1557899587774.png" alt="1557899587774"></p>
 <h3 id="3、系统差异"><a href="#3、系统差异" class="headerlink" title="3、系统差异"></a>3、系统差异</h3><p>此处使用Android 4.4.4，如果使用Android 5.0以上不存在lindvm.so，则需要在libart.so中对Openmemory函数下断，同样操作，保存R1,R2的值，R1代表基地址，R2代表长度。</p>
 <p>脚本为</p>
-<pre><code>static main(void){   
-auto fp, dex_addr, end_addr;   
-fp = fopen(&quot;D:\\dump.dex&quot;, &quot;wb&quot;);  
-end_addr = R1 + R2;   
-for ( dex_addr=R1; dex_addr &lt; end_addr; dex_addr ++ )       
-fputc(Byte(dex_addr), fp);
-}
-</code></pre><p>参考文章：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">static main(void)&#123;   </span><br><span class="line">auto fp, dex_addr, end_addr;   </span><br><span class="line">fp = fopen(&quot;D:\\dump.dex&quot;, &quot;wb&quot;);  </span><br><span class="line">end_addr = R1 + R2;   </span><br><span class="line">for ( dex_addr=R1; dex_addr &lt; end_addr; dex_addr ++ )       </span><br><span class="line">fputc(Byte(dex_addr), fp);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>参考文章：</p>
 <p><a href="https://www.52pojie.cn/thread-778654-1-1.html" target="_blank" rel="noopener">IDA动态调试脱壳步骤</a></p>
 
           </div>

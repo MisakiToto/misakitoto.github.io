@@ -114,262 +114,58 @@
           <div class="post_content">
               <h4 id="代码编译"><a href="#代码编译" class="headerlink" title="代码编译"></a>代码编译</h4><p>使用的代码为非虫的Android软件安全权威指南，app6.c</p>
 <p>代码如下：</p>
-<pre><code>#include &lt;stdio.h&gt;
-
-int nums[5] = {1, 2, 3, 4, 5};
-int for1(int n) {
-    int i = 0;
-    int s = 0;
-    for (i = 0; i &lt; n; i++) {
-        s += i * 2;
-    }
-    return s;
-}
-int for2(int n) {
-    int i = 0;
-    int s = 0;
-    for (i = 0; i &lt; n; i++) {
-        s += i * i + nums[n - 1];
-    }
-    return s;
-}
-
-int dowhile(int n) {
-    int i = 1;
-    int s = 0;
-    do {
-        s += i;
-    } while (i++ &lt; n);
-    return s;
-}
-int whiledo(int n) {
-    int i = 1;
-    int s = 0;
-    while (i &lt;= n) {
-        s += i++;
-    }
-    return s;
-}
-
-void if1(int n) {
-    if (n &lt; 10) {
-        printf(&quot;the number less than 10\n&quot;);
-    } else {
-        printf(&quot;the number greater than or equal to 10\n&quot;);
-    }
-}
-
-void if2(int n) {
-    if (n &lt; 16) {
-        printf(&quot;he is a boy\n&quot;);
-    } else if (n &lt; 30) {
-        printf(&quot;he is a young man\n&quot;);
-    } else if (n &lt; 45) {
-        printf(&quot;he is a strong man\n&quot;);
-    } else {
-        printf(&quot;he is an old man\n&quot;);
-    }
-}
-
-
-int main(int argc, char *argv[]) {
-    printf(&quot;for1:%d\n&quot;, for1(5));
-    printf(&quot;for2:%d\n&quot;, for2(5));
-
-    printf(&quot;dowhile:%d\n&quot;, dowhile(100));
-    printf(&quot;while:%d\n&quot;, whiledo(100));
-
-    if1(5);
-    if2(35);
-
-    return 0;
-}
-</code></pre><p>删除了其中的switch函数，编译的时候函数一直报错，使用make编译，创建jni目录，把c文件和Makefile放入到目录中，修改文件为如下：</p>
-<pre><code>#设置目录
-NDK_ROOT=D:\Androidstudio-sdk\android-ndk-r14b
-TOOLCHAINS_ROOT=$(NDK_ROOT)\toolchains\arm-linux-androideabi-4.9\prebuilt\windows-x86_64
-TOOLCHAINS_PREFIX=$(TOOLCHAINS_ROOT)\bin\arm-linux-androideabi
-TOOLCHAINS_INCLUDE=$(TOOLCHAINS_ROOT)\lib\gcc\arm-linux-androideabi\4.9.x\include-fixed
-PLATFORM_ROOT=$(NDK_ROOT)\platforms\android-14\arch-arm
-PLATFORM_INCLUDE=$(PLATFORM_ROOT)\usr\include
-PLATFORM_LIB=$(PLATFORM_ROOT)\usr\lib
-
-
-
-MODULE_NAME=app6
-BUILD_TYPE=c
-PATH_ANDROID=/data/local/tmp/
-
-RM=del
-
-FLAGS=-I$(TOOLCHAINS_INCLUDE) \
-    -I$(PLATFORM_INCLUDE) \
-    -L$(PLATFORM_LIB) \
-    -nostdlib \
-    -lgcc \
-    -Bdynamic \
-    -lc    \
-    -O0
-
-OBJS=$(MODULE_NAME).o \
-    $(PLATFORM_LIB)\crtbegin_dynamic.o \
-    $(PLATFORM_LIB)\crtend_android.o
-
-all:
-    $(TOOLCHAINS_PREFIX)-gcc $(FLAGS) -c $(MODULE_NAME).$(BUILD_TYPE) -o $(MODULE_NAME).o -pie -fPIE
-    $(TOOLCHAINS_PREFIX)-gcc $(FLAGS) -S $(MODULE_NAME).$(BUILD_TYPE) -o $(MODULE_NAME).S -pie -fPIE
-    $(TOOLCHAINS_PREFIX)-gcc $(FLAGS) $(OBJS) -o $(MODULE_NAME) -pie -fPIE
-clean:
-    $(RM) *.o
-install:
-    adb push $(MODULE_NAME) $(PATH_ANDROID)
-    adb shell chmod 755 $(PATH_ANDROID)$(MODULE_NAME)
-    adb shell $(PATH_ANDROID)$(MODULE_NAME)
-</code></pre><p>编译后如下，会生成一个无后缀的可执行文件。丢到IDA中。点击for1函数，空格切换图形视图。一般看到这种形式的箭头指向的时候基本就是for或者while语句。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line"></span><br><span class="line">int nums[5] = &#123;1, 2, 3, 4, 5&#125;;</span><br><span class="line">int for1(int n) &#123;</span><br><span class="line">    int i = 0;</span><br><span class="line">    int s = 0;</span><br><span class="line">    for (i = 0; i &lt; n; i++) &#123;</span><br><span class="line">        s += i * 2;</span><br><span class="line">    &#125;</span><br><span class="line">    return s;</span><br><span class="line">&#125;</span><br><span class="line">int for2(int n) &#123;</span><br><span class="line">    int i = 0;</span><br><span class="line">    int s = 0;</span><br><span class="line">    for (i = 0; i &lt; n; i++) &#123;</span><br><span class="line">        s += i * i + nums[n - 1];</span><br><span class="line">    &#125;</span><br><span class="line">    return s;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">int dowhile(int n) &#123;</span><br><span class="line">    int i = 1;</span><br><span class="line">    int s = 0;</span><br><span class="line">    do &#123;</span><br><span class="line">        s += i;</span><br><span class="line">    &#125; while (i++ &lt; n);</span><br><span class="line">    return s;</span><br><span class="line">&#125;</span><br><span class="line">int whiledo(int n) &#123;</span><br><span class="line">    int i = 1;</span><br><span class="line">    int s = 0;</span><br><span class="line">    while (i &lt;= n) &#123;</span><br><span class="line">        s += i++;</span><br><span class="line">    &#125;</span><br><span class="line">    return s;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">void if1(int n) &#123;</span><br><span class="line">    if (n &lt; 10) &#123;</span><br><span class="line">        printf(&quot;the number less than 10\n&quot;);</span><br><span class="line">    &#125; else &#123;</span><br><span class="line">        printf(&quot;the number greater than or equal to 10\n&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">void if2(int n) &#123;</span><br><span class="line">    if (n &lt; 16) &#123;</span><br><span class="line">        printf(&quot;he is a boy\n&quot;);</span><br><span class="line">    &#125; else if (n &lt; 30) &#123;</span><br><span class="line">        printf(&quot;he is a young man\n&quot;);</span><br><span class="line">    &#125; else if (n &lt; 45) &#123;</span><br><span class="line">        printf(&quot;he is a strong man\n&quot;);</span><br><span class="line">    &#125; else &#123;</span><br><span class="line">        printf(&quot;he is an old man\n&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">int main(int argc, char *argv[]) &#123;</span><br><span class="line">    printf(&quot;for1:%d\n&quot;, for1(5));</span><br><span class="line">    printf(&quot;for2:%d\n&quot;, for2(5));</span><br><span class="line"></span><br><span class="line">    printf(&quot;dowhile:%d\n&quot;, dowhile(100));</span><br><span class="line">    printf(&quot;while:%d\n&quot;, whiledo(100));</span><br><span class="line"></span><br><span class="line">    if1(5);</span><br><span class="line">    if2(35);</span><br><span class="line"></span><br><span class="line">    return 0;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>删除了其中的switch函数，编译的时候函数一直报错，使用make编译，创建jni目录，把c文件和Makefile放入到目录中，修改文件为如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line">#设置目录</span><br><span class="line">NDK_ROOT=D:\Androidstudio-sdk\android-ndk-r14b</span><br><span class="line">TOOLCHAINS_ROOT=$(NDK_ROOT)\toolchains\arm-linux-androideabi-4.9\prebuilt\windows-x86_64</span><br><span class="line">TOOLCHAINS_PREFIX=$(TOOLCHAINS_ROOT)\bin\arm-linux-androideabi</span><br><span class="line">TOOLCHAINS_INCLUDE=$(TOOLCHAINS_ROOT)\lib\gcc\arm-linux-androideabi\4.9.x\include-fixed</span><br><span class="line">PLATFORM_ROOT=$(NDK_ROOT)\platforms\android-14\arch-arm</span><br><span class="line">PLATFORM_INCLUDE=$(PLATFORM_ROOT)\usr\include</span><br><span class="line">PLATFORM_LIB=$(PLATFORM_ROOT)\usr\lib</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">MODULE_NAME=app6</span><br><span class="line">BUILD_TYPE=c</span><br><span class="line">PATH_ANDROID=/data/local/tmp/</span><br><span class="line"></span><br><span class="line">RM=del</span><br><span class="line"></span><br><span class="line">FLAGS=-I$(TOOLCHAINS_INCLUDE) \</span><br><span class="line">    -I$(PLATFORM_INCLUDE) \</span><br><span class="line">	-L$(PLATFORM_LIB) \</span><br><span class="line">	-nostdlib \</span><br><span class="line">	-lgcc \</span><br><span class="line">	-Bdynamic \</span><br><span class="line">	-lc	\</span><br><span class="line">	-O0</span><br><span class="line"></span><br><span class="line">OBJS=$(MODULE_NAME).o \</span><br><span class="line">	$(PLATFORM_LIB)\crtbegin_dynamic.o \</span><br><span class="line">	$(PLATFORM_LIB)\crtend_android.o</span><br><span class="line"></span><br><span class="line">all:</span><br><span class="line">	$(TOOLCHAINS_PREFIX)-gcc $(FLAGS) -c $(MODULE_NAME).$(BUILD_TYPE) -o $(MODULE_NAME).o -pie -fPIE</span><br><span class="line">	$(TOOLCHAINS_PREFIX)-gcc $(FLAGS) -S $(MODULE_NAME).$(BUILD_TYPE) -o $(MODULE_NAME).S -pie -fPIE</span><br><span class="line">	$(TOOLCHAINS_PREFIX)-gcc $(FLAGS) $(OBJS) -o $(MODULE_NAME) -pie -fPIE</span><br><span class="line">clean:</span><br><span class="line">	$(RM) *.o</span><br><span class="line">install:</span><br><span class="line">	adb push $(MODULE_NAME) $(PATH_ANDROID)</span><br><span class="line">	adb shell chmod 755 $(PATH_ANDROID)$(MODULE_NAME)</span><br><span class="line">	adb shell $(PATH_ANDROID)$(MODULE_NAME)</span><br></pre></td></tr></table></figure>
+<p>编译后如下，会生成一个无后缀的可执行文件。丢到IDA中。点击for1函数，空格切换图形视图。一般看到这种形式的箭头指向的时候基本就是for或者while语句。</p>
 <p><img src="\2019\07\ARM原生循环语句逆向分析\1561960721772.png" alt="1561960721772"></p>
 <h4 id="1-for1函数"><a href="#1-for1函数" class="headerlink" title="1. for1函数"></a>1. for1函数</h4><p>查看第一个汇编指令块，创建了三个函数，开头先做了保存子程序现场，开启堆栈空间。R0-R3，是用作传入变量寄存器，所以此处有三个变量，分别为，var_10, var_8, var_c。最后强制跳转到loc_3e8标记处。</p>
 <p><img src="\2019\07\ARM原生循环语句逆向分析\1561962684226.png" alt="1561962684226"></p>
 <p>loc_3e8处的汇编代码块，从存储器中加载两个变量值到R2，R3然后对比两个变量，如果R2小于R3，则跳转到loc_3c8标记处。其中对var_8做了一次逻辑左移处理，相当于R3 = R3 * 2^1。再获取变量var_c，执行操作R3 = R3 +R2，再存储到存储器中。下面就相当于for循环中的循环变量自加。最后循环跳出后，再把var_c的值返回。</p>
 <p><img src="\2019\07\ARM原生循环语句逆向分析\1561964069808.png" alt="1561964069808"></p>
 <p>按照以上逻辑写一段C代码，如下：</p>
-<pre><code>int for1(int var_10){
-    int var_8 = 0;
-    int var_c = 0;
-    for(var_8 = 0; var_8 &lt; var_10; var_8++){
-        var_c = var_c + var_8 &lt;&lt; 1;
-    }
-    return var_c;
-}
-</code></pre><h4 id="2-for2函数"><a href="#2-for2函数" class="headerlink" title="2. for2函数"></a>2. for2函数</h4><p>for2跟如上的for1基本类似，就是内部处理处有点不一样，其中nums，点击一下就可以看到是五位的数组，具体是，先var_8自乘，然后读取nums数组，R3为nums数组的地址值，也就是nums[var_10 -1]，再加var_8的自乘和var_c。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">int for1(int var_10)&#123;</span><br><span class="line">    int var_8 = 0;</span><br><span class="line">    int var_c = 0;</span><br><span class="line">    for(var_8 = 0; var_8 &lt; var_10; var_8++)&#123;</span><br><span class="line">        var_c = var_c + var_8 &lt;&lt; 1;</span><br><span class="line">    &#125;</span><br><span class="line">    return var_c;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="2-for2函数"><a href="#2-for2函数" class="headerlink" title="2. for2函数"></a>2. for2函数</h4><p>for2跟如上的for1基本类似，就是内部处理处有点不一样，其中nums，点击一下就可以看到是五位的数组，具体是，先var_8自乘，然后读取nums数组，R3为nums数组的地址值，也就是nums[var_10 -1]，再加var_8的自乘和var_c。</p>
 <p><img src="\2019\07\ARM原生循环语句逆向分析\1562135688840.png" alt="1562135688840"></p>
 <p>C代码：</p>
-<pre><code>int nums[5] = {1,2,3,4,5};
-int for2(int var_10){
-    int var_8 = 0;
-    int var_c = 0;
-    for(var_8 = 0; var_8 &lt; var_10; var_8++){
-        var_c =var_c + var_8* var_8  + nums[var_10 - 1];
-    }
-    return var_c;
-}
-</code></pre><h4 id="3-dowhile函数"><a href="#3-dowhile函数" class="headerlink" title="3. dowhile函数"></a>3. dowhile函数</h4><p>其中大部分都类似以上汇编代码，其中dowhile和whiledo存在有明显不同，dowhile是先执行内部的汇编代码，变量执行自加等操作，最后在判断是否一致，循环体上大致类似如下图，而whiledo更类似于如上的for循环体。汇编中并没有强制跳转，而且跳转标记在判断跳转处的上方。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">int nums[5] = &#123;1,2,3,4,5&#125;;</span><br><span class="line">int for2(int var_10)&#123;</span><br><span class="line">    int var_8 = 0;</span><br><span class="line">    int var_c = 0;</span><br><span class="line">    for(var_8 = 0; var_8 &lt; var_10; var_8++)&#123;</span><br><span class="line">        var_c =var_c + var_8* var_8  + nums[var_10 - 1];</span><br><span class="line">    &#125;</span><br><span class="line">    return var_c;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="3-dowhile函数"><a href="#3-dowhile函数" class="headerlink" title="3. dowhile函数"></a>3. dowhile函数</h4><p>其中大部分都类似以上汇编代码，其中dowhile和whiledo存在有明显不同，dowhile是先执行内部的汇编代码，变量执行自加等操作，最后在判断是否一致，循环体上大致类似如下图，而whiledo更类似于如上的for循环体。汇编中并没有强制跳转，而且跳转标记在判断跳转处的上方。</p>
 <p><img src="\2019\07\ARM原生循环语句逆向分析\1561972796048.png" alt="1561972796048"></p>
 <p>根据汇编代码写出大致的C代码。</p>
-<pre><code>int dowhile(int var_10){
-    int var_8 = 1;
-    int var_c = 0;
-    do{
-        var_c = var_8 + var_c;
-        var_8 = var_8 + 1;
-    }while(var_8 &lt; var_10)
-    return var_c
-}
-</code></pre><h4 id="4-whiledo函数"><a href="#4-whiledo函数" class="headerlink" title="4. whiledo函数"></a>4. whiledo函数</h4><p>whiledo从结构体上和for1相同，本来这两种循环就及其类似，主要查看的时候能分清while循环的特点和逻辑来区分，哪个参数为判断参数，哪个参数为计算参数。在B指令执行的地方，就为for和while的判断指令。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">int dowhile(int var_10)&#123;</span><br><span class="line">    int var_8 = 1;</span><br><span class="line">    int var_c = 0;</span><br><span class="line">    do&#123;</span><br><span class="line">        var_c = var_8 + var_c;</span><br><span class="line">        var_8 = var_8 + 1;</span><br><span class="line">    &#125;while(var_8 &lt; var_10)</span><br><span class="line">    return var_c</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="4-whiledo函数"><a href="#4-whiledo函数" class="headerlink" title="4. whiledo函数"></a>4. whiledo函数</h4><p>whiledo从结构体上和for1相同，本来这两种循环就及其类似，主要查看的时候能分清while循环的特点和逻辑来区分，哪个参数为判断参数，哪个参数为计算参数。在B指令执行的地方，就为for和while的判断指令。</p>
 <p><img src="\2019\07\ARM原生循环语句逆向分析\1562122434389.png" alt="1562122434389"></p>
 <p>根据汇编代码写出大致的C代码。</p>
-<pre><code>int whiledo(int var_10){
-    int var_8 = 1;
-    int var_c = 0;
-    while(var_8 &lt;= var_10){
-        var_8 = var_8 + 1;
-        var_c = var_c + var_8;
-    }
-    return var_c
-}
-</code></pre><h4 id="5-if1-函数"><a href="#5-if1-函数" class="headerlink" title="5. if1 函数"></a>5. if1 函数</h4><p>如下，具有单分支的if结构体可以看出是if-else判断形式</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">int whiledo(int var_10)&#123;</span><br><span class="line">    int var_8 = 1;</span><br><span class="line">    int var_c = 0;</span><br><span class="line">    while(var_8 &lt;= var_10)&#123;</span><br><span class="line">        var_8 = var_8 + 1;</span><br><span class="line">        var_c = var_c + var_8;</span><br><span class="line">    &#125;</span><br><span class="line">    return var_c</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="5-if1-函数"><a href="#5-if1-函数" class="headerlink" title="5. if1 函数"></a>5. if1 函数</h4><p>如下，具有单分支的if结构体可以看出是if-else判断形式</p>
 <p><img src="\2019\07\ARM原生循环语句逆向分析\1562123715096.png" alt="1562123715096"></p>
 <p>按照汇编意思，C代码如下：</p>
-<pre><code>void if1(int var_8){
-    if(var_8 &gt; 9){
-        puts(&quot;the number greater than or equal to 10&quot;);
-    }else{
-        puts(&quot;the number less than 10&quot;);
-    }
-}
-</code></pre><p>在if判断中，判断体在汇编中和原代码是相反的，意思是var_8 &gt; 9原文应该是var_8 &lt;=9 。printf也由puts来改变输出，puts输出会自动添加换行符，也就不在需要原文中的\n。</p>
-<pre><code>void if1(int var_8){
-    if(var_8 &lt;= 9){
-        puts(&quot;the number less than 10&quot;);
-    }else{
-        puts(&quot;the number greater than or equal to 10&quot;);
-    }
-}
-</code></pre><h4 id="6-if2函数"><a href="#6-if2函数" class="headerlink" title="6. if2函数"></a>6. if2函数</h4><p>多判断结构体，也就是if-else-if</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">void if1(int var_8)&#123;</span><br><span class="line">    if(var_8 &gt; 9)&#123;</span><br><span class="line">        puts(&quot;the number greater than or equal to 10&quot;);</span><br><span class="line">    &#125;else&#123;</span><br><span class="line">        puts(&quot;the number less than 10&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>在if判断中，判断体在汇编中和原代码是相反的，意思是var_8 &gt; 9原文应该是var_8 &lt;=9 。printf也由puts来改变输出，puts输出会自动添加换行符，也就不在需要原文中的\n。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">void if1(int var_8)&#123;</span><br><span class="line">    if(var_8 &lt;= 9)&#123;</span><br><span class="line">        puts(&quot;the number less than 10&quot;);</span><br><span class="line">    &#125;else&#123;</span><br><span class="line">        puts(&quot;the number greater than or equal to 10&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="6-if2函数"><a href="#6-if2函数" class="headerlink" title="6. if2函数"></a>6. if2函数</h4><p>多判断结构体，也就是if-else-if</p>
 <p><img src="\2019\07\ARM原生循环语句逆向分析\1562125307657.png" alt="1562125307657"></p>
 <p>其中可以看到有多个LDR计算赋值指令，此处的LDR和MOV类似，只是有些时候MOV不适合使用，所以用LDR来赋值计算。</p>
-<pre><code>LDR     R3, =(aHeIsABoy - 0x5D0)
-</code></pre><p>代表意思就是，aHeIsABoy的地址值减去0x5D0，赋值给R3。仔细看一下就可以明白，其中的参数都是原字符串。LDR就是aHeIsABoy减去0x5D0，此处是07EC减去0x5D0，为021C。而PC，程序计数器，指的是BL的地址值。详细参考：<a href="https://www.cnblogs.com/ichunqiu/p/9056630.html" target="_blank" rel="noopener">https://www.cnblogs.com/ichunqiu/p/9056630.html</a></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">LDR     R3, =(aHeIsABoy - 0x5D0)</span><br></pre></td></tr></table></figure>
+<p>代表意思就是，aHeIsABoy的地址值减去0x5D0，赋值给R3。仔细看一下就可以明白，其中的参数都是原字符串。LDR就是aHeIsABoy减去0x5D0，此处是07EC减去0x5D0，为021C。而PC，程序计数器，指的是BL的地址值。详细参考：<a href="https://www.cnblogs.com/ichunqiu/p/9056630.html" target="_blank" rel="noopener">https://www.cnblogs.com/ichunqiu/p/9056630.html</a></p>
 <p>也就是说，执行到ADD的时候，MOV在译码阶段，BL在取址阶段。PC寄存器总是指向随后的第三条指令。</p>
 <p>用BL的地址值加上R3，05D0加上021C为7EC，也就是aHeIsABoy的地址值，当然IDA已经识别出来并注释到其后。再把字符串由puts输出。</p>
-<pre><code>LDR     R3, =(aHeIsABoy - 0x5D0)     //000007EC aHeIsABoy       DCB &quot;he is a boy&quot;,0
-ADD     R3, PC, R3      ; &quot;he is a boy&quot;
-MOV     R0, R3          ; s
-BL      puts
-B       loc_628
-</code></pre><p>按照汇编意思，C代码如下：</p>
-<pre><code>void if2(int var_8){
-    if(var_8 &gt; 15){
-        if(var_8 &gt; 29){
-            if(var_8 &gt; 44){
-                puts(&quot;he is an old man&quot;);
-            }
-            else{
-                puts(&quot;he is a strong man&quot;);
-            }
-        }
-        else{
-            puts(&quot;he is a young man&quot;);
-        }
-    }
-    else{
-        puts(&quot;he is a boy&quot;);
-    }
-}
-</code></pre><p>由于汇编对判断的形式，用else if的形式可以这么写</p>
-<pre><code>void if2(int var_8){
-    if(var_8 &lt;= 15){
-        puts(&quot;he is a boy&quot;);
-    }
-    else if(var_8 &lt;= 29){
-        puts(&quot;he is a young man&quot;);
-    }
-    else if(var_8 &lt;= 44){
-        puts(&quot;he is a strong man&quot;);
-    }
-    else{
-        puts(&quot;he is an old man&quot;);
-    }
-}
-</code></pre><p>看完以上的汇编分析后，可以得到循环体的特点，循环体一般为以下：</p>
-<pre><code>....    //汇编代码
-B loc_xxx
-....
-CMP r1, r2
-BXX loc_xxx
-....
-BX LR
-</code></pre><p>判断形式一般为以下：</p>
-<pre><code>    ....
-    CMP R1, R2
-    BXX loc_xxx
-    ....
-loc_xxx
-    ....
-    B   loc_zzz
-loc_zzz
-    ....
-</code></pre><p>当然，以上CMP后并不一定会跟随B指令，也会由其他条件执行指令，例如：</p>
-<pre><code>CMP R2, R3
-ADDEQ R2, R3, #1
-</code></pre><p>其中寄存器存值，仍然是需要注意点，不小心会看错赋值，如下：</p>
-<pre><code>LDR     R3, [R11,#var_8]
-LDR     R2, [R11,#var_C] 
-ADD     R3, R2, R3      
-</code></pre><p>在执行一些类似ADD的指令操作后，其中的R3已不在代表var_8，其中的结果跟ADD后所获取到的R3赋值有关，这种情况可以看成：</p>
-<pre><code>a = 1;
-b = 2;
-a = a + b;  //3
-</code></pre><p>所以，其中a的值已不在是1，同样如上中，R3也为此，在初期可能在不能连续查看汇编代码的情况下，会犯这种失误。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">LDR     R3, =(aHeIsABoy - 0x5D0)     //000007EC aHeIsABoy       DCB &quot;he is a boy&quot;,0</span><br><span class="line">ADD     R3, PC, R3      ; &quot;he is a boy&quot;</span><br><span class="line">MOV     R0, R3          ; s</span><br><span class="line">BL      puts</span><br><span class="line">B       loc_628</span><br></pre></td></tr></table></figure>
+<p>按照汇编意思，C代码如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">void if2(int var_8)&#123;</span><br><span class="line">    if(var_8 &gt; 15)&#123;</span><br><span class="line">        if(var_8 &gt; 29)&#123;</span><br><span class="line">            if(var_8 &gt; 44)&#123;</span><br><span class="line">                puts(&quot;he is an old man&quot;);</span><br><span class="line">            &#125;</span><br><span class="line">            else&#123;</span><br><span class="line">                puts(&quot;he is a strong man&quot;);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        else&#123;</span><br><span class="line">            puts(&quot;he is a young man&quot;);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    else&#123;</span><br><span class="line">        puts(&quot;he is a boy&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>由于汇编对判断的形式，用else if的形式可以这么写</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">void if2(int var_8)&#123;</span><br><span class="line">    if(var_8 &lt;= 15)&#123;</span><br><span class="line">        puts(&quot;he is a boy&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">    else if(var_8 &lt;= 29)&#123;</span><br><span class="line">        puts(&quot;he is a young man&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">    else if(var_8 &lt;= 44)&#123;</span><br><span class="line">        puts(&quot;he is a strong man&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">    else&#123;</span><br><span class="line">        puts(&quot;he is an old man&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>看完以上的汇编分析后，可以得到循环体的特点，循环体一般为以下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">....    //汇编代码</span><br><span class="line">B loc_xxx</span><br><span class="line">....</span><br><span class="line">CMP r1, r2</span><br><span class="line">BXX loc_xxx</span><br><span class="line">....</span><br><span class="line">BX LR</span><br></pre></td></tr></table></figure>
+<p>判断形式一般为以下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">    ....</span><br><span class="line">    CMP R1, R2</span><br><span class="line">    BXX loc_xxx</span><br><span class="line">    ....</span><br><span class="line">loc_xxx</span><br><span class="line">	....</span><br><span class="line">	B   loc_zzz</span><br><span class="line">loc_zzz</span><br><span class="line">	....</span><br></pre></td></tr></table></figure>
+<p>当然，以上CMP后并不一定会跟随B指令，也会由其他条件执行指令，例如：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">CMP R2, R3</span><br><span class="line">ADDEQ R2, R3, #1</span><br></pre></td></tr></table></figure>
+<p>其中寄存器存值，仍然是需要注意点，不小心会看错赋值，如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">LDR     R3, [R11,#var_8]</span><br><span class="line">LDR     R2, [R11,#var_C] </span><br><span class="line">ADD     R3, R2, R3</span><br></pre></td></tr></table></figure>
+<p>在执行一些类似ADD的指令操作后，其中的R3已不在代表var_8，其中的结果跟ADD后所获取到的R3赋值有关，这种情况可以看成：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">a = 1;</span><br><span class="line">b = 2;</span><br><span class="line">a = a + b;  //3</span><br></pre></td></tr></table></figure>
+<p>所以，其中a的值已不在是1，同样如上中，R3也为此，在初期可能在不能连续查看汇编代码的情况下，会犯这种失误。</p>
 <h4 id="main-函数"><a href="#main-函数" class="headerlink" title="main 函数"></a>main 函数</h4><p>main函数中的赋值和返回值寄存器对应之前函数中的返回和赋值，如MOV R0, #5。在for1中，R0赋值给var_10。</p>
 <p>同时返回值在R0中。</p>
 <p><img src="\2019\07\ARM原生循环语句逆向分析\1562137477746.png" alt="1562137477746"></p>

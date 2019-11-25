@@ -119,30 +119,19 @@
 <p>反编译后如下代码：</p>
 <p><img src="\2019\02\Android-代码插桩\1550137101280.png" alt="1550137101280"></p>
 <p>分析代码可以看到，如果需要打印输出，则实际获取到字符串的代码为</p>
-<pre><code>Name.getText().toString().trim()
-</code></pre><p>因此，需要在onClick函数中打印输出，函数需要在按钮事件中触发，按钮相关的事件代码在MainActivity$1中。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Name.getText().toString().trim()</span><br></pre></td></tr></table></figure>
+<p>因此，需要在onClick函数中打印输出，函数需要在按钮事件中触发，按钮相关的事件代码在MainActivity$1中。</p>
 <p><img src="\2019\02\Android-代码插桩\1550137282454.png" alt="1550137282454"></p>
 <p>在MainActivity$1中查看onClick函数。</p>
 <p><img src="\2019\02\Android-代码插桩\1550137354347.png" alt="1550137354347"></p>
 <p>假设，需要打印输入的name变量。则需要在如下添加：</p>
-<pre><code>iget-object v1, p0, Lcom/example/user/application/MainActivity$1;-&gt;this$0:Lcom/example/user/application/MainActivity;
-
-    iget-object v1, v1, Lcom/example/user/application/MainActivity;-&gt;Name:Landroid/widget/EditText;
-
-    invoke-virtual {v1}, Landroid/widget/EditText;-&gt;getText()Landroid/text/Editable;
-
-    move-result-object v1
-
-    invoke-virtual {v1}, Ljava/lang/Object;-&gt;toString()Ljava/lang/String;
-
-    move-result-object v1
-</code></pre><p>此内容为上图中关于带入name的smali代码，意思是，从MainActivity获取实例对象。赋值给v1寄存器，然后再调用getText()函数和toString()函数。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">iget-object v1, p0, Lcom/example/user/application/MainActivity$1;-&gt;this$0:Lcom/example/user/application/MainActivity;</span><br><span class="line"></span><br><span class="line">    iget-object v1, v1, Lcom/example/user/application/MainActivity;-&gt;Name:Landroid/widget/EditText;</span><br><span class="line"></span><br><span class="line">    invoke-virtual &#123;v1&#125;, Landroid/widget/EditText;-&gt;getText()Landroid/text/Editable;</span><br><span class="line"></span><br><span class="line">    move-result-object v1</span><br><span class="line"></span><br><span class="line">    invoke-virtual &#123;v1&#125;, Ljava/lang/Object;-&gt;toString()Ljava/lang/String;</span><br><span class="line"></span><br><span class="line">    move-result-object v1</span><br></pre></td></tr></table></figure>
+<p>此内容为上图中关于带入name的smali代码，意思是，从MainActivity获取实例对象。赋值给v1寄存器，然后再调用getText()函数和toString()函数。</p>
 <p>在添加</p>
-<pre><code>const-string v0, &quot;message&quot;
- invoke-static {v0, v1}, Landroid/util/Log;-&gt;i(Ljava/lang/String;Ljava/lang/String;)I
-</code></pre><p>意思是调用Log.i函数打印输入，如上添加内容换算成Java代码类似于</p>
-<pre><code>Log.i(&quot;message&quot;,Name.getText().toString());
-</code></pre><p>回编译安装运行，监听日志输出，点击按钮事件可以看到如下的日志输出。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">const-string v0, &quot;message&quot;</span><br><span class="line"> invoke-static &#123;v0, v1&#125;, Landroid/util/Log;-&gt;i(Ljava/lang/String;Ljava/lang/String;)I</span><br></pre></td></tr></table></figure>
+<p>意思是调用Log.i函数打印输入，如上添加内容换算成Java代码类似于</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Log.i(&quot;message&quot;,Name.getText().toString());</span><br></pre></td></tr></table></figure>
+<p>回编译安装运行，监听日志输出，点击按钮事件可以看到如下的日志输出。</p>
 <p><img src="\2019\02\Android-代码插桩\1550137723095.png" alt="1550137723095"></p>
 <p>此种形式可以用在获取函数变量值和某些动态生成的参数中，来理解程序运行的结果和函数运行的方式。</p>
 

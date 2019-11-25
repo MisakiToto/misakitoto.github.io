@@ -110,6 +110,29 @@
             
             
                 <div class="col-md-11">
+                    <a href="/2019/08/重放攻击/" class="h3 title" target="_self">重放攻击</a>
+                    
+                    <p>重放攻击1. 漏洞简介​        首先简单看一下百度百科对重放攻击的简介：重放攻击(Replay Attacks)又称重播攻击、回放攻击，是指攻击者发送一个目的主机已接收过的包，来达到欺骗系统的目的，主要用于身份认证过程，破坏认证的正确性。重放攻击可以由发起者，也可以由拦截并重发该数据的敌方进行。攻击者利用网络监听或者其他方式盗取认证凭据，之...</p>
+                    
+                    
+                    <p class="h6">
+                        <i class="material-icons">date_range</i>2019-08-28
+                        
+                            <i class="material-icons">bookmark_border</i>
+                                
+                                    web安全 &nbsp;
+                                
+                        
+                    </p>
+                    
+                </div>
+        </div>
+       
+        
+        <div class="row post-card">
+            
+            
+                <div class="col-md-11">
                     <a href="/2019/08/2018-SWPUCTF/" class="h3 title" target="_self">2018 SWPUCTF</a>
                     
                     <p>某日在GitHub中看到了一些CTF使用的安卓逆向分析题，其中一个是SWPUCTF，是个没怎么听过的CTF。虽然我不怎么了解CTF。23333
@@ -138,17 +161,7 @@ app-debug1.apk把apk丢到AK中，反编译，结果中有一个目录是assert/
                     <a href="/2019/07/结构体链表逆向/" class="h3 title" target="_self">结构体链表逆向</a>
                     
                     <p>结构体链表逆向同样使用如下的C代码：
-#include &lt;stdio.h&gt;
-#include &lt;stdlib.h&gt;
-typedef struct _student
-{
-    char name[32];
-    int age;
-    struct _student * next;
-}T_student;
-
-
-T_stu...</p>
+12345678910111213141516171819202122232425262728293031323334353637383940#include &lt;stdio.h&gt;#include &lt;stdlib.h&gt;typedef struct _student&#123;	char n...</p>
                     
                     
                     <p class="h6">
@@ -172,15 +185,7 @@ T_stu...</p>
                     <a href="/2019/07/ARM数组重定向/" class="h3 title" target="_self">ARM数组重定向</a>
                     
                     <p>ARM数组重定向使用如下的C代码做演示，代码是无名侠的一份数组演示代码。如下：
-#include &lt;stdio.h&gt;
-// Arrays
-
-int g_Table[100];
-int g_Table2[100];
-
-void PrintAddr()
-{
-    printf(&quot;g_Table:0x%x\ng_Table2:%x...</p>
+12345678910111213141516171819202122232425262728293031323334353637383940414243444546474849505152#include &lt;stdio.h&gt;// Arraysint g_T...</p>
                     
                     
                     <p class="h6">
@@ -206,8 +211,8 @@ void PrintAddr()
                     <p>Redis主从复制redis主从复制，前几天分享的新版redis未授权利用的新型方式。
 什么是主从复制，http://blog.itpub.net/31545684/viewspace-2213629/
 通过redis命令来设置主从机
-127.0.0.1:6379&gt; slaveof 192.168.253.131 6379
-被设置的主机将通过...</p>
+1127.0.0.1:6379&gt; slaveof 192.168.253.131 6379
+被设置的主机将通...</p>
                     
                     
                     <p class="h6">
@@ -241,42 +246,6 @@ void PrintAddr()
                             <i class="material-icons">bookmark_border</i>
                                 
                                     web安全 &nbsp;
-                                
-                        
-                    </p>
-                    
-                </div>
-        </div>
-       
-        
-        <div class="row post-card">
-            
-            
-                <div class="col-md-11">
-                    <a href="/2019/07/逆向函数分析引用/" class="h3 title" target="_self">逆向函数分析引用</a>
-                    
-                    <p>代码编译，使用代码如下:
-#include &lt;stdio.h&gt;
-#include &lt;string.h&gt;
-int fun1()
-{
-    int a;
-    int b;
-    b=10;
-    a=b++;
-    return a;
-}
-int fun2(int a,int b)
-{
-    return a+b+...</p>
-                    
-                    
-                    <p class="h6">
-                        <i class="material-icons">date_range</i>2019-07-09
-                        
-                            <i class="material-icons">bookmark_border</i>
-                                
-                                    Android逆向 &nbsp;
                                 
                         
                     </p>

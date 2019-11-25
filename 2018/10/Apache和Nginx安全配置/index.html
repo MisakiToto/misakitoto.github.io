@@ -127,17 +127,10 @@
 <p>那么简单理解一下，配置参数的含义和使用，Allow和Deny可以用于apache的conf文件或者.htaccess文件中（配合Directory, Location, Files等），用来控制目录和文件的访问授权。<br>所以，最常用的是：<br>Order Deny,Allow<br>Allow from All</p>
 <p>注意“Deny,Allow”中间只有一个逗号，也只能有一个逗号，有空格都会出错；单词的大小写不限。上面设定的含义是先设定“先检查禁止设定，没有禁止的全部允许”，而第二句没有Deny，也就是没有禁止访问的设定，直接就是允许所有访问了。</p>
 <p>但是如果想限制IP访问，如下写</p>
-<pre><code>Order Deny,Allow
-Deny from 192.168.1.1
-Allow from all
-</code></pre><p>这时候限制不起作用，Order取规则为最后一个Allow规则，首先限制IP访问，但是会继续查看Allow规定指定的信息，IP又在all中，所以限制不起作用。所以可以如下写：</p>
-<pre><code>Order Deny,Allow
-Deny from 192.168.1.1
-或者
-Order Allow,Deny
-Allow from all
-Deny from 192.168.1.1
-</code></pre><p>比如：如下的常用配置</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Order Deny,Allow</span><br><span class="line">Deny from 192.168.1.1</span><br><span class="line">Allow from all</span><br></pre></td></tr></table></figure>
+<p>这时候限制不起作用，Order取规则为最后一个Allow规则，首先限制IP访问，但是会继续查看Allow规定指定的信息，IP又在all中，所以限制不起作用。所以可以如下写：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">Order Deny,Allow</span><br><span class="line">Deny from 192.168.1.1</span><br><span class="line">或者</span><br><span class="line">Order Allow,Deny</span><br><span class="line">Allow from all</span><br><span class="line">Deny from 192.168.1.1</span><br></pre></td></tr></table></figure>
+<p>比如：如下的常用配置</p>
 <p>1、在配置文件开始部分和下部有两个配置项，用来隐藏banner信息：</p>
 <p><code>ServerTokens OS</code>　 修改为：<code>ServerTokens Prod</code> </p>
 <p>（在出现错误页的时候不显示服务器操作系统的名称）<br><code>ServerSignature On</code> 修改为：<code>ServerSignature Off</code></p>
@@ -145,194 +138,69 @@ Deny from 192.168.1.1
 <p>2、apache在一些系统的默认配置中，开启目录浏览，所以可以使用以下关闭设置。</p>
 <p>将<code>Options Indexes FollowSymLinks</code> 改为 <code>Options -Indexes FollowSymLinks</code> </p>
 <p>3、取消部分目录的php执行权限</p>
-<pre><code>&lt;Directory &quot;/var/www/html/upload&quot;&gt;     
-    &lt;FilesMatch &quot;\.(?i:php|php3|php5)$&quot;&gt;     
-        Deny from all     
-    &lt;/FilesMatch&gt; 
-&lt;/Directory&gt; 
-//在upload目录下，尽可能多匹配后缀php|php3|php5的文件，不分大小写。
-</code></pre><p>还可以在主机配置文件中增加php_flag engine off指令即可，配置如下：</p>
-<pre><code>Options FollowSymLinks
-AllowOverride None
-Order allow,deny
-Allow from all 
-php_flag engine off
-</code></pre><p>5、配置httpd.conf限制一些特殊目录的特定ip访问，如内部接口等。</p>
-<pre><code>&lt;Directory &quot;/var/www/html/aaa&quot;&gt;     
-    Order Deny,Allow
-    Deny from all
-    Allow from 192.168.1.111    
-&lt;/Directory&gt; 
-</code></pre><p>6、配置httpd.conf限制一些文件类型的访问，如txt的日志</p>
-<pre><code>&lt;Files ~ &quot;.txt$&quot;&gt; 
-    Order allow,deny 
-    Deny from all 
-&lt;/Files&gt;
-</code></pre><p>7、针对URL相对路径的禁止访问：</p>
-<pre><code>&lt;Location /dir/&gt;
-Order allow,deny
-Deny from all
-&lt;/Location&gt;
-</code></pre><h3 id="Nginx-安全配置"><a href="#Nginx-安全配置" class="headerlink" title="Nginx 安全配置"></a>Nginx 安全配置</h3><h4 id="nginx-工作原理"><a href="#nginx-工作原理" class="headerlink" title="nginx 工作原理"></a>nginx 工作原理</h4><p>Nginx由内核和模块组成，nginx核心模块包括：HTTP模块、EVENT模块和MAIL模块。nginx仅仅通过查找配置文件将客户端请求映射到一个location block（location是Nginx配置中的一个指令，用于URL匹配），而在这个location中所配置的每个指令将会启动不同的模块去完成相应的工作。nginx架构类似于Apache的Worker工作状态，Nginx的每一个Worker进程都管理着大量的线程，真正处理请求的是Worker之下的线程。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&lt;Directory &quot;/var/www/html/upload&quot;&gt;     </span><br><span class="line">    &lt;FilesMatch &quot;\.(?i:php|php3|php5)$&quot;&gt;     </span><br><span class="line">        Deny from all     </span><br><span class="line">    &lt;/FilesMatch&gt; </span><br><span class="line">&lt;/Directory&gt; </span><br><span class="line">//在upload目录下，尽可能多匹配后缀php|php3|php5的文件，不分大小写。</span><br></pre></td></tr></table></figure>
+<p>还可以在主机配置文件中增加php_flag engine off指令即可，配置如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Options FollowSymLinks</span><br><span class="line">AllowOverride None</span><br><span class="line">Order allow,deny</span><br><span class="line">Allow from all </span><br><span class="line">php_flag engine off</span><br></pre></td></tr></table></figure></p>
+<p>5、配置httpd.conf限制一些特殊目录的特定ip访问，如内部接口等。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&lt;Directory &quot;/var/www/html/aaa&quot;&gt;     </span><br><span class="line">    Order Deny,Allow</span><br><span class="line">    Deny from all</span><br><span class="line">    Allow from 192.168.1.111    </span><br><span class="line">&lt;/Directory&gt;</span><br></pre></td></tr></table></figure>
+<p>6、配置httpd.conf限制一些文件类型的访问，如txt的日志</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&lt;Files ~ &quot;.txt$&quot;&gt; </span><br><span class="line">    Order allow,deny </span><br><span class="line">    Deny from all </span><br><span class="line">&lt;/Files&gt;</span><br></pre></td></tr></table></figure>
+<p>7、针对URL相对路径的禁止访问：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&lt;Location /dir/&gt;</span><br><span class="line">Order allow,deny</span><br><span class="line">Deny from all</span><br><span class="line">&lt;/Location&gt;</span><br></pre></td></tr></table></figure>
+<h3 id="Nginx-安全配置"><a href="#Nginx-安全配置" class="headerlink" title="Nginx 安全配置"></a>Nginx 安全配置</h3><h4 id="nginx-工作原理"><a href="#nginx-工作原理" class="headerlink" title="nginx 工作原理"></a>nginx 工作原理</h4><p>Nginx由内核和模块组成，nginx核心模块包括：HTTP模块、EVENT模块和MAIL模块。nginx仅仅通过查找配置文件将客户端请求映射到一个location block（location是Nginx配置中的一个指令，用于URL匹配），而在这个location中所配置的每个指令将会启动不同的模块去完成相应的工作。nginx架构类似于Apache的Worker工作状态，Nginx的每一个Worker进程都管理着大量的线程，真正处理请求的是Worker之下的线程。</p>
 <p>nginx本身不能处理PHP，它只是个web服务器，当接收到请求后，如果是php请求，则发给php解释器处理，并把结果返回给客户端。nginx一般是把请求发fastcgi管理进程处理，fastcgi管理进程选择cgi子进程处理结果并返回被nginx。</p>
 <p>nginx涉及到两个账户，一个是nginx的运行账户，一个是php-fpm的运行账户。如果访问的是一个静态文件，则只需要nginx的运行账户对文件具有读取权限；而如果访问的是一个php文件，则首先需要nginx的运行账户对文件有读取权限，读取到文件后发现是一个php文件，则转发给php-fpm，此时则需要php-fpm账户对文件具有读取权限。  </p>
 <h4 id="nginx-在centos下的安全配置"><a href="#nginx-在centos下的安全配置" class="headerlink" title="nginx 在centos下的安全配置"></a>nginx 在centos下的安全配置</h4><ol>
 <li>nginx设置问题</li>
 </ol>
-<pre><code>#隐藏 Nginx 的版本号，提高安全性。
-    server_tokens off;
-#开启高效文件传输模式，sendfile 指令指定 Nginx 是否调用sendfile 函数来输出文件，对于普通应用设为 on，如果用来进行下载等应用磁盘 IO 重负载应用，可设置为 off，以平衡磁盘与网络 I/O 处理速度，降低系统的负载。
-    sendfile on;
-#是否开启目录列表访问，默认关闭。
-    autoindex off;
-</code></pre><p>开头的配置</p>
-<pre><code>user www-data;   //用户和组
-worker_processes auto;   //进程数
-pid /run/nginx.pid;  //进程文件
-include /etc/nginx/modules-enabled/*.conf;  //导入其他配置文件到nginx配置文件
-</code></pre><p>events配置</p>
-<pre><code>events {
-    worker_connections 768;   //设置一个worker进程同时打开的最大连接数
-    # multi_accept on;    //告诉nginx收到一个新连接通知后接受尽可能多的连接
-}
-</code></pre><p>http配置</p>
-<pre><code>http {
-
-    ##
-    # Basic Settings
-    ##
-
-    sendfile on;      //开启高效文件传输模式
-    tcp_nopush on;     //告诉 Nginx 在一个数据包里发送所有头文件
-    tcp_nodelay on;    //告诉 Nginx 不要缓存数据，而是一段一段的发送
-    keepalive_timeout 65;   //连接超时时间，单位是秒
-    types_hash_max_size 2048;   //上传文件大小限制    
-    # server_tokens off;      //隐藏 Nginx 的版本号
-
-    # server_names_hash_bucket_size 64;
-    # server_name_in_redirect off;
-
-    include /etc/nginx/mime.types;   //包含配置
-    default_type application/octet-stream;  //默认传输类型
-
-    ##
-    # SSL Settings    
-    ##
-
-    ssl_protocols TLSv1 TLSv1.1 TLSv1.2; # Dropping SSLv3, ref: POODLE
-    ssl_prefer_server_ciphers on;
-
-    ##
-    # Logging Settings
-    ##
-
-    access_log /var/log/nginx/access.log;   //访问日志
-    error_log /var/log/nginx/error.log;     //错误日志
-
-    ##
-    # Gzip Settings
-    ##
-
-    gzip on;
-
-    # gzip_vary on;
-    # gzip_proxied any;
-    # gzip_comp_level 6;
-    # gzip_buffers 16 8k;
-    # gzip_http_version 1.1;
-    # gzip_types text/plain text/css application/json application/javascript text/xml application/xml application/xml+rss text/javascript;
-
-    ##
-    # Virtual Host Configs
-    ##
-
-    include /etc/nginx/conf.d/*.conf;
-    include /etc/nginx/sites-enabled/*;
-}
-
-</code></pre><p>server配置</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">#隐藏 Nginx 的版本号，提高安全性。</span><br><span class="line">    server_tokens off;</span><br><span class="line">#开启高效文件传输模式，sendfile 指令指定 Nginx 是否调用sendfile 函数来输出文件，对于普通应用设为 on，如果用来进行下载等应用磁盘 IO 重负载应用，可设置为 off，以平衡磁盘与网络 I/O 处理速度，降低系统的负载。</span><br><span class="line">    sendfile on;</span><br><span class="line">#是否开启目录列表访问，默认关闭。</span><br><span class="line">    autoindex off;</span><br></pre></td></tr></table></figure>
+<p>开头的配置</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">user www-data;   //用户和组</span><br><span class="line">worker_processes auto;   //进程数</span><br><span class="line">pid /run/nginx.pid;  //进程文件</span><br><span class="line">include /etc/nginx/modules-enabled/*.conf;  //导入其他配置文件到nginx配置文件</span><br></pre></td></tr></table></figure>
+<p>events配置</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">events &#123;</span><br><span class="line">	worker_connections 768;   //设置一个worker进程同时打开的最大连接数</span><br><span class="line">	# multi_accept on;    //告诉nginx收到一个新连接通知后接受尽可能多的连接</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>http配置</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br></pre></td><td class="code"><pre><span class="line">http &#123;</span><br><span class="line"></span><br><span class="line">	##</span><br><span class="line">	# Basic Settings</span><br><span class="line">	##</span><br><span class="line"></span><br><span class="line">	sendfile on;      //开启高效文件传输模式</span><br><span class="line">	tcp_nopush on;     //告诉 Nginx 在一个数据包里发送所有头文件</span><br><span class="line">	tcp_nodelay on;    //告诉 Nginx 不要缓存数据，而是一段一段的发送</span><br><span class="line">	keepalive_timeout 65;   //连接超时时间，单位是秒</span><br><span class="line">	types_hash_max_size 2048;   //上传文件大小限制	</span><br><span class="line">	# server_tokens off;      //隐藏 Nginx 的版本号</span><br><span class="line"></span><br><span class="line">	# server_names_hash_bucket_size 64;</span><br><span class="line">	# server_name_in_redirect off;</span><br><span class="line"></span><br><span class="line">	include /etc/nginx/mime.types;   //包含配置</span><br><span class="line">	default_type application/octet-stream;  //默认传输类型</span><br><span class="line"></span><br><span class="line">	##</span><br><span class="line">	# SSL Settings	</span><br><span class="line">	##</span><br><span class="line"></span><br><span class="line">	ssl_protocols TLSv1 TLSv1.1 TLSv1.2; # Dropping SSLv3, ref: POODLE</span><br><span class="line">	ssl_prefer_server_ciphers on;</span><br><span class="line"></span><br><span class="line">	##</span><br><span class="line">	# Logging Settings</span><br><span class="line">	##</span><br><span class="line"></span><br><span class="line">	access_log /var/log/nginx/access.log;   //访问日志</span><br><span class="line">	error_log /var/log/nginx/error.log;     //错误日志</span><br><span class="line"></span><br><span class="line">	##</span><br><span class="line">	# Gzip Settings</span><br><span class="line">	##</span><br><span class="line"></span><br><span class="line">	gzip on;</span><br><span class="line"></span><br><span class="line">	# gzip_vary on;</span><br><span class="line">	# gzip_proxied any;</span><br><span class="line">	# gzip_comp_level 6;</span><br><span class="line">	# gzip_buffers 16 8k;</span><br><span class="line">	# gzip_http_version 1.1;</span><br><span class="line">	# gzip_types text/plain text/css application/json application/javascript text/xml application/xml application/xml+rss text/javascript;</span><br><span class="line"></span><br><span class="line">	##</span><br><span class="line">	# Virtual Host Configs</span><br><span class="line">	##</span><br><span class="line"></span><br><span class="line">	include /etc/nginx/conf.d/*.conf;</span><br><span class="line">	include /etc/nginx/sites-enabled/*;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>server配置</p>
 <p>众所周知，Nginx的配置文件分为Server、Location、If等一些配置块，并且存在包含关系，和编程语言比较类似。如果在外层配置的一些选项，是可以被继承到内层的。</p>
 <p>但这里的继承也有一些特性，比如add_header，子块中配置后将会覆盖父块中的add_header添加的<strong>所有</strong>HTTP头，造成一些安全隐患。</p>
 <p>server配置在一些系统上不是默认的nginx配置，如果需要修改可以在nginx配置中添加，或者添加include，包含进其他的自定义server。</p>
 <p>如下列代码，Server块添加了CSP头：</p>
-<pre><code>server {
-    ...
-    add_header Content-Security-Policy &quot;default-src &#39;self&#39;&quot;;
-    add_header X-Frame-Options DENY;
-
-    location = /test {
-        add_header X-Content-Type-Options nosniff;
-        rewrite ^(.*)$ /xss.html break;
-    }
-}
-</code></pre><p>但/test的location中又添加了X-Content-Type-Options头，导致父块中的add_header全部失效。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">server &#123;</span><br><span class="line">    ...</span><br><span class="line">    add_header Content-Security-Policy &quot;default-src &apos;self&apos;&quot;;</span><br><span class="line">    add_header X-Frame-Options DENY;</span><br><span class="line"></span><br><span class="line">    location = /test &#123;</span><br><span class="line">        add_header X-Content-Type-Options nosniff;</span><br><span class="line">        rewrite ^(.*)$ /xss.html break;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>但/test的location中又添加了X-Content-Type-Options头，导致父块中的add_header全部失效。</p>
 <ol start="2">
 <li>禁止一个目录的访问<br>示例：禁止访问path目录  </li>
 </ol>
-<pre><code>location ^~ /path { 
-deny all; 
-} 
-</code></pre><p>可以把path换成实际需要的目录，目录path后是否带有”/“，带“/”会禁止访问该目录和该目录下所有文件。不带”/“的情况就有些复杂了，只要目录开头匹配上那个关键字就会禁止；注意要放在fastcgi配置之前。  </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">location ^~ /path &#123; </span><br><span class="line">deny all; </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>可以把path换成实际需要的目录，目录path后是否带有”/“，带“/”会禁止访问该目录和该目录下所有文件。不带”/“的情况就有些复杂了，只要目录开头匹配上那个关键字就会禁止；注意要放在fastcgi配置之前。  </p>
 <p>这个常见于Nginx做反向代理的情况，动态的部分被proxy_pass传递给后端端口，而静态文件需要Nginx来处理。</p>
 <p>假设静态文件存储在/home/目录下，而该目录在url中名字为files，那么就需要用alias设置目录的别名：</p>
-<pre><code>location /files {
-    alias /home/;
-}
-</code></pre><p>此时，访问<code>http://example.com/files/readme.txt</code>，就可以获取<code>/home/readme.txt</code>文件。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">location /files &#123;</span><br><span class="line">    alias /home/;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>此时，访问<code>http://example.com/files/readme.txt</code>，就可以获取<code>/home/readme.txt</code>文件。</p>
 <p>但我们注意到，url上<code>/files</code>没有加后缀<code>/</code>，而alias设置的<code>/home/</code>是有后缀<code>/</code>的，这个<code>/</code>就导致我们可以从<code>/home/</code>目录穿越到他的上层目录。从而导致一个目录穿越问题。</p>
 <ol start="3">
 <li>禁止php文件的访问及执行</li>
 </ol>
 <p>示例：去掉单个目录的PHP执行权限  </p>
-<pre><code>location ~ /attachments/.*\.(php|php5)?$ { 
-deny all; 
-} 
-</code></pre><p>示例：去掉多个目录的PHP执行权限  </p>
-<pre><code>location ~  
-/(attachments|upload)/.*\.(php|php5)?$ { 
-deny all; 
-} 
-</code></pre><ol start="4">
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">location ~ /attachments/.*\.(php|php5)?$ &#123; </span><br><span class="line">deny all; </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>示例：去掉多个目录的PHP执行权限  </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">location ~  </span><br><span class="line">/(attachments|upload)/.*\.(php|php5)?$ &#123; </span><br><span class="line">deny all; </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ol start="4">
 <li>禁止IP的访问 </li>
 </ol>
-<p>示例：禁止IP段的写法：</p>
-<pre><code>deny 10.0.0.0/24;
-</code></pre><p>示例：只允许某个IP或某个IP段用户访问，其它的用户全都禁止  </p>
-<pre><code>allow  
-x.x.x.x;  
-allow 10.0.0.0/24;  
-deny all; 
-</code></pre><ol start="5">
+<p>示例：禁止IP段的写法：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">deny 10.0.0.0/24;</span><br></pre></td></tr></table></figure></p>
+<p>示例：只允许某个IP或某个IP段用户访问，其它的用户全都禁止<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">allow  </span><br><span class="line">x.x.x.x;  </span><br><span class="line">allow 10.0.0.0/24;  </span><br><span class="line">deny all;</span><br></pre></td></tr></table></figure></p>
+<ol start="5">
 <li>禁用非必要的方法</li>
 </ol>
-<pre><code>if ($request_method !~ ^(GET|HEAD|POST)$ ) {
-    return   444;
-    }
-</code></pre><ol start="6">
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">if ($request_method !~ ^(GET|HEAD|POST)$ ) &#123;</span><br><span class="line">    return   444;</span><br><span class="line">	&#125;</span><br></pre></td></tr></table></figure>
+<ol start="6">
 <li>禁用扩展名</li>
 </ol>
-<pre><code>location ~* .(txt|doc|sql|gz|svn|git)$ {
-   deny all;
-   }
-</code></pre><ol start="7">
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">location ~* .(txt|doc|sql|gz|svn|git)$ &#123;</span><br><span class="line">   deny all;</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure>
+<ol start="7">
 <li>根据用户的真实 IP 做连接限制</li>
 </ol>
-<pre><code>## 这里取得原始用户的IP地址
-map $http_x_forwarded_for  $clientRealIp {
-    &quot;&quot;  $remote_addr;
-    ~^(?P&lt;firstAddr&gt;[0-9\.]+),?.*$    $firstAddr;
-}
-
-## 针对原始用户 IP 地址做限制
-limit_conn_zone $clientRealIp zone=TotalConnLimitZone:20m ;
-limit_conn  TotalConnLimitZone  50;
-limit_conn_log_level notice;
-
-## 针对原始用户 IP 地址做限制
-limit_req_zone $clientRealIp zone=ConnLimitZone:20m  rate=10r/s;
-#limit_req zone=ConnLimitZone burst=10 nodelay;
-limit_req_log_level notice;
-</code></pre><p>参考资料：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">## 这里取得原始用户的IP地址</span><br><span class="line">map $http_x_forwarded_for  $clientRealIp &#123;</span><br><span class="line">    &quot;&quot;  $remote_addr;</span><br><span class="line">    ~^(?P&lt;firstAddr&gt;[0-9\.]+),?.*$    $firstAddr;</span><br><span class="line">&#125;</span><br><span class="line"> </span><br><span class="line">## 针对原始用户 IP 地址做限制</span><br><span class="line">limit_conn_zone $clientRealIp zone=TotalConnLimitZone:20m ;</span><br><span class="line">limit_conn  TotalConnLimitZone  50;</span><br><span class="line">limit_conn_log_level notice;</span><br><span class="line"> </span><br><span class="line">## 针对原始用户 IP 地址做限制</span><br><span class="line">limit_req_zone $clientRealIp zone=ConnLimitZone:20m  rate=10r/s;</span><br><span class="line">#limit_req zone=ConnLimitZone burst=10 nodelay;</span><br><span class="line">limit_req_log_level notice;</span><br></pre></td></tr></table></figure>
+<p>参考资料：</p>
 <p><a href="https://www.cnblogs.com/chenpingzhao/p/5785416.html" target="_blank" rel="noopener">https://www.cnblogs.com/chenpingzhao/p/5785416.html</a></p>
 <p><a href="https://wooyun.kieran.top/#!/drops/201.Nginx%E5%AE%89%E5%85%A8%E9%85%8D%E7%BD%AE%E7%A0%94%E7%A9%B6" target="_blank" rel="noopener">https://wooyun.kieran.top/#!/drops/201.Nginx%E5%AE%89%E5%85%A8%E9%85%8D%E7%BD%AE%E7%A0%94%E7%A9%B6</a></p>
 <p><a href="https://wooyun.kieran.top/#!/drops/315.Apache%E5%AE%89%E5%85%A8%E9%85%8D%E7%BD%AE" target="_blank" rel="noopener">https://wooyun.kieran.top/#!/drops/315.Apache%E5%AE%89%E5%85%A8%E9%85%8D%E7%BD%AE</a></p>
