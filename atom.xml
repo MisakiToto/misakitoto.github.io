@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="/"/>
-  <updated>2019-12-06T05:47:30.353Z</updated>
+  <updated>2019-12-28T14:57:06.000Z</updated>
   <id>/</id>
   
   <author>
@@ -15,6 +15,31 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>逆向打卡APP</title>
+    <link href="/2019/12/%E9%80%86%E5%90%91%E6%89%93%E5%8D%A1APP/"/>
+    <id>/2019/12/逆向打卡APP/</id>
+    <published>2019-12-28T14:57:04.000Z</published>
+    <updated>2019-12-28T14:57:06.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>公司打卡APP，由于偶尔忘记打卡，所以想做一个能查询是否打卡来提醒自己的脚本，为什么不做自动打卡脚本，担心万一更新出问题，但没有发现，那岂不是很尴尬。</p><p>首先抓包，查看查询打卡的请求。</p><p><img src="https://i.loli.net/2019/12/28/nTaUrsMmBKqwZ2d.png" alt="image20191228215916256.png"><br>获取其中的参数，其中userid为手机号，rmk3为设备uid，reqssn为固定字符串，所以需要知道加密算法来计算sign</p><pre><code>fm=&lt;fm&gt;&lt;userid&gt;178xxxx&lt;/userid&gt;&lt;ver&gt;3.2.0&lt;/ver&gt;&lt;rmk1/&gt;&lt;rmk2&gt;2&lt;/rmk2&gt;&lt;rmk3&gt;8xxxx-xxxx-xxxx-xxxx-BCxxxxxxxx71&lt;/rmk3&gt;&lt;action&gt;attendRecord&lt;/action&gt;&lt;reqssn&gt;2244f70148454d03baeb739d9c86e082&lt;/reqssn&gt;&lt;sign&gt;54bexxxxxx&lt;/sign&gt;&lt;/fm&gt;</code></pre><p>按照惯例，解包后搜索参数名，找到一个sign函数，查看后发现是加密函数，其中部分代码如下，或者uuid，拼接参数</p><p><img src="https://i.loli.net/2019/12/28/goh6MUtlId1QeJj.png" alt="2.png"><br>其中有个私钥，记录一下</p><pre><code>PRIVATE_KEY = &quot;6fcb5584c28743b8ff16337353b0cabe&quot;</code></pre><p>继续查看，就可以看到后面还拼接了reqssn，然后通过和私钥的拼接组成新的字符串做一个sha256加密。所以，这个reqssn参数是哪里来的呢，是否是固定值。搜索查看</p><p><img src="https://i.loli.net/2019/12/28/ThS3Rj1Yf2oBqmO.png" alt="3.png"></p><p>在其他函数位置发现，reqssn的值，是固定值，且写入代码中。后面的就是上面所说的sign函数。<br><img src="https://i.loli.net/2019/12/28/eH4gfNX21yTZdnB.png" alt="4.png"></p><p>至于uuid是怎么发现，继续查看相关的代码引用，发现是利用本地读取的文件，打开测试机，找到如下位置，发现保存的uuid</p><p><img src="https://i.loli.net/2019/12/28/EK1VpcO6BMsJNCm.png" alt="5.png"></p><p>理论上至此，参数值和加密已经得知，但是经过计算还是不一样，继续查看调用的加密，发现其中做了一次base64的编码，然后再sha256加密。</p><p><img src="https://i.loli.net/2019/12/28/4aLcN3QHoKe9GV2.png" alt="6.png"></p><p>至此能算出加密值和抓包到的结果一致。</p><p><img src="https://i.loli.net/2019/12/28/o4YKayEedkcAQ5J.png" alt="image20191228221903626.png"></p><p>如果仔细想想，这个请求中貌似没有变化的量那岂不是只需要做这个请求就可以，干嘛需要加密算法呢。这个请求中没有变化的值，但是登陆中有啊，其中的reqssn就不再是固定值，而是一个当前的时间戳，这时候就需要算法来生成sign。总不能cookie失效一次就抓一次包改一次cookie吧。</p><p>登陆的时候参数就是</p><pre><code>&lt;fm&gt;&lt;pwd&gt;cxxxxxxxx0b33xxxxxxxxxxxxxx&lt;/pwd&gt;&lt;userid&gt;17xxxxxxx&lt;/userid&gt;&lt;ver&gt;3.2.0&lt;/ver&gt;&lt;rmk1/&gt;&lt;rmk2&gt;2&lt;/rmk2&gt;&lt;rmk3&gt;ffxxxxxx-xxxx-xxxx-xxxx-xxxxxxx9b&lt;/rmk3&gt;&lt;action&gt;login&lt;/action&gt;&lt;reqssn&gt;20191225122352145&lt;/reqssn&gt;&lt;/fm&gt;</code></pre>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;p&gt;公司打卡APP，由于偶尔忘记打卡，所以想做一个能查询是否打卡来提醒自己的脚本，为什么不做自动打卡脚本，担心万一更新出问题，但没有发现，那岂不是很尴尬。&lt;/p&gt;
+&lt;p&gt;首先抓包，查看查询打卡的请求。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;https://i.loli.net/20
+      
+    
+    </summary>
+    
+    
+      <category term="Android逆向" scheme="/tags/Android%E9%80%86%E5%90%91/"/>
+    
+  </entry>
   
   <entry>
     <title>OSSEC Wazuh</title>
@@ -474,38 +499,6 @@ commons-logging-1.2.jar
     
     
       <category term="web安全" scheme="/tags/web%E5%AE%89%E5%85%A8/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>逆向函数分析引用</title>
-    <link href="/2019/07/%E9%80%86%E5%90%91%E5%87%BD%E6%95%B0%E5%88%86%E6%9E%90%E5%BC%95%E7%94%A8/"/>
-    <id>/2019/07/逆向函数分析引用/</id>
-    <published>2019-07-09T08:56:32.000Z</published>
-    <updated>2019-07-26T09:56:38.114Z</updated>
-    
-    <content type="html"><![CDATA[<p>代码编译，使用代码如下:</p><pre><code>#include &lt;stdio.h&gt;#include &lt;string.h&gt;int fun1(){    int a;    int b;    b=10;    a=b++;    return a;}int fun2(int a,int b){    return a+b+fun1();}int fun3(int a,int b,int c,int d,int e,int f,int g,int h){    if(a+b+c &lt; d+e+f){        return a+b+c+fun2(a,f);    }else if(a+b+c &gt; d+e+f){        return a+b+c+fun2(b,e);    }else{        return 0;    }}int main(){    int tmp;    printf(&quot;%d&quot;,fun3(1,2,3,4,5,6,7,8));    return 0;}</code></pre><p>makefile文件同之前的基本一致</p><pre><code>#设置目录NDK_ROOT=D:\Androidstudio-sdk\android-ndk-r14bTOOLCHAINS_ROOT=$(NDK_ROOT)\toolchains\arm-linux-androideabi-4.9\prebuilt\windows-x86_64TOOLCHAINS_PREFIX=$(TOOLCHAINS_ROOT)\bin\arm-linux-androideabiTOOLCHAINS_INCLUDE=$(TOOLCHAINS_ROOT)\lib\gcc\arm-linux-androideabi\4.9.x\include-fixedPLATFORM_ROOT=$(NDK_ROOT)\platforms\android-14\arch-armPLATFORM_INCLUDE=$(PLATFORM_ROOT)\usr\includePLATFORM_LIB=$(PLATFORM_ROOT)\usr\libMODULE_NAME=app6BUILD_TYPE=cPATH_ANDROID=/data/local/tmp/RM=delFLAGS=-I$(TOOLCHAINS_INCLUDE) \    -I$(PLATFORM_INCLUDE) \    -L$(PLATFORM_LIB) \    -nostdlib \    -lgcc \    -Bdynamic \    -lc    \    -O0OBJS=$(MODULE_NAME).o \    $(PLATFORM_LIB)\crtbegin_dynamic.o \    $(PLATFORM_LIB)\crtend_android.oall:    $(TOOLCHAINS_PREFIX)-gcc $(FLAGS) -c $(MODULE_NAME).$(BUILD_TYPE) -o $(MODULE_NAME).o -pie -fPIE    $(TOOLCHAINS_PREFIX)-gcc $(FLAGS) -S $(MODULE_NAME).$(BUILD_TYPE) -o $(MODULE_NAME).S -pie -fPIE    $(TOOLCHAINS_PREFIX)-gcc $(FLAGS) $(OBJS) -o $(MODULE_NAME) -pie -fPIEclean:    $(RM) *.oinstall:    adb push $(MODULE_NAME) $(PATH_ANDROID)    adb shell chmod 755 $(PATH_ANDROID)$(MODULE_NAME)    adb shell $(PATH_ANDROID)$(MODULE_NAME)</code></pre><p>编译后如下，会生成一个无后缀的可执行文件。丢到IDA中。点击main函数，如下：</p><p><img src="\2019\07\逆向函数分析引用\1562658661016.png" alt="1562658661016"></p><p>其中已经简单分析函数参数的引用，开头可以看到，参数[sp]，意思是第五个参数引用，若后面还有其他参数则以四个字节为参数引用存储。关于寄存器的含义</p><pre><code>r0-r3    用作传入函数参数，传出函数返回值。在子程序调用之间，可以将 r0-r3 用于任何用途。r4-r11   被用来存放函数的局部变量。如果被调用函数使用了这些寄存器，它在返回之前必须恢复这些寄存器的值。r12      是内部调用暂时寄存器 ip。它在过程链接胶合代码（例如，交互操作胶合代码）中用于此角色。r13      是栈指针 sp。它不能用于任何其它用途。sp 中存放的值在退出被调用函数时必须与进入时的值相同。r14      是链接寄存器 lr。如果您保存了返回地址，则可以在调用之间将 r14 用于其它用途，程序返回时要恢复r15      是程序计数器 PC。它不能用于任何其它用途。</code></pre><p>详细介绍参考：<a href="https://www.veryarm.com/36274.html" target="_blank" rel="noopener">https://www.veryarm.com/36274.html</a></p><p>到BL指令，BL指令是有返回的跳转，表示子程序的返回通过LR寄存器保存，保存的地址值就是下一条指令的地址值。如下的fun3函数中，对于多参数并没有使用栈来保存，而是使用R0-R3寄存器来循环的调用。</p><p><img src="\2019\07\逆向函数分析引用\1562659401125.png" alt="1562659401125"></p><p>判断结束后进入不同的分支，走到如图中的两部分分支的时候出现了一个新的子程序调用，fun2。</p><p><img src="\2019\07\逆向函数分析引用\1562659598100.png" alt="1562659598100"></p><p>点击fun2，其中又调用了fun1函数，同样点击fun1。</p><p><img src="\2019\07\逆向函数分析引用\1562659844246.png" alt="1562659844246"></p><p>通过fun1就可以看到函数的具体操作行为，其中最后返回值BX，带状态切换返回，其中的LR则为fun2的函数MOV的地址值，返回到fun2中继续执行。</p><p><img src="\2019\07\逆向函数分析引用\1562659872641.png" alt="1562659872641"></p><p>而fun2中的最后代码也对应了开头的两个汇编语句，恢复sp指令值，将栈内容恢复到寄存器中。获取到参数值后，回到MOV指令中其中注释的fun1和fun2代表当前分支的输入参数。最后都执行到loc_4B8，结果保存到R0中返回，最后也是恢复sp和寄存器。</p><p><img src="\2019\07\逆向函数分析引用\1562662004752.png" alt="1562662004752"></p><p>这时候再看main函数最后执行，获取的fun3返回赋值给R2，至于LDR和ADD，代表了读取unk_5C8标记处的参数字段，点击则可以看到是“%d”，也就是R3代表“%d”,R1代表参数返回值。由printf来输出。最后返回0。结束函数执行。</p><p><img src="\2019\07\逆向函数分析引用\1562662154590.png" alt="1562662154590"></p><p>此汇编分析主要是函数调用和返回之间的联系，希望也可以为后面的读取APP so文件打下基础把。</p>]]></content>
-    
-    <summary type="html">
-    
-      
-      
-        &lt;p&gt;代码编译，使用代码如下:&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;#include &amp;lt;stdio.h&amp;gt;
-#include &amp;lt;string.h&amp;gt;
-int fun1()
-{
-    int a;
-    int b;
-    b=10;
-    a=b++;
-  
-      
-    
-    </summary>
-    
-    
-      <category term="Android逆向" scheme="/tags/Android%E9%80%86%E5%90%91/"/>
     
   </entry>
   
