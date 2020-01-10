@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+
+
+
+
+
+
+
+
+
+<head>
+    <meta charset="utf-8" />
+    <link rel="apple-touch-icon" sizes="76x76" href="/favicon.ico">
+    <link rel="icon" type="image/png" href="/favicon.ico">
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0, shrink-to-fit=no" name="viewport" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <meta name="description" content="One way to choose one">
+    <meta name="author" content="Misaki">
+    <meta name="keywords" content="">
+    <title>中小型企业自研HIDS简单实现 ~ Misaki&#39;s Blog</title>
+    <link rel="stylesheet" href="/css/Material_Icons.css">
+    <!-- <link rel="stylesheet" href="/css/font-awesome.css"> -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/css/main.css">
+    
+        <link rel="stylesheet" href="/css/post.css">
+        
+            <link rel="stylesheet" href="/css/Prettify/tomorrow-night-eighties.min.css">
+        
+    
+</head>
+
+<body class=" sidebar-collapse">
+<nav class="navbar navbar-transparent navbar-color-on-scroll fixed-top navbar-expand-lg" color-on-scroll="100" id="sectionsNav">
+    <div class="container">
+        <div class="navbar-translate">
+            <a class="navbar-brand" href="/">
+                Misaki&#39;s Blog</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="navbar-toggler-icon"></span>
+                <span class="navbar-toggler-icon"></span>
+                <span class="navbar-toggler-icon"></span>
+            </button>
+        </div>
+            <div class="collapse navbar-collapse">
+                <ul class="navbar-nav ml-auto">
+                    
+                        
+                            <li class="nav-item">
+                                <a class="nav-link" href="/archives/">
+                                    archives
+                                </a>
+                            </li>
+                        
+                            <li class="nav-item">
+                                <a class="nav-link" href="/about/">
+                                    about
+                                </a>
+                            </li>
+                        
+                    
+                    
+                        
+                            <li class="nav-item">
+                                <a class="nav-link" rel="tooltip" title="" data-placement="bottom" href="https://github.com/MisakiKata" target="_blank" data-original-title="See me here">
+                                    <i class="fa fa-github"></i>
+                                </a>
+                            </li>
+                        
+                            <li class="nav-item">
+                                <a class="nav-link" rel="tooltip" title="" data-placement="bottom" href="https://www.t00ls.net/members-profile-12179.html" target="_blank" data-original-title="See me here">
+                                    <i class="fa fa-twitch"></i>
+                                </a>
+                            </li>
+                        
+                            <li class="nav-item">
+                                <a class="nav-link" rel="tooltip" title="" data-placement="bottom" href="https://misakikata.github.io/atom.xml" target="_blank" data-original-title="See me here">
+                                    <i class="fa fa-rss"></i>
+                                </a>
+                            </li>
+                        
+                            <li class="nav-item">
+                                <a class="nav-link" rel="tooltip" title="" data-placement="bottom" href="mailto:misakikatas@gmail.com" target="_blank" data-original-title="See me here">
+                                    <i class="fa fa-envelope"></i>
+                                </a>
+                            </li>
+                        
+                    
+                </ul>
+            </div>
+    </div>
+</nav>
+    
+  <div class="page-header header-filter" data-parallax="true" style="background-image: url('/img/post-banner.jpg'); height: 70vh;">
+    
+      <div class="container">
+        <h1 class="title text-center post_title">中小型企业自研HIDS简单实现</h1>
+        <p class="text-center"><b>Friday, January 10th 2020, 11:51 am</b></p>
+      </div>
+    
+  </div>
+
+  
+  
+  
+    <div class="row" style="margin: 0 0 0; z-index: 999;">
+  <div class="col-md-8 offset-md-1">
+    <div class="main main-raised">
+      <div class="container">
+        <div class="section">
+          <div class="post_content">
+              <p>此HIDS自研面对中小型企业，一般服务器百级。如果对集群部署，系统获取更加完善灵活，服务量级较高可以参考：</p>
+<ol>
+<li><a href="https://github.com/ysrc/yulong-hids" target="_blank" rel="noopener">驭龙</a></li>
+<li><a href="https://tech.meituan.com/2019/01/17/distributed-hids-cluster-architecture-design.html" target="_blank" rel="noopener">美团</a></li>
+<li><a href="https://mp.weixin.qq.com/s?__biz=MzI5MjE4MDc4OQ==&amp;mid=2247483961&amp;idx=1&amp;sn=2736aad509f08c20d82cfc08b62da27a&amp;chksm=ec040463db738d754cce84506c098caca891b58740e1b38b3621f752f805eb1c02ebf0e2ac73&amp;mpshare=1&amp;scene=1&amp;srcid=1226ZgmHAUTfeYMuLFPWyuHS#rd" target="_blank" rel="noopener">点融</a></li>
+<li><a href="https://misakikata.github.io/2019/12/OSSEC-Wazuh/" target="_blank" rel="noopener">Wazuh</a></li>
+</ol>
+<h3 id="架构"><a href="#架构" class="headerlink" title="架构"></a>架构</h3><p>架构采用，一般中小型企业安全人员较少，重视度远不如大型企业，多见“一个人的安全部”。架构不适宜过于复杂，后端开发可以根据实际采用python，go，Java等。web框架，有django，php都可以使用。消息的被动或者主动获取又涉及到是否需要使用ES或者ActiveMQ。这一点后面再讨论。此处使用平安集团分享的一个预警结构流程。</p>
+<p><img src="https://i.loli.net/2020/01/10/WpozHBZAmJLiO4U.png" alt="1578622803994.png"></p>
+<h3 id="Agent"><a href="#Agent" class="headerlink" title="Agent"></a>Agent</h3><p>agent的建设是整个流程中最费劲的事情了。需要以下几种特点</p>
+<ol>
+<li>可维护性高，获取信息稳定</li>
+<li>对系统侵入小，适合多种系统的多版本内核</li>
+<li>通道信息安全，进程可维护</li>
+<li>支持灵活检测，负载小</li>
+<li>便于一键化部署</li>
+</ol>
+<p>对于互联网大厂采用的方案多是hook，audit等。hook的侵入性比较高，在没有专门的定制化开发下，中小型企业使用的成本比较高，之前在试图部署驭龙的时候就发现太容易对系统造成崩溃。这是生产系统不能接受的。</p>
+<p>如何选择侵入小，兼容高，信息全，成本低就是主要考虑了。</p>
+<p>对文件监控上比较好的开源监控也就是aide和inotify-tools。aide是对文件的hash比较来判断文件的改动，无实时性。inotify是实时监控，倾向于此。在实际系统测试上，对各个Linux的发行版兼容性也可以满足需求。</p>
+<p>其他信息的获取上，倾向于python库psutil。这是Linux的运维的第三方模块。可以收集很多Linux系统的信息，进程，网络，用户，内存等。可以跟主机做实时的信息获取。而且实现简单，方便跟inotify做联动。</p>
+<p>信息推送上，如果考虑实时性，可以使用agent主动推送的信息实现方案，但这样做会面临多服务的压力，延迟，丢失。所以需要对信息做消息处理，就需要消息队列。采用何种方式根据需求选择。</p>
+<p>agent被动提供消息，只需要把获取的信息提交到某个特定的地址。比如，此处使用类似ES的信息提供方式，agent获取信息后交给flask以json来展示，server对agent来做守护任务来被动获取。这样，实时性较低，需要对获取的信息做过滤处理。但消息获取上比较稳定。</p>
+<h3 id="Server"><a href="#Server" class="headerlink" title="Server"></a>Server</h3><p>server端主要做信息的展示和处理整合，此处直接使用python-django。如果使用被动获取信息，需要server做定时任务，采用任务框架APScheduler来管理定时任务。</p>
+<p>简而言之，实现方便，操作简单。server端还真是没有多少值得谈论。</p>
+<h3 id="功能"><a href="#功能" class="headerlink" title="功能"></a>功能</h3><p>虽然名为HIDS，但还是需要一些其他功能，只是agent传输的文件监控和主机的信息仿佛作用较低。而且在监控中可以看到，当服务文件改动较多的时候，提示的预警信息过于频繁。分析较为困难。所以为了便于发现其中存在的问题，使用文件扫描功能，比如Linux下的河马webshell扫描。调用扫描来对预警文件进行判断，但扫描识别率测试中，只有百分之六十到七十左右。识别率是否能接受就看个人情况拉。</p>
+<p>同时，对于感染型后门，我增加了一个对威胁信息的检测。从以下地址获取感染IP：</p>
+<p><a href="http://osint.bambenekconsulting.com" target="_blank" rel="noopener">http://osint.bambenekconsulting.com</a></p>
+<p><a href="https://feodotracker.abuse.ch" target="_blank" rel="noopener">https://feodotracker.abuse.ch</a></p>
+<p>通过网络连接来判断是否有类似的感染发生，对于IP的获取同样使用定时任务。</p>
+<h3 id="web日志"><a href="#web日志" class="headerlink" title="web日志"></a>web日志</h3><p>目前想通过web日志的方式来做检测告警，比如，大量文件的变更时，跟web日志做查询，来判断是否是一个外部创建的文件。通过ES日志服务器来整合，但在实现中发现，不一定创建成功的文件就一定在日志中，就像文件重命名。所以此功能具体的实现还有待考究。</p>
+<p>如果后期可以发现一种webshell识别较高的情况，可以使用扫描价web日志联合告警的方式来减少预警的情况下，提高准确度。</p>
+<p>由于使用上没有采用agent主动推送，没用参考消息队列，后期准备改为推送和消息队列形式，同时增加对文件检测的识别和减少告警。同时希望agent的信息获取可以使用audit的方式。</p>
+<p>以下是代码实现，简单到会django就可以做二次修改哦</p>
+<p><a href="https://github.com/MisakiKata/zeru" target="_blank" rel="noopener">zeru</a></p>
+
+          </div>
+          <br><br>
+              
+                <div class="license-wrapper">
+                    <p>原文作者：<a href="">Misaki</a>
+                    <p>原文链接：<a href="/2020/01/中小型企业自研HIDS简单实现/">/2020/01/中小型企业自研HIDS简单实现/</a>
+                    <p>发表日期：<a href="/2020/01/中小型企业自研HIDS简单实现/">January 10th 2020, 11:51:09 am</a>
+                    <p>更新日期：<a href="/2020/01/中小型企业自研HIDS简单实现/">January 10th 2020, 12:40:12 pm</a>
+                    <p>版权声明：本文采用<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">知识共享署名-非商业性使用 4.0 国际许可协议</a>进行许可</p>
+                </div>
+              
+          <br><br>
+          <div>
+              <p>
+                       
+                      <span class="badge badge-default">#&nbsp;Open Source Security</span>
+                      &nbsp;
+                      
+              </p>
+          </div>
+        </div>
+      </div>  
+    </div>
+  </div>
+  <!-- TOC -->
+  
+      <div class="">
+        <div id="toc">
+          <p class="toc-title"><i class="material-icons" style="vertical-align:middle">toc</i>Toc:</p> 
+          <div id="tocbot"></div>
+        </div>
+      </div>
+  
+</div>
+
+
+<!-- Comments -->
+<div class="row">
+    <div class="col-md-8 offset-md-2">
+    
+        
+            <div class="disqus" style="width:100%">
+    <div id="disqus_thread"></div>
+    <script>               
+        var disqus_shortname = '';
+        var disqus_config = function () {
+            this.page.url = '/2020/01/中小型企业自研HIDS简单实现/'; 
+            this.page.identifier = '/2020/01/中小型企业自研HIDS简单实现/';
+        };
+        (function() { 
+            var d = document, s = d.createElement('script');
+            s.type = 'text/javascript';
+            s.src = '//'+disqus_shortname+'.disqus.com/embed.js';
+            s.setAttribute('data-timestamp', +new Date());
+            (d.head || d.body).appendChild(s);
+        })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>                                
+</div>
+        
+    
+    </div>
+</div>
+  
+
+<footer class="footer footer-default">
+        <div class="container">
+          <div class="float-left" style="padding: 15px 0;">
+              <b>假如今天的你被生活辜负了，别伤心，因为明天生活还会继续辜负你！</b>
+          </div>
+          <div align="right" style="padding: 15px 0;">
+              <i class="iconfont icon-love" ></i>
+              <a href="https://github.com/0x2e/Material-T" target="_blank"> <b>Material-T</b></a>
+          </div>
+        </div>
+</footer>
+      <!--   Core JS Files   -->
+      <script src="/js/core/jquery.min.js?v=3.2.1"></script>
+      <script src="/js/main.js"></script>
+      <script src="/js/core/popper.min.js"></script>
+      <script src="/js/core/bootstrap-material-design.min.js"></script>
+      <script src="/js/plugins/moment.min.js"></script>
+      <script src="/js/material-kit.min.js?v=2.0.5"></script>
+      
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.4.2/tocbot.min.js"></script>
+        <script src="/js/post.js"></script>
+        <script src="/js/plugins/prettify.js"></script>
+        <script>
+            $(document).ready(function(){
+                $('pre').addClass('prettyprint linenums');
+                prettyPrint();
+            })
+        </script>
+      
+<script src="/live2d-widget/autoload.js"></script>
+</body>
+</html>
