@@ -308,7 +308,13 @@ consumer.seek(TopicPartition(topic=my_topic, partition=1), 0) # 可以注册多�
 
 for msg in consumer: # 迭代器，等待下一条消息
     print msg # 打印消息
-</code></pre>
+</code></pre><h3 id="部署kafka"><a href="#部署kafka" class="headerlink" title="部署kafka"></a>部署kafka</h3><p>配置好需要的参数后</p>
+<pre><code>./bin/zookeeper-server-start.sh -daemon config/zookeeper.properties
+</code></pre><p>就可以看到zookeeper处于监听状态，当然zookeeper这个一般使用集群部署的节点，此处仍然是使用kafka。</p>
+<p><img src="https://i.loli.net/2020/01/16/sQotxmScwZUjlfO.png" alt="1579162043232.png"></p>
+<pre><code>./bin/kafka-server-start.sh -daemon config/server-1.properties
+</code></pre><p><img src="https://i.loli.net/2020/01/16/jQ8E2tVhCTfx4Dr.png" alt="1579162335867.png"></p>
+
           </div>
           <br><br>
               
@@ -316,7 +322,7 @@ for msg in consumer: # 迭代器，等待下一条消息
                     <p>原文作者：<a href="">Misaki</a>
                     <p>原文链接：<a href="/2020/01/Kafka/">/2020/01/Kafka/</a>
                     <p>发表日期：<a href="/2020/01/Kafka/">January 14th 2020, 4:05:55 pm</a>
-                    <p>更新日期：<a href="/2020/01/Kafka/">January 14th 2020, 4:07:14 pm</a>
+                    <p>更新日期：<a href="/2020/01/Kafka/">January 16th 2020, 4:16:55 pm</a>
                     <p>版权声明：本文采用<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">知识共享署名-非商业性使用 4.0 国际许可协议</a>进行许可</p>
                 </div>
               
