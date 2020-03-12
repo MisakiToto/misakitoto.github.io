@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="/"/>
-  <updated>2020-01-20T06:15:08.138Z</updated>
+  <updated>2020-03-12T02:33:32.575Z</updated>
   <id>/</id>
   
   <author>
@@ -15,6 +15,30 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>HTTP 请求走私</title>
+    <link href="/2020/03/HTTP-%E8%AF%B7%E6%B1%82%E8%B5%B0%E7%A7%81/"/>
+    <id>/2020/03/HTTP-请求走私/</id>
+    <published>2020-03-12T02:29:20.000Z</published>
+    <updated>2020-03-12T02:33:32.575Z</updated>
+    
+    <content type="html"><![CDATA[<h3 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h3><p>原理有两篇文章写的十分详细，此处不在过多陈述。</p><p><a href="https://portswigger.net/web-security/request-smuggling" target="_blank" rel="noopener">HTTP request smuggling</a></p><p><a href="https://xz.aliyun.com/t/6878" target="_blank" rel="noopener">一篇文章带你读懂 HTTP Smuggling 攻击</a></p><h3 id="CL-TE"><a href="#CL-TE" class="headerlink" title="CL-TE"></a>CL-TE</h3><p>实验室：<a href="https://portswigger.net/web-security/request-smuggling/lab-basic-cl-te" target="_blank" rel="noopener">https://portswigger.net/web-security/request-smuggling/lab-basic-cl-te</a></p><p>登陆访问即可，看到实验室说明，只需要后端收到GPOST的请求方法即可。</p><p><img src="/images/2020/03/12/8145cce0-6409-11ea-a731-5d1f4a3ce08c.png" alt="image20200311170411457.png"></p><p>通过要求可以得知这是一个前端CL，后端TE的方式。先关闭burp的自动更新content-length的设置，然后修改为6字节，先发送一个请求，这个请求先不需要管。</p><p><img src="/images/2020/03/12/89e63470-6409-11ea-a731-5d1f4a3ce08c.png" alt="image20200311170700419.png"></p><p>再发送一个POST请求，就会显示这次实验的需求，GPOST方法。</p><p><img src="/images/2020/03/12/8e8007e0-6409-11ea-a731-5d1f4a3ce08c.png" alt="image20200311170830800.png"></p><pre><code>前端发送数据的时候，实验content-length来设置请求的长度，后端使用transfer-encoding来处理消息。在cl和te的模式中。默认是优先使用te。前端认为POST / HTTP/1.1Content-Length: 6Transfer-Encodin: chunkedxxxxxx0G以上为一个请求,参数长度受content-length控制。而后端接收te的模式，默认这个是一个分块请求POST / HTTP/1.1Content-Length: 6Transfer-Encodin: chunkedxxxxxx0-------------------------到此，后端认为是一个请求，而G作为下一个请求而等待G这时候再进来的请求，就会作为继续未完成的请求而连接GPOST / HTTP/1.1</code></pre><h3 id="TE-CL"><a href="#TE-CL" class="headerlink" title="TE-CL"></a>TE-CL</h3><p>实验室：<a href="https://portswigger.net/web-security/request-smuggling/lab-basic-te-cl" target="_blank" rel="noopener">https://portswigger.net/web-security/request-smuggling/lab-basic-te-cl</a></p><p>访问实验室，查看需求，由于说明中已经告诉我们是一个te-cl的方式。</p><p><img src="/images/2020/03/12/936b7dc0-6409-11ea-a731-5d1f4a3ce08c.png" alt="image20200312091318601.png"></p><p>构造transfer-encoding块，其中12代表0之前的字符串长度包括换行符，长度为16，十六进制就是12。最后面的0需要跟两个换行符，缺少的话会提示Invalid request。可能构造成功后，发送几次仍然显示Missing parameter，多试几次即可。</p><p><img src="/images/2020/03/12/97473150-6409-11ea-a731-5d1f4a3ce08c.png" alt="image20200312095612846.png"></p><pre><code>前端服务器使用TE块来区分。参数中12GPOST / HTTP/1.10都被认为是一个合法的块消息。而后端服务器处理中只使用CL来划分消息。导致在请求中的content-length: 4让后端服务器认为：12--------------------消息到此为一个消息GPOST / HTTP/1.10--------------------第二个请求消息从而达到请求走私的目的</code></pre><h3 id="TE-TE"><a href="#TE-TE" class="headerlink" title="TE.TE"></a>TE.TE</h3><p>此种方式是前后端服务器都支持并且默认使用te块，使用某种方式导致一端不识别te块来达到，cl-te或者te-cl的方式。</p><p>实验室：<a href="https://portswigger.net/web-security/request-smuggling/lab-ofuscating-te-header" target="_blank" rel="noopener">https://portswigger.net/web-security/request-smuggling/lab-ofuscating-te-header</a></p><p>同样是用后端服务器识别到GPOST请求方法。</p><p><img src="/images/2020/03/12/9c08ff20-6409-11ea-a731-5d1f4a3ce08c.png" alt="image20200312101007186.png"></p><p>构造混淆的te头的常用方式：</p><pre><code>1. Transfer-Encoding: xchunked2. Transfer-Encoding : chunked3. Transfer-Encoding: chunked   Transfer-Encoding: x4. Transfer-Encoding:[tab]chunked5. [space]Transfer-Encoding: chunked6. X: X[\n]Transfer-Encoding: chunked7. Transfer-Encoding   : chunked</code></pre><p>请求了多次后发现，一直提示缺少参数。</p><p><img src="/images/2020/03/12/a12f8230-6409-11ea-a731-5d1f4a3ce08c.png" alt="image20200312102005572.png"></p><p>构造错误的te块，提示无效请求，说明前端服务器很可能是te。</p><p><img src="/images/2020/03/12/a589dba0-6409-11ea-a731-5d1f4a3ce08c.png" alt="image20200312102105557.png"></p><p>重新使用以上提到的方式来尝试混淆te，尝试了几种方式，发现只有双写的情况下，可以混淆后端对te的处理。</p><p><img src="/images/2020/03/12/aa4bd080-6409-11ea-a731-5d1f4a3ce08c.png" alt="image20200312102617950.png"></p><p>也就是说前端服务器处理te块消息使用了第一个te头来当作标准解析，而后端服务器中使用了第二个te头来当作标准解析。</p>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h3 id=&quot;原理&quot;&gt;&lt;a href=&quot;#原理&quot; class=&quot;headerlink&quot; title=&quot;原理&quot;&gt;&lt;/a&gt;原理&lt;/h3&gt;&lt;p&gt;原理有两篇文章写的十分详细，此处不在过多陈述。&lt;/p&gt;
+&lt;p&gt;&lt;a href=&quot;https://portswigger.net/web-se
+      
+    
+    </summary>
+    
+    
+      <category term="web安全" scheme="/tags/web%E5%AE%89%E5%85%A8/"/>
+    
+  </entry>
   
   <entry>
     <title>MySQL客户端任意文件读取</title>
@@ -470,30 +494,6 @@ commons-logging-1.2.jar
         &lt;p&gt;某日在GitHub中看到了一些CTF使用的安卓逆向分析题，其中一个是SWPUCTF，是个没怎么听过的CTF。虽然我不怎么了解CTF。23333&lt;/p&gt;
 &lt;p&gt;于是，抽时间分析看看是否可以做出来。两个APK。&lt;/p&gt;
 &lt;h3 id=&quot;app-debug1-apk&quot;&gt;&lt;a hr
-      
-    
-    </summary>
-    
-    
-      <category term="Android逆向" scheme="/tags/Android%E9%80%86%E5%90%91/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>结构体链表逆向</title>
-    <link href="/2019/07/%E7%BB%93%E6%9E%84%E4%BD%93%E9%93%BE%E8%A1%A8%E9%80%86%E5%90%91/"/>
-    <id>/2019/07/结构体链表逆向/</id>
-    <published>2019-07-26T09:23:50.000Z</published>
-    <updated>2019-07-26T09:56:41.098Z</updated>
-    
-    <content type="html"><![CDATA[<h3 id="结构体链表逆向"><a href="#结构体链表逆向" class="headerlink" title="结构体链表逆向"></a>结构体链表逆向</h3><p>同样使用如下的C代码：</p><pre><code>#include &lt;stdio.h&gt;#include &lt;stdlib.h&gt;typedef struct _student{    char name[32];    int age;    struct _student * next;}T_student;T_student * head = NULL;void Insert(const char *name,int age){    T_student * newnode;    newnode = (T_student *)malloc(sizeof(T_student));    newnode-&gt;age = age;    newnode-&gt;next = head;    strcpy(newnode-&gt;name,name);    head = newnode;}void PrintStudent(){    T_student * tmp;    tmp = head;    while(tmp)    {        printf(&quot;name:%s age:%d\n&quot;,tmp-&gt;name,tmp-&gt;age);        tmp=tmp-&gt;next;    }}int  main(){    Insert(&quot;Panda&quot;,15);    Insert(&quot;Dog&quot;,3);    Insert(&quot;Cat&quot;,2);    Insert(&quot;XiaoMing&quot;,20);    PrintStudent();}</code></pre><p>按照惯例，编译把文件丢到IDA，找到main函数，点开。可以看到调用了四次insert函数和PrintStudent函数。</p><p><img src="\2019\07\结构体链表逆向\1564122124023.png" alt="1564122124023"></p><p>点到insert函数中查看函数实现。传入两个参数后，后面调用了malloc函数来分配内存空间，R3就可以看做是malloc分配来的内存并且指向此块内存的指针。其后使用dest来表示这个指针。var_14把内存数据存入dest加偏移量为32的地址上。也就是把第二个int参数存入相应地址。获取head变量，LDR把head变量当作地址来加载其上的数据，head同样可能是指针。而后会把第一个参数和head指针数据同样存入到结构体对应的地址上。只是第一个参数使用了strcpy来复制，顺便一提可能会产生数据覆盖。最后指针dest存到head的地址上，由head来表示基地址。</p><p><img src="\2019\07\结构体链表逆向\1564123321051.png" alt="1564123321051"></p><p>后面再看一下PrintStudent函数。将head的地址值存到新的指针中。以下仍然使用*head表示存入的地址上的数据。判断值为指针是否为0，从而进行遍历，到此为止基本可以看到前面的结构体存入参数和head赋值，完成了一个链表的结构。此处是遍历链表判断是否遍历完成。</p><p>获取到第一个第二个参数后，var_8指针由参数三来进行下一个结构体的查询。</p><p><img src="\2019\07\结构体链表逆向\1564130434725.png" alt="1564130434725"></p><p>实现大致如下，当执行第一次insert函数时，写入一个结构体，并且把结构体的基地址写入head指针，第二次执行insert函数时，把head指针写入第二个结构体的第三个参数也就是结构体的指向下一个节点的指针。完成一个链表的创建。按照执行顺序，从后往前执行，第三个参数也就是节点的指针是前一个结构体的基地址。直到遍历完成，指针为null。</p><p><img src="\2019\07\结构体链表逆向\1564132058549.png" alt="1564132058549"></p><p>至此，结构体链表的分析就算完成了。无名侠的这个课程也算是结束了，不得不说多看几遍还是有不少的收获。</p>]]></content>
-    
-    <summary type="html">
-    
-      
-      
-        &lt;h3 id=&quot;结构体链表逆向&quot;&gt;&lt;a href=&quot;#结构体链表逆向&quot; class=&quot;headerlink&quot; title=&quot;结构体链表逆向&quot;&gt;&lt;/a&gt;结构体链表逆向&lt;/h3&gt;&lt;p&gt;同样使用如下的C代码：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;#include &amp;lt;stdio.h&amp;gt
       
     
     </summary>
