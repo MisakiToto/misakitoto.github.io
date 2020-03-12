@@ -193,6 +193,50 @@ GPOST / HTTP/1.1
 <p>重新使用以上提到的方式来尝试混淆te，尝试了几种方式，发现只有双写的情况下，可以混淆后端对te的处理。</p>
 <p><img src="/images/2020/03/12/aa4bd080-6409-11ea-a731-5d1f4a3ce08c.png" alt="image20200312102617950.png"></p>
 <p>也就是说前端服务器处理te块消息使用了第一个te头来当作标准解析，而后端服务器中使用了第二个te头来当作标准解析。</p>
+<h3 id="请求走私利用"><a href="#请求走私利用" class="headerlink" title="请求走私利用"></a>请求走私利用</h3><p>上面几种情况说明了请求走私的利用方式，现在同样利用实验室来尝试一下请求走私能获取到什么。</p>
+<p>实验室：<a href="https://portswigger.net/web-security/request-smuggling/exploiting/lab-bypass-front-end-controls-cl-te" target="_blank" rel="noopener">https://portswigger.net/web-security/request-smuggling/exploiting/lab-bypass-front-end-controls-cl-te</a></p>
+<h4 id="CL-TE-1"><a href="#CL-TE-1" class="headerlink" title="CL-TE"></a>CL-TE</h4><p>利用CL-TE漏洞方式，来访问前端服务器不能访问的/admin页面。同时删除carlos用户。</p>
+<p><img src="/images/2020/03/12/1f1b2700-6417-11ea-8626-838e679dac65.png" alt="image20200312103959649.png"></p>
+<p>尝试直接访问的时候提示页面不能访问，然后修改为cl-te的方式</p>
+<p><img src="/images/2020/03/12/25645820-6417-11ea-8626-838e679dac65.png" alt="image20200312104623997.png"></p>
+<p>多发送两次会发现提示</p>
+<p><img src="/images/2020/03/12/2881ebd0-6417-11ea-8626-838e679dac65.png" alt="image20200312105204438.png"></p>
+<p>添加localhost头。多发送几次就可以看到需要删除的用户。</p>
+<p><img src="/images/2020/03/12/2be9f600-6417-11ea-8626-838e679dac65.png" alt="image20200312105326207.png"></p>
+<p>构造删除的地址来发送，提示跳转302</p>
+<p><img src="/images/2020/03/12/304a9100-6417-11ea-8626-838e679dac65.png" alt="image20200312105432606.png"></p>
+<p>再次查看页面发送用户被删除</p>
+<p><img src="/images/2020/03/12/34349c70-6417-11ea-8626-838e679dac65.png" alt="image20200312105610334.png"></p>
+<h4 id="TE-TE-1"><a href="#TE-TE-1" class="headerlink" title="TE-TE"></a>TE-TE</h4><p>第二个是利用TE-CL的方式来删除用户，同样尝试一下</p>
+<p>实验室: <a href="https://portswigger.net/web-security/request-smuggling/exploiting/lab-bypass-front-end-controls-te-cl" target="_blank" rel="noopener">https://portswigger.net/web-security/request-smuggling/exploiting/lab-bypass-front-end-controls-te-cl</a></p>
+<p><img src="/images/2020/03/12/39cfda50-6417-11ea-8626-838e679dac65.png" alt="image20200312105739571.png"></p>
+<p>流程基本一致，还是需要添加localhost头</p>
+<p><img src="/images/2020/03/12/3d1fc8a0-6417-11ea-8626-838e679dac65.png" alt="image20200312110053887.png"></p>
+<p>查看到admin页面</p>
+<p><img src="/images/2020/03/12/4176edc0-6417-11ea-8626-838e679dac65.png" alt="image20200312110217775.png"></p>
+<p>执行删除用户，查看已删除。</p>
+<p><img src="/images/2020/03/12/46effda0-6417-11ea-8626-838e679dac65.png" alt="image20200312110345830.png"></p>
+<h4 id="请求走私重写请求"><a href="#请求走私重写请求" class="headerlink" title="请求走私重写请求"></a>请求走私重写请求</h4><p>实验室：<a href="https://portswigger.net/web-security/request-smuggling/exploiting/lab-reveal-front-end-request-rewriting" target="_blank" rel="noopener">https://portswigger.net/web-security/request-smuggling/exploiting/lab-reveal-front-end-request-rewriting</a></p>
+<p>利用请求走私来达到访问/admin页面，但是需要添加请求头，类似xff头，但不是xff头，然后再去删除用户。</p>
+<p><img src="/images/2020/03/12/5891cdf0-6416-11ea-ac1a-19f07685b6f0.png" alt="image20200312111010862.png"></p>
+<p>实验室有个搜索功能，说明这个功能可能帮助我们获得需要的请求头。先访问admin页面</p>
+<p><img src="/images/2020/03/12/60894b50-6416-11ea-ac1a-19f07685b6f0.png" alt="image20200312112425807.png"></p>
+<p>再尝试走私请求来访问搜索，尝试了多次，添加头后终于看到了需要的请求头。而content-length的大小关系泄露出来的多少有关。</p>
+<p><img src="/images/2020/03/12/65edc1c0-6416-11ea-ac1a-19f07685b6f0.png" alt="image20200312113305960.png"></p>
+<p>查看到了熟悉的用户页面</p>
+<p><img src="/images/2020/03/12/6be3a2c0-6416-11ea-ac1a-19f07685b6f0.png" alt="image20200312113552192.png"></p>
+<p>不过删除过程中发现，如果还按照之前的方式来删除用户，会不能删除，多次尝试后发现提示不允许换行符。</p>
+<p><img src="/images/2020/03/12/7016c520-6416-11ea-ac1a-19f07685b6f0.png" alt="image20200312114635935.png"></p>
+<p>重新尝试发现使用GET方法来删除即可</p>
+<p><img src="/images/2020/03/12/75631fb0-6416-11ea-ac1a-19f07685b6f0.png" alt="image20200312114612255.png"></p>
+<h4 id="获取其他用户cookie"><a href="#获取其他用户cookie" class="headerlink" title="获取其他用户cookie"></a>获取其他用户cookie</h4><p>实验室：<a href="https://portswigger.net/web-security/request-smuggling/exploiting/lab-capture-other-users-requests" target="_blank" rel="noopener">https://portswigger.net/web-security/request-smuggling/exploiting/lab-capture-other-users-requests</a></p>
+<p>这个实验一开始并没有get到点，查看解后才发现原来忽略了长度。</p>
+<p>我们提交请求的时候，受害者也会提交请求，就是需要获取并显示受害者的请求来达到获取cookie的目的。</p>
+<p><img src="/images/2020/03/12/7b736680-6416-11ea-ac1a-19f07685b6f0.png" alt="image20200312115112213.png"></p>
+<p>提交请求后显示跳转地址</p>
+<p><img src="/images/2020/03/12/7f3fb0c0-6416-11ea-ac1a-19f07685b6f0.png" alt="image20200312115922944.png"></p>
+<p>查看页面的显示，从而获取用户的请求cookie</p>
+<p><img src="/images/2020/03/12/83413bd0-6416-11ea-ac1a-19f07685b6f0.png" alt="image20200312115952305.png"></p>
 
           </div>
           <br><br>
@@ -201,7 +245,7 @@ GPOST / HTTP/1.1
                     <p>原文作者：<a href="">Misaki</a>
                     <p>原文链接：<a href="/2020/03/HTTP-请求走私/">/2020/03/HTTP-请求走私/</a>
                     <p>发表日期：<a href="/2020/03/HTTP-请求走私/">March 12th 2020, 10:29:20 am</a>
-                    <p>更新日期：<a href="/2020/03/HTTP-请求走私/">March 12th 2020, 10:33:32 am</a>
+                    <p>更新日期：<a href="/2020/03/HTTP-请求走私/">March 12th 2020, 12:09:36 pm</a>
                     <p>版权声明：本文采用<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">知识共享署名-非商业性使用 4.0 国际许可协议</a>进行许可</p>
                 </div>
               
