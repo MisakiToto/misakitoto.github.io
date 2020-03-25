@@ -110,6 +110,58 @@
             
             
                 <div class="col-md-11">
+                    <a href="/2019/12/逆向打卡APP/" class="h3 title" target="_self">逆向打卡APP</a>
+                    
+                    <p>公司打卡APP，由于偶尔忘记打卡，所以想做一个能查询是否打卡来提醒自己的脚本，为什么不做自动打卡脚本，担心万一更新出问题，但没有发现，那岂不是很尴尬。
+首先抓包，查看查询打卡的请求。
+获取其中的参数，其中userid为手机号，rmk3为设备uid，reqssn为固定字符串，所以需要知道加密算法来计算sign
+fm=&lt;fm&gt;&lt;use...</p>
+                    
+                    
+                    <p class="h6">
+                        <i class="material-icons">date_range</i>2019-12-28
+                        
+                            <i class="material-icons">bookmark_border</i>
+                                
+                                    Android逆向 &nbsp;
+                                
+                        
+                    </p>
+                    
+                </div>
+        </div>
+       
+        
+        <div class="row post-card">
+            
+            
+                <div class="col-md-11">
+                    <a href="/2019/12/OSSEC-Wazuh/" class="h3 title" target="_self">OSSEC Wazuh</a>
+                    
+                    <p>安装Wazuh manager使用Ubuntu系统，目前wazuh版本为3.10
+安装文档地址：https://documentation.wazuh.com/3.10/installation-guide/installing-elastic-stack/elastic_server_deb.html
+添加更新源apt-get update
+ap...</p>
+                    
+                    
+                    <p class="h6">
+                        <i class="material-icons">date_range</i>2019-12-06
+                        
+                            <i class="material-icons">bookmark_border</i>
+                                
+                                    Open Source Security &nbsp;
+                                
+                        
+                    </p>
+                    
+                </div>
+        </div>
+       
+        
+        <div class="row post-card">
+            
+            
+                <div class="col-md-11">
                     <a href="/2019/11/Hook-WhyShouldIPay/" class="h3 title" target="_self">Hook WhyShouldIPay</a>
                     
                     <p>学习Frida的时候看到小肩膀视频中提到了一个apk，whyshouldipay。这个apk之前做过逆向分析修改，所以正好此处使用Frida来尝试HOOK。
@@ -216,71 +268,6 @@ ZooKeeper提供的常见服务如下 :
                             <i class="material-icons">bookmark_border</i>
                                 
                                     Open Source Security &nbsp;
-                                
-                        
-                    </p>
-                    
-                </div>
-        </div>
-       
-        
-        <div class="row post-card">
-            
-            
-                <div class="col-md-11">
-                    <a href="/2019/11/AI-WEB 1.0/" class="h3 title" target="_self">VulnHub AI WEB 1.0</a>
-                    
-                    <p>加载虚拟机后，由于没有账号暂不登录，通过虚拟机网段，查询DHCP分配的地址。
-扫描端口发现只有80的对外开放端口，访问发现
-
-扫描路径发现robots文件。其中两个路径文件，看样子是文件上传的地址。
-
-访问其中地址，403
-
-介于是403尝试访问上一级发现
-
-尝试输入1，发现显示admin用户，那就是说可能这是个注入点。
-
-检查是否存在注入，发现存...</p>
-                    
-                    
-                    <p class="h6">
-                        <i class="material-icons">date_range</i>2019-11-06
-                        
-                            <i class="material-icons">bookmark_border</i>
-                                
-                                    渗透测试 &nbsp;
-                                
-                        
-                    </p>
-                    
-                </div>
-        </div>
-       
-        
-        <div class="row post-card">
-            
-            
-                <div class="col-md-11">
-                    <a href="/2019/11/GitHub-Monitor/" class="h3 title" target="_self">GitHub-Monitor</a>
-                    
-                    <p>GITHUB_MONTIOR
-  python3 + Django 2.2.6 + supervisord
-
-
-环境由简单的Django完成，外加一个HTML展示模板
-GitHub的爬虫由supervisord来维护，需要修改配置文件内的信息，可以改成/var/run路径
-pip安装如下的文件即可
-
-爬虫需要账号密码模拟登陆，进程为五分钟一次。是否...</p>
-                    
-                    
-                    <p class="h6">
-                        <i class="material-icons">date_range</i>2019-11-06
-                        
-                            <i class="material-icons">bookmark_border</i>
-                                
-                                    python &nbsp;
                                 
                         
                     </p>

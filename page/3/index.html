@@ -110,6 +110,71 @@
             
             
                 <div class="col-md-11">
+                    <a href="/2019/11/AI-WEB 1.0/" class="h3 title" target="_self">VulnHub AI WEB 1.0</a>
+                    
+                    <p>加载虚拟机后，由于没有账号暂不登录，通过虚拟机网段，查询DHCP分配的地址。
+扫描端口发现只有80的对外开放端口，访问发现
+
+扫描路径发现robots文件。其中两个路径文件，看样子是文件上传的地址。
+
+访问其中地址，403
+
+介于是403尝试访问上一级发现
+
+尝试输入1，发现显示admin用户，那就是说可能这是个注入点。
+
+检查是否存在注入，发现存...</p>
+                    
+                    
+                    <p class="h6">
+                        <i class="material-icons">date_range</i>2019-11-06
+                        
+                            <i class="material-icons">bookmark_border</i>
+                                
+                                    渗透测试 &nbsp;
+                                
+                        
+                    </p>
+                    
+                </div>
+        </div>
+       
+        
+        <div class="row post-card">
+            
+            
+                <div class="col-md-11">
+                    <a href="/2019/11/GitHub-Monitor/" class="h3 title" target="_self">GitHub-Monitor</a>
+                    
+                    <p>GITHUB_MONTIOR
+  python3 + Django 2.2.6 + supervisord
+
+
+环境由简单的Django完成，外加一个HTML展示模板
+GitHub的爬虫由supervisord来维护，需要修改配置文件内的信息，可以改成/var/run路径
+pip安装如下的文件即可
+
+爬虫需要账号密码模拟登陆，进程为五分钟一次。是否...</p>
+                    
+                    
+                    <p class="h6">
+                        <i class="material-icons">date_range</i>2019-11-06
+                        
+                            <i class="material-icons">bookmark_border</i>
+                                
+                                    python &nbsp;
+                                
+                        
+                    </p>
+                    
+                </div>
+        </div>
+       
+        
+        <div class="row post-card">
+            
+            
+                <div class="col-md-11">
                     <a href="/2019/10/2018SUSCTF-Mobile题/" class="h3 title" target="_self">2018SUSCTF-Mobile题</a>
                     
                     <p>BabyAndroid常规，JEB反编译
@@ -205,59 +270,6 @@ net g...</p>
                             <i class="material-icons">bookmark_border</i>
                                 
                                     web安全 &nbsp;
-                                
-                        
-                    </p>
-                    
-                </div>
-        </div>
-       
-        
-        <div class="row post-card">
-            
-            
-                <div class="col-md-11">
-                    <a href="/2019/09/CVE-2019-10392-Jenkins-2k19认证远程RCE/" class="h3 title" target="_self">CVE-2019-10392 Jenkins 2k19认证远程RCE</a>
-                    
-                    <p>CVE-2019-10392 Jenkins 2k19认证远程RCE使用以下命令在本地使用Docker启动了Jenkins实例：
-docker run -p 8080:8080 -p 50000:50000 jenkins/jenkins:lts-alpine
-版本为：Jenkins 2.176.3
-git客户端：http://updates.je...</p>
-                    
-                    
-                    <p class="h6">
-                        <i class="material-icons">date_range</i>2019-09-16
-                        
-                            <i class="material-icons">bookmark_border</i>
-                                
-                                    web安全 &nbsp;
-                                
-                        
-                    </p>
-                    
-                </div>
-        </div>
-       
-        
-        <div class="row post-card">
-            
-            
-                <div class="col-md-11">
-                    <a href="/2019/09/Android-Java-Hook/" class="h3 title" target="_self">Android Java Hook</a>
-                    
-                    <p>使用Inspeckage尝试hook其中的加密函数环境：夜神模拟器Inspeckage 2.3某收件APP
-获取关键参数安装app后，抓包看到如下参数
-在AK中搜索其中关键词fm和sign，搜索中发现sign过多，于是尝试搜索FM，搜索中发现如下class文件。
-打开Java源代码，在其中的一个void类型的b函数中发现关键。
-打开对应文件的sha...</p>
-                    
-                    
-                    <p class="h6">
-                        <i class="material-icons">date_range</i>2019-09-16
-                        
-                            <i class="material-icons">bookmark_border</i>
-                                
-                                    Android逆向 &nbsp;
                                 
                         
                     </p>

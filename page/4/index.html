@@ -110,6 +110,59 @@
             
             
                 <div class="col-md-11">
+                    <a href="/2019/09/CVE-2019-10392-Jenkins-2k19认证远程RCE/" class="h3 title" target="_self">CVE-2019-10392 Jenkins 2k19认证远程RCE</a>
+                    
+                    <p>CVE-2019-10392 Jenkins 2k19认证远程RCE使用以下命令在本地使用Docker启动了Jenkins实例：
+docker run -p 8080:8080 -p 50000:50000 jenkins/jenkins:lts-alpine
+版本为：Jenkins 2.176.3
+git客户端：http://updates.je...</p>
+                    
+                    
+                    <p class="h6">
+                        <i class="material-icons">date_range</i>2019-09-16
+                        
+                            <i class="material-icons">bookmark_border</i>
+                                
+                                    web安全 &nbsp;
+                                
+                        
+                    </p>
+                    
+                </div>
+        </div>
+       
+        
+        <div class="row post-card">
+            
+            
+                <div class="col-md-11">
+                    <a href="/2019/09/Android-Java-Hook/" class="h3 title" target="_self">Android Java Hook</a>
+                    
+                    <p>使用Inspeckage尝试hook其中的加密函数环境：夜神模拟器Inspeckage 2.3某收件APP
+获取关键参数安装app后，抓包看到如下参数
+在AK中搜索其中关键词fm和sign，搜索中发现sign过多，于是尝试搜索FM，搜索中发现如下class文件。
+打开Java源代码，在其中的一个void类型的b函数中发现关键。
+打开对应文件的sha...</p>
+                    
+                    
+                    <p class="h6">
+                        <i class="material-icons">date_range</i>2019-09-16
+                        
+                            <i class="material-icons">bookmark_border</i>
+                                
+                                    Android逆向 &nbsp;
+                                
+                        
+                    </p>
+                    
+                </div>
+        </div>
+       
+        
+        <div class="row post-card">
+            
+            
+                <div class="col-md-11">
                     <a href="/2019/08/重放攻击/" class="h3 title" target="_self">重放攻击</a>
                     
                     <p>重放攻击1. 漏洞简介​        首先简单看一下百度百科对重放攻击的简介：重放攻击(Replay Attacks)又称重播攻击、回放攻击，是指攻击者发送一个目的主机已接收过的包，来达到欺骗系统的目的，主要用于身份认证过程，破坏认证的正确性。重放攻击可以由发起者，也可以由拦截并重发该数据的敌方进行。攻击者利用网络监听或者其他方式盗取认证凭据，之...</p>
@@ -212,58 +265,6 @@ void PrintAddr()
                             <i class="material-icons">bookmark_border</i>
                                 
                                     Android逆向 &nbsp;
-                                
-                        
-                    </p>
-                    
-                </div>
-        </div>
-       
-        
-        <div class="row post-card">
-            
-            
-                <div class="col-md-11">
-                    <a href="/2019/07/Redis-主从复制/" class="h3 title" target="_self">Redis 主从复制</a>
-                    
-                    <p>Redis主从复制redis主从复制，前几天分享的新版redis未授权利用的新型方式。
-什么是主从复制，http://blog.itpub.net/31545684/viewspace-2213629/
-通过redis命令来设置主从机
-127.0.0.1:6379&gt; slaveof 192.168.253.131 6379
-被设置的主机将通过...</p>
-                    
-                    
-                    <p class="h6">
-                        <i class="material-icons">date_range</i>2019-07-15
-                        
-                            <i class="material-icons">bookmark_border</i>
-                                
-                                    web安全 &nbsp;
-                                
-                        
-                    </p>
-                    
-                </div>
-        </div>
-       
-        
-        <div class="row post-card">
-            
-            
-                <div class="col-md-11">
-                    <a href="/2019/07/FastJson-反序列化/" class="h3 title" target="_self">FastJson 反序列化</a>
-                    
-                    <p>FastJson 反序列化前一段时间HW护出来一个FastJson的RCE。网上遍布了利用的poc。此处简单模拟一下触发流程。
-先下载1.2.47的FastJson，地址：http://repo1.maven.org/maven2/com/alibaba/fastjson/1.2.47/FastJson-1.2.47.jar
-利用的JDK为，jav...</p>
-                    
-                    
-                    <p class="h6">
-                        <i class="material-icons">date_range</i>2019-07-15
-                        
-                            <i class="material-icons">bookmark_border</i>
-                                
-                                    web安全 &nbsp;
                                 
                         
                     </p>

