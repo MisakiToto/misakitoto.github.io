@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+
+
+
+
+
+
+
+
+
+<head>
+    <meta charset="utf-8" />
+    <link rel="apple-touch-icon" sizes="76x76" href="/favicon.ico">
+    <link rel="icon" type="image/png" href="/favicon.ico">
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0, shrink-to-fit=no" name="viewport" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <meta name="description" content="One way to choose one">
+    <meta name="author" content="Misaki">
+    <meta name="keywords" content="">
+    <title>APP应用安全检测 ~ Misaki&#39;s Blog</title>
+    <link rel="stylesheet" href="/css/Material_Icons.css">
+    <!-- <link rel="stylesheet" href="/css/font-awesome.css"> -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/css/main.css">
+    
+        <link rel="stylesheet" href="/css/post.css">
+        
+            <link rel="stylesheet" href="/css/Prettify/tomorrow-night-eighties.min.css">
+        
+    
+</head>
+
+<body class=" sidebar-collapse">
+<nav class="navbar navbar-transparent navbar-color-on-scroll fixed-top navbar-expand-lg" color-on-scroll="100" id="sectionsNav">
+    <div class="container">
+        <div class="navbar-translate">
+            <a class="navbar-brand" href="/">
+                Misaki&#39;s Blog</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="navbar-toggler-icon"></span>
+                <span class="navbar-toggler-icon"></span>
+                <span class="navbar-toggler-icon"></span>
+            </button>
+        </div>
+            <div class="collapse navbar-collapse">
+                <ul class="navbar-nav ml-auto">
+                    
+                        
+                            <li class="nav-item">
+                                <a class="nav-link" href="/archives/">
+                                    archives
+                                </a>
+                            </li>
+                        
+                            <li class="nav-item">
+                                <a class="nav-link" href="/about/">
+                                    about
+                                </a>
+                            </li>
+                        
+                    
+                    
+                        
+                            <li class="nav-item">
+                                <a class="nav-link" rel="tooltip" title="" data-placement="bottom" href="https://github.com/MisakiKata" target="_blank" data-original-title="See me here">
+                                    <i class="fa fa-github"></i>
+                                </a>
+                            </li>
+                        
+                            <li class="nav-item">
+                                <a class="nav-link" rel="tooltip" title="" data-placement="bottom" href="https://www.t00ls.net/members-profile-12179.html" target="_blank" data-original-title="See me here">
+                                    <i class="fa fa-twitch"></i>
+                                </a>
+                            </li>
+                        
+                            <li class="nav-item">
+                                <a class="nav-link" rel="tooltip" title="" data-placement="bottom" href="https://misakikata.github.io/atom.xml" target="_blank" data-original-title="See me here">
+                                    <i class="fa fa-rss"></i>
+                                </a>
+                            </li>
+                        
+                            <li class="nav-item">
+                                <a class="nav-link" rel="tooltip" title="" data-placement="bottom" href="mailto:misakikatas@gmail.com" target="_blank" data-original-title="See me here">
+                                    <i class="fa fa-envelope"></i>
+                                </a>
+                            </li>
+                        
+                    
+                </ul>
+            </div>
+    </div>
+</nav>
+    
+  <div class="page-header header-filter" data-parallax="true" style="background-image: url('/img/post-banner.jpg'); height: 70vh;">
+    
+      <div class="container">
+        <h1 class="title text-center post_title">APP应用安全检测</h1>
+        <p class="text-center"><b>Friday, April 10th 2020, 4:30 pm</b></p>
+      </div>
+    
+  </div>
+
+  
+  
+  
+    <div class="row" style="margin: 0 0 0; z-index: 999;">
+  <div class="col-md-8 offset-md-1">
+    <div class="main main-raised">
+      <div class="container">
+        <div class="section">
+          <div class="post_content">
+              <h2 id="测试说明"><a href="#测试说明" class="headerlink" title="测试说明"></a>测试说明</h2><p>测试内容根据绿盟APP测试流程进行检查，APP是前几年谷歌CTF的中的APK。</p>
+<h2 id="客户端安全"><a href="#客户端安全" class="headerlink" title="客户端安全"></a>客户端安全</h2><h3 id="安装包签名"><a href="#安装包签名" class="headerlink" title="安装包签名"></a>安装包签名</h3><pre><code>jarsigner.exe -verify WhyShouldIPay.apk -verbose -certs
+</code></pre><p>输出结果为“jar 已验证”时，表示签名正常。  </p>
+<p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/20200410162840.png" alt="image-20200410140458826"></p>
+<h3 id="程序保护"><a href="#程序保护" class="headerlink" title="程序保护"></a>程序保护</h3><p>此处使用jadx打开APK，若软件使用混淆好加壳则不存在问题。如下打开后是下面这种，则是没添加保护。</p>
+<p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/20200410162841.png" alt="image-20200410140922318"></p>
+<h3 id="应用完整性检测"><a href="#应用完整性检测" class="headerlink" title="应用完整性检测"></a>应用完整性检测</h3><p>反编译APK，修改其中的res资源文件，把其中的一个图片替换为其他图片</p>
+<p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/20200410162843.png" alt="image-20200410141438100"></p>
+<p>如果完整性是检查MANIFEST.MF 中的数据则存在风险。若回编译后安装使用正常，则代表无检查。</p>
+<h3 id="组件安全"><a href="#组件安全" class="headerlink" title="组件安全"></a>组件安全</h3><p>主要查看是否存在<code>android:exported=&quot;true&quot;</code>属性的组件，存在属性的组件可以被第三方导出。但是部分组件需要被调用来执行，比如组件中存在<code>&lt;intent-filter&gt;</code>过滤器。这种组件就相当于允许导出。</p>
+<p>根据不同的要求这种情况不一定算是风险项。比如此activity组件，由于是首启动页。需要被调用执行，也就不存在上面所说的不允许被导出情况。</p>
+<p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/20200410162846.png" alt="image-20200410144025704"></p>
+<h3 id="webview组件安全"><a href="#webview组件安全" class="headerlink" title="webview组件安全"></a>webview组件安全</h3><p>Android 4.2 版本以下的 webview 组件存在安全漏洞 ，检测本地是否会被利用的方式是允许运行的sdk最小不能低于17，来避免在受影响的手机上使用。</p>
+<p><img src="APP应用安全检测.assets/image-20200410144355967.png" alt="image-20200410144355967"></p>
+<h2 id="敏感信息安全"><a href="#敏感信息安全" class="headerlink" title="敏感信息安全"></a>敏感信息安全</h2><h3 id="数据文件"><a href="#数据文件" class="headerlink" title="数据文件"></a>数据文件</h3><p>查看安装app目录文件权限是否为<code>rw-rw----</code>当前用户可读性模式。</p>
+<p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/20200410162847.png" alt="image-20200410145303695"></p>
+<p>如果文件目录下存在database目录，db类型的文件，说明使用本地数据库，查看数据文件是否有明文敏感信息。</p>
+<h3 id="日志文件"><a href="#日志文件" class="headerlink" title="日志文件"></a>日志文件</h3><p>查看日志文件中是否输出了一些敏感信息，比如账号密码，认证session等</p>
+<p>可以通过adb命令查看，也可以使用第三方连接软件查看<code>adb logcat</code></p>
+<p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/20200410162849.png" alt="image-20200410145927703"></p>
+<h2 id="密码键盘安全性"><a href="#密码键盘安全性" class="headerlink" title="密码键盘安全性"></a>密码键盘安全性</h2><h3 id="屏幕录像"><a href="#屏幕录像" class="headerlink" title="屏幕录像"></a>屏幕录像</h3><p>这种问题从测过的软件和客户来看，在意的程度不高，可能也就在银行金融类APP上会比较在意。</p>
+<p>比如利用adb截图来测试是否可以对屏幕进行记录<code>adb shell /system/bin/screencap -p /path/a.png</code></p>
+<p>如果打开后，可以看到输入的数据，或者可以看到键盘点击反馈则算安全问题。</p>
+<p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/20200410162850.png" alt="image-20200410151346239"></p>
+<h3 id="随机键盘"><a href="#随机键盘" class="headerlink" title="随机键盘"></a>随机键盘</h3><p>这种目前只在银行APP支付的时候输入银行卡密码的时候存在，一般APP并没有此要求。可以根据情况来确定是否需要检测此项。</p>
+<h2 id="安全策略"><a href="#安全策略" class="headerlink" title="安全策略"></a>安全策略</h2><h3 id="密码复杂度"><a href="#密码复杂度" class="headerlink" title="密码复杂度"></a>密码复杂度</h3><p>APP登陆的密码一般要求大小写字母和数字，需要其中两种以上，不少于八位。如果允许使用纯数字或者纯字母，且长度没有要求的情况下，则存在问题。</p>
+<h3 id="账号登陆限制"><a href="#账号登陆限制" class="headerlink" title="账号登陆限制"></a>账号登陆限制</h3><p>根据业务需要，是否允许同一个账号多设备登陆同时操作，如果不允许则尝试多设备登陆，登陆正常使用则存在问题。</p>
+<h3 id="账号锁定机制"><a href="#账号锁定机制" class="headerlink" title="账号锁定机制"></a>账号锁定机制</h3><p>账号可能存在被爆破密码的可能，在有些不适合使用验证码的场景下，对账号执行登陆错误次数的限制是可以有效防止账号被暴力破解的方式之一。</p>
+<h3 id="验证码安全性"><a href="#验证码安全性" class="headerlink" title="验证码安全性"></a>验证码安全性</h3><p>查看使用的验证码是否能被简单识别，使用能正常使用和防止登陆中被多次验证的问题</p>
+<h3 id="安全退出"><a href="#安全退出" class="headerlink" title="安全退出"></a>安全退出</h3><p>账号在登陆退出后，查看是否正确的注销session。利用原session是否还可以请求到数据。</p>
+<h3 id="密码修改验证"><a href="#密码修改验证" class="headerlink" title="密码修改验证"></a>密码修改验证</h3><p>验证修改密码的功能是否存在问题，是否需要原密码判断，修改的复杂度等是否符合要求</p>
+<h3 id="activity-界面劫持"><a href="#activity-界面劫持" class="headerlink" title="activity 界面劫持"></a>activity 界面劫持</h3><p>如果攻击者注册一个receiver，响应android.intent.action.BOOT_COMPLETED，使得开启启动一个service；在这个service中启动一个计时器，不停枚举当前进程中是否有预设的进程启动，如果发现有预设进程，则使用FLAG_ACTIVITY_NEW_TASK启动自己的钓鱼界面，而正常应用的界面则隐藏在钓鱼界面的后面。</p>
+<p>比如使用<a href="https://github.com/abigbread/Hijack来创建一个apk。循环监听设置好的app。" target="_blank" rel="noopener">https://github.com/abigbread/Hijack来创建一个apk。循环监听设置好的app。</a></p>
+<h2 id="进程防护"><a href="#进程防护" class="headerlink" title="进程防护"></a>进程防护</h2><h3 id="动态注入"><a href="#动态注入" class="headerlink" title="动态注入"></a>动态注入</h3><p>可以利用成熟的HOOK框架来尝试，比如使用xpose，在对于进程文件中，查看maps文件。其中可以看到对于的xpose文件</p>
+<p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/20200410162854.png" alt="image-20200410155352701"></p>
+<p>或者使用Frida来加载其中的所有的类，查看是否正常获取。</p>
+<p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/20200410162856.png" alt="image-20200410161814489"></p>
+<h2 id="通信安全"><a href="#通信安全" class="headerlink" title="通信安全"></a>通信安全</h2><h3 id="通信加密"><a href="#通信加密" class="headerlink" title="通信加密"></a>通信加密</h3><p>这种更像是web漏洞，主要查看是否使用了https加密流量，并且是否有正确的证书配置。加密算法是否在TLSv1.1以上。</p>
+
+          </div>
+          <br><br>
+              
+                <div class="license-wrapper">
+                    <p>原文作者：<a href="">Misaki</a>
+                    <p>原文链接：<a href="/2020/04/APP应用安全检测/">/2020/04/APP应用安全检测/</a>
+                    <p>发表日期：<a href="/2020/04/APP应用安全检测/">April 10th 2020, 4:30:24 pm</a>
+                    <p>更新日期：<a href="/2020/04/APP应用安全检测/">April 10th 2020, 4:30:33 pm</a>
+                    <p>版权声明：本文采用<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">知识共享署名-非商业性使用 4.0 国际许可协议</a>进行许可</p>
+                </div>
+              
+          <br><br>
+          <div>
+              <p>
+                       
+                      <span class="badge badge-default">#&nbsp;Android逆向</span>
+                      &nbsp;
+                      
+              </p>
+          </div>
+        </div>
+      </div>  
+    </div>
+  </div>
+  <!-- TOC -->
+  
+      <div class="">
+        <div id="toc">
+          <p class="toc-title"><i class="material-icons" style="vertical-align:middle">toc</i>Toc:</p> 
+          <div id="tocbot"></div>
+        </div>
+      </div>
+  
+</div>
+
+
+<!-- Comments -->
+<div class="row">
+    <div class="col-md-8 offset-md-2">
+    
+        
+            <div class="disqus" style="width:100%">
+    <div id="disqus_thread"></div>
+    <script>               
+        var disqus_shortname = '';
+        var disqus_config = function () {
+            this.page.url = '/2020/04/APP应用安全检测/'; 
+            this.page.identifier = '/2020/04/APP应用安全检测/';
+        };
+        (function() { 
+            var d = document, s = d.createElement('script');
+            s.type = 'text/javascript';
+            s.src = '//'+disqus_shortname+'.disqus.com/embed.js';
+            s.setAttribute('data-timestamp', +new Date());
+            (d.head || d.body).appendChild(s);
+        })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>                                
+</div>
+        
+    
+    </div>
+</div>
+  
+
+<footer class="footer footer-default">
+        <div class="container">
+          <div class="float-left" style="padding: 15px 0;">
+              <b>假如今天的你被生活辜负了，别伤心，因为明天生活还会继续辜负你！</b>
+          </div>
+          <div align="right" style="padding: 15px 0;">
+              <i class="iconfont icon-love" ></i>
+              <a href="https://github.com/0x2e/Material-T" target="_blank"> <b>Material-T</b></a>
+          </div>
+        </div>
+</footer>
+      <!--   Core JS Files   -->
+      <script src="/js/core/jquery.min.js?v=3.2.1"></script>
+      <script src="/js/main.js"></script>
+      <script src="/js/core/popper.min.js"></script>
+      <script src="/js/core/bootstrap-material-design.min.js"></script>
+      <script src="/js/plugins/moment.min.js"></script>
+      <script src="/js/material-kit.min.js?v=2.0.5"></script>
+      
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.4.2/tocbot.min.js"></script>
+        <script src="/js/post.js"></script>
+        <script src="/js/plugins/prettify.js"></script>
+        <script>
+            $(document).ready(function(){
+                $('pre').addClass('prettyprint linenums');
+                prettyPrint();
+            })
+        </script>
+      
+<script src="/live2d-widget/autoload.js"></script>
+</body>
+</html>

