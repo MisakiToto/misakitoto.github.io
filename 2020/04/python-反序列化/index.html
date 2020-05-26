@@ -255,7 +255,7 @@ if __name__ == &quot;__main__&quot;:
 &gt;&gt;&gt; response = requests.get(&quot;http://127.0.0.1:5000/&quot;, cookies=dict(user=base64.b64encode(s).decode()))
 </code></pre><p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/image-20200427134049774.png" alt="image-20200427134049774"></p>
 <h3 id="Unpickler-find-class"><a href="#Unpickler-find-class" class="headerlink" title="Unpickler find_class()"></a>Unpickler find_class()</h3><p>当然对于这种无限制的任意对象调用，官方也有一定的解决办法，定制<code>find_class()</code>来控制要解封的对象。</p>
-<p><img src="python-反序列化.assets/image-20200427135200757.png" alt="image-20200427135200757"></p>
+<p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/image-20200509163651496.png" alt="image-20200509163651496"></p>
 <p>比如如下的一个例子：</p>
 <pre><code>import io
 import pickle
@@ -735,6 +735,35 @@ yaml.load(cp)
 yaml.safe_load(cp)
 
 #yaml.constructor.ConstructorError: could not determine a constructor for the tag
+</code></pre><h3 id="Jsonpickle"><a href="#Jsonpickle" class="headerlink" title="Jsonpickle"></a>Jsonpickle</h3><p>用于将任意对象序列化为JSON的Python库。<code>Jsonpickle</code>可以使用几乎所有Python对象并将该对象转换为JSON。另外，它可以将对象重新构造回Python。该对象必须可以通过模块进行全局访问，并且必须继承自对象（又称新类）。<a href="https://jsonpickle.github.io/#module-jsonpickle" target="_blank" rel="noopener">https://jsonpickle.github.io/#module-jsonpickle</a></p>
+<p>创建一个对象：</p>
+<pre><code>class Thing(object):
+    def __init__(self, name):
+        self.name = name
+
+obj = Thing(&#39;Awesome&#39;)
+</code></pre><p>使用<code>Jsonpickle</code>将对象转换为JSON字符串：</p>
+<pre><code>import jsonpickle
+frozen = jsonpickle.encode(obj)
+</code></pre><p>使用<code>Jsonpickle</code>从JSON字符串重新创建Python对象：</p>
+<pre><code>thawed = jsonpickle.decode(frozen)
+</code></pre><p>如果使用跟原pickle相似的利用方式</p>
+<pre><code>&gt;&gt;&gt; class Thing(object):
+...     def __init__(self, name):
+...         os.system(&#39;whoami&#39;)
+...
+&gt;&gt;&gt; obj = Thing(&#39;Awesome&#39;)
+misaki\user
+</code></pre><h3 id="Shelve"><a href="#Shelve" class="headerlink" title="Shelve"></a>Shelve</h3><p>shelve用处是让对象持久化，但它在序列化与反序列化的过程中使用了pickle模块，因此我们可以利用shelve会调用的pickle在反序列化过程中执行代码。</p>
+<pre><code>import shelve
+import os
+
+class exp(object):
+    def __reduce__(self):
+        return (os.system(&#39;ls&#39;))
+
+file = shelve.open(&quot;test&quot;)
+file[&#39;exp&#39;] = exp()
 </code></pre><p>文章参考：<a href="https://xz.aliyun.com/t/2289" target="_blank" rel="noopener">Python反序列化漏洞的花式利用</a>，<a href="https://xz.aliyun.com/t/7436" target="_blank" rel="noopener">pickle反序列化初探</a>，<a href="http://www.polaris-lab.com/index.php/archives/178/" target="_blank" rel="noopener">Python Pickle的任意代码执行漏洞实践和Payload构造</a>，<a href="https://segmentfault.com/a/1190000013099825" target="_blank" rel="noopener">Python反序列化安全问题</a>，<a href="https://www.leavesongs.com/PENETRATION/code-breaking-2018-python-sandbox.html" target="_blank" rel="noopener">Code-Breaking中的两个Python沙箱</a>，<a href="https://checkoway.net/musings/pickle/" target="_blank" rel="noopener">Arbitrary code execution with Python pickles</a>，<a href="http://www.polaris-lab.com/index.php/archives/375/" target="_blank" rel="noopener">Python PyYAML反序列化漏洞实验和Payload构造</a></p>
 
           </div>
@@ -744,7 +773,7 @@ yaml.safe_load(cp)
                     <p>原文作者：<a href="">Misaki</a>
                     <p>原文链接：<a href="/2020/04/python-反序列化/">/2020/04/python-反序列化/</a>
                     <p>发表日期：<a href="/2020/04/python-反序列化/">April 26th 2020, 3:11:44 pm</a>
-                    <p>更新日期：<a href="/2020/04/python-反序列化/">May 6th 2020, 4:46:34 pm</a>
+                    <p>更新日期：<a href="/2020/04/python-反序列化/">May 26th 2020, 4:49:23 pm</a>
                     <p>版权声明：本文采用<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">知识共享署名-非商业性使用 4.0 国际许可协议</a>进行许可</p>
                 </div>
               
