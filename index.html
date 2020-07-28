@@ -110,6 +110,56 @@
             
             
                 <div class="col-md-11">
+                    <a href="/2020/07/TryHackMe-DogCat/" class="h3 title" target="_self">TryHackMe DogCat</a>
+                    
+                    <p>dogcat来自tryhackme的一个靶场，启动环境后在80端口上访问到一个web服务，点击查看是一个显示动物图片的功能。
+http://10.10.175.143/?view=dog
+
+给参数来个单引号查看变化，发现报错，并且从报错上看，明显是文件读取拼接文件后缀名，所以此处可能存在一个文件读取漏洞。
+http://10.10.175.143/...</p>
+                    
+                    
+                    <p class="h6">
+                        <i class="material-icons">date_range</i>2020-07-28
+                        
+                    </p>
+                    
+                </div>
+        </div>
+       
+        
+        <div class="row post-card">
+            
+            
+                <div class="col-md-11">
+                    <a href="/2020/07/TryHackMe-Mr-Robot/" class="h3 title" target="_self">TryHackMe Mr Robot</a>
+                    
+                    <p>来自tryhackme的Mr Robot CTF
+访问首页是一个命令行执行页面，其实也没多大用，就是输出命令显示相关的东西。随便输入一个地址报错，显示是一个wordpress的站点，4.3.1的版本。
+http://10.10.188.224/http:/10.10.188.224/
+
+然后查找一个其他页面是否有别的信息。
+python dirbr...</p>
+                    
+                    
+                    <p class="h6">
+                        <i class="material-icons">date_range</i>2020-07-28
+                        
+                            <i class="material-icons">bookmark_border</i>
+                                
+                                    web安全 &nbsp;
+                                
+                        
+                    </p>
+                    
+                </div>
+        </div>
+       
+        
+        <div class="row post-card">
+            
+            
+                <div class="col-md-11">
                     <a href="/2020/07/又叒叒一个基于osquery的监控/" class="h3 title" target="_self">又叒叒一个基于osquery的监控</a>
                     
                     <p>又叒叒一个基于osquery的监控项目地址：https://github.com/MisakiKata/zeru
@@ -203,62 +253,6 @@ with open(&#39;...</p>
                             <i class="material-icons">bookmark_border</i>
                                 
                                     python &nbsp;
-                                
-                        
-                    </p>
-                    
-                </div>
-        </div>
-       
-        
-        <div class="row post-card">
-            
-            
-                <div class="col-md-11">
-                    <a href="/2020/04/python-沙箱逃逸与SSTI/" class="h3 title" target="_self">python 沙箱逃逸与SSTI</a>
-                    
-                    <p>沙箱逃逸概述沙箱逃逸就是在在一个严格限制的python环境中，通过绕过限制和过滤达到执行更高权限，甚至getshell的过程。
-既然是想getshell，或者说是执行命令就需要一个可执行命令的包。可直接执行命令的模块有
-os
-pty
-subprocess
-plarform
-commands
-有些时候，比如CTF，我们并不需要去执行命令，而是去读取目...</p>
-                    
-                    
-                    <p class="h6">
-                        <i class="material-icons">date_range</i>2020-04-21
-                        
-                            <i class="material-icons">bookmark_border</i>
-                                
-                                    python &nbsp;
-                                
-                        
-                    </p>
-                    
-                </div>
-        </div>
-       
-        
-        <div class="row post-card">
-            
-            
-                <div class="col-md-11">
-                    <a href="/2020/04/域靶场WP/" class="h3 title" target="_self">域靶场WP</a>
-                    
-                    <p>域环境利用已有靶场，简单方便http://vulnstack.qiyuanxuetang.net/vuln/detail/3/
-web环境漏洞FastJson。利用https://github.com/RealBearcat/FastJson-JdbcRowSetImpl-RCE 修改而来
-
-参数为json字符串，可以简单的使用如下探测是否存在问题...</p>
-                    
-                    
-                    <p class="h6">
-                        <i class="material-icons">date_range</i>2020-04-10
-                        
-                            <i class="material-icons">bookmark_border</i>
-                                
-                                    渗透测试 &nbsp;
                                 
                         
                     </p>

