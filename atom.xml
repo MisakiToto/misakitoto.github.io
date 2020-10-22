@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="/"/>
-  <updated>2020-09-04T09:02:38.805Z</updated>
+  <updated>2020-09-17T07:42:29.531Z</updated>
   <id>/</id>
   
   <author>
@@ -15,6 +15,29 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>开源WAF搭建</title>
+    <link href="/2020/09/%E5%BC%80%E6%BA%90WAF%E6%90%AD%E5%BB%BA/"/>
+    <id>/2020/09/开源WAF搭建/</id>
+    <published>2020-09-17T07:42:09.000Z</published>
+    <updated>2020-09-17T07:42:29.531Z</updated>
+    
+    <content type="html"><![CDATA[<h3 id="ModSecurity"><a href="#ModSecurity" class="headerlink" title="ModSecurity"></a>ModSecurity</h3><p>在Ubuntu和Nginx上安装，nginx版本为1.14.0。</p><h4 id="安装需要包"><a href="#安装需要包" class="headerlink" title="安装需要包"></a>安装需要包</h4><pre><code>apt-get install -y apt-utils autoconf automake build-essential git libcurl4-openssl-dev libgeoip-dev liblmdb-dev libpcre++-dev libtool libxml2-dev libyajl-dev pkgconf wget zlib1g-dev</code></pre><h4 id="下载编译ModSecurity-3-0源代码"><a href="#下载编译ModSecurity-3-0源代码" class="headerlink" title="下载编译ModSecurity 3.0源代码"></a>下载编译ModSecurity 3.0源代码</h4><pre><code>git clone --depth 1 -b v3/master --single-branch https://github.com/SpiderLabs/ModSecurity</code></pre><p>进入目录运行编译</p><pre><code>./build.shgit submodule initgit submodule update./configuremakemake install</code></pre><p>如果出现<code>fatal: No names found, cannot describe anything.</code>，是可以忽略的。</p><h4 id="ModSecurity连接器"><a href="#ModSecurity连接器" class="headerlink" title="ModSecurity连接器"></a>ModSecurity连接器</h4><p>下载连接器代码</p><pre><code>git clone --depth 1 https://github.com/SpiderLabs/ModSecurity-nginx.git</code></pre><p>根据已安装的nginx版本安装需要的nginx原代码</p><pre><code>wget http://nginx.org/download/nginx-1.14.0.tar.gztar zxvf nginx-1.14.0.tar.gz</code></pre><p>需要把连接器编译为动态模块到nginx中，到nginx目录下，其中的编译命令根据<code>nginx -V</code>来决定。</p><pre><code>./configure --with-compat --add-dynamic-module=../ModSecurity-nginxmake modulesmkdir /etc/nginx/modulescp objs/ngx_http_modsecurity_module.so /etc/nginx/modules/</code></pre><p>PS：运行<code>nginx -t</code>测试nginx运行，如果出现报错ModSecurity二进制文件不匹配，则可能是nginx版本验证不匹配，那就需要源码编译安装nginx，同时把ModSecurity一起编译。</p><h4 id="加载nginx动态模块"><a href="#加载nginx动态模块" class="headerlink" title="加载nginx动态模块"></a>加载nginx动态模块</h4><p>编译完成后的动态模块需要到配置文件中启动加载，修改配置文件<code>/etc/nginx/nginx.conf</code>中</p><pre><code>load_module /etc/nginx/modules/ngx_http_modsecurity_module.so;</code></pre><h4 id="启用和测试规则"><a href="#启用和测试规则" class="headerlink" title="启用和测试规则"></a>启用和测试规则</h4><p>安装Spiderlabs的规则</p><pre><code>mkdir /etc/nginx/modsecwget -P /etc/nginx/modsec/ https://raw.githubusercontent.com/SpiderLabs/ModSecurity/v3/master/modsecurity.conf-recommendedmv /etc/nginx/modsec/modsecurity.conf-recommended /etc/nginx/modsec/modsecurity.conf</code></pre><p>把ModSecurity中的unicode.mapping文件复制到以上目录</p><pre><code>cp ModSecurity/unicode.mapping /etc/nginx/modsec</code></pre><p>修改配置文件，其中配置部分被注释，需要安需要启用。</p><pre><code>SecRuleEngine DetectionOnly  #仅检测恶意流量，改为on为丢弃恶意流量</code></pre><p>添加owasp的规则，在nginx下创建目录</p><pre><code>mkdir owasp-modsecurity-crscd owasp-modsecurity-crswget https://github.com/coreruleset/coreruleset/archive/v3.3.0.tar.gzmv crs-setup.conf.example crs-setup.confmv rules/REQUEST-900-EXCLUSION-RULES-BEFORE-CRS.conf.example rules/REQUEST-900-EXCLUSION-RULES-BEFORE-CRS.confmv rules/RESPONSE-999-EXCLUSION-RULES-AFTER-CRS.conf.example rules/RESPONSE-999-EXCLUSION-RULES-AFTER-CRS.conf</code></pre><p>在modsec中修改modsecurity.conf，添加配置文件，同时把rules目录下的配置文件添加进去</p><pre><code>Include /etc/nginx/modsec/owasp-modsecurity-crs/coreruleset-3.3.0/crs-setup.confInclude /etc/nginx/modsec/owasp-modsecurity-crs/coreruleset-3.3.0/rules/*.conf</code></pre><p>在nginx配置文件中添加此配置</p><pre><code>vi sites-enabled/defaultserver {    listen 80;    modsecurity on;    modsecurity_rules_file /etc/nginx/modsec/modsecurity.conf;}</code></pre><p>可以到crs配置文件中找到对应的规则来启用，比如如下启用id为900240的后缀文件检测</p><pre><code>C:\Users\user&gt;curl http://192.168.120.142/admin.db&lt;html&gt;&lt;head&gt;&lt;title&gt;403 Forbidden&lt;/title&gt;&lt;/head&gt;&lt;body bgcolor=&quot;white&quot;&gt;&lt;center&gt;&lt;h1&gt;403 Forbidden&lt;/h1&gt;&lt;/center&gt;&lt;hr&gt;&lt;center&gt;nginx/1.14.0&lt;/center&gt;&lt;/body&gt;&lt;/html&gt;</code></pre><p>默认情况下会拦截常见的web攻击，比如</p><pre><code>C:\Users\user&gt;curl http://192.168.120.142/admin.php?id=1%20and%201=1&lt;html&gt;&lt;head&gt;&lt;title&gt;403 Forbidden&lt;/title&gt;&lt;/head&gt;&lt;body bgcolor=&quot;white&quot;&gt;&lt;center&gt;&lt;h1&gt;403 Forbidden&lt;/h1&gt;&lt;/center&gt;&lt;hr&gt;&lt;center&gt;nginx/1.14.0&lt;/center&gt;&lt;/body&gt;&lt;/html&gt;</code></pre><h4 id="配置新的conf文件"><a href="#配置新的conf文件" class="headerlink" title="配置新的conf文件"></a>配置新的conf文件</h4><p>如果默认的规则文件不符合需求，获取由于其他原因需要添加规则。先看一个普通的规则是怎么样的</p><pre><code> SecRule REQUEST_FILENAME &quot;@endsWith /wp-login.php&quot; \     &quot;id:1003,\     phase:2,\     pass,\     nolog,\     ctl:ruleRemoveTargetByTag=OWASP_CRS;ARGS:pwd&quot;</code></pre><p>相当于在wp-login.php页面中，禁用对参数pwd的拦截检查。其中的格式是</p><pre><code>SecRule VARIABLES OPERATOR ACTIONSVARIABLES ：代表HTTP包中的标识项，规定了安全规则针对的对象。OPERATOR：代表操作符，一般用来定义安全规则的匹配条件。ACTIONS：代表响应动作，一般用来定义数据包被规则命中后的响应动作。</code></pre><p>比如，我们打算写一个只允许特定IP访问的路径。这时候需要两条规则来判断，需要<code>chain</code>来连接动作。把它保存到上面crs配置文件路径。重启nginx</p><pre><code>SecRule REQUEST_FILENAME &quot;@endsWith /login.php&quot; \    &quot;id:91002,\    phase:1,\    pass,\    nolog,\    deny,\    chain&quot;    SecRule  REMOTE_ADDR &quot;!@ipMatch 192.168.120.1&quot; \        &quot;t:none&quot;</code></pre><p>配置文档参考：<code>http://www.modsecurity.cn/chm/ConfigurationDirectives.html</code></p><h3 id="VeryNginx"><a href="#VeryNginx" class="headerlink" title="VeryNginx"></a>VeryNginx</h3><p>VeryNginx 基于 <code>lua_nginx_module(openrestry)</code> 开发。 集成在 Nginx 中运行，扩展了 Nginx 本身的功能，并提供了友好的 Web 交互界面。本质上这并不是一个WAF，只是openrestry的界面化。但是可以通过界面化的配置规则来实现waf的功能。</p><p><code>https://github.com/alexazhou/VeryNginx</code></p><h4 id="一键配置"><a href="#一键配置" class="headerlink" title="一键配置"></a>一键配置</h4><p>克隆 VeryNginx 仓库到本地, 然后进入仓库目录，执行以下命令</p><pre><code>python install.py install</code></pre><p>即可一键安装 VeryNginx 和 以及依赖的 OpenResty，可以先修改其中的版本为新版本地址再安装。</p><h4 id="手动安装"><a href="#手动安装" class="headerlink" title="手动安装"></a>手动安装</h4><p>手动安装，需要本地的nginx有openrestry，所以先安装。</p><pre><code>apt-get install libreadline-dev libpcre3-dev libssl-dev perlwget https://openresty.org/download/openresty-1.17.8.2.tar.gz./configure -j2make -j2sudo make installexport PATH=/usr/local/openresty/bin:$PATH</code></pre><p>这时候会把openrestry加入快捷命令，如果直接执行openrestry将开启自带的nginx。</p><p>再来安装verynginx</p><pre><code>python install.py install verynginx</code></pre><p>在nginx的配置文件中添加以下规则，需要配置到不同的地方。</p><pre><code>include /opt/verynginx/verynginx/nginx_conf/in_external.conf;   #http外部include /opt/verynginx/verynginx/nginx_conf/in_http_block.conf;  #http内部include /opt/verynginx/verynginx/nginx_conf/in_server_block.conf;  #server内部</code></pre><p>在地址<code>/verynginx/index_zh.html</code>下即可访问到页面。</p><p>默认的账号密码都是<code>verynginx</code> / <code>verynginx</code>。添加规则的方式比modsecurity简单，但自带的规则过于简单，需要自己添加规则。</p><p>已有的规则可以参考：<code>https://github.com/unixhot/waf</code></p><h3 id="JxWaf"><a href="#JxWaf" class="headerlink" title="JxWaf"></a>JxWaf</h3><p><code>https://github.com/jx-sec/jxwaf</code></p><p>jxwaf(锦衣盾)是一款开源WEB应用防火墙，分为客户端和服务端，客户端也是openrestry开发而来。</p><h4 id="服务端安装"><a href="#服务端安装" class="headerlink" title="服务端安装"></a>服务端安装</h4><p>采用私有化部署</p><pre><code>docker run -d -p 80:80 jxwaf/jxwaf-server:latest</code></pre><p>拉取后，访问地址邮箱验证码随便填写，注册账号在全局配置页面获取”api key”和”api password”</p><h4 id="客户端安装"><a href="#客户端安装" class="headerlink" title="客户端安装"></a>客户端安装</h4><pre><code>git clone https://github.com/jx-sec/jxwaf.gitcd jxwafsh install_waf.sh</code></pre><p>在下载的文件内：</p><pre><code>cd toolspython jxwaf_init.py --api_key=xxxx --api_password=xxxx --waf_server=http://192.168.1.1/opt/jxwaf/nginx/sbin/nginx</code></pre><p>在网站管理中添加对应的域名和IP端口</p><h3 id="Janusec"><a href="#Janusec" class="headerlink" title="Janusec"></a>Janusec</h3><p>可多节点布置的应用网关。<code>https://github.com/Janusec/janusec</code></p><pre><code>wget https://www.janusec.com/download/janusec-latest.tar.gztar zxf ./janusec-latest.tar.gzcd janusec-0.9.9./install.sh</code></pre><p>此处选择的是1，主节点。默认安装的路径为 <code>/usr/local/janusec/</code></p><p>由于需要postgresql</p><pre><code>sudo apt-get install postgresql postgresql-clientsudo -i -u postgrescreate user janusec with password &#39;janusec&#39;;create database janusec owner janusec;grant all on database janusec to janusec;\q</code></pre><p>然后编辑 <code>/usr/local/janusec/config.json</code> ，尝试开启waf</p><pre><code>systemctl start janusec</code></pre><p>设置中管理太台监听设置为true，则使用http:9080端口，此处修改为false，直接在目录<code>janusec-admin/</code></p><p>默认用户名：<code>admin</code>，默认口令：<code>J@nusec123</code>。在应用管理中添加IP端口信息即可。</p>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h3 id=&quot;ModSecurity&quot;&gt;&lt;a href=&quot;#ModSecurity&quot; class=&quot;headerlink&quot; title=&quot;ModSecurity&quot;&gt;&lt;/a&gt;ModSecurity&lt;/h3&gt;&lt;p&gt;在Ubuntu和Nginx上安装，nginx版本为1.14.0。&lt;/
+      
+    
+    </summary>
+    
+    
+      <category term="Open Source Security" scheme="/tags/Open-Source-Security/"/>
+    
+  </entry>
   
   <entry>
     <title>基于inotify的Linux文件实时监控扫描</title>
@@ -460,31 +483,6 @@
     
     
       <category term="Open Source Security" scheme="/tags/Open-Source-Security/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>逆向打卡APP</title>
-    <link href="/2019/12/%E9%80%86%E5%90%91%E6%89%93%E5%8D%A1APP/"/>
-    <id>/2019/12/逆向打卡APP/</id>
-    <published>2019-12-28T14:57:04.000Z</published>
-    <updated>2019-12-28T14:57:06.000Z</updated>
-    
-    <content type="html"><![CDATA[<p>公司打卡APP，由于偶尔忘记打卡，所以想做一个能查询是否打卡来提醒自己的脚本，为什么不做自动打卡脚本，担心万一更新出问题，但没有发现，那岂不是很尴尬。</p><p>首先抓包，查看查询打卡的请求。</p><p><img src="https://i.loli.net/2019/12/28/nTaUrsMmBKqwZ2d.png" alt="image20191228215916256.png"><br>获取其中的参数，其中userid为手机号，rmk3为设备uid，reqssn为固定字符串，所以需要知道加密算法来计算sign</p><pre><code>fm=&lt;fm&gt;&lt;userid&gt;178xxxx&lt;/userid&gt;&lt;ver&gt;3.2.0&lt;/ver&gt;&lt;rmk1/&gt;&lt;rmk2&gt;2&lt;/rmk2&gt;&lt;rmk3&gt;8xxxx-xxxx-xxxx-xxxx-BCxxxxxxxx71&lt;/rmk3&gt;&lt;action&gt;attendRecord&lt;/action&gt;&lt;reqssn&gt;2244f70148454d03baeb739d9c86e082&lt;/reqssn&gt;&lt;sign&gt;54bexxxxxx&lt;/sign&gt;&lt;/fm&gt;</code></pre><p>按照惯例，解包后搜索参数名，找到一个sign函数，查看后发现是加密函数，其中部分代码如下，或者uuid，拼接参数</p><p><img src="https://i.loli.net/2019/12/28/goh6MUtlId1QeJj.png" alt="2.png"><br>其中有个私钥，记录一下</p><pre><code>PRIVATE_KEY = &quot;6fcb5584c28743b8ff16337353b0cabe&quot;</code></pre><p>继续查看，就可以看到后面还拼接了reqssn，然后通过和私钥的拼接组成新的字符串做一个sha256加密。所以，这个reqssn参数是哪里来的呢，是否是固定值。搜索查看</p><p><img src="https://i.loli.net/2019/12/28/ThS3Rj1Yf2oBqmO.png" alt="3.png"></p><p>在其他函数位置发现，reqssn的值，是固定值，且写入代码中。后面的就是上面所说的sign函数。<br><img src="https://i.loli.net/2019/12/28/eH4gfNX21yTZdnB.png" alt="4.png"></p><p>至于uuid是怎么发现，继续查看相关的代码引用，发现是利用本地读取的文件，打开测试机，找到如下位置，发现保存的uuid</p><p><img src="https://i.loli.net/2019/12/28/EK1VpcO6BMsJNCm.png" alt="5.png"></p><p>理论上至此，参数值和加密已经得知，但是经过计算还是不一样，继续查看调用的加密，发现其中做了一次base64的编码，然后再sha256加密。</p><p><img src="https://i.loli.net/2019/12/28/4aLcN3QHoKe9GV2.png" alt="6.png"></p><p>至此能算出加密值和抓包到的结果一致。</p><p><img src="https://i.loli.net/2019/12/28/o4YKayEedkcAQ5J.png" alt="image20191228221903626.png"></p><p>如果仔细想想，这个请求中貌似没有变化的量那岂不是只需要做这个请求就可以，干嘛需要加密算法呢。这个请求中没有变化的值，但是登陆中有啊，其中的reqssn就不再是固定值，而是一个当前的时间戳，这时候就需要算法来生成sign。总不能cookie失效一次就抓一次包改一次cookie吧。</p><p>登陆的时候参数就是</p><pre><code>&lt;fm&gt;&lt;pwd&gt;cxxxxxxxx0b33xxxxxxxxxxxxxx&lt;/pwd&gt;&lt;userid&gt;17xxxxxxx&lt;/userid&gt;&lt;ver&gt;3.2.0&lt;/ver&gt;&lt;rmk1/&gt;&lt;rmk2&gt;2&lt;/rmk2&gt;&lt;rmk3&gt;ffxxxxxx-xxxx-xxxx-xxxx-xxxxxxx9b&lt;/rmk3&gt;&lt;action&gt;login&lt;/action&gt;&lt;reqssn&gt;20191225122352145&lt;/reqssn&gt;&lt;/fm&gt;</code></pre>]]></content>
-    
-    <summary type="html">
-    
-      
-      
-        &lt;p&gt;公司打卡APP，由于偶尔忘记打卡，所以想做一个能查询是否打卡来提醒自己的脚本，为什么不做自动打卡脚本，担心万一更新出问题，但没有发现，那岂不是很尴尬。&lt;/p&gt;
-&lt;p&gt;首先抓包，查看查询打卡的请求。&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;https://i.loli.net/20
-      
-    
-    </summary>
-    
-    
-      <category term="Android逆向" scheme="/tags/Android%E9%80%86%E5%90%91/"/>
     
   </entry>
   
