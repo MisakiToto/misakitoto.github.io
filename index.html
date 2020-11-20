@@ -110,6 +110,35 @@
             
             
                 <div class="col-md-11">
+                    <a href="/2020/11/代码审计-osroom/" class="h3 title" target="_self">代码审计--osroom</a>
+                    
+                    <p>osroom这个cms很有意思，从漏洞和程序的写法上，很适合用来入门学习，漏洞的一些形式相比来说，也比较多一点。
+RCEapps\utils\format\obj_format.py
+如下，文件中采用了eval来转换字符串对象，当json.loads转换失败的时候，则直接使用eval来转换。
+def json_to_pyseq(tjson):
+  ...</p>
+                    
+                    
+                    <p class="h6">
+                        <i class="material-icons">date_range</i>2020-11-20
+                        
+                            <i class="material-icons">bookmark_border</i>
+                                
+                                    web安全 &nbsp;
+                                
+                                    python &nbsp;
+                                
+                        
+                    </p>
+                    
+                </div>
+        </div>
+       
+        
+        <div class="row post-card">
+            
+            
+                <div class="col-md-11">
                     <a href="/2020/11/代码审计-Plone/" class="h3 title" target="_self">代码审计--Plone</a>
                     
                     <p>PlonePlone是使用Python开发的一个开源的内容管理系统，安装的时候以第三方包的形式安装使用，三百个包左右的程序，这个查看起来查找对应功能实在是费劲。
@@ -226,34 +255,6 @@ http://10.10.175.143/...</p>
                     
                     <p class="h6">
                         <i class="material-icons">date_range</i>2020-07-28
-                        
-                    </p>
-                    
-                </div>
-        </div>
-       
-        
-        <div class="row post-card">
-            
-            
-                <div class="col-md-11">
-                    <a href="/2020/07/TryHackMe-Mr-Robot/" class="h3 title" target="_self">TryHackMe Mr Robot</a>
-                    
-                    <p>来自tryhackme的Mr Robot CTF
-访问首页是一个命令行执行页面，其实也没多大用，就是输出命令显示相关的东西。随便输入一个地址报错，显示是一个wordpress的站点，4.3.1的版本。
-http://10.10.188.224/http:/10.10.188.224/
-
-然后查找一个其他页面是否有别的信息。
-python dirbr...</p>
-                    
-                    
-                    <p class="h6">
-                        <i class="material-icons">date_range</i>2020-07-28
-                        
-                            <i class="material-icons">bookmark_border</i>
-                                
-                                    web安全 &nbsp;
-                                
                         
                     </p>
                     
