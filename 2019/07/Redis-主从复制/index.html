@@ -20,17 +20,27 @@
     <meta name="author" content="Misaki">
     <meta name="keywords" content="">
     <title>Redis 主从复制 ~ Misaki&#39;s Blog</title>
-    <link rel="stylesheet" href="/css/Material_Icons.css">
-    <!-- <link rel="stylesheet" href="/css/font-awesome.css"> -->
+    
+<link rel="stylesheet" href="/css/Material_Icons.css">
+
+    <!-- 
+<link rel="stylesheet" href="/css/font-awesome.css">
+ -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css">
-    <link rel="stylesheet" href="/css/main.css">
     
-        <link rel="stylesheet" href="/css/post.css">
+<link rel="stylesheet" href="/css/main.css">
+
+    
         
-            <link rel="stylesheet" href="/css/Prettify/tomorrow-night-eighties.min.css">
+<link rel="stylesheet" href="/css/post.css">
+
+        
+            
+<link rel="stylesheet" href="/css/Prettify/tomorrow-night-eighties.min.css">
+
         
     
-</head>
+<meta name="generator" content="Hexo 5.2.0"></head>
 
 <body class=" sidebar-collapse">
 <nav class="navbar navbar-transparent navbar-color-on-scroll fixed-top navbar-expand-lg" color-on-scroll="100" id="sectionsNav">
@@ -113,34 +123,35 @@
         <div class="section">
           <div class="post_content">
               <h3 id="Redis主从复制"><a href="#Redis主从复制" class="headerlink" title="Redis主从复制"></a>Redis主从复制</h3><p>redis主从复制，前几天分享的新版redis未授权利用的新型方式。</p>
-<p>什么是主从复制，<a href="http://blog.itpub.net/31545684/viewspace-2213629/" target="_blank" rel="noopener">http://blog.itpub.net/31545684/viewspace-2213629/</a></p>
+<p>什么是主从复制，<a target="_blank" rel="noopener" href="http://blog.itpub.net/31545684/viewspace-2213629/">http://blog.itpub.net/31545684/viewspace-2213629/</a></p>
 <p>通过redis命令来设置主从机</p>
-<pre><code>127.0.0.1:6379&gt; slaveof 192.168.253.131 6379
-</code></pre><p>被设置的主机将通过SYNC来和主机通信， 通过日志可以看到请求的sync连接。</p>
-<p>首先需要一个高版本的redis服务，<a href="https://redis.io/download。下载后按照官网给的安装步骤来安装。" target="_blank" rel="noopener">https://redis.io/download。下载后按照官网给的安装步骤来安装。</a></p>
+<pre class="line-numbers language-none"><code class="language-none">127.0.0.1:6379&gt; slaveof 192.168.253.131 6379<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<p>被设置的主机将通过SYNC来和主机通信， 通过日志可以看到请求的sync连接。</p>
+<p>首先需要一个高版本的redis服务，<a target="_blank" rel="noopener" href="https://redis.io/download%E3%80%82%E4%B8%8B%E8%BD%BD%E5%90%8E%E6%8C%89%E7%85%A7%E5%AE%98%E7%BD%91%E7%BB%99%E7%9A%84%E5%AE%89%E8%A3%85%E6%AD%A5%E9%AA%A4%E6%9D%A5%E5%AE%89%E8%A3%85%E3%80%82">https://redis.io/download。下载后按照官网给的安装步骤来安装。</a></p>
 <p>安装后修改redis.conf文件来执行redis，修改文件中的绑定本地地址的参数项，开启任意地址访问。</p>
-<p><img src="\2019\07\Redis-主从复制\1563024704044.png" alt="1563024704044"></p>
+<p><img src="%5C2019%5C07%5CRedis-%E4%B8%BB%E4%BB%8E%E5%A4%8D%E5%88%B6%5C1563024704044.png" alt="1563024704044"></p>
 <p>执行命令：<code>src/redis-server ./redis.conf</code>，开启redis成功。</p>
-<p><img src="\2019\07\Redis-主从复制\1563023912222.png" alt="1563023912222"></p>
-<p>下载脚本：<a href="https://github.com/Dliv3/redis-rogue-server。启动执行脚本" target="_blank" rel="noopener">https://github.com/Dliv3/redis-rogue-server。启动执行脚本</a></p>
+<p><img src="%5C2019%5C07%5CRedis-%E4%B8%BB%E4%BB%8E%E5%A4%8D%E5%88%B6%5C1563023912222.png" alt="1563023912222"></p>
+<p>下载脚本：<a target="_blank" rel="noopener" href="https://github.com/Dliv3/redis-rogue-server%E3%80%82%E5%90%AF%E5%8A%A8%E6%89%A7%E8%A1%8C%E8%84%9A%E6%9C%AC">https://github.com/Dliv3/redis-rogue-server。启动执行脚本</a></p>
 <p>脚本执行完后显示：</p>
-<p><img src="\2019\07\Redis-主从复制\1563025997123.png" alt="1563025997123"></p>
+<p><img src="%5C2019%5C07%5CRedis-%E4%B8%BB%E4%BB%8E%E5%A4%8D%E5%88%B6%5C1563025997123.png" alt="1563025997123"></p>
 <p>同时可以看到redis日志中加载了so文件：</p>
-<p><img src="\2019\07\Redis-主从复制\1563026034882.png" alt="1563026034882"></p>
+<p><img src="%5C2019%5C07%5CRedis-%E4%B8%BB%E4%BB%8E%E5%A4%8D%E5%88%B6%5C1563026034882.png" alt="1563026034882"></p>
 <p>连接redis执行命令：</p>
-<p><img src="\2019\07\Redis-主从复制\1563026095498.png" alt="1563026095498"></p>
+<p><img src="%5C2019%5C07%5CRedis-%E4%B8%BB%E4%BB%8E%E5%A4%8D%E5%88%B6%5C1563026095498.png" alt="1563026095498"></p>
 <p>所以在未授权访问和弱密码登陆的情况下此问题才可以利用。</p>
-<p>原文章：<a href="https://paper.seebug.org/975/" target="_blank" rel="noopener">https://paper.seebug.org/975/</a></p>
+<p>原文章：<a target="_blank" rel="noopener" href="https://paper.seebug.org/975/">https://paper.seebug.org/975/</a></p>
 
           </div>
           <br><br>
               
                 <div class="license-wrapper">
-                    <p>原文作者：<a href="">Misaki</a>
-                    <p>原文链接：<a href="/2019/07/Redis-主从复制/">/2019/07/Redis-主从复制/</a>
-                    <p>发表日期：<a href="/2019/07/Redis-主从复制/">July 15th 2019, 10:16:27 am</a>
-                    <p>更新日期：<a href="/2019/07/Redis-主从复制/">July 15th 2019, 10:37:01 am</a>
-                    <p>版权声明：本文采用<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">知识共享署名-非商业性使用 4.0 国际许可协议</a>进行许可</p>
+                    <p>原文作者：<a href="https://misakikata.github.io">Misaki</a>
+                    <p>原文链接：<a href="https://misakikata.github.io/2019/07/Redis-%E4%B8%BB%E4%BB%8E%E5%A4%8D%E5%88%B6/">https://misakikata.github.io/2019/07/Redis-%E4%B8%BB%E4%BB%8E%E5%A4%8D%E5%88%B6/</a>
+                    <p>发表日期：<a href="https://misakikata.github.io/2019/07/Redis-%E4%B8%BB%E4%BB%8E%E5%A4%8D%E5%88%B6/">July 15th 2019, 10:16:27 am</a>
+                    <p>更新日期：<a href="https://misakikata.github.io/2019/07/Redis-%E4%B8%BB%E4%BB%8E%E5%A4%8D%E5%88%B6/">July 15th 2019, 10:37:01 am</a>
+                    <p>版权声明：本文采用<a rel="license noopener" target="_blank" href="http://creativecommons.org/licenses/by-nc/4.0/">知识共享署名-非商业性使用 4.0 国际许可协议</a>进行许可</p>
                 </div>
               
           <br><br>
@@ -178,7 +189,7 @@
     <script>               
         var disqus_shortname = '';
         var disqus_config = function () {
-            this.page.url = '/2019/07/Redis-主从复制/'; 
+            this.page.url = 'https://misakikata.github.io/2019/07/Redis-主从复制/'; 
             this.page.identifier = '/2019/07/Redis-主从复制/';
         };
         (function() { 
@@ -189,7 +200,7 @@
             (d.head || d.body).appendChild(s);
         })();
     </script>
-    <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>                                
+    <noscript>Please enable JavaScript to view the <a target="_blank" rel="noopener" href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>                                
 </div>
         
     
@@ -209,16 +220,32 @@
         </div>
 </footer>
       <!--   Core JS Files   -->
-      <script src="/js/core/jquery.min.js?v=3.2.1"></script>
-      <script src="/js/main.js"></script>
-      <script src="/js/core/popper.min.js"></script>
-      <script src="/js/core/bootstrap-material-design.min.js"></script>
-      <script src="/js/plugins/moment.min.js"></script>
-      <script src="/js/material-kit.min.js?v=2.0.5"></script>
+      
+<script src="/js/core/jquery.min.js?v=3.2.1.js"></script>
+
+      
+<script src="/js/main.js"></script>
+
+      
+<script src="/js/core/popper.min.js"></script>
+
+      
+<script src="/js/core/bootstrap-material-design.min.js"></script>
+
+      
+<script src="/js/plugins/moment.min.js"></script>
+
+      
+<script src="/js/material-kit.min.js?v=2.0.5.js"></script>
+
       
         <script src="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.4.2/tocbot.min.js"></script>
-        <script src="/js/post.js"></script>
-        <script src="/js/plugins/prettify.js"></script>
+        
+<script src="/js/post.js"></script>
+
+        
+<script src="/js/plugins/prettify.js"></script>
+
         <script>
             $(document).ready(function(){
                 $('pre').addClass('prettyprint linenums');

@@ -20,12 +20,18 @@
     <meta name="author" content="Misaki">
     <meta name="keywords" content="">
     <title>Misaki&#39;s Blog</title>
-    <link rel="stylesheet" href="/css/Material_Icons.css">
-    <!-- <link rel="stylesheet" href="/css/font-awesome.css"> -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css">
-    <link rel="stylesheet" href="/css/main.css">
     
-</head>
+<link rel="stylesheet" href="/css/Material_Icons.css">
+
+    <!-- 
+<link rel="stylesheet" href="/css/font-awesome.css">
+ -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css">
+    
+<link rel="stylesheet" href="/css/main.css">
+
+    
+<meta name="generator" content="Hexo 5.2.0"></head>
 
 <body class=" sidebar-collapse">
 <nav class="navbar navbar-transparent navbar-color-on-scroll fixed-top navbar-expand-lg" color-on-scroll="100" id="sectionsNav">
@@ -110,14 +116,37 @@
             
             
                 <div class="col-md-11">
+                    <a href="/2020/07/TryHackMe-DogCat/" class="h3 title" target="_self">TryHackMe DogCat</a>
+                    
+                    <p>dogcat来自tryhackme的一个靶场，启动环境后在80端口上访问到一个web服务，点击查看是一个显示动物图片的功能。
+http:&#x2F;&#x2F;10.10.175.143&#x2F;?view&#x3D;dog
+
+
+给参数来个单引号查看变化，发现报错，并且从报错上看，明显是文件读取拼接文件后缀名，所以此处可能存在一个文件读取漏洞。
+...</p>
+                    
+                    
+                    <p class="h6">
+                        <i class="material-icons">date_range</i>2020-07-28
+                        
+                    </p>
+                    
+                </div>
+        </div>
+       
+        
+        <div class="row post-card">
+            
+            
+                <div class="col-md-11">
                     <a href="/2020/07/TryHackMe-Mr-Robot/" class="h3 title" target="_self">TryHackMe Mr Robot</a>
                     
                     <p>来自tryhackme的Mr Robot CTF
 访问首页是一个命令行执行页面，其实也没多大用，就是输出命令显示相关的东西。随便输入一个地址报错，显示是一个wordpress的站点，4.3.1的版本。
-http://10.10.188.224/http:/10.10.188.224/
+http:&#x2F;&#x2F;10.10.188.224&#x2F;http:&#x2F;10.10.188.224&#x2F;
 
-然后查找一个其他页面是否有别的信息。
-python dirbr...</p>
+
+然后查找一...</p>
                     
                     
                     <p class="h6">
@@ -138,7 +167,7 @@ python dirbr...</p>
             
             
                 <div class="col-md-11">
-                    <a href="/2020/07/又叒叒一个基于osquery的监控/" class="h3 title" target="_self">又叒叒一个基于osquery的监控</a>
+                    <a href="/2020/07/%E5%8F%88%E5%8F%92%E5%8F%92%E4%B8%80%E4%B8%AA%E5%9F%BA%E4%BA%8Eosquery%E7%9A%84%E7%9B%91%E6%8E%A7/" class="h3 title" target="_self">又叒叒一个基于osquery的监控</a>
                     
                     <p>又叒叒一个基于osquery的监控项目地址：https://github.com/MisakiKata/zeru
 此项目是基于osquery的数据收集分析项目，用来监控主机，从最初的学习项目到现在的具有一定使用价值的项目。
@@ -168,10 +197,10 @@ python dirbr...</p>
                     
                     <p>反序列化来自一个开源协会管理系统，文件tendenci\apps\helpdesk\views\staff.py
 def ticket_list(request):
-    context = {}
+    context = &#123;&#125;
     ......
-    if request.GET.get(&#39;saved_query&#39;, None):
-           ...</p>
+    if request.GET.get('saved_query', None):
+         ...</p>
                     
                     
                     <p class="h6">
@@ -192,7 +221,7 @@ def ticket_list(request):
             
             
                 <div class="col-md-11">
-                    <a href="/2020/05/Python-过滤器/" class="h3 title" target="_self">Python 过滤器</a>
+                    <a href="/2020/05/Python-%E8%BF%87%E6%BB%A4%E5%99%A8/" class="h3 title" target="_self">Python 过滤器</a>
                     
                     <p>布隆过滤器什么是布隆过滤器？本质上布隆过滤器( BloomFilter )是一种数据结构，比较巧妙的概率型数据结构（probabilistic data structure），特点是高效地插入和查询，可以用来告诉你 “某样东西一定不存在或者可能存在”。
 相比于传统的 Set、Map 等数据结构，它更高效、占用空间更少，但是缺点是其返回的结果是概率性...</p>
@@ -216,7 +245,7 @@ def ticket_list(request):
             
             
                 <div class="col-md-11">
-                    <a href="/2020/04/python-反序列化/" class="h3 title" target="_self">python 反序列化</a>
+                    <a href="/2020/04/python-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/" class="h3 title" target="_self">python 反序列化</a>
                     
                     <p>反序列化库python 序列化和反序列化使用最为频繁的是cPickle和pickle，前者是C语言实现，据说速度比后者快很多。
 只不过python3标准库中不再叫cPickle，而是只有pickle。python2中两者都有。
@@ -227,36 +256,6 @@ with open(&#39;...</p>
                     
                     <p class="h6">
                         <i class="material-icons">date_range</i>2020-04-26
-                        
-                            <i class="material-icons">bookmark_border</i>
-                                
-                                    python &nbsp;
-                                
-                        
-                    </p>
-                    
-                </div>
-        </div>
-       
-        
-        <div class="row post-card">
-            
-            
-                <div class="col-md-11">
-                    <a href="/2020/04/python-沙箱逃逸与SSTI/" class="h3 title" target="_self">python 沙箱逃逸与SSTI</a>
-                    
-                    <p>沙箱逃逸概述沙箱逃逸就是在在一个严格限制的python环境中，通过绕过限制和过滤达到执行更高权限，甚至getshell的过程。
-既然是想getshell，或者说是执行命令就需要一个可执行命令的包。可直接执行命令的模块有
-os
-pty
-subprocess
-plarform
-commands
-有些时候，比如CTF，我们并不需要去执行命令，而是去读取目...</p>
-                    
-                    
-                    <p class="h6">
-                        <i class="material-icons">date_range</i>2020-04-21
                         
                             <i class="material-icons">bookmark_border</i>
                                 
@@ -305,12 +304,24 @@ commands
         </div>
 </footer>
       <!--   Core JS Files   -->
-      <script src="/js/core/jquery.min.js?v=3.2.1"></script>
-      <script src="/js/main.js"></script>
-      <script src="/js/core/popper.min.js"></script>
-      <script src="/js/core/bootstrap-material-design.min.js"></script>
-      <script src="/js/plugins/moment.min.js"></script>
-      <script src="/js/material-kit.min.js?v=2.0.5"></script>
+      
+<script src="/js/core/jquery.min.js?v=3.2.1.js"></script>
+
+      
+<script src="/js/main.js"></script>
+
+      
+<script src="/js/core/popper.min.js"></script>
+
+      
+<script src="/js/core/bootstrap-material-design.min.js"></script>
+
+      
+<script src="/js/plugins/moment.min.js"></script>
+
+      
+<script src="/js/material-kit.min.js?v=2.0.5.js"></script>
+
       
 <script src="/live2d-widget/autoload.js"></script>
 </body>

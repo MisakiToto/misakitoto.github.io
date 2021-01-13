@@ -20,17 +20,27 @@
     <meta name="author" content="Misaki">
     <meta name="keywords" content="">
     <title>Android逆向逻辑修改入门 ~ Misaki&#39;s Blog</title>
-    <link rel="stylesheet" href="/css/Material_Icons.css">
-    <!-- <link rel="stylesheet" href="/css/font-awesome.css"> -->
+    
+<link rel="stylesheet" href="/css/Material_Icons.css">
+
+    <!-- 
+<link rel="stylesheet" href="/css/font-awesome.css">
+ -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css">
-    <link rel="stylesheet" href="/css/main.css">
     
-        <link rel="stylesheet" href="/css/post.css">
+<link rel="stylesheet" href="/css/main.css">
+
+    
         
-            <link rel="stylesheet" href="/css/Prettify/tomorrow-night-eighties.min.css">
+<link rel="stylesheet" href="/css/post.css">
+
+        
+            
+<link rel="stylesheet" href="/css/Prettify/tomorrow-night-eighties.min.css">
+
         
     
-</head>
+<meta name="generator" content="Hexo 5.2.0"></head>
 
 <body class=" sidebar-collapse">
 <nav class="navbar navbar-transparent navbar-color-on-scroll fixed-top navbar-expand-lg" color-on-scroll="100" id="sectionsNav">
@@ -114,36 +124,37 @@
           <div class="post_content">
               <h3 id="Android-逻辑判断修改"><a href="#Android-逻辑判断修改" class="headerlink" title="Android 逻辑判断修改"></a>Android 逻辑判断修改</h3><p>使用AS创建一个工程，利用生成工程的初始代码来做。</p>
 <p>创建新的layout，在mainactivity中添加新的layout标识。在显示界面的时候加一个判断逻辑，完成后类似如下</p>
-<pre><code>if(a==1) {
+<pre class="line-numbers language-none"><code class="language-none">if(a&#x3D;&#x3D;1) &#123;
             setContentView(R.layout.activity_main);
-        }
+        &#125;
         else
             setContentView(R.layout.activity_main2);
-    }
-</code></pre><p>于是乎，当a为1的时候显示activity_main界面字段。不为1显示activity_main2字段。</p>
+    &#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>于是乎，当a为1的时候显示activity_main界面字段。不为1显示activity_main2字段。</p>
 <p>一般情况下，对于有些需要内购，或者某些情况才给你显示的界面的时候，界面不是从后端返回而是返回json参数由前端接收显示的时候，可以从前端修改逻辑来绕过判断。</p>
 <p>生成smali代码，其中主要部分为下：</p>
-<pre><code>.method protected onCreate(Landroid/os/Bundle;)V
+<pre class="line-numbers language-none"><code class="language-none">.method protected onCreate(Landroid&#x2F;os&#x2F;Bundle;)V
     .registers 4
-    .param p1, &quot;savedInstanceState&quot;    # Landroid/os/Bundle;
+    .param p1, &quot;savedInstanceState&quot;    # Landroid&#x2F;os&#x2F;Bundle;
 
     .prologue
     .line 17
-    invoke-super {p0, p1}, Landroid/support/v7/app/AppCompatActivity;-&gt;onCreate(Landroid/os/Bundle;)V
+    invoke-super &#123;p0, p1&#125;, Landroid&#x2F;support&#x2F;v7&#x2F;app&#x2F;AppCompatActivity;-&gt;onCreate(Landroid&#x2F;os&#x2F;Bundle;)V
 
     .line 18
-    const/4 v0, 0x0
+    const&#x2F;4 v0, 0x0
 
     .line 19
     .local v0, &quot;a&quot;:I
-    const/4 v1, 0x1
+    const&#x2F;4 v1, 0x1
 
     if-ne v0, v1, :cond_e
 
     .line 20
     const v1, 0x7f09001c
 
-    invoke-virtual {p0, v1}, Lcom/example/user/application/MainActivity;-&gt;setContentView(I)V
+    invoke-virtual &#123;p0, v1&#125;, Lcom&#x2F;example&#x2F;user&#x2F;application&#x2F;MainActivity;-&gt;setContentView(I)V
 
     .line 24
     :goto_d
@@ -153,51 +164,55 @@
     :cond_e
     const v1, 0x7f09001d
 
-    invoke-virtual {p0, v1}, Lcom/example/user/application/MainActivity;-&gt;setContentView(I)V
+    invoke-virtual &#123;p0, v1&#125;, Lcom&#x2F;example&#x2F;user&#x2F;application&#x2F;MainActivity;-&gt;setContentView(I)V
 
     goto :goto_d
-.end method
-</code></pre><p>整体的代码相当简单轻松，来看判断代码处。</p>
-<pre><code>.line 18
-    const/4 v0, 0x0
+.end method<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>整体的代码相当简单轻松，来看判断代码处。</p>
+<pre class="line-numbers language-none"><code class="language-none">.line 18
+    const&#x2F;4 v0, 0x0
 
     .line 19
     .local v0, &quot;a&quot;:I
-    const/4 v1, 0x1
+    const&#x2F;4 v1, 0x1
 
     if-ne v0, v1, :cond_e
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
-</code></pre><p>其中if-ne，逻辑显示v0不等于v1，跳转到cond_e标签处。</p>
+<p>其中if-ne，逻辑显示v0不等于v1，跳转到cond_e标签处。</p>
 <h4 id="修改一："><a href="#修改一：" class="headerlink" title="修改一："></a>修改一：</h4><p>直接修改if-ne判断形式，修改为if-eq，这样只要不完成正常的逻辑操作，都会跳转到我们想看的界面。</p>
 <h4 id="修改二："><a href="#修改二：" class="headerlink" title="修改二："></a>修改二：</h4><p>由于判断处是根据参数a的值和1做对比，所以我们直接对a重赋值(以上的a赋值可以粗略的看为是请求获取的值)。</p>
-<pre><code>.line 18
-    const/4 v0, 0x0
+<pre class="line-numbers language-none"><code class="language-none">.line 18
+    const&#x2F;4 v0, 0x0
 
     .line 19
     .local v0, &quot;a&quot;:I
-    const/4 v1, 0x1
+    const&#x2F;4 v1, 0x1
+	
+	const&#x2F;4 v0, 0x1
+    if-ne v0, v1, :cond_e<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
-    const/4 v0, 0x1
-    if-ne v0, v1, :cond_e
-</code></pre><h4 id="修改三："><a href="#修改三：" class="headerlink" title="修改三："></a>修改三：</h4><p>利用强制跳转，在需要去查看，或者执行下去的地方添加标签，goto_1，然后在判断执行前强制跳转进去。</p>
-<pre><code> const/4 v1, 0x1
+<h4 id="修改三："><a href="#修改三：" class="headerlink" title="修改三："></a>修改三：</h4><p>利用强制跳转，在需要去查看，或者执行下去的地方添加标签，goto_1，然后在判断执行前强制跳转进去。</p>
+<pre class="line-numbers language-none"><code class="language-none">const&#x2F;4 v1, 0x1
 
-    goto :goto_1
-    if-ne v0, v1, :cond_0
+goto :goto_1
+   if-ne v0, v1, :cond_0
 
-    .line 20
-    :goto_1
-    const v1, 0x7f09001c
-</code></pre>
+   .line 20
+:goto_1
+   const v1, 0x7f09001c<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+
           </div>
           <br><br>
               
                 <div class="license-wrapper">
-                    <p>原文作者：<a href="">Misaki</a>
-                    <p>原文链接：<a href="/2019/01/Android逆向逻辑修改入门/">/2019/01/Android逆向逻辑修改入门/</a>
-                    <p>发表日期：<a href="/2019/01/Android逆向逻辑修改入门/">January 28th 2019, 4:28:34 pm</a>
-                    <p>更新日期：<a href="/2019/01/Android逆向逻辑修改入门/">July 26th 2019, 5:56:19 pm</a>
-                    <p>版权声明：本文采用<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">知识共享署名-非商业性使用 4.0 国际许可协议</a>进行许可</p>
+                    <p>原文作者：<a href="https://misakikata.github.io">Misaki</a>
+                    <p>原文链接：<a href="https://misakikata.github.io/2019/01/Android%E9%80%86%E5%90%91%E9%80%BB%E8%BE%91%E4%BF%AE%E6%94%B9%E5%85%A5%E9%97%A8/">https://misakikata.github.io/2019/01/Android%E9%80%86%E5%90%91%E9%80%BB%E8%BE%91%E4%BF%AE%E6%94%B9%E5%85%A5%E9%97%A8/</a>
+                    <p>发表日期：<a href="https://misakikata.github.io/2019/01/Android%E9%80%86%E5%90%91%E9%80%BB%E8%BE%91%E4%BF%AE%E6%94%B9%E5%85%A5%E9%97%A8/">January 28th 2019, 4:28:34 pm</a>
+                    <p>更新日期：<a href="https://misakikata.github.io/2019/01/Android%E9%80%86%E5%90%91%E9%80%BB%E8%BE%91%E4%BF%AE%E6%94%B9%E5%85%A5%E9%97%A8/">July 26th 2019, 5:56:19 pm</a>
+                    <p>版权声明：本文采用<a rel="license noopener" target="_blank" href="http://creativecommons.org/licenses/by-nc/4.0/">知识共享署名-非商业性使用 4.0 国际许可协议</a>进行许可</p>
                 </div>
               
           <br><br>
@@ -235,7 +250,7 @@
     <script>               
         var disqus_shortname = '';
         var disqus_config = function () {
-            this.page.url = '/2019/01/Android逆向逻辑修改入门/'; 
+            this.page.url = 'https://misakikata.github.io/2019/01/Android逆向逻辑修改入门/'; 
             this.page.identifier = '/2019/01/Android逆向逻辑修改入门/';
         };
         (function() { 
@@ -246,7 +261,7 @@
             (d.head || d.body).appendChild(s);
         })();
     </script>
-    <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>                                
+    <noscript>Please enable JavaScript to view the <a target="_blank" rel="noopener" href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>                                
 </div>
         
     
@@ -266,16 +281,32 @@
         </div>
 </footer>
       <!--   Core JS Files   -->
-      <script src="/js/core/jquery.min.js?v=3.2.1"></script>
-      <script src="/js/main.js"></script>
-      <script src="/js/core/popper.min.js"></script>
-      <script src="/js/core/bootstrap-material-design.min.js"></script>
-      <script src="/js/plugins/moment.min.js"></script>
-      <script src="/js/material-kit.min.js?v=2.0.5"></script>
+      
+<script src="/js/core/jquery.min.js?v=3.2.1.js"></script>
+
+      
+<script src="/js/main.js"></script>
+
+      
+<script src="/js/core/popper.min.js"></script>
+
+      
+<script src="/js/core/bootstrap-material-design.min.js"></script>
+
+      
+<script src="/js/plugins/moment.min.js"></script>
+
+      
+<script src="/js/material-kit.min.js?v=2.0.5.js"></script>
+
       
         <script src="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.4.2/tocbot.min.js"></script>
-        <script src="/js/post.js"></script>
-        <script src="/js/plugins/prettify.js"></script>
+        
+<script src="/js/post.js"></script>
+
+        
+<script src="/js/plugins/prettify.js"></script>
+
         <script>
             $(document).ready(function(){
                 $('pre').addClass('prettyprint linenums');

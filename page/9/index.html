@@ -20,12 +20,18 @@
     <meta name="author" content="Misaki">
     <meta name="keywords" content="">
     <title>Misaki&#39;s Blog</title>
-    <link rel="stylesheet" href="/css/Material_Icons.css">
-    <!-- <link rel="stylesheet" href="/css/font-awesome.css"> -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css">
-    <link rel="stylesheet" href="/css/main.css">
     
-</head>
+<link rel="stylesheet" href="/css/Material_Icons.css">
+
+    <!-- 
+<link rel="stylesheet" href="/css/font-awesome.css">
+ -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css">
+    
+<link rel="stylesheet" href="/css/main.css">
+
+    
+<meta name="generator" content="Hexo 5.2.0"></head>
 
 <body class=" sidebar-collapse">
 <nav class="navbar navbar-transparent navbar-color-on-scroll fixed-top navbar-expand-lg" color-on-scroll="100" id="sectionsNav">
@@ -110,7 +116,31 @@
             
             
                 <div class="col-md-11">
-                    <a href="/2019/05/基于dvmDexFileOpenPartial的动态脱壳/" class="h3 title" target="_self">基于dvmDexFileOpenPartial的动态脱壳</a>
+                    <a href="/2019/05/%E5%BE%AE%E4%BF%A1%E5%85%AC%E4%BC%97%E5%8F%B7%E6%8E%A5%E5%8F%A3/" class="h3 title" target="_self">微信公众号接口</a>
+                    
+                    <p>在一个偶然的机会获取到了一对微信AppId与Secret，于是整理了一下常用和有用的微信公众号信息获取的接口，以下是部分微信接口调用示例和说明。
+1、平台开发者获取access_tokenaccess_token是公众号的全局唯一接口调用凭据，公众号调用各接口时都需使用access_token。access_token的有效期目前为2个小时，需定时...</p>
+                    
+                    
+                    <p class="h6">
+                        <i class="material-icons">date_range</i>2019-05-27
+                        
+                            <i class="material-icons">bookmark_border</i>
+                                
+                                    web安全 &nbsp;
+                                
+                        
+                    </p>
+                    
+                </div>
+        </div>
+       
+        
+        <div class="row post-card">
+            
+            
+                <div class="col-md-11">
+                    <a href="/2019/05/%E5%9F%BA%E4%BA%8EdvmDexFileOpenPartial%E7%9A%84%E5%8A%A8%E6%80%81%E8%84%B1%E5%A3%B3/" class="h3 title" target="_self">基于dvmDexFileOpenPartial的动态脱壳</a>
                     
                     <p>1、dvmDexFileOpenPartial脱壳原理基于libdvm.so下dvmDexFileOpenPartial的文件脱壳，当然如果是新版的加固方式一般不可行，因为会基本会重写dvmDexFileOpenPartial方法。如此，先了解一下libdvm.so的方法dvmDexFileOpenPartial是干什么的。
 加密dex文件在软件运...</p>
@@ -159,7 +189,7 @@
             
             
                 <div class="col-md-11">
-                    <a href="/2019/04/APP解密参数sign/" class="h3 title" target="_self">APP解密参数sign</a>
+                    <a href="/2019/04/APP%E8%A7%A3%E5%AF%86%E5%8F%82%E6%95%B0sign/" class="h3 title" target="_self">APP解密参数sign</a>
                     
                     <p>APP解密参数signAPP是公司自己的业务APP，没有加固，只做了代码混淆。本以为要对加密字段进行so文件的逆向，查看后发现是Java层的加密，相对较简单。
 首先抓包查看加密字段和相关参数值，可以看到一共有四个参数，其中sign是加密验证完整性字段
@@ -185,7 +215,7 @@
             
             
                 <div class="col-md-11">
-                    <a href="/2019/04/MySQL历史漏洞分析/" class="h3 title" target="_self">MySQL历史漏洞分析</a>
+                    <a href="/2019/04/MySQL%E5%8E%86%E5%8F%B2%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/" class="h3 title" target="_self">MySQL历史漏洞分析</a>
                     
                     <p>MySQL历史漏洞分析前段时间公司一托管的老系统，被木马勒索，然后紧急处理了一下，此系统使用少，而且是外包托管阿里云，因此并没有影响其他系统。拿到这个系统后，查看端口服务时发现，数据库端口对外开放，ssh对外开放，然后根据对系统的核查，猜测有可能存在以下问题：
 1、后台弱口令或者登陆绕过
@@ -212,41 +242,17 @@
             
             
                 <div class="col-md-11">
-                    <a href="/2019/04/逆向修改手机内核，绕过反调试/" class="h3 title" target="_self">逆向修改手机内核，绕过反调试</a>
+                    <a href="/2019/04/%E9%80%86%E5%90%91%E4%BF%AE%E6%94%B9%E6%89%8B%E6%9C%BA%E5%86%85%E6%A0%B8%EF%BC%8C%E7%BB%95%E8%BF%87%E5%8F%8D%E8%B0%83%E8%AF%95/" class="h3 title" target="_self">逆向修改手机内核，绕过反调试</a>
                     
                     <p>逆向修改手机内核，绕过反调试Android 应用反调试里最常用的一种反调试方法是查看/proc/self/status的信息，如果 TracerPid 不为 0，就判断为正在被调试。因此修改手机的TracePid,让其值恒为零。
 一、  提取 zImage 内核文件查找boot文件位置
-find / | grep boot
+find &#x2F; | grep boot
 
-cd /dev/blo...</p>
+cd &#x...</p>
                     
                     
                     <p class="h6">
                         <i class="material-icons">date_range</i>2019-04-02
-                        
-                            <i class="material-icons">bookmark_border</i>
-                                
-                                    Android逆向 &nbsp;
-                                
-                        
-                    </p>
-                    
-                </div>
-        </div>
-       
-        
-        <div class="row post-card">
-            
-            
-                <div class="col-md-11">
-                    <a href="/2019/03/IDA动态调试/" class="h3 title" target="_self">IDA动态调试</a>
-                    
-                    <p>IDA 动态调试通常在APP逆向和破解时，某些重要的函数会以so文件的形式进行加载，所以，在想获得关键操作逻辑和修改某些函数时，就需要IDA来进行操作啦。以下使用IDA版本7.0，小米手机
-1、上传Android_Server文件存放在安装目录下的dbgsrv目录中，7.0以后版本多了几个其他版本的Android_server文件，上传Androi...</p>
-                    
-                    
-                    <p class="h6">
-                        <i class="material-icons">date_range</i>2019-03-29
                         
                             <i class="material-icons">bookmark_border</i>
                                 
@@ -295,12 +301,24 @@ cd /dev/blo...</p>
         </div>
 </footer>
       <!--   Core JS Files   -->
-      <script src="/js/core/jquery.min.js?v=3.2.1"></script>
-      <script src="/js/main.js"></script>
-      <script src="/js/core/popper.min.js"></script>
-      <script src="/js/core/bootstrap-material-design.min.js"></script>
-      <script src="/js/plugins/moment.min.js"></script>
-      <script src="/js/material-kit.min.js?v=2.0.5"></script>
+      
+<script src="/js/core/jquery.min.js?v=3.2.1.js"></script>
+
+      
+<script src="/js/main.js"></script>
+
+      
+<script src="/js/core/popper.min.js"></script>
+
+      
+<script src="/js/core/bootstrap-material-design.min.js"></script>
+
+      
+<script src="/js/plugins/moment.min.js"></script>
+
+      
+<script src="/js/material-kit.min.js?v=2.0.5.js"></script>
+
       
 <script src="/live2d-widget/autoload.js"></script>
 </body>

@@ -20,17 +20,27 @@
     <meta name="author" content="Misaki">
     <meta name="keywords" content="">
     <title>Android Studio 动态调试 ~ Misaki&#39;s Blog</title>
-    <link rel="stylesheet" href="/css/Material_Icons.css">
-    <!-- <link rel="stylesheet" href="/css/font-awesome.css"> -->
+    
+<link rel="stylesheet" href="/css/Material_Icons.css">
+
+    <!-- 
+<link rel="stylesheet" href="/css/font-awesome.css">
+ -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css">
-    <link rel="stylesheet" href="/css/main.css">
     
-        <link rel="stylesheet" href="/css/post.css">
+<link rel="stylesheet" href="/css/main.css">
+
+    
         
-            <link rel="stylesheet" href="/css/Prettify/tomorrow-night-eighties.min.css">
+<link rel="stylesheet" href="/css/post.css">
+
+        
+            
+<link rel="stylesheet" href="/css/Prettify/tomorrow-night-eighties.min.css">
+
         
     
-</head>
+<meta name="generator" content="Hexo 5.2.0"></head>
 
 <body class=" sidebar-collapse">
 <nav class="navbar navbar-transparent navbar-color-on-scroll fixed-top navbar-expand-lg" color-on-scroll="100" id="sectionsNav">
@@ -115,35 +125,37 @@
               <h3 id="Android-Studio-动态调试"><a href="#Android-Studio-动态调试" class="headerlink" title="Android Studio 动态调试"></a>Android Studio 动态调试</h3><p>调试仍然使用我们喜闻乐见的Android Studio，不过使用的是AS3，AS在3.0版本后便不在使用DDMS，调试smali上有点不适应，不过我们仍然可以在配置SDK后，在命令行输入“monitor”来打开DDMS。</p>
 <p>apk使用我们自己生成的一个简单的登陆判断界面来做测试。</p>
 <p>使用网上的一段登陆代码如下</p>
-<p><img src="\2019\01\Android-Studio-动态调试\1548750208555.png" alt="1548750208555"></p>
+<p><img src="%5C2019%5C01%5CAndroid-Studio-%E5%8A%A8%E6%80%81%E8%B0%83%E8%AF%95%5C1548750208555.png" alt="1548750208555"></p>
 <p>生成APK后，利用AK反编译为smali代码。</p>
-<p><img src="\2019\01\Android-Studio-动态调试\1548750320824.png" alt="1548750320824"></p>
+<p><img src="%5C2019%5C01%5CAndroid-Studio-%E5%8A%A8%E6%80%81%E8%B0%83%E8%AF%95%5C1548750320824.png" alt="1548750320824"></p>
 <p>然后用AS打开反编译后的文件夹，当然在利用AS调试smali的时候，需要安装ideasmali插件，具体可以百度插件名即可下载。</p>
 <p>调试的时候需要我们进行端口的转发，可以先用DDMS查看一下端口是否是8700（一般默认为8700），因为启动AS后会占有相应的端口，导致无法打开DDMS。</p>
 <p>具体使用方式为：打开DDMS。在CMD命令行输入以下内容，其中package为包名。MainActivity是需要调试的activity名，具体看情况修改。</p>
-<pre><code>adb shell am start -D -n package/.MainActivity
-</code></pre><p>可以看到手机端或者模拟器端已经以调试的方式启动我们相应的程序了。在DDMS中就可以看到一只红色的小蜘蛛了。后面有一个端口默认应该是8700。然后查看进程PID，假设为1980。</p>
-<pre><code>adb forward tcp:8700 jdwp:1980
-</code></pre><p>进行端口转发到。转发的时候要先关闭DDMS，不然显示端口被占用。</p>
+<pre class="line-numbers language-none"><code class="language-none">adb shell am start -D -n package&#x2F;.MainActivity<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<p>可以看到手机端或者模拟器端已经以调试的方式启动我们相应的程序了。在DDMS中就可以看到一只红色的小蜘蛛了。后面有一个端口默认应该是8700。然后查看进程PID，假设为1980。</p>
+<pre class="line-numbers language-none"><code class="language-none">adb forward tcp:8700 jdwp:1980<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<p>进行端口转发到。转发的时候要先关闭DDMS，不然显示端口被占用。</p>
 <p>在使用AS打开我们需要的文件后，如以下内容。</p>
-<p><img src="\2019\01\Android-Studio-动态调试\1548750452683.png" alt="1548750452683"></p>
+<p><img src="%5C2019%5C01%5CAndroid-Studio-%E5%8A%A8%E6%80%81%E8%B0%83%E8%AF%95%5C1548750452683.png" alt="1548750452683"></p>
 <p>配置远程调试参数，修改端口为8700.</p>
-<p><img src="\2019\01\Android-Studio-动态调试\1548750876061.png" alt="1548750876061"></p>
+<p><img src="%5C2019%5C01%5CAndroid-Studio-%E5%8A%A8%E6%80%81%E8%B0%83%E8%AF%95%5C1548750876061.png" alt="1548750876061"></p>
 <p>然后在需要的地方设置断点，此处在账户密码的判断处下断点。启动调试，然后就可以看到界面显示到我们断点前的地方了。在模拟器上输入账号密码后，就可以看到断点被执行。</p>
-<p><img src="\2019\01\Android-Studio-动态调试\1548751037753.png" alt="1548751037753"></p>
+<p><img src="%5C2019%5C01%5CAndroid-Studio-%E5%8A%A8%E6%80%81%E8%B0%83%E8%AF%95%5C1548751037753.png" alt="1548751037753"></p>
 <p>可以看到下面两部分第一部分为为v0赋值为admin，调用String类的equals方法来判断v0参数和p1对象值是否相同，并把结果赋值给v0，一个布尔值。第二部分，判断v0是否为0，等于0跳转到:cond_0处。不等于0则继续，同样为v0赋值一个字符串为12345，调用方法判断是否相同，以下则和上面基本一致。</p>
-<p><img src="\2019\01\Android-Studio-动态调试\1548751160949.png" alt="1548751160949"></p>
+<p><img src="%5C2019%5C01%5CAndroid-Studio-%E5%8A%A8%E6%80%81%E8%B0%83%E8%AF%95%5C1548751160949.png" alt="1548751160949"></p>
 <p>此时，需要做些什么修改，判断，以后参数变化，可以在下面的variables查看，上图中的参数就是在模拟器中输入的参数显示。</p>
 
           </div>
           <br><br>
               
                 <div class="license-wrapper">
-                    <p>原文作者：<a href="">Misaki</a>
-                    <p>原文链接：<a href="/2019/01/Android-Studio-动态调试/">/2019/01/Android-Studio-动态调试/</a>
-                    <p>发表日期：<a href="/2019/01/Android-Studio-动态调试/">January 29th 2019, 4:47:40 pm</a>
-                    <p>更新日期：<a href="/2019/01/Android-Studio-动态调试/">July 26th 2019, 5:56:30 pm</a>
-                    <p>版权声明：本文采用<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">知识共享署名-非商业性使用 4.0 国际许可协议</a>进行许可</p>
+                    <p>原文作者：<a href="https://misakikata.github.io">Misaki</a>
+                    <p>原文链接：<a href="https://misakikata.github.io/2019/01/Android-Studio-%E5%8A%A8%E6%80%81%E8%B0%83%E8%AF%95/">https://misakikata.github.io/2019/01/Android-Studio-%E5%8A%A8%E6%80%81%E8%B0%83%E8%AF%95/</a>
+                    <p>发表日期：<a href="https://misakikata.github.io/2019/01/Android-Studio-%E5%8A%A8%E6%80%81%E8%B0%83%E8%AF%95/">January 29th 2019, 4:47:40 pm</a>
+                    <p>更新日期：<a href="https://misakikata.github.io/2019/01/Android-Studio-%E5%8A%A8%E6%80%81%E8%B0%83%E8%AF%95/">July 26th 2019, 5:56:30 pm</a>
+                    <p>版权声明：本文采用<a rel="license noopener" target="_blank" href="http://creativecommons.org/licenses/by-nc/4.0/">知识共享署名-非商业性使用 4.0 国际许可协议</a>进行许可</p>
                 </div>
               
           <br><br>
@@ -181,7 +193,7 @@
     <script>               
         var disqus_shortname = '';
         var disqus_config = function () {
-            this.page.url = '/2019/01/Android-Studio-动态调试/'; 
+            this.page.url = 'https://misakikata.github.io/2019/01/Android-Studio-动态调试/'; 
             this.page.identifier = '/2019/01/Android-Studio-动态调试/';
         };
         (function() { 
@@ -192,7 +204,7 @@
             (d.head || d.body).appendChild(s);
         })();
     </script>
-    <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>                                
+    <noscript>Please enable JavaScript to view the <a target="_blank" rel="noopener" href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>                                
 </div>
         
     
@@ -212,16 +224,32 @@
         </div>
 </footer>
       <!--   Core JS Files   -->
-      <script src="/js/core/jquery.min.js?v=3.2.1"></script>
-      <script src="/js/main.js"></script>
-      <script src="/js/core/popper.min.js"></script>
-      <script src="/js/core/bootstrap-material-design.min.js"></script>
-      <script src="/js/plugins/moment.min.js"></script>
-      <script src="/js/material-kit.min.js?v=2.0.5"></script>
+      
+<script src="/js/core/jquery.min.js?v=3.2.1.js"></script>
+
+      
+<script src="/js/main.js"></script>
+
+      
+<script src="/js/core/popper.min.js"></script>
+
+      
+<script src="/js/core/bootstrap-material-design.min.js"></script>
+
+      
+<script src="/js/plugins/moment.min.js"></script>
+
+      
+<script src="/js/material-kit.min.js?v=2.0.5.js"></script>
+
       
         <script src="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.4.2/tocbot.min.js"></script>
-        <script src="/js/post.js"></script>
-        <script src="/js/plugins/prettify.js"></script>
+        
+<script src="/js/post.js"></script>
+
+        
+<script src="/js/plugins/prettify.js"></script>
+
         <script>
             $(document).ready(function(){
                 $('pre').addClass('prettyprint linenums');

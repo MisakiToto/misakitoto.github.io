@@ -20,12 +20,18 @@
     <meta name="author" content="Misaki">
     <meta name="keywords" content="">
     <title>Misaki&#39;s Blog</title>
-    <link rel="stylesheet" href="/css/Material_Icons.css">
-    <!-- <link rel="stylesheet" href="/css/font-awesome.css"> -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css">
-    <link rel="stylesheet" href="/css/main.css">
     
-</head>
+<link rel="stylesheet" href="/css/Material_Icons.css">
+
+    <!-- 
+<link rel="stylesheet" href="/css/font-awesome.css">
+ -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css">
+    
+<link rel="stylesheet" href="/css/main.css">
+
+    
+<meta name="generator" content="Hexo 5.2.0"></head>
 
 <body class=" sidebar-collapse">
 <nav class="navbar navbar-transparent navbar-color-on-scroll fixed-top navbar-expand-lg" color-on-scroll="100" id="sectionsNav">
@@ -110,7 +116,34 @@
             
             
                 <div class="col-md-11">
-                    <a href="/2019/08/重放攻击/" class="h3 title" target="_self">重放攻击</a>
+                    <a href="/2019/09/Android-Java-Hook/" class="h3 title" target="_self">Android Java Hook</a>
+                    
+                    <p>使用Inspeckage尝试hook其中的加密函数环境：夜神模拟器Inspeckage 2.3某收件APP
+获取关键参数安装app后，抓包看到如下参数
+在AK中搜索其中关键词fm和sign，搜索中发现sign过多，于是尝试搜索FM，搜索中发现如下class文件。
+打开Java源代码，在其中的一个void类型的b函数中发现关键。
+打开对应文件的sha...</p>
+                    
+                    
+                    <p class="h6">
+                        <i class="material-icons">date_range</i>2019-09-16
+                        
+                            <i class="material-icons">bookmark_border</i>
+                                
+                                    Android逆向 &nbsp;
+                                
+                        
+                    </p>
+                    
+                </div>
+        </div>
+       
+        
+        <div class="row post-card">
+            
+            
+                <div class="col-md-11">
+                    <a href="/2019/08/%E9%87%8D%E6%94%BE%E6%94%BB%E5%87%BB/" class="h3 title" target="_self">重放攻击</a>
                     
                     <p>重放攻击1. 漏洞简介​        首先简单看一下百度百科对重放攻击的简介：重放攻击(Replay Attacks)又称重播攻击、回放攻击，是指攻击者发送一个目的主机已接收过的包，来达到欺骗系统的目的，主要用于身份认证过程，破坏认证的正确性。重放攻击可以由发起者，也可以由拦截并重发该数据的敌方进行。攻击者利用网络监听或者其他方式盗取认证凭据，之...</p>
                     
@@ -158,20 +191,20 @@ app-debug1.apk把apk丢到AK中，反编译，结果中有一个目录是assert/
             
             
                 <div class="col-md-11">
-                    <a href="/2019/07/结构体链表逆向/" class="h3 title" target="_self">结构体链表逆向</a>
+                    <a href="/2019/07/%E7%BB%93%E6%9E%84%E4%BD%93%E9%93%BE%E8%A1%A8%E9%80%86%E5%90%91/" class="h3 title" target="_self">结构体链表逆向</a>
                     
                     <p>结构体链表逆向同样使用如下的C代码：
 #include &lt;stdio.h&gt;
 #include &lt;stdlib.h&gt;
 typedef struct _student
-{
-    char name[32];
-    int age;
-    struct _student * next;
-}T_student;
+&#123;
+	char name[32];
+	int age;
+	struct _student * next;
+&#125;T_student;
 
 
-T_stu...</p>
+T_st...</p>
                     
                     
                     <p class="h6">
@@ -192,18 +225,18 @@ T_stu...</p>
             
             
                 <div class="col-md-11">
-                    <a href="/2019/07/ARM数组重定向/" class="h3 title" target="_self">ARM数组重定向</a>
+                    <a href="/2019/07/ARM%E6%95%B0%E7%BB%84%E9%87%8D%E5%AE%9A%E5%90%91/" class="h3 title" target="_self">ARM数组重定向</a>
                     
                     <p>ARM数组重定向使用如下的C代码做演示，代码是无名侠的一份数组演示代码。如下：
 #include &lt;stdio.h&gt;
-// Arrays
+&#x2F;&#x2F; Arrays
 
 int g_Table[100];
 int g_Table2[100];
 
 void PrintAddr()
-{
-    printf(&quot;g_Table:0x%x\ng_Table2:%x...</p>
+&#123;
+	printf(&quot;g_Table:0x%x\...</p>
                     
                     
                     <p class="h6">
@@ -224,38 +257,14 @@ void PrintAddr()
             
             
                 <div class="col-md-11">
-                    <a href="/2019/07/Redis-主从复制/" class="h3 title" target="_self">Redis 主从复制</a>
+                    <a href="/2019/07/Redis-%E4%B8%BB%E4%BB%8E%E5%A4%8D%E5%88%B6/" class="h3 title" target="_self">Redis 主从复制</a>
                     
                     <p>Redis主从复制redis主从复制，前几天分享的新版redis未授权利用的新型方式。
 什么是主从复制，http://blog.itpub.net/31545684/viewspace-2213629/
 通过redis命令来设置主从机
 127.0.0.1:6379&gt; slaveof 192.168.253.131 6379
-被设置的主机将通过...</p>
-                    
-                    
-                    <p class="h6">
-                        <i class="material-icons">date_range</i>2019-07-15
-                        
-                            <i class="material-icons">bookmark_border</i>
-                                
-                                    web安全 &nbsp;
-                                
-                        
-                    </p>
-                    
-                </div>
-        </div>
-       
-        
-        <div class="row post-card">
-            
-            
-                <div class="col-md-11">
-                    <a href="/2019/07/FastJson-反序列化/" class="h3 title" target="_self">FastJson 反序列化</a>
-                    
-                    <p>FastJson 反序列化前一段时间HW护出来一个FastJson的RCE。网上遍布了利用的poc。此处简单模拟一下触发流程。
-先下载1.2.47的FastJson，地址：http://repo1.maven.org/maven2/com/alibaba/fastjson/1.2.47/FastJson-1.2.47.jar
-利用的JDK为，jav...</p>
+
+被设置的主机将通...</p>
                     
                     
                     <p class="h6">
@@ -308,12 +317,24 @@ void PrintAddr()
         </div>
 </footer>
       <!--   Core JS Files   -->
-      <script src="/js/core/jquery.min.js?v=3.2.1"></script>
-      <script src="/js/main.js"></script>
-      <script src="/js/core/popper.min.js"></script>
-      <script src="/js/core/bootstrap-material-design.min.js"></script>
-      <script src="/js/plugins/moment.min.js"></script>
-      <script src="/js/material-kit.min.js?v=2.0.5"></script>
+      
+<script src="/js/core/jquery.min.js?v=3.2.1.js"></script>
+
+      
+<script src="/js/main.js"></script>
+
+      
+<script src="/js/core/popper.min.js"></script>
+
+      
+<script src="/js/core/bootstrap-material-design.min.js"></script>
+
+      
+<script src="/js/plugins/moment.min.js"></script>
+
+      
+<script src="/js/material-kit.min.js?v=2.0.5.js"></script>
+
       
 <script src="/live2d-widget/autoload.js"></script>
 </body>

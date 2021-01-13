@@ -20,12 +20,18 @@
     <meta name="author" content="Misaki">
     <meta name="keywords" content="">
     <title>Misaki&#39;s Blog</title>
-    <link rel="stylesheet" href="/css/Material_Icons.css">
-    <!-- <link rel="stylesheet" href="/css/font-awesome.css"> -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css">
-    <link rel="stylesheet" href="/css/main.css">
     
-</head>
+<link rel="stylesheet" href="/css/Material_Icons.css">
+
+    <!-- 
+<link rel="stylesheet" href="/css/font-awesome.css">
+ -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css">
+    
+<link rel="stylesheet" href="/css/main.css">
+
+    
+<meta name="generator" content="Hexo 5.2.0"></head>
 
 <body class=" sidebar-collapse">
 <nav class="navbar navbar-transparent navbar-color-on-scroll fixed-top navbar-expand-lg" color-on-scroll="100" id="sectionsNav">
@@ -110,13 +116,37 @@
             
             
                 <div class="col-md-11">
-                    <a href="/2018/10/Apache中ModSecurity安装配置/" class="h3 title" target="_self">Apache中ModSecurity安装配置</a>
+                    <a href="/2018/11/ELK%E6%90%AD%E5%BB%BA%E4%BD%BF%E7%94%A8/" class="h3 title" target="_self">ELK搭建使用</a>
+                    
+                    <p>ELK日志分析系统搭建使用ELK是三个开源软件的缩写，分别表示：Elasticsearch , Logstash, Kibana , 它们都是开源软件。但现在新增了一个FileBeat，它是一个轻量级的日志收集处理工具(Agent)，Filebeat占用资源少，适合于在各个服务器上搜集日志后传输给Logstash，但此次并不添加filebeat，仍...</p>
+                    
+                    
+                    <p class="h6">
+                        <i class="material-icons">date_range</i>2018-11-04
+                        
+                            <i class="material-icons">bookmark_border</i>
+                                
+                                    web安全 &nbsp;
+                                
+                        
+                    </p>
+                    
+                </div>
+        </div>
+       
+        
+        <div class="row post-card">
+            
+            
+                <div class="col-md-11">
+                    <a href="/2018/10/Apache%E4%B8%ADModSecurity%E5%AE%89%E8%A3%85%E9%85%8D%E7%BD%AE/" class="h3 title" target="_self">Apache中ModSecurity安装配置</a>
                     
                     <p>环境为centos 6.5 apache2.2 modsecurity2.9.2
 安装mod_security的依赖
 yum install gcc make httpd-devel libxml2 pcre-devel libxml2-devel curl-devel git
+
 下载最新稳定的mod_security源代码
-wget https:/...</p>
+wget https:...</p>
                     
                     
                     <p class="h6">
@@ -137,7 +167,7 @@ wget https:/...</p>
             
             
                 <div class="col-md-11">
-                    <a href="/2018/10/Apache和Nginx安全配置/" class="h3 title" target="_self">Apache和Nginx安全配置</a>
+                    <a href="/2018/10/Apache%E5%92%8CNginx%E5%AE%89%E5%85%A8%E9%85%8D%E7%BD%AE/" class="h3 title" target="_self">Apache和Nginx安全配置</a>
                     
                     <p>apache安全配置apache运行原理Apache是基于模块化设计的，它的核心代码并不多，大多数的功能都被分散到各个模块中，各个模块在系统启动的时候按需载入。从配置文件中可以看到加载的各个模块。
 apache在启动阶段采用root权限来获取更多的资源使用权限，这个时候会加载配置文件，模块，资源文件等，在下一个运行阶段，Apache为了获得系统资源...</p>
@@ -161,7 +191,7 @@ apache在启动阶段采用root权限来获取更多的资源使用权限，这�
             
             
                 <div class="col-md-11">
-                    <a href="/2018/10/XSS-GAME记录/" class="h3 title" target="_self">XSS GAME记录</a>
+                    <a href="/2018/10/XSS-GAME%E8%AE%B0%E5%BD%95/" class="h3 title" target="_self">XSS GAME记录</a>
                     
                     <p>在安全文摘上看到一篇前端安全的文章，最后提到了几个xss在线游戏，有两个是之前就见过的，一个没玩过，好像也是之前的xss游戏。
 文章地址：https://segmentfault.com/a/1190000016551188
@@ -188,7 +218,7 @@ https://xss-game.appspot.com/level1
             
             
                 <div class="col-md-11">
-                    <a href="/2018/09/批量获取数据库权限/" class="h3 title" target="_self">批量获取数据库权限</a>
+                    <a href="/2018/09/%E6%89%B9%E9%87%8F%E8%8E%B7%E5%8F%96%E6%95%B0%E6%8D%AE%E5%BA%93%E6%9D%83%E9%99%90/" class="h3 title" target="_self">批量获取数据库权限</a>
                     
                     <p>眼看要到十一国庆小长假了，打算长假前写篇文章，巧合看到一篇老博文，dub ZJ居然要价七千，所以干脆写一个数据库ZJ脚本。
 利用以下几点：
@@ -216,12 +246,13 @@ https://xss-game.appspot.com/level1
             
             
                 <div class="col-md-11">
-                    <a href="/2018/09/基于scrapy的备份文件扫描/" class="h3 title" target="_self">基于scrapy的备份文件扫描</a>
+                    <a href="/2018/09/%E5%9F%BA%E4%BA%8Escrapy%E7%9A%84%E5%A4%87%E4%BB%BD%E6%96%87%E4%BB%B6%E6%89%AB%E6%8F%8F/" class="h3 title" target="_self">基于scrapy的备份文件扫描</a>
                     
                     <p>Scrapy，Python开发的一个快速、高层次的屏幕抓取和web抓取框架，用于抓取web站点并从页面中提取结构化的数据。Scrapy用途广泛，可以用于数据挖掘、监测和自动测试。
 首先生成项目文件
 scrapy startproject spiderdata
-生成成功后，会有以下目录结构，首先在spiderdata中的spider目录创建我们的sp...</p>
+
+生成成功后，会有以下目录结构，首先在spiderdata中的spider目录创建我们的s...</p>
                     
                     
                     <p class="h6">
@@ -230,37 +261,6 @@ scrapy startproject spiderdata
                             <i class="material-icons">bookmark_border</i>
                                 
                                     python &nbsp;
-                                
-                        
-                    </p>
-                    
-                </div>
-        </div>
-       
-        
-        <div class="row post-card">
-            
-            
-                <div class="col-md-11">
-                    <a href="/2018/09/使用docker创建镜像/" class="h3 title" target="_self">使用docker创建镜像</a>
-                    
-                    <p>在测试以及开源工具使用中，docker的便捷越来越成为快速部署的选择，那我们怎么构建自己的docker镜像。
-构建Docker镜像有以下两种方法：
-
-使用docker commit命令。
-使用docker build命令和 Dockerfile 文件
-
-docker commit命令首先我们在本地拉取ubuntu镜像作为基础的镜像环境。
-
-如果我们...</p>
-                    
-                    
-                    <p class="h6">
-                        <i class="material-icons">date_range</i>2018-09-25
-                        
-                            <i class="material-icons">bookmark_border</i>
-                                
-                                    web安全 &nbsp;
                                 
                         
                     </p>
@@ -305,12 +305,24 @@ docker commit命令首先我们在本地拉取ubuntu镜像作为基础的镜像�
         </div>
 </footer>
       <!--   Core JS Files   -->
-      <script src="/js/core/jquery.min.js?v=3.2.1"></script>
-      <script src="/js/main.js"></script>
-      <script src="/js/core/popper.min.js"></script>
-      <script src="/js/core/bootstrap-material-design.min.js"></script>
-      <script src="/js/plugins/moment.min.js"></script>
-      <script src="/js/material-kit.min.js?v=2.0.5"></script>
+      
+<script src="/js/core/jquery.min.js?v=3.2.1.js"></script>
+
+      
+<script src="/js/main.js"></script>
+
+      
+<script src="/js/core/popper.min.js"></script>
+
+      
+<script src="/js/core/bootstrap-material-design.min.js"></script>
+
+      
+<script src="/js/plugins/moment.min.js"></script>
+
+      
+<script src="/js/material-kit.min.js?v=2.0.5.js"></script>
+
       
 <script src="/live2d-widget/autoload.js"></script>
 </body>

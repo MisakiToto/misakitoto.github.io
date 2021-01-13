@@ -20,17 +20,27 @@
     <meta name="author" content="Misaki">
     <meta name="keywords" content="">
     <title>结构体链表逆向 ~ Misaki&#39;s Blog</title>
-    <link rel="stylesheet" href="/css/Material_Icons.css">
-    <!-- <link rel="stylesheet" href="/css/font-awesome.css"> -->
+    
+<link rel="stylesheet" href="/css/Material_Icons.css">
+
+    <!-- 
+<link rel="stylesheet" href="/css/font-awesome.css">
+ -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css">
-    <link rel="stylesheet" href="/css/main.css">
     
-        <link rel="stylesheet" href="/css/post.css">
+<link rel="stylesheet" href="/css/main.css">
+
+    
         
-            <link rel="stylesheet" href="/css/Prettify/tomorrow-night-eighties.min.css">
+<link rel="stylesheet" href="/css/post.css">
+
+        
+            
+<link rel="stylesheet" href="/css/Prettify/tomorrow-night-eighties.min.css">
+
         
     
-</head>
+<meta name="generator" content="Hexo 5.2.0"></head>
 
 <body class=" sidebar-collapse">
 <nav class="navbar navbar-transparent navbar-color-on-scroll fixed-top navbar-expand-lg" color-on-scroll="100" id="sectionsNav">
@@ -113,67 +123,68 @@
         <div class="section">
           <div class="post_content">
               <h3 id="结构体链表逆向"><a href="#结构体链表逆向" class="headerlink" title="结构体链表逆向"></a>结构体链表逆向</h3><p>同样使用如下的C代码：</p>
-<pre><code>#include &lt;stdio.h&gt;
+<pre class="line-numbers language-none"><code class="language-none">#include &lt;stdio.h&gt;
 #include &lt;stdlib.h&gt;
 typedef struct _student
-{
-    char name[32];
-    int age;
-    struct _student * next;
-}T_student;
+&#123;
+	char name[32];
+	int age;
+	struct _student * next;
+&#125;T_student;
 
 
-T_student * head = NULL;
+T_student * head &#x3D; NULL;
 
 void Insert(const char *name,int age)
-{
-    T_student * newnode;
-    newnode = (T_student *)malloc(sizeof(T_student));
-    newnode-&gt;age = age;
-    newnode-&gt;next = head;
-    strcpy(newnode-&gt;name,name);
-    head = newnode;
-}
+&#123;
+	T_student * newnode;
+	newnode &#x3D; (T_student *)malloc(sizeof(T_student));
+	newnode-&gt;age &#x3D; age;
+	newnode-&gt;next &#x3D; head;
+	strcpy(newnode-&gt;name,name);
+	head &#x3D; newnode;
+&#125;
 void PrintStudent()
-{
-    T_student * tmp;
-    tmp = head;
-    while(tmp)
-    {
-        printf(&quot;name:%s age:%d\n&quot;,tmp-&gt;name,tmp-&gt;age);
-        tmp=tmp-&gt;next;
-    }
-}
+&#123;
+	T_student * tmp;
+	tmp &#x3D; head;
+	while(tmp)
+	&#123;
+		printf(&quot;name:%s age:%d\n&quot;,tmp-&gt;name,tmp-&gt;age);
+		tmp&#x3D;tmp-&gt;next;
+	&#125;
+&#125;
 
 int  main()
-{
-    Insert(&quot;Panda&quot;,15);
-    Insert(&quot;Dog&quot;,3);
-    Insert(&quot;Cat&quot;,2);
-    Insert(&quot;XiaoMing&quot;,20);
-    PrintStudent();
-}
+&#123;
+	Insert(&quot;Panda&quot;,15);
+	Insert(&quot;Dog&quot;,3);
+	Insert(&quot;Cat&quot;,2);
+	Insert(&quot;XiaoMing&quot;,20);
+	PrintStudent();
+&#125;
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
-</code></pre><p>按照惯例，编译把文件丢到IDA，找到main函数，点开。可以看到调用了四次insert函数和PrintStudent函数。</p>
-<p><img src="\2019\07\结构体链表逆向\1564122124023.png" alt="1564122124023"></p>
+<p>按照惯例，编译把文件丢到IDA，找到main函数，点开。可以看到调用了四次insert函数和PrintStudent函数。</p>
+<p><img src="%5C2019%5C07%5C%E7%BB%93%E6%9E%84%E4%BD%93%E9%93%BE%E8%A1%A8%E9%80%86%E5%90%91%5C1564122124023.png" alt="1564122124023"></p>
 <p>点到insert函数中查看函数实现。传入两个参数后，后面调用了malloc函数来分配内存空间，R3就可以看做是malloc分配来的内存并且指向此块内存的指针。其后使用dest来表示这个指针。var_14把内存数据存入dest加偏移量为32的地址上。也就是把第二个int参数存入相应地址。获取head变量，LDR把head变量当作地址来加载其上的数据，head同样可能是指针。而后会把第一个参数和head指针数据同样存入到结构体对应的地址上。只是第一个参数使用了strcpy来复制，顺便一提可能会产生数据覆盖。最后指针dest存到head的地址上，由head来表示基地址。</p>
-<p><img src="\2019\07\结构体链表逆向\1564123321051.png" alt="1564123321051"></p>
+<p><img src="%5C2019%5C07%5C%E7%BB%93%E6%9E%84%E4%BD%93%E9%93%BE%E8%A1%A8%E9%80%86%E5%90%91%5C1564123321051.png" alt="1564123321051"></p>
 <p>后面再看一下PrintStudent函数。将head的地址值存到新的指针中。以下仍然使用*head表示存入的地址上的数据。判断值为指针是否为0，从而进行遍历，到此为止基本可以看到前面的结构体存入参数和head赋值，完成了一个链表的结构。此处是遍历链表判断是否遍历完成。</p>
 <p>获取到第一个第二个参数后，var_8指针由参数三来进行下一个结构体的查询。</p>
-<p><img src="\2019\07\结构体链表逆向\1564130434725.png" alt="1564130434725"></p>
+<p><img src="%5C2019%5C07%5C%E7%BB%93%E6%9E%84%E4%BD%93%E9%93%BE%E8%A1%A8%E9%80%86%E5%90%91%5C1564130434725.png" alt="1564130434725"></p>
 <p>实现大致如下，当执行第一次insert函数时，写入一个结构体，并且把结构体的基地址写入head指针，第二次执行insert函数时，把head指针写入第二个结构体的第三个参数也就是结构体的指向下一个节点的指针。完成一个链表的创建。按照执行顺序，从后往前执行，第三个参数也就是节点的指针是前一个结构体的基地址。直到遍历完成，指针为null。</p>
-<p><img src="\2019\07\结构体链表逆向\1564132058549.png" alt="1564132058549"></p>
+<p><img src="%5C2019%5C07%5C%E7%BB%93%E6%9E%84%E4%BD%93%E9%93%BE%E8%A1%A8%E9%80%86%E5%90%91%5C1564132058549.png" alt="1564132058549"></p>
 <p>至此，结构体链表的分析就算完成了。无名侠的这个课程也算是结束了，不得不说多看几遍还是有不少的收获。</p>
 
           </div>
           <br><br>
               
                 <div class="license-wrapper">
-                    <p>原文作者：<a href="">Misaki</a>
-                    <p>原文链接：<a href="/2019/07/结构体链表逆向/">/2019/07/结构体链表逆向/</a>
-                    <p>发表日期：<a href="/2019/07/结构体链表逆向/">July 26th 2019, 5:23:50 pm</a>
-                    <p>更新日期：<a href="/2019/07/结构体链表逆向/">July 26th 2019, 5:56:41 pm</a>
-                    <p>版权声明：本文采用<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">知识共享署名-非商业性使用 4.0 国际许可协议</a>进行许可</p>
+                    <p>原文作者：<a href="https://misakikata.github.io">Misaki</a>
+                    <p>原文链接：<a href="https://misakikata.github.io/2019/07/%E7%BB%93%E6%9E%84%E4%BD%93%E9%93%BE%E8%A1%A8%E9%80%86%E5%90%91/">https://misakikata.github.io/2019/07/%E7%BB%93%E6%9E%84%E4%BD%93%E9%93%BE%E8%A1%A8%E9%80%86%E5%90%91/</a>
+                    <p>发表日期：<a href="https://misakikata.github.io/2019/07/%E7%BB%93%E6%9E%84%E4%BD%93%E9%93%BE%E8%A1%A8%E9%80%86%E5%90%91/">July 26th 2019, 5:23:50 pm</a>
+                    <p>更新日期：<a href="https://misakikata.github.io/2019/07/%E7%BB%93%E6%9E%84%E4%BD%93%E9%93%BE%E8%A1%A8%E9%80%86%E5%90%91/">July 26th 2019, 5:56:41 pm</a>
+                    <p>版权声明：本文采用<a rel="license noopener" target="_blank" href="http://creativecommons.org/licenses/by-nc/4.0/">知识共享署名-非商业性使用 4.0 国际许可协议</a>进行许可</p>
                 </div>
               
           <br><br>
@@ -211,7 +222,7 @@ int  main()
     <script>               
         var disqus_shortname = '';
         var disqus_config = function () {
-            this.page.url = '/2019/07/结构体链表逆向/'; 
+            this.page.url = 'https://misakikata.github.io/2019/07/结构体链表逆向/'; 
             this.page.identifier = '/2019/07/结构体链表逆向/';
         };
         (function() { 
@@ -222,7 +233,7 @@ int  main()
             (d.head || d.body).appendChild(s);
         })();
     </script>
-    <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>                                
+    <noscript>Please enable JavaScript to view the <a target="_blank" rel="noopener" href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>                                
 </div>
         
     
@@ -242,16 +253,32 @@ int  main()
         </div>
 </footer>
       <!--   Core JS Files   -->
-      <script src="/js/core/jquery.min.js?v=3.2.1"></script>
-      <script src="/js/main.js"></script>
-      <script src="/js/core/popper.min.js"></script>
-      <script src="/js/core/bootstrap-material-design.min.js"></script>
-      <script src="/js/plugins/moment.min.js"></script>
-      <script src="/js/material-kit.min.js?v=2.0.5"></script>
+      
+<script src="/js/core/jquery.min.js?v=3.2.1.js"></script>
+
+      
+<script src="/js/main.js"></script>
+
+      
+<script src="/js/core/popper.min.js"></script>
+
+      
+<script src="/js/core/bootstrap-material-design.min.js"></script>
+
+      
+<script src="/js/plugins/moment.min.js"></script>
+
+      
+<script src="/js/material-kit.min.js?v=2.0.5.js"></script>
+
       
         <script src="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.4.2/tocbot.min.js"></script>
-        <script src="/js/post.js"></script>
-        <script src="/js/plugins/prettify.js"></script>
+        
+<script src="/js/post.js"></script>
+
+        
+<script src="/js/plugins/prettify.js"></script>
+
         <script>
             $(document).ready(function(){
                 $('pre').addClass('prettyprint linenums');

@@ -20,17 +20,27 @@
     <meta name="author" content="Misaki">
     <meta name="keywords" content="">
     <title>IDA动态调试 ~ Misaki&#39;s Blog</title>
-    <link rel="stylesheet" href="/css/Material_Icons.css">
-    <!-- <link rel="stylesheet" href="/css/font-awesome.css"> -->
+    
+<link rel="stylesheet" href="/css/Material_Icons.css">
+
+    <!-- 
+<link rel="stylesheet" href="/css/font-awesome.css">
+ -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css">
-    <link rel="stylesheet" href="/css/main.css">
     
-        <link rel="stylesheet" href="/css/post.css">
+<link rel="stylesheet" href="/css/main.css">
+
+    
         
-            <link rel="stylesheet" href="/css/Prettify/tomorrow-night-eighties.min.css">
+<link rel="stylesheet" href="/css/post.css">
+
+        
+            
+<link rel="stylesheet" href="/css/Prettify/tomorrow-night-eighties.min.css">
+
         
     
-</head>
+<meta name="generator" content="Hexo 5.2.0"></head>
 
 <body class=" sidebar-collapse">
 <nav class="navbar navbar-transparent navbar-color-on-scroll fixed-top navbar-expand-lg" color-on-scroll="100" id="sectionsNav">
@@ -114,26 +124,30 @@
           <div class="post_content">
               <h3 id="IDA-动态调试"><a href="#IDA-动态调试" class="headerlink" title="IDA 动态调试"></a>IDA 动态调试</h3><p>通常在APP逆向和破解时，某些重要的函数会以so文件的形式进行加载，所以，在想获得关键操作逻辑和修改某些函数时，就需要IDA来进行操作啦。以下使用IDA版本7.0，小米手机</p>
 <h4 id="1、上传Android-Server"><a href="#1、上传Android-Server" class="headerlink" title="1、上传Android_Server"></a>1、上传Android_Server</h4><p>文件存放在安装目录下的dbgsrv目录中，7.0以后版本多了几个其他版本的Android_server文件，上传Android_server文件到手机目录中，并提升执行权限。</p>
-<pre><code>adb push android_server /data/local/tmp/
+<pre class="line-numbers language-none"><code class="language-none">adb push android_server &#x2F;data&#x2F;local&#x2F;tmp&#x2F;
 chmod 755 android_server
-adb forward tcp:23946 tcp:23946
-</code></pre><p>执行后就可以显示正在监听23946端口，如果报错，一般是使用位数和系统不一致。</p>
+adb forward tcp:23946 tcp:23946<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+
+<p>执行后就可以显示正在监听23946端口，如果报错，一般是使用位数和系统不一致。</p>
 <h4 id="2、调试启动APP"><a href="#2、调试启动APP" class="headerlink" title="2、调试启动APP"></a>2、调试启动APP</h4><p>以调试模式启动app</p>
-<pre><code>adb shell am start -D -n 包名/.MainActivity
-</code></pre><p>手机界面显示等待调试中，便可以进行下一步了。</p>
+<pre class="line-numbers language-none"><code class="language-none">adb shell am start -D -n 包名&#x2F;.MainActivity<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<p>手机界面显示等待调试中，便可以进行下一步了。</p>
 <h4 id="3、查看APP-PID"><a href="#3、查看APP-PID" class="headerlink" title="3、查看APP PID"></a>3、查看APP PID</h4><p>调试进程进行端口转发，查看进程对应PID。</p>
-<pre><code>adb shell ps | grep 包名
-adb forward tcp:8700 jdwp:pid
-</code></pre><p>8700端口一般为默认的本地调试端口，如果不一致，可以在DDMS中查看。</p>
+<pre class="line-numbers language-none"><code class="language-none">adb shell ps | grep 包名
+adb forward tcp:8700 jdwp:pid<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+
+<p>8700端口一般为默认的本地调试端口，如果不一致，可以在DDMS中查看。</p>
 <h4 id="4、IDA附加进程"><a href="#4、IDA附加进程" class="headerlink" title="4、IDA附加进程"></a>4、IDA附加进程</h4><p>附加进程调试时，有时候需要对，如下的选项进行勾选，一般在需要动态加载so文件，调试JNI_onload函数的时候需要，对于一般调试静态函数的，需要拦取执行后断点的，可能连调试模式启动app都不需要。</p>
-<p><img src="\2019\03\IDA动态调试\1553850211516.png" alt="1553850211516"></p>
+<p><img src="%5C2019%5C03%5CIDA%E5%8A%A8%E6%80%81%E8%B0%83%E8%AF%95%5C1553850211516.png" alt="1553850211516"></p>
 <p>选择后，便可以在attach to process选项中查看到相应的可调试进程了。如果没有进程可能是你的APP不能调试，需要添加可调试参数。或者直接修改ro.debuggable=1。</p>
-<p><img src="\2019\03\IDA动态调试\1553850356604.png" alt="1553850356604"></p>
+<p><img src="%5C2019%5C03%5CIDA%E5%8A%A8%E6%80%81%E8%B0%83%E8%AF%95%5C1553850356604.png" alt="1553850356604"></p>
 <h4 id="5、JDB附加"><a href="#5、JDB附加" class="headerlink" title="5、JDB附加"></a>5、JDB附加</h4><p>执行jdb附加</p>
-<pre><code>jdb -connect com.sun.jdi.SocketAttach:hostname=127.0.0.1,port=8700
-</code></pre><h4 id="6、调试选择"><a href="#6、调试选择" class="headerlink" title="6、调试选择"></a>6、调试选择</h4><p>选择完成后，进入调试状态，在右边的modules栏可以看到加载进来的so文件。选择需要调试的so文件，如果没有看到需要的so文件，说明so文件是动态加载的，这时候F9运行，就可以看到相应的so文件了。</p>
+<pre class="line-numbers language-none"><code class="language-none">jdb -connect com.sun.jdi.SocketAttach:hostname&#x3D;127.0.0.1,port&#x3D;8700<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<h4 id="6、调试选择"><a href="#6、调试选择" class="headerlink" title="6、调试选择"></a>6、调试选择</h4><p>选择完成后，进入调试状态，在右边的modules栏可以看到加载进来的so文件。选择需要调试的so文件，如果没有看到需要的so文件，说明so文件是动态加载的，这时候F9运行，就可以看到相应的so文件了。</p>
 <p>选择相应的so文件后，会显示so文件中的函数，选择对于函数即可。</p>
-<p><img src="\2019\03\IDA动态调试\1553850903002.png" alt="1553850903002"></p>
+<p><img src="%5C2019%5C03%5CIDA%E5%8A%A8%E6%80%81%E8%B0%83%E8%AF%95%5C1553850903002.png" alt="1553850903002"></p>
 <h4 id="7、调试断点"><a href="#7、调试断点" class="headerlink" title="7、调试断点"></a>7、调试断点</h4><p>如选择对于的JNI_Onload 函数，这时候界面会跳转到函数的起始位置，当然也可以使用基地址加偏移地址的方式寻找。找到函数位置后就可以F2下断点了。</p>
 <p>断点执行后，点击F9再次运行，程序就可以执行到断点位置，当然有些是需要配合界面操作来执行。由于以上是抓取JNI_Onload函数，直接运行即可。</p>
 <p>利用F8步过，F7步入进行调试即可。</p>
@@ -143,11 +157,11 @@ adb forward tcp:8700 jdwp:pid
           <br><br>
               
                 <div class="license-wrapper">
-                    <p>原文作者：<a href="">Misaki</a>
-                    <p>原文链接：<a href="/2019/03/IDA动态调试/">/2019/03/IDA动态调试/</a>
-                    <p>发表日期：<a href="/2019/03/IDA动态调试/">March 29th 2019, 4:31:34 pm</a>
-                    <p>更新日期：<a href="/2019/03/IDA动态调试/">July 26th 2019, 5:56:06 pm</a>
-                    <p>版权声明：本文采用<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">知识共享署名-非商业性使用 4.0 国际许可协议</a>进行许可</p>
+                    <p>原文作者：<a href="https://misakikata.github.io">Misaki</a>
+                    <p>原文链接：<a href="https://misakikata.github.io/2019/03/IDA%E5%8A%A8%E6%80%81%E8%B0%83%E8%AF%95/">https://misakikata.github.io/2019/03/IDA%E5%8A%A8%E6%80%81%E8%B0%83%E8%AF%95/</a>
+                    <p>发表日期：<a href="https://misakikata.github.io/2019/03/IDA%E5%8A%A8%E6%80%81%E8%B0%83%E8%AF%95/">March 29th 2019, 4:31:34 pm</a>
+                    <p>更新日期：<a href="https://misakikata.github.io/2019/03/IDA%E5%8A%A8%E6%80%81%E8%B0%83%E8%AF%95/">July 26th 2019, 5:56:06 pm</a>
+                    <p>版权声明：本文采用<a rel="license noopener" target="_blank" href="http://creativecommons.org/licenses/by-nc/4.0/">知识共享署名-非商业性使用 4.0 国际许可协议</a>进行许可</p>
                 </div>
               
           <br><br>
@@ -185,7 +199,7 @@ adb forward tcp:8700 jdwp:pid
     <script>               
         var disqus_shortname = '';
         var disqus_config = function () {
-            this.page.url = '/2019/03/IDA动态调试/'; 
+            this.page.url = 'https://misakikata.github.io/2019/03/IDA动态调试/'; 
             this.page.identifier = '/2019/03/IDA动态调试/';
         };
         (function() { 
@@ -196,7 +210,7 @@ adb forward tcp:8700 jdwp:pid
             (d.head || d.body).appendChild(s);
         })();
     </script>
-    <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>                                
+    <noscript>Please enable JavaScript to view the <a target="_blank" rel="noopener" href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>                                
 </div>
         
     
@@ -216,16 +230,32 @@ adb forward tcp:8700 jdwp:pid
         </div>
 </footer>
       <!--   Core JS Files   -->
-      <script src="/js/core/jquery.min.js?v=3.2.1"></script>
-      <script src="/js/main.js"></script>
-      <script src="/js/core/popper.min.js"></script>
-      <script src="/js/core/bootstrap-material-design.min.js"></script>
-      <script src="/js/plugins/moment.min.js"></script>
-      <script src="/js/material-kit.min.js?v=2.0.5"></script>
+      
+<script src="/js/core/jquery.min.js?v=3.2.1.js"></script>
+
+      
+<script src="/js/main.js"></script>
+
+      
+<script src="/js/core/popper.min.js"></script>
+
+      
+<script src="/js/core/bootstrap-material-design.min.js"></script>
+
+      
+<script src="/js/plugins/moment.min.js"></script>
+
+      
+<script src="/js/material-kit.min.js?v=2.0.5.js"></script>
+
       
         <script src="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.4.2/tocbot.min.js"></script>
-        <script src="/js/post.js"></script>
-        <script src="/js/plugins/prettify.js"></script>
+        
+<script src="/js/post.js"></script>
+
+        
+<script src="/js/plugins/prettify.js"></script>
+
         <script>
             $(document).ready(function(){
                 $('pre').addClass('prettyprint linenums');

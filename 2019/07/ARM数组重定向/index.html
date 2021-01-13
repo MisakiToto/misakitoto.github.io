@@ -20,17 +20,27 @@
     <meta name="author" content="Misaki">
     <meta name="keywords" content="">
     <title>ARM数组重定向 ~ Misaki&#39;s Blog</title>
-    <link rel="stylesheet" href="/css/Material_Icons.css">
-    <!-- <link rel="stylesheet" href="/css/font-awesome.css"> -->
+    
+<link rel="stylesheet" href="/css/Material_Icons.css">
+
+    <!-- 
+<link rel="stylesheet" href="/css/font-awesome.css">
+ -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css">
-    <link rel="stylesheet" href="/css/main.css">
     
-        <link rel="stylesheet" href="/css/post.css">
+<link rel="stylesheet" href="/css/main.css">
+
+    
         
-            <link rel="stylesheet" href="/css/Prettify/tomorrow-night-eighties.min.css">
+<link rel="stylesheet" href="/css/post.css">
+
+        
+            
+<link rel="stylesheet" href="/css/Prettify/tomorrow-night-eighties.min.css">
+
         
     
-</head>
+<meta name="generator" content="Hexo 5.2.0"></head>
 
 <body class=" sidebar-collapse">
 <nav class="navbar navbar-transparent navbar-color-on-scroll fixed-top navbar-expand-lg" color-on-scroll="100" id="sectionsNav">
@@ -113,94 +123,97 @@
         <div class="section">
           <div class="post_content">
               <h3 id="ARM数组重定向"><a href="#ARM数组重定向" class="headerlink" title="ARM数组重定向"></a>ARM数组重定向</h3><p>使用如下的C代码做演示，代码是无名侠的一份数组演示代码。如下：</p>
-<pre><code>#include &lt;stdio.h&gt;
-// Arrays
+<pre class="line-numbers language-none"><code class="language-none">#include &lt;stdio.h&gt;
+&#x2F;&#x2F; Arrays
 
 int g_Table[100];
 int g_Table2[100];
 
 void PrintAddr()
-{
-    printf(&quot;g_Table:0x%x\ng_Table2:%x\n&quot;,g_Table,g_Table2);
-
-}
+&#123;
+	printf(&quot;g_Table:0x%x\ng_Table2:%x\n&quot;,g_Table,g_Table2);
+	
+&#125;
 void InitTable()
-{
-    int i;
-    for(i=0;i&lt;100;i++)
-        g_Table[i] = i;
-
-    printf(&quot;Table1 init ok\n&quot;);
-    for(i=0;i&lt;100;i++)
-        g_Table2[i] = i;
-}
+&#123;
+	int i;
+	for(i&#x3D;0;i&lt;100;i++)
+		g_Table[i] &#x3D; i;
+	
+	printf(&quot;Table1 init ok\n&quot;);
+	for(i&#x3D;0;i&lt;100;i++)
+		g_Table2[i] &#x3D; i;
+&#125;
 
 int search(int key)
-{
-    int i=0;
-    for(;i&lt;100;i++)
-    {
-        if(g_Table[i]==key)
-            return i;
-    }
-    return -1;
-}
+&#123;
+	int i&#x3D;0;
+	for(;i&lt;100;i++)
+	&#123;
+		if(g_Table[i]&#x3D;&#x3D;key)
+			return i;
+	&#125;
+	return -1;
+&#125;
 
 int read(int x)
-{
-    return g_Table[x];
-}
+&#123;
+	return g_Table[x];
+&#125;
 void write(int x,int value)
-{
-     g_Table[x] = value;
-}
+&#123;
+	 g_Table[x] &#x3D; value;
+&#125;
 
 int main()
-{
-    int idx;
-    PrintAddr();
-    InitTable();
-    write(2,200);
-    write(6,900);
-    if((idx = search(200))!=-1)
-        write(idx,400);
-}
+&#123;
+	int idx;
+	PrintAddr();
+	InitTable();
+	write(2,200);
+	write(6,900);
+	if((idx &#x3D; search(200))!&#x3D;-1)
+		write(idx,400);
+&#125;
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
-</code></pre><p>利用之前的makefile文件进行编译，打可执行文件丢入IDA中打开。选择main函数，大概就是酱紫</p>
-<p><img src="\2019\07\ARM数组重定向\1563864556080.png" alt="1563864556080"></p>
+<p>利用之前的makefile文件进行编译，打可执行文件丢入IDA中打开。选择main函数，大概就是酱紫</p>
+<p><img src="%5C2019%5C07%5CARM%E6%95%B0%E7%BB%84%E9%87%8D%E5%AE%9A%E5%90%91%5C1563864556080.png" alt="1563864556080"></p>
 <p>选择第一个函数PrintAddr来查看其中的实现代码。根据其中的注释就可以看出来输出是的打印g_Table和g_Table2。</p>
-<p><img src="\2019\07\ARM数组重定向\1563865049285.png" alt="1563865049285"></p>
+<p><img src="%5C2019%5C07%5CARM%E6%95%B0%E7%BB%84%E9%87%8D%E5%AE%9A%E5%90%91%5C1563865049285.png" alt="1563865049285"></p>
 <p>而对于其中的这两个参数只有类似如下数组地址值，所以打印就是数组的地址。</p>
-<pre><code>.text:00000400                 LDR     R2, =(g_Table_ptr - 0x1FE4)
-.text:00000404                 LDR     R2, [R3,R2] ; g_Table
-</code></pre><p>回到main函数中，重新选择InitTable函数，在图表视图中可以看到此函数实现了两个循环，具体是哪种循环暂不得知，首先查看第一个循环，从开始的循环赋值和比较开始，</p>
-<p><img src="\2019\07\ARM数组重定向\1563866904258.png" alt="1563866904258"></p>
+<pre class="line-numbers language-none"><code class="language-none">.text:00000400                 LDR     R2, &#x3D;(g_Table_ptr - 0x1FE4)
+.text:00000404                 LDR     R2, [R3,R2] ; g_Table<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+
+<p>回到main函数中，重新选择InitTable函数，在图表视图中可以看到此函数实现了两个循环，具体是哪种循环暂不得知，首先查看第一个循环，从开始的循环赋值和比较开始，</p>
+<p><img src="%5C2019%5C07%5CARM%E6%95%B0%E7%BB%84%E9%87%8D%E5%AE%9A%E5%90%91%5C1563866904258.png" alt="1563866904258"></p>
 <p>在左侧的循环体中，获取的是循环变量的值，在STR指令中，把循环变量存入到了R3(g_Table数组的地址值)，R2、*4代表了int型的四字节长度，所以此处意义是array[i] = i。按照循环变量的增长值按顺序存入到了数组中。</p>
 <p>当循环变量大于99时，跳出循环走到右边的步骤，获取R3的地址值，R3则代表的是一串字符串，其后使用puts输出，利用puts是输出后，会自动在其后添加换行符。然后再对循环体重赋值。</p>
 <p>继续查看第二个循环体，由于跟第一个循环一致，不在细看。</p>
-<p><img src="\2019\07\ARM数组重定向\1563868287872.png" alt="1563868287872"></p>
+<p><img src="%5C2019%5C07%5CARM%E6%95%B0%E7%BB%84%E9%87%8D%E5%AE%9A%E5%90%91%5C1563868287872.png" alt="1563868287872"></p>
 <p>分析完InitTable函数后，可以得知，这是一个对全局数组进行赋值的操作。也许后面会用到这个数组。回到main函数中，其后调用了两次write函数，对每个write函数进行两个参数的引用。查看write函数。</p>
-<p><img src="\2019\07\ARM数组重定向\1563868846505.png" alt="1563868846505"></p>
+<p><img src="%5C2019%5C07%5CARM%E6%95%B0%E7%BB%84%E9%87%8D%E5%AE%9A%E5%90%91%5C1563868846505.png" alt="1563868846505"></p>
 <p>函数跟InitTable其中对数组的操作类似，都是根据参数进入数组的赋值，如下的对write函数中的第一个参数作为数组的下标，以第二个参数作为需要重新赋值的数组值。array[var_8] = var_c。</p>
-<p><img src="\2019\07\ARM数组重定向\1563870802372.png" alt="1563870802372"></p>
+<p><img src="%5C2019%5C07%5CARM%E6%95%B0%E7%BB%84%E9%87%8D%E5%AE%9A%E5%90%91%5C1563870802372.png" alt="1563870802372"></p>
 <p>在去选择search函数，查看函数实现和逻辑，其中传入参数var_10为200，进入循环判断是否大于99，进入循环体，获取数组的下标对应的值，来和传入的参数进行对比不相同则跳转继续循环。相同则跳出循环，获取数组下标值返回，类似如下</p>
-<pre><code>R1 = array[var_8] = array[i]
-R3 = var_10 = 200
-if array[var_8] == var_10:
-    return var_8
-</code></pre><p><img src="\2019\07\ARM数组重定向\1563874211104.png" alt="1563874211104"></p>
+<pre class="line-numbers language-none"><code class="language-none">R1 &#x3D; array[var_8] &#x3D; array[i]
+R3 &#x3D; var_10 &#x3D; 200
+if array[var_8] &#x3D;&#x3D; var_10:
+	return var_8<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p><img src="%5C2019%5C07%5CARM%E6%95%B0%E7%BB%84%E9%87%8D%E5%AE%9A%E5%90%91%5C1563874211104.png" alt="1563874211104"></p>
 <p>最后的main函数，重新调用了write函数，利用search的返回值来判断是否是-1，CMN是做负数对比。而R3的负数来源search函数的大于99后仍然没有找到返回值时，返回-1。</p>
-<p><img src="\2019\07\ARM数组重定向\1563875783761.png" alt="1563875783761"></p>
+<p><img src="%5C2019%5C07%5CARM%E6%95%B0%E7%BB%84%E9%87%8D%E5%AE%9A%E5%90%91%5C1563875783761.png" alt="1563875783761"></p>
 
           </div>
           <br><br>
               
                 <div class="license-wrapper">
-                    <p>原文作者：<a href="">Misaki</a>
-                    <p>原文链接：<a href="/2019/07/ARM数组重定向/">/2019/07/ARM数组重定向/</a>
-                    <p>发表日期：<a href="/2019/07/ARM数组重定向/">July 26th 2019, 5:23:36 pm</a>
-                    <p>更新日期：<a href="/2019/07/ARM数组重定向/">July 26th 2019, 5:56:13 pm</a>
-                    <p>版权声明：本文采用<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">知识共享署名-非商业性使用 4.0 国际许可协议</a>进行许可</p>
+                    <p>原文作者：<a href="https://misakikata.github.io">Misaki</a>
+                    <p>原文链接：<a href="https://misakikata.github.io/2019/07/ARM%E6%95%B0%E7%BB%84%E9%87%8D%E5%AE%9A%E5%90%91/">https://misakikata.github.io/2019/07/ARM%E6%95%B0%E7%BB%84%E9%87%8D%E5%AE%9A%E5%90%91/</a>
+                    <p>发表日期：<a href="https://misakikata.github.io/2019/07/ARM%E6%95%B0%E7%BB%84%E9%87%8D%E5%AE%9A%E5%90%91/">July 26th 2019, 5:23:36 pm</a>
+                    <p>更新日期：<a href="https://misakikata.github.io/2019/07/ARM%E6%95%B0%E7%BB%84%E9%87%8D%E5%AE%9A%E5%90%91/">July 26th 2019, 5:56:13 pm</a>
+                    <p>版权声明：本文采用<a rel="license noopener" target="_blank" href="http://creativecommons.org/licenses/by-nc/4.0/">知识共享署名-非商业性使用 4.0 国际许可协议</a>进行许可</p>
                 </div>
               
           <br><br>
@@ -238,7 +251,7 @@ if array[var_8] == var_10:
     <script>               
         var disqus_shortname = '';
         var disqus_config = function () {
-            this.page.url = '/2019/07/ARM数组重定向/'; 
+            this.page.url = 'https://misakikata.github.io/2019/07/ARM数组重定向/'; 
             this.page.identifier = '/2019/07/ARM数组重定向/';
         };
         (function() { 
@@ -249,7 +262,7 @@ if array[var_8] == var_10:
             (d.head || d.body).appendChild(s);
         })();
     </script>
-    <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>                                
+    <noscript>Please enable JavaScript to view the <a target="_blank" rel="noopener" href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>                                
 </div>
         
     
@@ -269,16 +282,32 @@ if array[var_8] == var_10:
         </div>
 </footer>
       <!--   Core JS Files   -->
-      <script src="/js/core/jquery.min.js?v=3.2.1"></script>
-      <script src="/js/main.js"></script>
-      <script src="/js/core/popper.min.js"></script>
-      <script src="/js/core/bootstrap-material-design.min.js"></script>
-      <script src="/js/plugins/moment.min.js"></script>
-      <script src="/js/material-kit.min.js?v=2.0.5"></script>
+      
+<script src="/js/core/jquery.min.js?v=3.2.1.js"></script>
+
+      
+<script src="/js/main.js"></script>
+
+      
+<script src="/js/core/popper.min.js"></script>
+
+      
+<script src="/js/core/bootstrap-material-design.min.js"></script>
+
+      
+<script src="/js/plugins/moment.min.js"></script>
+
+      
+<script src="/js/material-kit.min.js?v=2.0.5.js"></script>
+
       
         <script src="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.4.2/tocbot.min.js"></script>
-        <script src="/js/post.js"></script>
-        <script src="/js/plugins/prettify.js"></script>
+        
+<script src="/js/post.js"></script>
+
+        
+<script src="/js/plugins/prettify.js"></script>
+
         <script>
             $(document).ready(function(){
                 $('pre').addClass('prettyprint linenums');

@@ -20,17 +20,27 @@
     <meta name="author" content="Misaki">
     <meta name="keywords" content="">
     <title>APP解密参数sign ~ Misaki&#39;s Blog</title>
-    <link rel="stylesheet" href="/css/Material_Icons.css">
-    <!-- <link rel="stylesheet" href="/css/font-awesome.css"> -->
+    
+<link rel="stylesheet" href="/css/Material_Icons.css">
+
+    <!-- 
+<link rel="stylesheet" href="/css/font-awesome.css">
+ -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css">
-    <link rel="stylesheet" href="/css/main.css">
     
-        <link rel="stylesheet" href="/css/post.css">
+<link rel="stylesheet" href="/css/main.css">
+
+    
         
-            <link rel="stylesheet" href="/css/Prettify/tomorrow-night-eighties.min.css">
+<link rel="stylesheet" href="/css/post.css">
+
+        
+            
+<link rel="stylesheet" href="/css/Prettify/tomorrow-night-eighties.min.css">
+
         
     
-</head>
+<meta name="generator" content="Hexo 5.2.0"></head>
 
 <body class=" sidebar-collapse">
 <nav class="navbar navbar-transparent navbar-color-on-scroll fixed-top navbar-expand-lg" color-on-scroll="100" id="sectionsNav">
@@ -114,71 +124,74 @@
           <div class="post_content">
               <h3 id="APP解密参数sign"><a href="#APP解密参数sign" class="headerlink" title="APP解密参数sign"></a>APP解密参数sign</h3><p>APP是公司自己的业务APP，没有加固，只做了代码混淆。本以为要对加密字段进行so文件的逆向，查看后发现是Java层的加密，相对较简单。</p>
 <p>首先抓包查看加密字段和相关参数值，可以看到一共有四个参数，其中sign是加密验证完整性字段</p>
-<p><img src="\2019\04\APP解密参数sign\1555574089554.png" alt="1555574089554"></p>
+<p><img src="%5C2019%5C04%5CAPP%E8%A7%A3%E5%AF%86%E5%8F%82%E6%95%B0sign%5C1555574089554.png" alt="1555574089554"></p>
 <p>利用AK逆向APP包，搜索sign字段信息，但是搜索结果过多，查找较困难，但是sign是一个data参数字段，因此尝试更换其他字段搜索。</p>
-<p><img src="\2019\04\APP解密参数sign\1555574535666.png" alt="1555574535666"></p>
+<p><img src="%5C2019%5C04%5CAPP%E8%A7%A3%E5%AF%86%E5%8F%82%E6%95%B0sign%5C1555574535666.png" alt="1555574535666"></p>
 <p>搜索reqData字段可以看到，搜索结果就smali文件存在，第一个为程序包，查看代码，利用jd来查看反编译Java代码。</p>
-<p><img src="\2019\04\APP解密参数sign\1555574610824.png" alt="1555574610824"></p>
+<p><img src="%5C2019%5C04%5CAPP%E8%A7%A3%E5%AF%86%E5%8F%82%E6%95%B0sign%5C1555574610824.png" alt="1555574610824"></p>
 <p>搜索字段，可以看到如下所示，以下字段可以看出，程序对其四个字段的获取都有代表的变量，而我们只需要获取sign的变量，localObject2。</p>
 <p>变量的值来源为t包的b方法，可以明显看到，值为nonce，tiestamp, localObject1, t.f的相加值。而localObject1为reqData的值。</p>
-<p><img src="\2019\04\APP解密参数sign\1555575022131.png" alt="1555575022131"></p>
+<p><img src="%5C2019%5C04%5CAPP%E8%A7%A3%E5%AF%86%E5%8F%82%E6%95%B0sign%5C1555575022131.png" alt="1555575022131"></p>
 <p>查看t.b的方法，方法如下，对字段进行sha-256加密。查看a方法</p>
-<pre><code>public static String b(String paramString)
-  {
+<pre class="line-numbers language-none"><code class="language-none">public static String b(String paramString)
+  &#123;
     return a(paramString, &quot;SHA-256&quot;);
-  }
-</code></pre><p>其中t.a的执行为对指定的参数进行指定的加密，利用传入参数来确定。</p>
-<pre><code>public static String a(String paramString1, String paramString2)
-  {
+  &#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>其中t.a的执行为对指定的参数进行指定的加密，利用传入参数来确定。</p>
+<pre class="line-numbers language-none"><code class="language-none">public static String a(String paramString1, String paramString2)
+  &#123;
     try
-    {
-      paramString2 = MessageDigest.getInstance(paramString2);
+    &#123;
+      paramString2 &#x3D; MessageDigest.getInstance(paramString2);
       paramString2.update(paramString1.getBytes());
-      paramString1 = a(paramString2.digest());
+      paramString1 &#x3D; a(paramString2.digest());
       return paramString1;
-    }
+    &#125;
     catch (Exception paramString1)
-    {
+    &#123;
       paramString1.printStackTrace();
-    }
+    &#125;
     return null;
-  }
-</code></pre><p>而t.f代表的是一段加密公钥，此处不在列出，利用在线工具查看加密结果是否一致。可以看到加密后的参数和抓到的包结果一致。</p>
-<p><img src="\2019\04\APP解密参数sign\1555575489330.png" alt="1555575489330"></p>
+  &#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>而t.f代表的是一段加密公钥，此处不在列出，利用在线工具查看加密结果是否一致。可以看到加密后的参数和抓到的包结果一致。</p>
+<p><img src="%5C2019%5C04%5CAPP%E8%A7%A3%E5%AF%86%E5%8F%82%E6%95%B0sign%5C1555575489330.png" alt="1555575489330"></p>
 <p>那么就可以利用我们自己生成加密参数的方式来进行测试，例如如下脚本，通过判断响应返回的字段来获取参数值，查看是否越权等信息。</p>
-<pre><code>#coding : utf-8
+<pre class="line-numbers language-none"><code class="language-none">#coding : utf-8
 
 
 import hashlib
 import requests
 
 
-headers = {
-    &#39;Content-Type&#39;: &#39;application/x-www-form-urlencoded&#39;,
-    &#39;Accept-Encoding&#39;: &#39;gzip, deflate&#39;,
-    &#39;Cookie&#39;: &#39;JSESSIONID=xxxxxxx&#39;,
-    &#39;User-Agent&#39;: &#39;okhttp/3.4.1&#39;
-}
+headers &#x3D; &#123;
+	&#39;Content-Type&#39;: &#39;application&#x2F;x-www-form-urlencoded&#39;,
+	&#39;Accept-Encoding&#39;: &#39;gzip, deflate&#39;,
+	&#39;Cookie&#39;: &#39;JSESSIONID&#x3D;xxxxxxx&#39;,
+	&#39;User-Agent&#39;: &#39;okhttp&#x2F;3.4.1&#39;
+&#125;
 
 for i in range(60200000, 60295558):
-    sha = &#39;MIICdgIBADAN.....TMK63hMPgm25mbCD0vKhsQtcSDlzVwtOOoNlW5E8CQQDNXVwGolFCqU9lb5147AHc+&lt;INF&gt;&lt;action&gt;...&lt;/action&gt;&lt;hostId&gt;&#39;+str(i)+&#39;&lt;/hostId&gt;&lt;ver&gt;27&lt;/ver&gt;&lt;transNo&gt;1555571421812&lt;/transNo&gt;&lt;deviceType&gt;0&lt;/deviceType&gt;&lt;verNm&gt;3.3.1&lt;/verNm&gt;&lt;/INF&gt;LE8I2QTAFHJM3M.....1555571421812&#39;
-    h = hashlib.sha256(sha)
-    sha256 = h.hexdigest()
-    data = &#39;reqData=&lt;INF&gt;&lt;action&gt;.....&lt;/action&gt;&lt;hostId&gt;&#39;+str(i)+&#39;&lt;/hostId&gt;&lt;ver&gt;27&lt;/ver&gt;&lt;transNo&gt;1555571421812&lt;/transNo&gt;&lt;deviceType&gt;0&lt;/deviceType&gt;&lt;verNm&gt;3.3.1&lt;/verNm&gt;&lt;/INF&gt;&amp;nonce=LE8I2QTAFHJM3MO.....&amp;timestamp=1555571421812&amp;sign=&#39;+sha256
-    r = requests.post(&#39;http://xxxxxx/api&#39;, data = data, headers=headers)
-    if &#39;xxxxxx&#39; in r.text:
-        print i
+	sha &#x3D; &#39;MIICdgIBADAN.....TMK63hMPgm25mbCD0vKhsQtcSDlzVwtOOoNlW5E8CQQDNXVwGolFCqU9lb5147AHc+&lt;INF&gt;&lt;action&gt;...&lt;&#x2F;action&gt;&lt;hostId&gt;&#39;+str(i)+&#39;&lt;&#x2F;hostId&gt;&lt;ver&gt;27&lt;&#x2F;ver&gt;&lt;transNo&gt;1555571421812&lt;&#x2F;transNo&gt;&lt;deviceType&gt;0&lt;&#x2F;deviceType&gt;&lt;verNm&gt;3.3.1&lt;&#x2F;verNm&gt;&lt;&#x2F;INF&gt;LE8I2QTAFHJM3M.....1555571421812&#39;
+	h &#x3D; hashlib.sha256(sha)
+	sha256 &#x3D; h.hexdigest()
+	data &#x3D; &#39;reqData&#x3D;&lt;INF&gt;&lt;action&gt;.....&lt;&#x2F;action&gt;&lt;hostId&gt;&#39;+str(i)+&#39;&lt;&#x2F;hostId&gt;&lt;ver&gt;27&lt;&#x2F;ver&gt;&lt;transNo&gt;1555571421812&lt;&#x2F;transNo&gt;&lt;deviceType&gt;0&lt;&#x2F;deviceType&gt;&lt;verNm&gt;3.3.1&lt;&#x2F;verNm&gt;&lt;&#x2F;INF&gt;&amp;nonce&#x3D;LE8I2QTAFHJM3MO.....&amp;timestamp&#x3D;1555571421812&amp;sign&#x3D;&#39;+sha256
+	r &#x3D; requests.post(&#39;http:&#x2F;&#x2F;xxxxxx&#x2F;api&#39;, data &#x3D; data, headers&#x3D;headers)
+	if &#39;xxxxxx&#39; in r.text:
+		print i
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
-</code></pre>
+
           </div>
           <br><br>
               
                 <div class="license-wrapper">
-                    <p>原文作者：<a href="">Misaki</a>
-                    <p>原文链接：<a href="/2019/04/APP解密参数sign/">/2019/04/APP解密参数sign/</a>
-                    <p>发表日期：<a href="/2019/04/APP解密参数sign/">April 18th 2019, 4:34:21 pm</a>
-                    <p>更新日期：<a href="/2019/04/APP解密参数sign/">July 26th 2019, 5:56:16 pm</a>
-                    <p>版权声明：本文采用<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">知识共享署名-非商业性使用 4.0 国际许可协议</a>进行许可</p>
+                    <p>原文作者：<a href="https://misakikata.github.io">Misaki</a>
+                    <p>原文链接：<a href="https://misakikata.github.io/2019/04/APP%E8%A7%A3%E5%AF%86%E5%8F%82%E6%95%B0sign/">https://misakikata.github.io/2019/04/APP%E8%A7%A3%E5%AF%86%E5%8F%82%E6%95%B0sign/</a>
+                    <p>发表日期：<a href="https://misakikata.github.io/2019/04/APP%E8%A7%A3%E5%AF%86%E5%8F%82%E6%95%B0sign/">April 18th 2019, 4:34:21 pm</a>
+                    <p>更新日期：<a href="https://misakikata.github.io/2019/04/APP%E8%A7%A3%E5%AF%86%E5%8F%82%E6%95%B0sign/">July 26th 2019, 5:56:16 pm</a>
+                    <p>版权声明：本文采用<a rel="license noopener" target="_blank" href="http://creativecommons.org/licenses/by-nc/4.0/">知识共享署名-非商业性使用 4.0 国际许可协议</a>进行许可</p>
                 </div>
               
           <br><br>
@@ -216,7 +229,7 @@ for i in range(60200000, 60295558):
     <script>               
         var disqus_shortname = '';
         var disqus_config = function () {
-            this.page.url = '/2019/04/APP解密参数sign/'; 
+            this.page.url = 'https://misakikata.github.io/2019/04/APP解密参数sign/'; 
             this.page.identifier = '/2019/04/APP解密参数sign/';
         };
         (function() { 
@@ -227,7 +240,7 @@ for i in range(60200000, 60295558):
             (d.head || d.body).appendChild(s);
         })();
     </script>
-    <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>                                
+    <noscript>Please enable JavaScript to view the <a target="_blank" rel="noopener" href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>                                
 </div>
         
     
@@ -247,16 +260,32 @@ for i in range(60200000, 60295558):
         </div>
 </footer>
       <!--   Core JS Files   -->
-      <script src="/js/core/jquery.min.js?v=3.2.1"></script>
-      <script src="/js/main.js"></script>
-      <script src="/js/core/popper.min.js"></script>
-      <script src="/js/core/bootstrap-material-design.min.js"></script>
-      <script src="/js/plugins/moment.min.js"></script>
-      <script src="/js/material-kit.min.js?v=2.0.5"></script>
+      
+<script src="/js/core/jquery.min.js?v=3.2.1.js"></script>
+
+      
+<script src="/js/main.js"></script>
+
+      
+<script src="/js/core/popper.min.js"></script>
+
+      
+<script src="/js/core/bootstrap-material-design.min.js"></script>
+
+      
+<script src="/js/plugins/moment.min.js"></script>
+
+      
+<script src="/js/material-kit.min.js?v=2.0.5.js"></script>
+
       
         <script src="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.4.2/tocbot.min.js"></script>
-        <script src="/js/post.js"></script>
-        <script src="/js/plugins/prettify.js"></script>
+        
+<script src="/js/post.js"></script>
+
+        
+<script src="/js/plugins/prettify.js"></script>
+
         <script>
             $(document).ready(function(){
                 $('pre').addClass('prettyprint linenums');

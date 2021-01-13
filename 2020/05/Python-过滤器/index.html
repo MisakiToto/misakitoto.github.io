@@ -20,17 +20,27 @@
     <meta name="author" content="Misaki">
     <meta name="keywords" content="">
     <title>Python 过滤器 ~ Misaki&#39;s Blog</title>
-    <link rel="stylesheet" href="/css/Material_Icons.css">
-    <!-- <link rel="stylesheet" href="/css/font-awesome.css"> -->
+    
+<link rel="stylesheet" href="/css/Material_Icons.css">
+
+    <!-- 
+<link rel="stylesheet" href="/css/font-awesome.css">
+ -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css">
-    <link rel="stylesheet" href="/css/main.css">
     
-        <link rel="stylesheet" href="/css/post.css">
+<link rel="stylesheet" href="/css/main.css">
+
+    
         
-            <link rel="stylesheet" href="/css/Prettify/tomorrow-night-eighties.min.css">
+<link rel="stylesheet" href="/css/post.css">
+
+        
+            
+<link rel="stylesheet" href="/css/Prettify/tomorrow-night-eighties.min.css">
+
         
     
-</head>
+<meta name="generator" content="Hexo 5.2.0"></head>
 
 <body class=" sidebar-collapse">
 <nav class="navbar navbar-transparent navbar-color-on-scroll fixed-top navbar-expand-lg" color-on-scroll="100" id="sectionsNav">
@@ -125,18 +135,18 @@
 <p>从上面布隆过滤器的实现原理可以看出，它不支持删除， 一旦将某个key对应的bit位置0，可能会导致同样bit位的其他key的存在性判断错误。</p>
 <h3 id="如何在python中使用布隆过滤器"><a href="#如何在python中使用布隆过滤器" class="headerlink" title="如何在python中使用布隆过滤器"></a>如何在python中使用布隆过滤器</h3><ol>
 <li><p>先去这个网站下载<code>bitarray</code>这个依赖 <code>https://www.lfd.uci.edu/~gohlke/pythonlibs/#bitarray</code></p>
-<p>直接安装会报错<code>error: Microsoft Visual C++ 14.0 is required. Get it with &quot;Build Tools for Visual Studio&quot;: https://visualstudio.microsoft.com/downloads/</code></p>
+<p> 直接安装会报错<code>error: Microsoft Visual C++ 14.0 is required. Get it with &quot;Build Tools for Visual Studio&quot;: https://visualstudio.microsoft.com/downloads/</code></p>
 </li>
-<li><p>安装<code>wheel</code>文件, 防止我们主动安装报这样的错误<code>pip3 install bitarray-1.1.0-cp36-cp36m-win_amd64.whl</code></p>
+<li><p> 安装<code>wheel</code>文件, 防止我们主动安装报这样的错误<code>pip3 install bitarray-1.1.0-cp36-cp36m-win_amd64.whl</code></p>
 </li>
-<li><p><code>pip3 install pybloom_live</code></p>
+<li><p> <code>pip3 install pybloom_live</code></p>
 </li>
 </ol>
 <p>该模块包含两个类实现布隆过滤器功能。<code>BloomFilter</code> 是定容。<code>ScalableBloomFilter</code> 可以自动扩容</p>
-<pre><code>import pybloom_live
+<pre class="line-numbers language-none"><code class="language-none">import pybloom_live
 
 
-bloom = pybloom_live.BloomFilter(capacity=10000)  #定容一万
+bloom &#x3D; pybloom_live.BloomFilter(capacity&#x3D;10000)  #定容一万
 
 for i in range(0, 10001):
     bloom.add(i)
@@ -146,58 +156,65 @@ print(len(bloom))
 bloom.add(10002)
 bloom.add(10003)
 
-print(len(bloom))
-</code></pre><p>当超过一万时，会提示一个越界提示，<code>IndexError: BloomFilter is at capacity</code>。看起来好像不如自动扩容的好用。对比一下定容数量和扩容数量的差别。</p>
+print(len(bloom))<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>当超过一万时，会提示一个越界提示，<code>IndexError: BloomFilter is at capacity</code>。看起来好像不如自动扩容的好用。对比一下定容数量和扩容数量的差别。</p>
 <p>误判率默认是设置为千分之一，按照默认的误判率来做对比，当数量在定容内，误判率远低于设置的误判率，但数量超过定容时，准确度基本按照设置的误判率来控制。</p>
 <p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/image-20200507094915132.png" alt="image-20200507094915132"></p>
 <p>如果需要自动扩容来处理不确定的数量差别，可以使用<code>error_rate</code>来控制误判率。</p>
 <p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/image-20200507095303352.png" alt="image-20200507095303352"></p>
 <h3 id="redis-使用"><a href="#redis-使用" class="headerlink" title="redis 使用"></a>redis 使用</h3><p>docker拉取redis环境</p>
-<pre><code>docker run -p 6379:6379 --name redis-redisbloom redislabs/rebloom:latest
-</code></pre><p>创建一个新过滤器</p>
-<pre><code>106.54.181.x:6379&gt; bf.reserve newbloom 0.001 10000
-OK
-</code></pre><p>添加一个新的值，存在返回0，不存在会返回1</p>
-<pre><code>106.54.181.x:6379&gt; bf.add name 1111
+<pre class="line-numbers language-none"><code class="language-none">docker run -p 6379:6379 --name redis-redisbloom redislabs&#x2F;rebloom:latest<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<p>创建一个新过滤器</p>
+<pre class="line-numbers language-none"><code class="language-none">106.54.181.x:6379&gt; bf.reserve newbloom 0.001 10000
+OK<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+
+<p>添加一个新的值，存在返回0，不存在会返回1</p>
+<pre class="line-numbers language-none"><code class="language-none">106.54.181.x:6379&gt; bf.add name 1111
 (integer) 1
 106.54.181.x:6379&gt; bf.add name 1111
-(integer) 0
-</code></pre><p>判断值是否存在，不存在返回0，存在返回1。</p>
-<pre><code>106.54.181.x:6379&gt; bf.exists name 1111
+(integer) 0<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>判断值是否存在，不存在返回0，存在返回1。</p>
+<pre class="line-numbers language-none"><code class="language-none">106.54.181.x:6379&gt; bf.exists name 1111
 (integer) 1
 106.54.181.x:6379&gt; bf.exists name 2222
-(integer) 0
-</code></pre><p>添加多个新的值</p>
-<pre><code>106.54.181.187:6379&gt; bf.madd name 2222  3333
+(integer) 0<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>添加多个新的值</p>
+<pre class="line-numbers language-none"><code class="language-none">106.54.181.187:6379&gt; bf.madd name 2222  3333
 1) (integer) 1
-2) (integer) 1
-</code></pre><p>使用<a href="https://github.com/RedisBloom/redisbloom-py编写一个简单的添加脚本" target="_blank" rel="noopener">https://github.com/RedisBloom/redisbloom-py编写一个简单的添加脚本</a></p>
-<pre><code>from redisbloom.client import Client
+2) (integer) 1<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+
+<p>使用<a target="_blank" rel="noopener" href="https://github.com/RedisBloom/redisbloom-py%E7%BC%96%E5%86%99%E4%B8%80%E4%B8%AA%E7%AE%80%E5%8D%95%E7%9A%84%E6%B7%BB%E5%8A%A0%E8%84%9A%E6%9C%AC">https://github.com/RedisBloom/redisbloom-py编写一个简单的添加脚本</a></p>
+<pre class="line-numbers language-none"><code class="language-none">from redisbloom.client import Client
 
 
 class _redis_bloom(object):
-    def __init__(self, size, error=0.001, key=&#39;name&#39;):
-        self.size = size
-        self.error = error
-        self.key = key
+    def __init__(self, size, error&#x3D;0.001, key&#x3D;&#39;name&#39;):
+        self.size &#x3D; size
+        self.error &#x3D; error
+        self.key &#x3D; key
 
-        self.rb = Client(host=&#39;106.54.181.x&#39;, port=6379)
+        self.rb &#x3D; Client(host&#x3D;&#39;106.54.181.x&#39;, port&#x3D;6379)
         self.rb.bfCreate(self.size, self.error, self.key)
         self.rb.delete(key)
 
     def insert(self, name):
 
-        if self.rb.bfExists(self.key, name) == 0:
+        if self.rb.bfExists(self.key, name) &#x3D;&#x3D; 0:
             self.rb.bfAdd(self.key, name)
             return True
         else:
             return False
 
-rd = _redis_bloom(size=10000)
+rd &#x3D; _redis_bloom(size&#x3D;10000)
 for i in range(0, 5000):
     rd.insert(i)
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
-</code></pre><h2 id="布谷鸟过滤器"><a href="#布谷鸟过滤器" class="headerlink" title="布谷鸟过滤器"></a>布谷鸟过滤器</h2><h3 id="布谷鸟过滤器-1"><a href="#布谷鸟过滤器-1" class="headerlink" title="布谷鸟过滤器"></a>布谷鸟过滤器</h3><p>布谷过滤器(cuckoo fliter)，这个名字来源于更早发表的布谷散列(cuckoo hash)，为了解决布隆过滤器不能删除的问题而出现。</p>
+<h2 id="布谷鸟过滤器"><a href="#布谷鸟过滤器" class="headerlink" title="布谷鸟过滤器"></a>布谷鸟过滤器</h2><h3 id="布谷鸟过滤器-1"><a href="#布谷鸟过滤器-1" class="headerlink" title="布谷鸟过滤器"></a>布谷鸟过滤器</h3><p>布谷过滤器(cuckoo fliter)，这个名字来源于更早发表的布谷散列(cuckoo hash)，为了解决布隆过滤器不能删除的问题而出现。</p>
 <p>采用一部分示意图说明布谷散列</p>
 <p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/cuckoo0.png" alt="image"></p>
 <p>现在我们假设有一些项要存入散列表，其每个项都有其对应的两个位置，先插入第一项A</p>
@@ -211,11 +228,12 @@ for i in range(0, 5000):
 <p>随着布谷鸟过滤器的装满，插入将变得缓慢，因为需要踢走更多的物品。如果程序对插入时间很敏感，布谷鸟过滤器并不一定适合。</p>
 <p>另外还有一个明显的问题就是，如果插入一个数据插入了多次，就会产生自己踢自己的结果，将导致几个位置上都是同一个数据，不止如此还会提早的达到数组阈值。导致空间利用率底下。也许可以使用一次查询来解决此问题。</p>
 <p>但是删除的时候会出现一定概率的误删。因为不同的元素被 hash 到同一个位置的可能性还是很大的，而且指纹只有一个字节，256 种可能，同一个位置出现相同的指纹可能性也很大。如果两个元素的 hash 位置相同，指纹相同，那么这个插入检查会认为它们是相等的。</p>
-<h3 id="python实现布谷鸟过滤器"><a href="#python实现布谷鸟过滤器" class="headerlink" title="python实现布谷鸟过滤器"></a>python实现布谷鸟过滤器</h3><pre><code>pip install cuckoopy
-</code></pre><pre><code>from cuckoopy import CuckooFilter
+<h3 id="python实现布谷鸟过滤器"><a href="#python实现布谷鸟过滤器" class="headerlink" title="python实现布谷鸟过滤器"></a>python实现布谷鸟过滤器</h3><pre class="line-numbers language-none"><code class="language-none">pip install cuckoopy<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<pre class="line-numbers language-none"><code class="language-none">from cuckoopy import CuckooFilter
 
 
-ck = CuckooFilter(capacity=1000, bucket_size=4, fingerprint_size=1)   #每个位置四个座位，指纹字节长度为1
+ck &#x3D; CuckooFilter(capacity&#x3D;1000, bucket_size&#x3D;4, fingerprint_size&#x3D;1)   #每个位置四个座位，指纹字节长度为1
 
 ck.insert(&#39;hello&#39;)
 ck.insert(&#39;hello&#39;)
@@ -227,14 +245,16 @@ ck.insert(&#39;hello&#39;)
 ck.insert(&#39;hello&#39;)
 ck.insert(&#39;hello&#39;)
 
-print(ck.contains(&#39;hello&#39;), ck.size)
-</code></pre><p>这种情况下，当插入同一个数据超过八次的时候，由于两个桶的八个座位都被一个数据占用，会出现循环踢的情况，超过阈值导致认为数据桶一件满了。</p>
-<pre><code>cuckoopy.exceptions.CuckooFilterFullException: Insert operation failed. Filter is full.
-</code></pre><p>所以在使用布谷鸟过滤器的时候，需要先进行一次查询，如果数据存在则不在进行插入。</p>
-<pre><code>from cuckoopy import CuckooFilter
+print(ck.contains(&#39;hello&#39;), ck.size)<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>这种情况下，当插入同一个数据超过八次的时候，由于两个桶的八个座位都被一个数据占用，会出现循环踢的情况，超过阈值导致认为数据桶一件满了。</p>
+<pre class="line-numbers language-none"><code class="language-none">cuckoopy.exceptions.CuckooFilterFullException: Insert operation failed. Filter is full.<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<p>所以在使用布谷鸟过滤器的时候，需要先进行一次查询，如果数据存在则不在进行插入。</p>
+<pre class="line-numbers language-none"><code class="language-none">from cuckoopy import CuckooFilter
 
 
-ck = CuckooFilter(capacity=1000, bucket_size=4, fingerprint_size=1)   #每个位置四个座位，指纹字节长度为1
+ck &#x3D; CuckooFilter(capacity&#x3D;1000, bucket_size&#x3D;4, fingerprint_size&#x3D;1)   #每个位置四个座位，指纹字节长度为1
 
 ck.insert(&#39;hello&#39;)
 
@@ -243,63 +263,66 @@ if not ck.contains(&#39;hello&#39;):
 else:
     print(&quot;数据重复！&quot;)
 
-print(ck.contains(&#39;hello&#39;), ck.size)  #数据重复！ True 1
-</code></pre><h3 id="redis-使用-1"><a href="#redis-使用-1" class="headerlink" title="redis 使用"></a>redis 使用</h3><p>使用方式跟布隆过滤器基本一致，需要把bf改为cf即可</p>
-<pre><code>CF.RESERVE newCuckooFilter 1000  #新建一个过滤器
+print(ck.contains(&#39;hello&#39;), ck.size)  #数据重复！ True 1<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<h3 id="redis-使用-1"><a href="#redis-使用-1" class="headerlink" title="redis 使用"></a>redis 使用</h3><p>使用方式跟布隆过滤器基本一致，需要把bf改为cf即可</p>
+<pre class="line-numbers language-none"><code class="language-none">CF.RESERVE newCuckooFilter 1000  #新建一个过滤器
 CF.ADD newCuckooFilter foo  #增加一个值
 CF.EXISTS newCuckooFilter foo  #判断是否存在
-CF.DEL newCuckooFilter foo  #删除
-</code></pre><p>同样使用上面的脚本</p>
-<pre><code>from redisbloom.client import Client
+CF.DEL newCuckooFilter foo  #删除<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>同样使用上面的脚本</p>
+<pre class="line-numbers language-none"><code class="language-none">from redisbloom.client import Client
 
 
 class _redis_cuckoo(object):
-    def __init__(self, size, key=&#39;name&#39;):
-        self.size = size
-        self.key = key
+    def __init__(self, size, key&#x3D;&#39;name&#39;):
+        self.size &#x3D; size
+        self.key &#x3D; key
 
-        self.rb = Client(host=&#39;106.54.181.x&#39;, port=6379)
+        self.rb &#x3D; Client(host&#x3D;&#39;106.54.181.x&#39;, port&#x3D;6379)
         self.rb.cfCreate(self.key,self.size)
 
     def insert(self, name):
 
-        if self.rb.cfExists(self.key, name) == 0:
+        if self.rb.cfExists(self.key, name) &#x3D;&#x3D; 0:
             self.rb.cfAdd(self.key, name)
             return True
         else:
             return False
 
-rd = _redis_cuckoo(size=10000)
+rd &#x3D; _redis_cuckoo(size&#x3D;10000)
 for i in range(0, 5000):
-    rd.insert(i)
-</code></pre><h2 id="令牌桶算法"><a href="#令牌桶算法" class="headerlink" title="令牌桶算法"></a>令牌桶算法</h2><p>令牌桶算法是网络流量整形（Traffic Shaping）和速率限制（Rate Limiting）中最常使用的一种算法。典型情况下，令牌桶算法用来控制发送到网络上的数据的数目，并允许突发数据的发送。</p>
-<p>实现代码：<a href="https://github.com/titan-web/rate-limit/blob/master/token_bucket/__init__.py" target="_blank" rel="noopener">https://github.com/titan-web/rate-limit/blob/master/token_bucket/__init__.py</a></p>
-<pre><code>import time
+    rd.insert(i)<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<h2 id="令牌桶算法"><a href="#令牌桶算法" class="headerlink" title="令牌桶算法"></a>令牌桶算法</h2><p>令牌桶算法是网络流量整形（Traffic Shaping）和速率限制（Rate Limiting）中最常使用的一种算法。典型情况下，令牌桶算法用来控制发送到网络上的数据的数目，并允许突发数据的发送。</p>
+<p>实现代码：<a target="_blank" rel="noopener" href="https://github.com/titan-web/rate-limit/blob/master/token_bucket/__init__.py">https://github.com/titan-web/rate-limit/blob/master/token_bucket/__init__.py</a></p>
+<pre class="line-numbers language-none"><code class="language-none">import time
 from threading import RLock
 
-__all__ = (&quot;TokenBucket&quot;, )
+__all__ &#x3D; (&quot;TokenBucket&quot;, )
 
 
 class TokenBucket(object):
 
-    def __init__(self, capacity, fill_rate, is_lock=False):
+    def __init__(self, capacity, fill_rate, is_lock&#x3D;False):
         &quot;&quot;&quot;
         :param capacity:  The total tokens in the bucket.
-        :param fill_rate:  The rate in tokens/second that the bucket will be refilled
+        :param fill_rate:  The rate in tokens&#x2F;second that the bucket will be refilled
         &quot;&quot;&quot;
-        self._capacity = float(capacity)
-        self._tokens = float(capacity)
-        self._fill_rate = float(fill_rate)
-        self._last_time = time.time()
-        self._is_lock = is_lock
-        self._lock = RLock()
+        self._capacity &#x3D; float(capacity)
+        self._tokens &#x3D; float(capacity)
+        self._fill_rate &#x3D; float(fill_rate)
+        self._last_time &#x3D; time.time()
+        self._is_lock &#x3D; is_lock
+        self._lock &#x3D; RLock()
 
     def _get_cur_tokens(self):
         if self._tokens &lt; self._capacity:
-            now = time.time()
-            delta = self._fill_rate * (now - self._last_time)  # 计算从上次发送到这次发送，新发放的令牌数量
-            self._tokens = min(self._capacity, self._tokens + delta) # 令牌数量不能超过桶的容量
-            self._last_time = now
+            now &#x3D; time.time()
+            delta &#x3D; self._fill_rate * (now - self._last_time)  # 计算从上次发送到这次发送，新发放的令牌数量
+            self._tokens &#x3D; min(self._capacity, self._tokens + delta) # 令牌数量不能超过桶的容量
+            self._last_time &#x3D; now
         return self._tokens
 
     def get_cur_tokens(self):
@@ -310,8 +333,8 @@ class TokenBucket(object):
             return self._get_cur_tokens()
 
     def _consume(self, tokens):
-        if tokens &lt;= self.get_cur_tokens():  # 如果没有足够的令牌，则不能发送数据
-            self._tokens -= tokens
+        if tokens &lt;&#x3D; self.get_cur_tokens():  # 如果没有足够的令牌，则不能发送数据
+            self._tokens -&#x3D; tokens
             return True
         return False
 
@@ -320,38 +343,40 @@ class TokenBucket(object):
             with self._lock:
                 return self._consume(tokens)
         else:
-            return self._consume(tokens)
-</code></pre><p>调用的方式是传入需要的令牌数，比如</p>
-<pre><code>tk = TokenBucket(capacity=10, fill_rate=10)  #容量10，每秒10个令牌
+            return self._consume(tokens)<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>调用的方式是传入需要的令牌数，比如</p>
+<pre class="line-numbers language-none"><code class="language-none">tk &#x3D; TokenBucket(capacity&#x3D;10, fill_rate&#x3D;10)  #容量10，每秒10个令牌
 while True:
     if tk.consume(1):
         print(&#39;1111&#39;)
     else:
         print(&#39;2222&#39;)
-        time.sleep(1)
-</code></pre><p>会显示如下：</p>
+        time.sleep(1)<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>会显示如下：</p>
 <p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/image-20200508164220582.png" alt="image-20200508164220582"></p>
 <p>当桶内令牌又新增的时候会继续发送。</p>
 <h2 id="漏桶算法"><a href="#漏桶算法" class="headerlink" title="漏桶算法"></a>漏桶算法</h2><p>漏桶算法(Leaky Bucket)它的主要目的是控制数据注入到网络的速率，平滑网络上的突发流量。漏桶可以看作是一个带有常量服务时间的单服务器队列，如果漏桶（包缓存）溢出，那么数据包会被丢弃。 在网络中，漏桶算法可以控制端口的流量输出速率，平滑网络上的突发流量，实现流量整形，从而为网络提供一个稳定的流量。</p>
-<p>实现代码：<a href="https://github.com/titan-web/rate-limit/blob/master/leaky_bucket/__init__.py" target="_blank" rel="noopener">https://github.com/titan-web/rate-limit/blob/master/leaky_bucket/__init__.py</a></p>
-<pre><code>from time import time, sleep
+<p>实现代码：<a target="_blank" rel="noopener" href="https://github.com/titan-web/rate-limit/blob/master/leaky_bucket/__init__.py">https://github.com/titan-web/rate-limit/blob/master/leaky_bucket/__init__.py</a></p>
+<pre class="line-numbers language-none"><code class="language-none">from time import time, sleep
 from threading import RLock
 
-__all__ = (&quot;LeakyBucket&quot;, )
+__all__ &#x3D; (&quot;LeakyBucket&quot;, )
 
 
 class LeakyBucket(object):
 
-    def __init__(self, capacity, leak_rate, is_lock=False):
+    def __init__(self, capacity, leak_rate, is_lock&#x3D;False):
         &quot;&quot;&quot;
         :param capacity:  The total tokens in the bucket.
-        :param leak_rate:  The rate in tokens/second that the bucket leaks
+        :param leak_rate:  The rate in tokens&#x2F;second that the bucket leaks
         &quot;&quot;&quot;
-        self._capacity = float(capacity)
-        self._used_tokens = 0
-        self._leak_rate = float(leak_rate)
-        self._last_time = time()
-        self._lock = RLock() if is_lock else None
+        self._capacity &#x3D; float(capacity)
+        self._used_tokens &#x3D; 0
+        self._leak_rate &#x3D; float(leak_rate)
+        self._last_time &#x3D; time()
+        self._lock &#x3D; RLock() if is_lock else None
 
     def get_used_tokens(self):
         if self._lock:
@@ -361,15 +386,15 @@ class LeakyBucket(object):
             return self._get_used_tokens()
 
     def _get_used_tokens(self):
-        now = time()
-        delta = self._leak_rate * (now - self._last_time)     #间隔时间新泄露的漏桶令牌数
-        self._used_tokens = max(0, self._used_tokens - delta)   #获取数不超过漏桶最大容量
+        now &#x3D; time()
+        delta &#x3D; self._leak_rate * (now - self._last_time)     #间隔时间新泄露的漏桶令牌数
+        self._used_tokens &#x3D; max(0, self._used_tokens - delta)   #获取数不超过漏桶最大容量
         return self._used_tokens
 
     def _consume(self, tokens):
-        if tokens + self._get_used_tokens() &lt;= self._capacity:  #小于桶容量继续存储
-            self._used_tokens += tokens
-            self._last_time = time()
+        if tokens + self._get_used_tokens() &lt;&#x3D; self._capacity:  #小于桶容量继续存储
+            self._used_tokens +&#x3D; tokens
+            self._last_time &#x3D; time()
             return True
         return False
 
@@ -378,30 +403,32 @@ class LeakyBucket(object):
             with self._lock:
                 return self._consume(tokens)
         else:
-            return self._consume(tokens)
-</code></pre><p>使用类似如上的方法调用</p>
-<pre><code>ck = LeakyBucket(capacity=20, leak_rate=5)   #桶容量20，每秒泄露5
+            return self._consume(tokens)<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>使用类似如上的方法调用</p>
+<pre class="line-numbers language-none"><code class="language-none">ck &#x3D; LeakyBucket(capacity&#x3D;20, leak_rate&#x3D;5)   #桶容量20，每秒泄露5
 while True:
     if ck.consume(1):
         print(&#39;1111&#39;)
     else:
         print(&#39;2222&#39;)
-        sleep(1)
-</code></pre><p>结果首先把桶内的泄露完，此后每秒泄露五个。如果修改泄露数为30，这样结果任然是最多20个泄露。</p>
-<p>参考文章：<a href="https://www.cnblogs.com/yscl/p/12003359.html" target="_blank" rel="noopener">https://www.cnblogs.com/yscl/p/12003359.html</a></p>
-<p>​                        <a href="https://www.cnblogs.com/chuxiuhong/p/8215719.html" target="_blank" rel="noopener">https://www.cnblogs.com/chuxiuhong/p/8215719.html</a></p>
-<p>​                        <a href="https://zhuanlan.zhihu.com/p/68418134" target="_blank" rel="noopener">https://zhuanlan.zhihu.com/p/68418134</a></p>
-<p>​                        <a href="https://www.jianshu.com/p/c02899c30bbd" target="_blank" rel="noopener">https://www.jianshu.com/p/c02899c30bbd</a></p>
+        sleep(1)<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>结果首先把桶内的泄露完，此后每秒泄露五个。如果修改泄露数为30，这样结果任然是最多20个泄露。</p>
+<p>参考文章：<a target="_blank" rel="noopener" href="https://www.cnblogs.com/yscl/p/12003359.html">https://www.cnblogs.com/yscl/p/12003359.html</a></p>
+<p>​                        <a target="_blank" rel="noopener" href="https://www.cnblogs.com/chuxiuhong/p/8215719.html">https://www.cnblogs.com/chuxiuhong/p/8215719.html</a></p>
+<p>​                        <a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/68418134">https://zhuanlan.zhihu.com/p/68418134</a></p>
+<p>​                        <a target="_blank" rel="noopener" href="https://www.jianshu.com/p/c02899c30bbd">https://www.jianshu.com/p/c02899c30bbd</a></p>
 
           </div>
           <br><br>
               
                 <div class="license-wrapper">
-                    <p>原文作者：<a href="">Misaki</a>
-                    <p>原文链接：<a href="/2020/05/Python-过滤器/">/2020/05/Python-过滤器/</a>
-                    <p>发表日期：<a href="/2020/05/Python-过滤器/">May 27th 2020, 4:08:24 pm</a>
-                    <p>更新日期：<a href="/2020/05/Python-过滤器/">May 27th 2020, 4:11:28 pm</a>
-                    <p>版权声明：本文采用<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">知识共享署名-非商业性使用 4.0 国际许可协议</a>进行许可</p>
+                    <p>原文作者：<a href="https://misakikata.github.io">Misaki</a>
+                    <p>原文链接：<a href="https://misakikata.github.io/2020/05/Python-%E8%BF%87%E6%BB%A4%E5%99%A8/">https://misakikata.github.io/2020/05/Python-%E8%BF%87%E6%BB%A4%E5%99%A8/</a>
+                    <p>发表日期：<a href="https://misakikata.github.io/2020/05/Python-%E8%BF%87%E6%BB%A4%E5%99%A8/">May 27th 2020, 4:08:24 pm</a>
+                    <p>更新日期：<a href="https://misakikata.github.io/2020/05/Python-%E8%BF%87%E6%BB%A4%E5%99%A8/">May 27th 2020, 4:11:28 pm</a>
+                    <p>版权声明：本文采用<a rel="license noopener" target="_blank" href="http://creativecommons.org/licenses/by-nc/4.0/">知识共享署名-非商业性使用 4.0 国际许可协议</a>进行许可</p>
                 </div>
               
           <br><br>
@@ -439,7 +466,7 @@ while True:
     <script>               
         var disqus_shortname = '';
         var disqus_config = function () {
-            this.page.url = '/2020/05/Python-过滤器/'; 
+            this.page.url = 'https://misakikata.github.io/2020/05/Python-过滤器/'; 
             this.page.identifier = '/2020/05/Python-过滤器/';
         };
         (function() { 
@@ -450,7 +477,7 @@ while True:
             (d.head || d.body).appendChild(s);
         })();
     </script>
-    <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>                                
+    <noscript>Please enable JavaScript to view the <a target="_blank" rel="noopener" href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>                                
 </div>
         
     
@@ -470,16 +497,32 @@ while True:
         </div>
 </footer>
       <!--   Core JS Files   -->
-      <script src="/js/core/jquery.min.js?v=3.2.1"></script>
-      <script src="/js/main.js"></script>
-      <script src="/js/core/popper.min.js"></script>
-      <script src="/js/core/bootstrap-material-design.min.js"></script>
-      <script src="/js/plugins/moment.min.js"></script>
-      <script src="/js/material-kit.min.js?v=2.0.5"></script>
+      
+<script src="/js/core/jquery.min.js?v=3.2.1.js"></script>
+
+      
+<script src="/js/main.js"></script>
+
+      
+<script src="/js/core/popper.min.js"></script>
+
+      
+<script src="/js/core/bootstrap-material-design.min.js"></script>
+
+      
+<script src="/js/plugins/moment.min.js"></script>
+
+      
+<script src="/js/material-kit.min.js?v=2.0.5.js"></script>
+
       
         <script src="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.4.2/tocbot.min.js"></script>
-        <script src="/js/post.js"></script>
-        <script src="/js/plugins/prettify.js"></script>
+        
+<script src="/js/post.js"></script>
+
+        
+<script src="/js/plugins/prettify.js"></script>
+
         <script>
             $(document).ready(function(){
                 $('pre').addClass('prettyprint linenums');

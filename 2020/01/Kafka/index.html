@@ -20,17 +20,27 @@
     <meta name="author" content="Misaki">
     <meta name="keywords" content="">
     <title>Kafka ~ Misaki&#39;s Blog</title>
-    <link rel="stylesheet" href="/css/Material_Icons.css">
-    <!-- <link rel="stylesheet" href="/css/font-awesome.css"> -->
+    
+<link rel="stylesheet" href="/css/Material_Icons.css">
+
+    <!-- 
+<link rel="stylesheet" href="/css/font-awesome.css">
+ -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css">
-    <link rel="stylesheet" href="/css/main.css">
     
-        <link rel="stylesheet" href="/css/post.css">
+<link rel="stylesheet" href="/css/main.css">
+
+    
         
-            <link rel="stylesheet" href="/css/Prettify/tomorrow-night-eighties.min.css">
+<link rel="stylesheet" href="/css/post.css">
+
+        
+            
+<link rel="stylesheet" href="/css/Prettify/tomorrow-night-eighties.min.css">
+
         
     
-</head>
+<meta name="generator" content="Hexo 5.2.0"></head>
 
 <body class=" sidebar-collapse">
 <nav class="navbar navbar-transparent navbar-color-on-scroll fixed-top navbar-expand-lg" color-on-scroll="100" id="sectionsNav">
@@ -112,218 +122,239 @@
       <div class="container">
         <div class="section">
           <div class="post_content">
-              <h3 id="Kafka-简介"><a href="#Kafka-简介" class="headerlink" title="Kafka 简介"></a>Kafka 简介</h3><p>详情：<a href="http://kafka.apachecn.org/intro.html" target="_blank" rel="noopener">http://kafka.apachecn.org/intro.html</a></p>
+              <h3 id="Kafka-简介"><a href="#Kafka-简介" class="headerlink" title="Kafka 简介"></a>Kafka 简介</h3><p>详情：<a target="_blank" rel="noopener" href="http://kafka.apachecn.org/intro.html">http://kafka.apachecn.org/intro.html</a></p>
 <h3 id="Kafka-使用"><a href="#Kafka-使用" class="headerlink" title="Kafka 使用"></a>Kafka 使用</h3><p>简介这种网上很多的，此处不介绍了，可以查看以上ApacheCN的文档，就直接开始使用和python之间的整合。</p>
 <p>下载当前的最新版本：</p>
-<pre><code>wget http://archive.apache.org/dist/kafka/2.4.0/kafka_2.13-2.4.0.tgz
-</code></pre><p>此处没有搭建zookeeper，就直接使用kafka的便捷脚本创建节点</p>
-<pre><code>./bin/zookeeper-server-start.sh config/zookeeper.properties
-</code></pre><p>如果出现错误<code>Unrecognized VM option &#39;PrintGCDateStamps&#39;</code>，可能是Java版本和Kafka版本之间的问题，尝试使用更高版本的Kafka或者其他版本的Java。</p>
+<pre class="line-numbers language-none"><code class="language-none">wget http:&#x2F;&#x2F;archive.apache.org&#x2F;dist&#x2F;kafka&#x2F;2.4.0&#x2F;kafka_2.13-2.4.0.tgz<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<p>此处没有搭建zookeeper，就直接使用kafka的便捷脚本创建节点</p>
+<pre class="line-numbers language-none"><code class="language-none">.&#x2F;bin&#x2F;zookeeper-server-start.sh config&#x2F;zookeeper.properties<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<p>如果出现错误<code>Unrecognized VM option &#39;PrintGCDateStamps&#39;</code>，可能是Java版本和Kafka版本之间的问题，尝试使用更高版本的Kafka或者其他版本的Java。</p>
 <p>启动kafka，先复制一份需要的配置文件</p>
-<pre><code>cp config/server.properties config/server-1.properties
-</code></pre><p>配置文件中</p>
-<pre><code>broker.id=0  #必须唯一，当前只设置一个，所以暂不更改
-listeners=PLAINTEXT://:9092 #listeners是broker监听的地址和端口，多broker的时候需要不重复
-log.dirs=/tmp/kafka-logs-1 #日志，此处改为kafka-logs-1
-zookeeper.connect=localhost:2181  #zookeeper地址，没更改
-</code></pre><p>启动kafka</p>
-<pre><code>./bin/kafka-server-start.sh config/server-1.properties
-</code></pre><p>一串输出后，kafka启动成功</p>
+<pre class="line-numbers language-none"><code class="language-none">cp config&#x2F;server.properties config&#x2F;server-1.properties<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<p>配置文件中</p>
+<pre class="line-numbers language-none"><code class="language-none">broker.id&#x3D;0  #必须唯一，当前只设置一个，所以暂不更改
+listeners&#x3D;PLAINTEXT:&#x2F;&#x2F;:9092 #listeners是broker监听的地址和端口，多broker的时候需要不重复
+log.dirs&#x3D;&#x2F;tmp&#x2F;kafka-logs-1 #日志，此处改为kafka-logs-1
+zookeeper.connect&#x3D;localhost:2181  #zookeeper地址，没更改<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>启动kafka</p>
+<pre class="line-numbers language-none"><code class="language-none">.&#x2F;bin&#x2F;kafka-server-start.sh config&#x2F;server-1.properties<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<p>一串输出后，kafka启动成功</p>
 <p><img src="https://i.loli.net/2020/01/14/jTvtupFxArQEIoh.png" alt="1578901458153.png"></p>
-<h4 id="创建一个主题"><a href="#创建一个主题" class="headerlink" title="创建一个主题"></a>创建一个主题</h4><pre><code>./bin/kafka-topics.sh --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic test   #创建test主题,replication-factor副本数，小于集群服务器数
-./bin/kafka-topics.sh --list --zookeeper localhost:2181  #查看当前主题
-</code></pre><p><img src="https://i.loli.net/2020/01/14/VMQzbmGAuKjyHrx.png" alt="1578902209494.png"></p>
+<h4 id="创建一个主题"><a href="#创建一个主题" class="headerlink" title="创建一个主题"></a>创建一个主题</h4><pre class="line-numbers language-none"><code class="language-none">.&#x2F;bin&#x2F;kafka-topics.sh --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic test   #创建test主题,replication-factor副本数，小于集群服务器数
+.&#x2F;bin&#x2F;kafka-topics.sh --list --zookeeper localhost:2181  #查看当前主题<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+
+<p><img src="https://i.loli.net/2020/01/14/VMQzbmGAuKjyHrx.png" alt="1578902209494.png"></p>
 <h4 id="发送消息"><a href="#发送消息" class="headerlink" title="发送消息"></a>发送消息</h4><p>当在生产者发送消息的时候，消费者会显示消息</p>
-<pre><code>./bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic test --from-beginning 
+<pre class="line-numbers language-none"><code class="language-none">.&#x2F;bin&#x2F;kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic test --from-beginning 
 # 消费者监听，此时有生产者传入消息会显示
-./bin/kafka-console-producer.sh --broker-list localhost:9092 --topic test #生产者发送消息
-</code></pre><h4 id="多代理集群"><a href="#多代理集群" class="headerlink" title="多代理集群"></a>多代理集群</h4><p>为每个代理创建一个配置文件</p>
-<pre><code>如上的复制配置文件
-cp config/server.properties config/server-1.properties
+.&#x2F;bin&#x2F;kafka-console-producer.sh --broker-list localhost:9092 --topic test #生产者发送消息<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+
+<h4 id="多代理集群"><a href="#多代理集群" class="headerlink" title="多代理集群"></a>多代理集群</h4><p>为每个代理创建一个配置文件</p>
+<pre class="line-numbers language-none"><code class="language-none">如上的复制配置文件
+cp config&#x2F;server.properties config&#x2F;server-1.properties
 修改配置文件参数
-config/server-1.properties:
-    broker.id=1
-    listeners=PLAINTEXT://:9093
-    log.dir=/tmp/kafka-logs-1
-</code></pre><p>启动新节点</p>
-<pre><code>./bin/kafka-server-start.sh config/server-1.properties &amp;
-</code></pre><p>重新创建一个主题，然后通过生产者和消费者来处理消息，处理方式和上一样，只是需要更改不同的topic</p>
+config&#x2F;server-1.properties:
+    broker.id&#x3D;1
+    listeners&#x3D;PLAINTEXT:&#x2F;&#x2F;:9093
+    log.dir&#x3D;&#x2F;tmp&#x2F;kafka-logs-1<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>启动新节点</p>
+<pre class="line-numbers language-none"><code class="language-none">.&#x2F;bin&#x2F;kafka-server-start.sh config&#x2F;server-1.properties &amp;<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<p>重新创建一个主题，然后通过生产者和消费者来处理消息，处理方式和上一样，只是需要更改不同的topic</p>
 <h4 id="导入-导出文件"><a href="#导入-导出文件" class="headerlink" title="导入/导出文件"></a>导入/导出文件</h4><p>使用官方提高的三个配置文件，首先是Kafka Connect的配置文件，包含常用的配置，如Kafka brokers连接方式和数据的序列化格式。 其余的配置文件均指定一个要创建的连接器。这些文件包括连接器的唯一名称，类的实例，以及其他连接器所需的配置。</p>
-<pre><code>./bin/connect-standalone.sh config/connect-standalone.properties config/connect-file-source.properties config/connect-file-sink.properties
-</code></pre><p>一连串输出后，提示没有test.txt文件。</p>
+<pre class="line-numbers language-none"><code class="language-none">.&#x2F;bin&#x2F;connect-standalone.sh config&#x2F;connect-standalone.properties config&#x2F;connect-file-source.properties config&#x2F;connect-file-sink.properties<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<p>一连串输出后，提示没有test.txt文件。</p>
 <p><img src="https://i.loli.net/2020/01/14/GvlowAIxhsKFmi3.png" alt="1578905379715.png"></p>
 <p>创建test.txt，就可以看到对文件的处理，文件夹下就会生成test.sink.txt。</p>
 <p><img src="https://i.loli.net/2020/01/14/rp4KibEAcl5Htog.png" alt="1578905418254.png"></p>
 <h3 id="使用python处理消息"><a href="#使用python处理消息" class="headerlink" title="使用python处理消息"></a>使用python处理消息</h3><p>安装包</p>
-<pre><code>pip3 install kafka-python
-</code></pre><p>使用文档</p>
-<pre><code>https://kafka-python.readthedocs.io/en/master/usage.html
-</code></pre><h4 id="生产者代码："><a href="#生产者代码：" class="headerlink" title="生产者代码："></a>生产者代码：</h4><pre><code>from kafka import KafkaProducer
+<pre class="line-numbers language-none"><code class="language-none">pip3 install kafka-python<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<p>使用文档</p>
+<pre class="line-numbers language-none"><code class="language-none">https:&#x2F;&#x2F;kafka-python.readthedocs.io&#x2F;en&#x2F;master&#x2F;usage.html<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<h4 id="生产者代码："><a href="#生产者代码：" class="headerlink" title="生产者代码："></a>生产者代码：</h4><pre class="line-numbers language-none"><code class="language-none">from kafka import KafkaProducer
 from kafka.errors import KafkaError
 
-producer = KafkaProducer(
-    bootstrap_servers=[
+producer &#x3D; KafkaProducer(
+    bootstrap_servers&#x3D;[
         &quot;localhost:9092&quot;
   ]
 )
 
-future = producer.send(&quot;test&quot;, b&#39;I am rito yan&#39;)
+future &#x3D; producer.send(&quot;test&quot;, b&#39;I am rito yan&#39;)
 try:
-    record_metadata = future.get(timeout=10)
+    record_metadata &#x3D; future.get(timeout&#x3D;10)
     print(record_metadata)
 except KafkaError as e:
-    print(e)
-</code></pre><p>发送成功后返回</p>
-<pre><code>RecordMetadata(topic=&#39;test&#39;, partition=0, topic_partition=TopicPartition(topic=&#39;test&#39;, partition=0), offset=3, timestamp=1578905897675, checksum=None, serialized_key_size=-1, serialized_value_size=13, serialized_header_size=-1)
-</code></pre><p>也可以格式化消息格式</p>
-<pre><code>from kafka import KafkaProducer
+    print(e)<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>发送成功后返回</p>
+<pre class="line-numbers language-none"><code class="language-none">RecordMetadata(topic&#x3D;&#39;test&#39;, partition&#x3D;0, topic_partition&#x3D;TopicPartition(topic&#x3D;&#39;test&#39;, partition&#x3D;0), offset&#x3D;3, timestamp&#x3D;1578905897675, checksum&#x3D;None, serialized_key_size&#x3D;-1, serialized_value_size&#x3D;13, serialized_header_size&#x3D;-1)<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<p>也可以格式化消息格式</p>
+<pre class="line-numbers language-none"><code class="language-none">from kafka import KafkaProducer
 from kafka.errors import KafkaError
 
-producer = KafkaProducer(
-  bootstrap_servers=[
+producer &#x3D; KafkaProducer(
+  bootstrap_servers&#x3D;[
         &quot;localhost:9092&quot;
   ]
-  #value_serializer=lambda m: json.dumps(m).encode(&#39;ascii&#39;) #生产者发送json数据
+  #value_serializer&#x3D;lambda m: json.dumps(m).encode(&#39;ascii&#39;) #生产者发送json数据
 )
 
-future = producer.send(&quot;test&quot;, b&#39;I am rito yan&#39;)
-#future = producer.send(&#39;test&#39;, {&#39;key&#39;: &#39;value&#39;})
+future &#x3D; producer.send(&quot;test&quot;, b&#39;I am rito yan&#39;)
+#future &#x3D; producer.send(&#39;test&#39;, &#123;&#39;key&#39;: &#39;value&#39;&#125;)
 try:
-    record_metadata = future.get(timeout=10)
+    record_metadata &#x3D; future.get(timeout&#x3D;10)
     print(record_metadata)
 except KafkaError as e:
-    print(e)
-</code></pre><h4 id="消费者代码"><a href="#消费者代码" class="headerlink" title="消费者代码"></a>消费者代码</h4><pre><code>from kafka import KafkaConsumer
+    print(e)<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
-consumer = KafkaConsumer(
+<h4 id="消费者代码"><a href="#消费者代码" class="headerlink" title="消费者代码"></a>消费者代码</h4><pre class="line-numbers language-none"><code class="language-none">from kafka import KafkaConsumer
+
+consumer &#x3D; KafkaConsumer(
     &quot;test&quot;,
-    group_id = &quot;user-test&quot;,   #群组id，消息只能被同组的一个消费者消费，所以需要定义组名
-    bootstrap_servers = [
+    group_id &#x3D; &quot;user-test&quot;,   #群组id，消息只能被同组的一个消费者消费，所以需要定义组名
+    bootstrap_servers &#x3D; [
         &quot;localhost:9092&quot;
     ]
-    #value_deserializer=lambda m: json.loads(m.decode(&#39;ascii&#39;)) #格式化解析格式
+    #value_deserializer&#x3D;lambda m: json.loads(m.decode(&#39;ascii&#39;)) #格式化解析格式
 )
 for message in consumer:
-    print(&quot;%s:%d:%d: key=%s value=%s&quot; % (message.topic, message.partition,
+    print(&quot;%s:%d:%d: key&#x3D;%s value&#x3D;%s&quot; % (message.topic, message.partition,
                                           message.offset, message.key,
-                                          message.value))
-</code></pre><p>消费这运行后处于监听状态，当运行如上的生产者代码的时候，界面会显示出生产者的消息</p>
+                                          message.value))<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>消费这运行后处于监听状态，当运行如上的生产者代码的时候，界面会显示出生产者的消息</p>
 <p><img src="https://i.loli.net/2020/01/14/TXHazuyFBOMercZ.png" alt="1578907705145.png"></p>
 <h3 id="项目中引用"><a href="#项目中引用" class="headerlink" title="项目中引用"></a>项目中引用</h3><p>kafka在实现过程中，消费者处于监听状态，但是项目运行时，阻塞性的监听并不可用，可以使用多线程或者其他方式来处理。</p>
-<pre><code>def search_area():
-    prints = PrintThread()
+<pre class="line-numbers language-none"><code class="language-none">def search_area():
+    prints &#x3D; PrintThread()
     prints.setDaemon(True)
     prints.start()
     for i in range(100,200):
          time.sleep(1)
          print(i)
-
+ 
 import threading
 import time
 from kafka import KafkaConsumer
 class PrintThread(threading.Thread):
     def run(self):
         print(&quot;start.... %s&quot; %self.getName())
-        consumer = KafkaConsumer(
+        consumer &#x3D; KafkaConsumer(
             &quot;test&quot;,
-            group_id = &quot;user-test&quot;,   #群组id，消息只能被同组的一个消费者消费，所以需要定义组名
-            bootstrap_servers = [
+            group_id &#x3D; &quot;user-test&quot;,   #群组id，消息只能被同组的一个消费者消费，所以需要定义组名
+            bootstrap_servers &#x3D; [
                 &quot;localhost:9092&quot;
             ]
-            #value_deserializer=lambda m: json.loads(m.decode(&#39;ascii&#39;)) #格式化解析格式
+            #value_deserializer&#x3D;lambda m: json.loads(m.decode(&#39;ascii&#39;)) #格式化解析格式
         )
         for message in consumer:
-            print(&quot;%s:%d:%d: key=%s value=%s&quot; % (message.topic, message.partition,
+            print(&quot;%s:%d:%d: key&#x3D;%s value&#x3D;%s&quot; % (message.topic, message.partition,
                                                   message.offset, message.key,
                                                   message.value))
-search_area()
-</code></pre><p>达到主线程不阻塞的情况下仍然可以继续监听</p>
+search_area()<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>达到主线程不阻塞的情况下仍然可以继续监听</p>
 <p><img src="https://i.loli.net/2020/01/14/lYfcqCXow9R2gJW.png" alt="1578987250537.png"></p>
 <p>或者不采用监听的方式，采用主动拉取队列数据，这样一次拉取的时候可能是较大的数据，对数据量处理要求高的情况下可能会增加消息延迟堆积</p>
-<pre><code>from kafka import KafkaConsumer
+<pre class="line-numbers language-none"><code class="language-none">from kafka import KafkaConsumer
 
-consumer = KafkaConsumer(
-    &quot;test&quot;,
-    group_id=&#39;user-test&#39;, 
-    bootstrap_servers = [
+consumer &#x3D; KafkaConsumer(
+	&quot;test&quot;,
+	group_id&#x3D;&#39;user-test&#39;, 
+	bootstrap_servers &#x3D; [
         &quot;localhost:9092&quot;
-    ]
+	]
 )
-consumer.subscribe(topics=(&#39;test&#39;,))
-#  consumer.subscribe(topics=(&#39;test&#39;,&#39;test0&#39;))  #订阅多个主题
-msg = consumer.poll(timeout_ms=2000)  # 从kafka获取消息
+consumer.subscribe(topics&#x3D;(&#39;test&#39;,))
+#  consumer.subscribe(topics&#x3D;(&#39;test&#39;,&#39;test0&#39;))  #订阅多个主题
+msg &#x3D; consumer.poll(timeout_ms&#x3D;2000)  # 从kafka获取消息
 print(msg)
 for tp, messages in msg.items():
     for message in messages:
-        print(&quot;%s:%d:%d: key=%s value=%s&quot; % (tp.topic, tp.partition,
+    	print(&quot;%s:%d:%d: key&#x3D;%s value&#x3D;%s&quot; % (tp.topic, tp.partition,
                                           message.offset, message.key,
-                                          message.value))
-</code></pre><p>但是这样做会出现多次获取重复已消费的信息，因为自动位移提交的动作是在 poll() 方法的逻辑里完成的，在每次真正向服务端发起拉取请求之前会检查是否可以进行位移提交，如果可以，那么就会提交上一次轮询的位移。单次请求的时候不能提交offset。</p>
+                                          message.value))<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>但是这样做会出现多次获取重复已消费的信息，因为自动位移提交的动作是在 poll() 方法的逻辑里完成的，在每次真正向服务端发起拉取请求之前会检查是否可以进行位移提交，如果可以，那么就会提交上一次轮询的位移。单次请求的时候不能提交offset。</p>
 <p><img src="https://i.loli.net/2020/01/14/Fex4WgyqDaQ37vM.png" alt="1578984621248.png"></p>
 <p>添加如下手动提交已消费信息</p>
-<pre><code>from kafka import KafkaConsumer
+<pre class="line-numbers language-none"><code class="language-none">from kafka import KafkaConsumer
 
-consumer = KafkaConsumer(
-    &quot;test&quot;,
-    group_id=&#39;user-test&#39;, 
-    enable_auto_commit = False,
-    bootstrap_servers = [
+consumer &#x3D; KafkaConsumer(
+	&quot;test&quot;,
+	group_id&#x3D;&#39;user-test&#39;, 
+	enable_auto_commit &#x3D; False,
+	bootstrap_servers &#x3D; [
         &quot;localhost:9092&quot;
-    ]
+	]
 )
-consumer.subscribe(topics=(&#39;test&#39;,))
-#  consumer.subscribe(topics=(&#39;test&#39;,&#39;test0&#39;))  #订阅多个主题
-msg = consumer.poll(timeout_ms=2000)  # 从kafka获取消息
+consumer.subscribe(topics&#x3D;(&#39;test&#39;,))
+#  consumer.subscribe(topics&#x3D;(&#39;test&#39;,&#39;test0&#39;))  #订阅多个主题
+msg &#x3D; consumer.poll(timeout_ms&#x3D;2000)  # 从kafka获取消息
 print(msg)
 for tp, messages in msg.items():
     for message in messages:
-        print(&quot;%s:%d:%d: key=%s value=%s&quot; % (tp.topic, tp.partition,
+    	print(&quot;%s:%d:%d: key&#x3D;%s value&#x3D;%s&quot; % (tp.topic, tp.partition,
                                           message.offset, message.key,
                                           message.value))
 consumer.commit()  #同步提交，直到正常或异常返回之前阻塞
-consumer.commit_async() #异步提交，不阻塞
-</code></pre><p>读取已消费信息</p>
+consumer.commit_async() #异步提交，不阻塞<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>读取已消费信息</p>
 <p>使用 seek方法从指定的partition和offset开始读取数据，需要记录分区和offset。</p>
-<pre><code>#encoding:utf8
+<pre class="line-numbers language-none"><code class="language-none">#encoding:utf8
 from kafka import KafkaConsumer, TopicPartition
 
-my_topic = &quot;my.topic&quot; # 指定需要消费的主题
+my_topic &#x3D; &quot;my.topic&quot; # 指定需要消费的主题
 
-consumer = KafkaConsumer(
-    bootstrap_servers = &quot;192.168.70.221:19092,192.168.70.222:19092,192.168.70.223:19092&quot;, # kafka集群地址
-    group_id = &quot;my.group&quot;, # 消费组id
-    enable_auto_commit = True, # 每过一段时间自动提交所有已消费的消息（在迭代时提交）
-    auto_commit_interval_ms = 5000, # 自动提交的周期（毫秒）
+consumer &#x3D; KafkaConsumer(
+    bootstrap_servers &#x3D; &quot;192.168.70.221:19092,192.168.70.222:19092,192.168.70.223:19092&quot;, # kafka集群地址
+    group_id &#x3D; &quot;my.group&quot;, # 消费组id
+    enable_auto_commit &#x3D; True, # 每过一段时间自动提交所有已消费的消息（在迭代时提交）
+    auto_commit_interval_ms &#x3D; 5000, # 自动提交的周期（毫秒）
 )
 
 consumer.assign([
-    TopicPartition(topic=my_topic, partition=0),
-    TopicPartition(topic=my_topic, partition=1),
-    TopicPartition(topic=my_topic, partition=2)
+    TopicPartition(topic&#x3D;my_topic, partition&#x3D;0),
+    TopicPartition(topic&#x3D;my_topic, partition&#x3D;1),
+    TopicPartition(topic&#x3D;my_topic, partition&#x3D;2)
 ])
 
-consumer.seek(TopicPartition(topic=my_topic, partition=0), 12) # 指定起始offset为12
-consumer.seek(TopicPartition(topic=my_topic, partition=1), 0) # 可以注册多个分区，此分区从第一条消息开始接收
-# consumer.seek(TopicPartition(topic=my_topic, partition=2), 32) # 没有注册的分区上的消息不会被消费
+consumer.seek(TopicPartition(topic&#x3D;my_topic, partition&#x3D;0), 12) # 指定起始offset为12
+consumer.seek(TopicPartition(topic&#x3D;my_topic, partition&#x3D;1), 0) # 可以注册多个分区，此分区从第一条消息开始接收
+# consumer.seek(TopicPartition(topic&#x3D;my_topic, partition&#x3D;2), 32) # 没有注册的分区上的消息不会被消费
 
 for msg in consumer: # 迭代器，等待下一条消息
-    print msg # 打印消息
-</code></pre><h3 id="部署kafka"><a href="#部署kafka" class="headerlink" title="部署kafka"></a>部署kafka</h3><p>配置好需要的参数后</p>
-<pre><code>./bin/zookeeper-server-start.sh -daemon config/zookeeper.properties
-</code></pre><p>就可以看到zookeeper处于监听状态，当然zookeeper这个一般使用集群部署的节点，此处仍然是使用kafka。</p>
+    print msg # 打印消息<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h3 id="部署kafka"><a href="#部署kafka" class="headerlink" title="部署kafka"></a>部署kafka</h3><p>配置好需要的参数后</p>
+<pre class="line-numbers language-none"><code class="language-none">.&#x2F;bin&#x2F;zookeeper-server-start.sh -daemon config&#x2F;zookeeper.properties<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<p>就可以看到zookeeper处于监听状态，当然zookeeper这个一般使用集群部署的节点，此处仍然是使用kafka。</p>
 <p><img src="https://i.loli.net/2020/01/16/sQotxmScwZUjlfO.png" alt="1579162043232.png"></p>
-<pre><code>./bin/kafka-server-start.sh -daemon config/server-1.properties
-</code></pre><p><img src="https://i.loli.net/2020/01/16/jQ8E2tVhCTfx4Dr.png" alt="1579162335867.png"></p>
+<pre class="line-numbers language-none"><code class="language-none">.&#x2F;bin&#x2F;kafka-server-start.sh -daemon config&#x2F;server-1.properties<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<p><img src="https://i.loli.net/2020/01/16/jQ8E2tVhCTfx4Dr.png" alt="1579162335867.png"></p>
 
           </div>
           <br><br>
               
                 <div class="license-wrapper">
-                    <p>原文作者：<a href="">Misaki</a>
-                    <p>原文链接：<a href="/2020/01/Kafka/">/2020/01/Kafka/</a>
-                    <p>发表日期：<a href="/2020/01/Kafka/">January 14th 2020, 4:05:55 pm</a>
-                    <p>更新日期：<a href="/2020/01/Kafka/">January 16th 2020, 4:16:55 pm</a>
-                    <p>版权声明：本文采用<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">知识共享署名-非商业性使用 4.0 国际许可协议</a>进行许可</p>
+                    <p>原文作者：<a href="https://misakikata.github.io">Misaki</a>
+                    <p>原文链接：<a href="https://misakikata.github.io/2020/01/Kafka/">https://misakikata.github.io/2020/01/Kafka/</a>
+                    <p>发表日期：<a href="https://misakikata.github.io/2020/01/Kafka/">January 14th 2020, 4:05:55 pm</a>
+                    <p>更新日期：<a href="https://misakikata.github.io/2020/01/Kafka/">January 16th 2020, 4:16:55 pm</a>
+                    <p>版权声明：本文采用<a rel="license noopener" target="_blank" href="http://creativecommons.org/licenses/by-nc/4.0/">知识共享署名-非商业性使用 4.0 国际许可协议</a>进行许可</p>
                 </div>
               
           <br><br>
@@ -361,7 +392,7 @@ for msg in consumer: # 迭代器，等待下一条消息
     <script>               
         var disqus_shortname = '';
         var disqus_config = function () {
-            this.page.url = '/2020/01/Kafka/'; 
+            this.page.url = 'https://misakikata.github.io/2020/01/Kafka/'; 
             this.page.identifier = '/2020/01/Kafka/';
         };
         (function() { 
@@ -372,7 +403,7 @@ for msg in consumer: # 迭代器，等待下一条消息
             (d.head || d.body).appendChild(s);
         })();
     </script>
-    <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>                                
+    <noscript>Please enable JavaScript to view the <a target="_blank" rel="noopener" href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>                                
 </div>
         
     
@@ -392,16 +423,32 @@ for msg in consumer: # 迭代器，等待下一条消息
         </div>
 </footer>
       <!--   Core JS Files   -->
-      <script src="/js/core/jquery.min.js?v=3.2.1"></script>
-      <script src="/js/main.js"></script>
-      <script src="/js/core/popper.min.js"></script>
-      <script src="/js/core/bootstrap-material-design.min.js"></script>
-      <script src="/js/plugins/moment.min.js"></script>
-      <script src="/js/material-kit.min.js?v=2.0.5"></script>
+      
+<script src="/js/core/jquery.min.js?v=3.2.1.js"></script>
+
+      
+<script src="/js/main.js"></script>
+
+      
+<script src="/js/core/popper.min.js"></script>
+
+      
+<script src="/js/core/bootstrap-material-design.min.js"></script>
+
+      
+<script src="/js/plugins/moment.min.js"></script>
+
+      
+<script src="/js/material-kit.min.js?v=2.0.5.js"></script>
+
       
         <script src="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.4.2/tocbot.min.js"></script>
-        <script src="/js/post.js"></script>
-        <script src="/js/plugins/prettify.js"></script>
+        
+<script src="/js/post.js"></script>
+
+        
+<script src="/js/plugins/prettify.js"></script>
+
         <script>
             $(document).ready(function(){
                 $('pre').addClass('prettyprint linenums');

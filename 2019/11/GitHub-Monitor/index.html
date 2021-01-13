@@ -20,17 +20,27 @@
     <meta name="author" content="Misaki">
     <meta name="keywords" content="">
     <title>GitHub-Monitor ~ Misaki&#39;s Blog</title>
-    <link rel="stylesheet" href="/css/Material_Icons.css">
-    <!-- <link rel="stylesheet" href="/css/font-awesome.css"> -->
+    
+<link rel="stylesheet" href="/css/Material_Icons.css">
+
+    <!-- 
+<link rel="stylesheet" href="/css/font-awesome.css">
+ -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css">
-    <link rel="stylesheet" href="/css/main.css">
     
-        <link rel="stylesheet" href="/css/post.css">
+<link rel="stylesheet" href="/css/main.css">
+
+    
         
-            <link rel="stylesheet" href="/css/Prettify/tomorrow-night-eighties.min.css">
+<link rel="stylesheet" href="/css/post.css">
+
+        
+            
+<link rel="stylesheet" href="/css/Prettify/tomorrow-night-eighties.min.css">
+
         
     
-</head>
+<meta name="generator" content="Hexo 5.2.0"></head>
 
 <body class=" sidebar-collapse">
 <nav class="navbar navbar-transparent navbar-color-on-scroll fixed-top navbar-expand-lg" color-on-scroll="100" id="sectionsNav">
@@ -116,18 +126,19 @@
 <p>  python3 + Django 2.2.6 + supervisord</p>
 </blockquote>
 <ol>
-<li>环境由简单的Django完成，外加一个HTML展示模板</li>
-<li>GitHub的爬虫由supervisord来维护，需要修改配置文件内的信息，可以改成/var/run路径</li>
-<li>pip安装如下的文件即可</li>
+<li> 环境由简单的Django完成，外加一个HTML展示模板</li>
+<li> GitHub的爬虫由supervisord来维护，需要修改配置文件内的信息，可以改成/var/run路径</li>
+<li> pip安装如下的文件即可</li>
 </ol>
 <p>爬虫需要账号密码模拟登陆，进程为五分钟一次。是否扫描根据任务数据里保存的时间来做判断。</p>
 <p>修改任务只需要在编辑里输入任务名，直接输入其他参数更新即可。</p>
 <p>数据库采用MySQL5.7。</p>
-<pre><code>python3 manager.py createsuperuser
+<pre class="line-numbers language-none"><code class="language-none">python3 manager.py createsuperuser
 python3 manager.py makemigrations
 python3 manager.py migrate
-登陆后台添加一个可以登陆前端的账号即可。
-</code></pre><p>地址：<a href="https://github.com/MisakiKata/github_monitor" target="_blank" rel="noopener">https://github.com/MisakiKata/github_monitor</a></p>
+登陆后台添加一个可以登陆前端的账号即可。<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>地址：<a target="_blank" rel="noopener" href="https://github.com/MisakiKata/github_monitor">https://github.com/MisakiKata/github_monitor</a></p>
 <p>首界面</p>
 <p><img src="https://user-images.githubusercontent.com/27627614/68268529-83d12080-0091-11ea-8956-988a74a77da4.png" alt="1573011489137"></p>
 <p>全部信息<img src="https://user-images.githubusercontent.com/27627614/68268531-8764a780-0091-11ea-8269-0288c1c879cb.png" alt="1573011512652"></p>
@@ -140,11 +151,11 @@ python3 manager.py migrate
           <br><br>
               
                 <div class="license-wrapper">
-                    <p>原文作者：<a href="">Misaki</a>
-                    <p>原文链接：<a href="/2019/11/GitHub-Monitor/">/2019/11/GitHub-Monitor/</a>
-                    <p>发表日期：<a href="/2019/11/GitHub-Monitor/">November 6th 2019, 12:41:49 pm</a>
-                    <p>更新日期：<a href="/2019/11/GitHub-Monitor/">November 6th 2019, 12:41:49 pm</a>
-                    <p>版权声明：本文采用<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">知识共享署名-非商业性使用 4.0 国际许可协议</a>进行许可</p>
+                    <p>原文作者：<a href="https://misakikata.github.io">Misaki</a>
+                    <p>原文链接：<a href="https://misakikata.github.io/2019/11/GitHub-Monitor/">https://misakikata.github.io/2019/11/GitHub-Monitor/</a>
+                    <p>发表日期：<a href="https://misakikata.github.io/2019/11/GitHub-Monitor/">November 6th 2019, 12:41:49 pm</a>
+                    <p>更新日期：<a href="https://misakikata.github.io/2019/11/GitHub-Monitor/">November 6th 2019, 12:41:49 pm</a>
+                    <p>版权声明：本文采用<a rel="license noopener" target="_blank" href="http://creativecommons.org/licenses/by-nc/4.0/">知识共享署名-非商业性使用 4.0 国际许可协议</a>进行许可</p>
                 </div>
               
           <br><br>
@@ -182,7 +193,7 @@ python3 manager.py migrate
     <script>               
         var disqus_shortname = '';
         var disqus_config = function () {
-            this.page.url = '/2019/11/GitHub-Monitor/'; 
+            this.page.url = 'https://misakikata.github.io/2019/11/GitHub-Monitor/'; 
             this.page.identifier = '/2019/11/GitHub-Monitor/';
         };
         (function() { 
@@ -193,7 +204,7 @@ python3 manager.py migrate
             (d.head || d.body).appendChild(s);
         })();
     </script>
-    <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>                                
+    <noscript>Please enable JavaScript to view the <a target="_blank" rel="noopener" href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>                                
 </div>
         
     
@@ -213,16 +224,32 @@ python3 manager.py migrate
         </div>
 </footer>
       <!--   Core JS Files   -->
-      <script src="/js/core/jquery.min.js?v=3.2.1"></script>
-      <script src="/js/main.js"></script>
-      <script src="/js/core/popper.min.js"></script>
-      <script src="/js/core/bootstrap-material-design.min.js"></script>
-      <script src="/js/plugins/moment.min.js"></script>
-      <script src="/js/material-kit.min.js?v=2.0.5"></script>
+      
+<script src="/js/core/jquery.min.js?v=3.2.1.js"></script>
+
+      
+<script src="/js/main.js"></script>
+
+      
+<script src="/js/core/popper.min.js"></script>
+
+      
+<script src="/js/core/bootstrap-material-design.min.js"></script>
+
+      
+<script src="/js/plugins/moment.min.js"></script>
+
+      
+<script src="/js/material-kit.min.js?v=2.0.5.js"></script>
+
       
         <script src="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.4.2/tocbot.min.js"></script>
-        <script src="/js/post.js"></script>
-        <script src="/js/plugins/prettify.js"></script>
+        
+<script src="/js/post.js"></script>
+
+        
+<script src="/js/plugins/prettify.js"></script>
+
         <script>
             $(document).ready(function(){
                 $('pre').addClass('prettyprint linenums');

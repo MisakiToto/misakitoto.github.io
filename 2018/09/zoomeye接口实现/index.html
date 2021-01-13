@@ -20,17 +20,27 @@
     <meta name="author" content="Misaki">
     <meta name="keywords" content="">
     <title>zoomeye接口实现 ~ Misaki&#39;s Blog</title>
-    <link rel="stylesheet" href="/css/Material_Icons.css">
-    <!-- <link rel="stylesheet" href="/css/font-awesome.css"> -->
+    
+<link rel="stylesheet" href="/css/Material_Icons.css">
+
+    <!-- 
+<link rel="stylesheet" href="/css/font-awesome.css">
+ -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css">
-    <link rel="stylesheet" href="/css/main.css">
     
-        <link rel="stylesheet" href="/css/post.css">
+<link rel="stylesheet" href="/css/main.css">
+
+    
         
-            <link rel="stylesheet" href="/css/Prettify/tomorrow-night-eighties.min.css">
+<link rel="stylesheet" href="/css/post.css">
+
+        
+            
+<link rel="stylesheet" href="/css/Prettify/tomorrow-night-eighties.min.css">
+
         
     
-</head>
+<meta name="generator" content="Hexo 5.2.0"></head>
 
 <body class=" sidebar-collapse">
 <nav class="navbar navbar-transparent navbar-color-on-scroll fixed-top navbar-expand-lg" color-on-scroll="100" id="sectionsNav">
@@ -113,7 +123,7 @@
         <div class="section">
           <div class="post_content">
               <p>zoomeye的接口网上不少人做过实现，之前在学python的json信息处理，便写了这个一个利用脚本，唯一的坑就是wiki和返回信息不一样，浪费了点时间。<br>没有多少难度，就是写了不少提示符，用来多次和提示输入。</p>
-<pre><code>#coding:utf-8
+<pre class="line-numbers language-none"><code class="language-none">#coding:utf-8
 #author:misaki
 import requests
 import json
@@ -121,58 +131,58 @@ import re
 
 
 def geturl():
-    app = raw_input(&#39;app:&#39;)
-    app2 = input(&#39;page:&#39;)
-    app3 = raw_input(&#39;country:&#39;)
+    app &#x3D; raw_input(&#39;app:&#39;)
+    app2 &#x3D; input(&#39;page:&#39;)
+    app3 &#x3D; raw_input(&#39;country:&#39;)
     for i in xrange(1,app2+1):
-        i=str(i)
-        url=&#39;https://api.zoomeye.org/web/search?query=app:&#39;+app+&#39;&amp;page=&#39;+i+&#39;&amp;country=&#39;+app3
-        r2=requests.get(url,headers=headers)
-        soup = r2.text
-        a=json.loads(soup)                  #获取site
+        i&#x3D;str(i)
+        url&#x3D;&#39;https:&#x2F;&#x2F;api.zoomeye.org&#x2F;web&#x2F;search?query&#x3D;app:&#39;+app+&#39;&amp;page&#x3D;&#39;+i+&#39;&amp;country&#x3D;&#39;+app3
+        r2&#x3D;requests.get(url,headers&#x3D;headers)
+        soup &#x3D; r2.text
+        a&#x3D;json.loads(soup)                  #获取site
         for i in a[&#39;matches&#39;]:
-            f=open(app+&#39;.txt&#39;,&#39;a&#39;)
+            f&#x3D;open(app+&#39;.txt&#39;,&#39;a&#39;)
             f.write(str(i[&#39;site&#39;])+&#39;\n&#39;)
             f.close
     print &#39;All url number: %s&#39; % len(open(r&quot;web.txt&quot;, &#39;rU&#39;).readlines())
     print &#39;\r&#39;
-    zoom = raw_input(&#39;Are you continue?[y/n]:&#39;)
+    zoom &#x3D; raw_input(&#39;Are you continue?[y&#x2F;n]:&#39;)
     print &#39;\r&#39;
     while zoom not in [&#39;y&#39;,&#39;n&#39;,&#39;Y&#39;,&#39;N&#39;]:
         print &quot;Please enter the specified letter!&quot;
-        zoom = raw_input(&#39;Are you continue?[y/n]:&#39;)
+        zoom &#x3D; raw_input(&#39;Are you continue?[y&#x2F;n]:&#39;)
     print &#39;\r&#39;
     if zoom in [&#39;y&#39;,&#39;Y&#39;]:
         main()
 
 def getip():
-    app4 = raw_input(&#39;app:&#39;)
-    app5 = input(&#39;page:&#39;)
-    app6 = raw_input(&#39;country:&#39;)
+    app4 &#x3D; raw_input(&#39;app:&#39;)
+    app5 &#x3D; input(&#39;page:&#39;)
+    app6 &#x3D; raw_input(&#39;country:&#39;)
     for i in xrange(1, app5 + 1):
-        i = str(i)
-        url = &#39;https://api.zoomeye.org/host/search?query=&#39; + app4 + &#39;&amp;page=&#39; + i +&#39;&amp;country=&#39; + app6
-        r2 = requests.get(url, headers=headers)
-        parrten = re.compile(r&#39;(?&lt;![\.\d])(?:\d{1,3}\.){3}\d{1,3}(?![\.\d])&#39;)         #获取ip
-        ip = parrten.findall(str(r2.text))
+        i &#x3D; str(i)
+        url &#x3D; &#39;https:&#x2F;&#x2F;api.zoomeye.org&#x2F;host&#x2F;search?query&#x3D;&#39; + app4 + &#39;&amp;page&#x3D;&#39; + i +&#39;&amp;country&#x3D;&#39; + app6
+        r2 &#x3D; requests.get(url, headers&#x3D;headers)
+        parrten &#x3D; re.compile(r&#39;(?&lt;![\.\d])(?:\d&#123;1,3&#125;\.)&#123;3&#125;\d&#123;1,3&#125;(?![\.\d])&#39;)         #获取ip
+        ip &#x3D; parrten.findall(str(r2.text))
         for i in ip:
-            f = open(app4+&#39;.txt&#39;, &#39;a&#39;)
+            f &#x3D; open(app4+&#39;.txt&#39;, &#39;a&#39;)
             f.write(str(i) + &#39;\n&#39;)
             f.close
     print &#39;All url number: %s&#39; % len(open(r&quot;host.txt&quot;, &#39;rU&#39;).readlines())
     print &#39;\r&#39;
-    zoom = raw_input(&#39;Are you continue?[y/n]:&#39;)
+    zoom &#x3D; raw_input(&#39;Are you continue?[y&#x2F;n]:&#39;)
     while zoom not in [&#39;y&#39;,&#39;n&#39;,&#39;Y&#39;,&#39;N&#39;]:
         print &quot;Please enter the specified letter!&quot;
-        zoom = raw_input(&#39;Are you continue?[y/n]:&#39;)
+        zoom &#x3D; raw_input(&#39;Are you continue?[y&#x2F;n]:&#39;)
     print &#39;\r&#39;
     if zoom in [&#39;y&#39;,&#39;Y&#39;]:
         main()
 
 def getuser():
-    url = &#39;https://api.zoomeye.org/resources-info&#39;
-    r2 = requests.get(url, headers=headers)
-    soup = json.loads(r2.text)
+    url &#x3D; &#39;https:&#x2F;&#x2F;api.zoomeye.org&#x2F;resources-info&#39;
+    r2 &#x3D; requests.get(url, headers&#x3D;headers)
+    soup &#x3D; json.loads(r2.text)
     print &#39;\r&#39;
     print &#39;plan: %s&#39; %soup[&#39;plan&#39;]
     print &#39;search_num: %s&#39; %soup[&#39;resources&#39;][&#39;search&#39;]
@@ -184,23 +194,23 @@ def main():
     print &#39;1 - web_search&#39;
     print &#39;2 - host_search&#39;
     print &#39;3 - resources_info&#39;
-    name = raw_input(&#39;input num:&#39;)
+    name &#x3D; raw_input(&#39;input num:&#39;)
     print &#39;\r&#39;
     while name not in [&#39;1&#39;,&#39;2&#39;,&#39;3&#39;]:
-        name = raw_input(&#39;input num:&#39;)
-    if name != &#39;&#39;:
+        name &#x3D; raw_input(&#39;input num:&#39;)
+    if name !&#x3D; &#39;&#39;:
         try:
-            if name == &#39;1&#39;:
+            if name &#x3D;&#x3D; &#39;1&#39;:
                 geturl()
-            elif name == &#39;2&#39;:
+            elif name &#x3D;&#x3D; &#39;2&#39;:
                 getip()
-            elif name == &#39;3&#39;:
+            elif name &#x3D;&#x3D; &#39;3&#39;:
                 getuser()
         except:
             pass
 
 
-if __name__==&#39;__main__&#39;:
+if __name__&#x3D;&#x3D;&#39;__main__&#39;:
     print &#39;#######&#39;
     print &#39;     #   ####   ####  #    # ###### #   # ######&#39;
     print &#39;    #   #    # #    # ##  ## #       # #  #     &#39;
@@ -211,30 +221,30 @@ if __name__==&#39;__main__&#39;:
     print &#39;auther:misaki&#39;
     print &#39;\r&#39;
     print &#39;Input your username and password&#39;
-    username = raw_input(&#39;username:&#39;)
-    password = raw_input(&#39;password:&#39;)
+    username &#x3D; raw_input(&#39;username:&#39;)
+    password &#x3D; raw_input(&#39;password:&#39;)
     print &#39;\r&#39;
-    if username and password != -1:
-        data = {&quot;username&quot;: username, &quot;password&quot;: password}
-        s = json.dumps(data, indent=4)
-        r = requests.post(&#39;https://api.zoomeye.org/user/login&#39;, data=s)
-        if r.status_code == 200:
-            token = r.text
-            headers = {&#39;Authorization&#39;: &#39;JWT&#39; + &#39; &#39; + token[18:-2]}
+    if username and password !&#x3D; -1:
+        data &#x3D; &#123;&quot;username&quot;: username, &quot;password&quot;: password&#125;
+        s &#x3D; json.dumps(data, indent&#x3D;4)
+        r &#x3D; requests.post(&#39;https:&#x2F;&#x2F;api.zoomeye.org&#x2F;user&#x2F;login&#39;, data&#x3D;s)
+        if r.status_code &#x3D;&#x3D; 200:
+            token &#x3D; r.text
+            headers &#x3D; &#123;&#39;Authorization&#39;: &#39;JWT&#39; + &#39; &#39; + token[18:-2]&#125;
             main()
         else:
-            print &#39;Incorrect username or password&#39;
-</code></pre><p>​<br>​            </p>
+            print &#39;Incorrect username or password&#39;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>​<br>​            </p>
 
           </div>
           <br><br>
               
                 <div class="license-wrapper">
-                    <p>原文作者：<a href="">Misaki</a>
-                    <p>原文链接：<a href="/2018/09/zoomeye接口实现/">/2018/09/zoomeye接口实现/</a>
-                    <p>发表日期：<a href="/2018/09/zoomeye接口实现/">September 18th 2018, 12:44:29 pm</a>
-                    <p>更新日期：<a href="/2018/09/zoomeye接口实现/">September 20th 2018, 12:35:56 pm</a>
-                    <p>版权声明：本文采用<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">知识共享署名-非商业性使用 4.0 国际许可协议</a>进行许可</p>
+                    <p>原文作者：<a href="https://misakikata.github.io">Misaki</a>
+                    <p>原文链接：<a href="https://misakikata.github.io/2018/09/zoomeye%E6%8E%A5%E5%8F%A3%E5%AE%9E%E7%8E%B0/">https://misakikata.github.io/2018/09/zoomeye%E6%8E%A5%E5%8F%A3%E5%AE%9E%E7%8E%B0/</a>
+                    <p>发表日期：<a href="https://misakikata.github.io/2018/09/zoomeye%E6%8E%A5%E5%8F%A3%E5%AE%9E%E7%8E%B0/">September 18th 2018, 12:44:29 pm</a>
+                    <p>更新日期：<a href="https://misakikata.github.io/2018/09/zoomeye%E6%8E%A5%E5%8F%A3%E5%AE%9E%E7%8E%B0/">September 20th 2018, 12:35:56 pm</a>
+                    <p>版权声明：本文采用<a rel="license noopener" target="_blank" href="http://creativecommons.org/licenses/by-nc/4.0/">知识共享署名-非商业性使用 4.0 国际许可协议</a>进行许可</p>
                 </div>
               
           <br><br>
@@ -272,7 +282,7 @@ if __name__==&#39;__main__&#39;:
     <script>               
         var disqus_shortname = '';
         var disqus_config = function () {
-            this.page.url = '/2018/09/zoomeye接口实现/'; 
+            this.page.url = 'https://misakikata.github.io/2018/09/zoomeye接口实现/'; 
             this.page.identifier = '/2018/09/zoomeye接口实现/';
         };
         (function() { 
@@ -283,7 +293,7 @@ if __name__==&#39;__main__&#39;:
             (d.head || d.body).appendChild(s);
         })();
     </script>
-    <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>                                
+    <noscript>Please enable JavaScript to view the <a target="_blank" rel="noopener" href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>                                
 </div>
         
     
@@ -303,16 +313,32 @@ if __name__==&#39;__main__&#39;:
         </div>
 </footer>
       <!--   Core JS Files   -->
-      <script src="/js/core/jquery.min.js?v=3.2.1"></script>
-      <script src="/js/main.js"></script>
-      <script src="/js/core/popper.min.js"></script>
-      <script src="/js/core/bootstrap-material-design.min.js"></script>
-      <script src="/js/plugins/moment.min.js"></script>
-      <script src="/js/material-kit.min.js?v=2.0.5"></script>
+      
+<script src="/js/core/jquery.min.js?v=3.2.1.js"></script>
+
+      
+<script src="/js/main.js"></script>
+
+      
+<script src="/js/core/popper.min.js"></script>
+
+      
+<script src="/js/core/bootstrap-material-design.min.js"></script>
+
+      
+<script src="/js/plugins/moment.min.js"></script>
+
+      
+<script src="/js/material-kit.min.js?v=2.0.5.js"></script>
+
       
         <script src="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.4.2/tocbot.min.js"></script>
-        <script src="/js/post.js"></script>
-        <script src="/js/plugins/prettify.js"></script>
+        
+<script src="/js/post.js"></script>
+
+        
+<script src="/js/plugins/prettify.js"></script>
+
         <script>
             $(document).ready(function(){
                 $('pre').addClass('prettyprint linenums');

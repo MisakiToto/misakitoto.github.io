@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+
+
+
+
+
+
+
+
+
+<head>
+    <meta charset="utf-8" />
+    <link rel="apple-touch-icon" sizes="76x76" href="/favicon.ico">
+    <link rel="icon" type="image/png" href="/favicon.ico">
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0, shrink-to-fit=no" name="viewport" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <meta name="description" content="One way to choose one">
+    <meta name="author" content="Misaki">
+    <meta name="keywords" content="">
+    <title>又叒一个代理扫描平台 ~ Misaki&#39;s Blog</title>
+    
+<link rel="stylesheet" href="/css/Material_Icons.css">
+
+    <!-- 
+<link rel="stylesheet" href="/css/font-awesome.css">
+ -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css">
+    
+<link rel="stylesheet" href="/css/main.css">
+
+    
+        
+<link rel="stylesheet" href="/css/post.css">
+
+        
+            
+<link rel="stylesheet" href="/css/Prettify/tomorrow-night-eighties.min.css">
+
+        
+    
+<meta name="generator" content="Hexo 5.2.0"></head>
+
+<body class=" sidebar-collapse">
+<nav class="navbar navbar-transparent navbar-color-on-scroll fixed-top navbar-expand-lg" color-on-scroll="100" id="sectionsNav">
+    <div class="container">
+        <div class="navbar-translate">
+            <a class="navbar-brand" href="/">
+                Misaki&#39;s Blog</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="navbar-toggler-icon"></span>
+                <span class="navbar-toggler-icon"></span>
+                <span class="navbar-toggler-icon"></span>
+            </button>
+        </div>
+            <div class="collapse navbar-collapse">
+                <ul class="navbar-nav ml-auto">
+                    
+                        
+                            <li class="nav-item">
+                                <a class="nav-link" href="/archives/">
+                                    archives
+                                </a>
+                            </li>
+                        
+                            <li class="nav-item">
+                                <a class="nav-link" href="/about/">
+                                    about
+                                </a>
+                            </li>
+                        
+                    
+                    
+                        
+                            <li class="nav-item">
+                                <a class="nav-link" rel="tooltip" title="" data-placement="bottom" href="https://github.com/MisakiKata" target="_blank" data-original-title="See me here">
+                                    <i class="fa fa-github"></i>
+                                </a>
+                            </li>
+                        
+                            <li class="nav-item">
+                                <a class="nav-link" rel="tooltip" title="" data-placement="bottom" href="https://www.t00ls.net/members-profile-12179.html" target="_blank" data-original-title="See me here">
+                                    <i class="fa fa-twitch"></i>
+                                </a>
+                            </li>
+                        
+                            <li class="nav-item">
+                                <a class="nav-link" rel="tooltip" title="" data-placement="bottom" href="https://misakikata.github.io/atom.xml" target="_blank" data-original-title="See me here">
+                                    <i class="fa fa-rss"></i>
+                                </a>
+                            </li>
+                        
+                            <li class="nav-item">
+                                <a class="nav-link" rel="tooltip" title="" data-placement="bottom" href="mailto:misakikatas@gmail.com" target="_blank" data-original-title="See me here">
+                                    <i class="fa fa-envelope"></i>
+                                </a>
+                            </li>
+                        
+                    
+                </ul>
+            </div>
+    </div>
+</nav>
+    
+  <div class="page-header header-filter" data-parallax="true" style="background-image: url('/img/post-banner.jpg'); height: 70vh;">
+    
+      <div class="container">
+        <h1 class="title text-center post_title">又叒一个代理扫描平台</h1>
+        <p class="text-center"><b>Wednesday, January 13th 2021, 4:25 pm</b></p>
+      </div>
+    
+  </div>
+
+  
+  
+  
+    <div class="row" style="margin: 0 0 0; z-index: 999;">
+  <div class="col-md-8 offset-md-1">
+    <div class="main main-raised">
+      <div class="container">
+        <div class="section">
+          <div class="post_content">
+              <h2 id="关于项目"><a href="#关于项目" class="headerlink" title="关于项目"></a>关于项目</h2><ol>
+<li> 项目是一个代理扫描器，现有的代理扫描平台有xray，w13scan等，只是我希望关于SQL注入的使用sqlmap来检测执行，所以就有了这个平台，本质上和GroudScan是差不多的，只是把w13scan也加入到其中来检测别的漏洞。</li>
+<li> 同时也期望这个东西能做到代理扫描上的统一化，在实际工作中，开发测试对于新功能并不会实时进行安全申报，所以希望平台化的被动扫描可以帮助实现安全的加固。</li>
+</ol>
+<h2 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h2><ol>
+<li>环境使用MySQL，建议手动调整连接超时时间，代码会检测连接是否超时，但是可以调整超时来延缓长连接。不修改本质上也没事。</li>
+<li>安装，基于python3.7</li>
+</ol>
+<pre class="line-numbers language-none"><code class="language-none">mitmproxy
+apscheduler
+django-apscheduler
+django&#x3D;&#x3D;2.2.10
+django-simpleui
+PyMySQL
+secrets
+asn1crypto&#x3D;&#x3D;0.24.0
+certifi&#x3D;&#x3D;2019.6.16
+cffi&#x3D;&#x3D;1.12.3
+chardet&#x3D;&#x3D;3.0.4
+colorama&#x3D;&#x3D;0.4.1
+cowpy&#x3D;&#x3D;1.1.0
+cryptography&#x3D;&#x3D;2.7
+cssselect&#x3D;&#x3D;1.1.0
+idna&#x3D;&#x3D;2.8
+lxml&#x3D;&#x3D;4.5.0
+pycparser&#x3D;&#x3D;2.19
+pyjsparser&#x3D;&#x3D;2.7.1
+pyOpenSSL&#x3D;&#x3D;18.0.0
+PySocks&#x3D;&#x3D;1.7.1
+requests&#x3D;&#x3D;2.24.0
+requests-toolbelt&#x3D;&#x3D;0.9.1
+six&#x3D;&#x3D;1.12.0
+tld&#x3D;&#x3D;0.9.3
+urllib3&#x3D;&#x3D;1.25.3<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<ol start="3">
+<li> 代理模块使用mitmproxy，如果需要代理https，请在开启代理后访问地址<code>http://mitm.it/</code>下载证书，默认代理为<code>0.0.0.0:18088</code>。如需修改在myproxy/myproxys.py中修改。</li>
+<li> 需要开启sqlmapapi</li>
+</ol>
+<pre class="line-numbers language-none"><code class="language-none">python sqlmapapi.py -s <span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<ol start="5">
+<li> 为了避免流量数据堆积，只显示最近三天的流量，检索也是按照最近三天检索，如果需要修改<code>apps/proxy/views.py</code>中修改<code>timedelta(days=3)</code>为想要的天数。</li>
+</ol>
+<h2 id="使用"><a href="#使用" class="headerlink" title="使用"></a>使用</h2><p>配置setting的数据库信息</p>
+<pre class="line-numbers language-sh" data-language="sh"><code class="language-sh">python manage.py makemigrations
+python manage.py migrate 
+python manage.py createsuperuser
+python manage.py runserver 0.0.0.0:8000<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>访问地址ip:8000即可，如需维持进程，可以使用supervisor。</p>
+<h4 id="监控前台"><a href="#监控前台" class="headerlink" title="监控前台"></a>监控前台</h4><p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/image-20210112111910805.png" alt="image-20210112111910805"></p>
+<h4 id="监控选项"><a href="#监控选项" class="headerlink" title="监控选项"></a>监控选项</h4><p>注入的结果使用的<code>apscheduler</code>任务框架来定时检索，默认是一分钟执行一次。所以请开启，不然不会检查是否注入完成。如果需要修改时间请到<code>apps/sqli/views.py</code>中，修改<code>minutes=1</code>为需要的分钟。</p>
+<p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/image-20210112112450179.png" alt="image-20210112112450179"></p>
+<h4 id="代理数据"><a href="#代理数据" class="headerlink" title="代理数据"></a>代理数据</h4><p>关于搜索，需要输入请求的地址和端口来检测，也可以只输入一个值，但如果是ip加端口的形式，需要分开来一起搜索。</p>
+<p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/image-20210112111940503.png" alt="image-20210112111940503"></p>
+<h4 id="代理设置"><a href="#代理设置" class="headerlink" title="代理设置"></a>代理设置</h4><p>请在其中添加修改需要过滤的代理请求关键词，所有添加的参数都会按照并集来处理。</p>
+<p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/image-20210112111959302.png" alt="image-20210112111959302"></p>
+<h4 id="SQL注入监控"><a href="#SQL注入监控" class="headerlink" title="SQL注入监控"></a>SQL注入监控</h4><p>菜单下的注入设置同上。等待已完成查看结果即可，需要右上角刷新页面</p>
+<p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/image-20210112112110829.png" alt="image-20210112112110829"></p>
+<h4 id="漏洞管理"><a href="#漏洞管理" class="headerlink" title="漏洞管理"></a>漏洞管理</h4><p>此漏洞为w13scan扫描结果漏洞展示</p>
+<p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/image-20210112112302619.png" alt="image-20210112112302619"></p>
+<h2 id="描述"><a href="#描述" class="headerlink" title="描述"></a>描述</h2><p>此项目主要是融合利用，存在的已知问题是：稳定性暂时没有经过大流量的测试，只是单纯的个人使用无误。如果存在其他问题，还请表哥issue。</p>
+
+          </div>
+          <br><br>
+              
+                <div class="license-wrapper">
+                    <p>原文作者：<a href="https://misakikata.github.io">Misaki</a>
+                    <p>原文链接：<a href="https://misakikata.github.io/2021/01/%E5%8F%88%E5%8F%92%E4%B8%80%E4%B8%AA%E4%BB%A3%E7%90%86%E6%89%AB%E6%8F%8F%E5%B9%B3%E5%8F%B0/">https://misakikata.github.io/2021/01/%E5%8F%88%E5%8F%92%E4%B8%80%E4%B8%AA%E4%BB%A3%E7%90%86%E6%89%AB%E6%8F%8F%E5%B9%B3%E5%8F%B0/</a>
+                    <p>发表日期：<a href="https://misakikata.github.io/2021/01/%E5%8F%88%E5%8F%92%E4%B8%80%E4%B8%AA%E4%BB%A3%E7%90%86%E6%89%AB%E6%8F%8F%E5%B9%B3%E5%8F%B0/">January 13th 2021, 4:25:40 pm</a>
+                    <p>更新日期：<a href="https://misakikata.github.io/2021/01/%E5%8F%88%E5%8F%92%E4%B8%80%E4%B8%AA%E4%BB%A3%E7%90%86%E6%89%AB%E6%8F%8F%E5%B9%B3%E5%8F%B0/">January 13th 2021, 4:26:49 pm</a>
+                    <p>版权声明：本文采用<a rel="license noopener" target="_blank" href="http://creativecommons.org/licenses/by-nc/4.0/">知识共享署名-非商业性使用 4.0 国际许可协议</a>进行许可</p>
+                </div>
+              
+          <br><br>
+          <div>
+              <p>
+                       
+                      <span class="badge badge-default">#&nbsp;web安全</span>
+                      &nbsp;
+                       
+                      <span class="badge badge-default">#&nbsp;python</span>
+                      &nbsp;
+                      
+              </p>
+          </div>
+        </div>
+      </div>  
+    </div>
+  </div>
+  <!-- TOC -->
+  
+      <div class="">
+        <div id="toc">
+          <p class="toc-title"><i class="material-icons" style="vertical-align:middle">toc</i>Toc:</p> 
+          <div id="tocbot"></div>
+        </div>
+      </div>
+  
+</div>
+
+
+<!-- Comments -->
+<div class="row">
+    <div class="col-md-8 offset-md-2">
+    
+        
+            <div class="disqus" style="width:100%">
+    <div id="disqus_thread"></div>
+    <script>               
+        var disqus_shortname = '';
+        var disqus_config = function () {
+            this.page.url = 'https://misakikata.github.io/2021/01/又叒一个代理扫描平台/'; 
+            this.page.identifier = '/2021/01/又叒一个代理扫描平台/';
+        };
+        (function() { 
+            var d = document, s = d.createElement('script');
+            s.type = 'text/javascript';
+            s.src = '//'+disqus_shortname+'.disqus.com/embed.js';
+            s.setAttribute('data-timestamp', +new Date());
+            (d.head || d.body).appendChild(s);
+        })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a target="_blank" rel="noopener" href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>                                
+</div>
+        
+    
+    </div>
+</div>
+  
+
+<footer class="footer footer-default">
+        <div class="container">
+          <div class="float-left" style="padding: 15px 0;">
+              <b>假如今天的你被生活辜负了，别伤心，因为明天生活还会继续辜负你！</b>
+          </div>
+          <div align="right" style="padding: 15px 0;">
+              <i class="iconfont icon-love" ></i>
+              <a href="https://github.com/0x2e/Material-T" target="_blank"> <b>Material-T</b></a>
+          </div>
+        </div>
+</footer>
+      <!--   Core JS Files   -->
+      
+<script src="/js/core/jquery.min.js?v=3.2.1.js"></script>
+
+      
+<script src="/js/main.js"></script>
+
+      
+<script src="/js/core/popper.min.js"></script>
+
+      
+<script src="/js/core/bootstrap-material-design.min.js"></script>
+
+      
+<script src="/js/plugins/moment.min.js"></script>
+
+      
+<script src="/js/material-kit.min.js?v=2.0.5.js"></script>
+
+      
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.4.2/tocbot.min.js"></script>
+        
+<script src="/js/post.js"></script>
+
+        
+<script src="/js/plugins/prettify.js"></script>
+
+        <script>
+            $(document).ready(function(){
+                $('pre').addClass('prettyprint linenums');
+                prettyPrint();
+            })
+        </script>
+      
+<script src="/live2d-widget/autoload.js"></script>
+</body>
+</html>
