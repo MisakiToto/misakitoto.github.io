@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+
+
+
+
+
+
+
+
+
+<head>
+    <meta charset="utf-8" />
+    <link rel="apple-touch-icon" sizes="76x76" href="/favicon.ico">
+    <link rel="icon" type="image/png" href="/favicon.ico">
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0, shrink-to-fit=no" name="viewport" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <meta name="description" content="One way to choose one">
+    <meta name="author" content="Misaki">
+    <meta name="keywords" content="">
+    <title>微信小程序解包 ~ Misaki&#39;s Blog</title>
+    
+<link rel="stylesheet" href="/css/Material_Icons.css">
+
+    <!-- 
+<link rel="stylesheet" href="/css/font-awesome.css">
+ -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css">
+    
+<link rel="stylesheet" href="/css/main.css">
+
+    
+        
+<link rel="stylesheet" href="/css/post.css">
+
+        
+            
+<link rel="stylesheet" href="/css/Prettify/tomorrow-night-eighties.min.css">
+
+        
+    
+<meta name="generator" content="Hexo 5.2.0"></head>
+
+<body class=" sidebar-collapse">
+<nav class="navbar navbar-transparent navbar-color-on-scroll fixed-top navbar-expand-lg" color-on-scroll="100" id="sectionsNav">
+    <div class="container">
+        <div class="navbar-translate">
+            <a class="navbar-brand" href="/">
+                Misaki&#39;s Blog</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="navbar-toggler-icon"></span>
+                <span class="navbar-toggler-icon"></span>
+                <span class="navbar-toggler-icon"></span>
+            </button>
+        </div>
+            <div class="collapse navbar-collapse">
+                <ul class="navbar-nav ml-auto">
+                    
+                        
+                            <li class="nav-item">
+                                <a class="nav-link" href="/archives/">
+                                    archives
+                                </a>
+                            </li>
+                        
+                            <li class="nav-item">
+                                <a class="nav-link" href="/about/">
+                                    about
+                                </a>
+                            </li>
+                        
+                    
+                    
+                        
+                            <li class="nav-item">
+                                <a class="nav-link" rel="tooltip" title="" data-placement="bottom" href="https://github.com/MisakiKata" target="_blank" data-original-title="See me here">
+                                    <i class="fa fa-github"></i>
+                                </a>
+                            </li>
+                        
+                            <li class="nav-item">
+                                <a class="nav-link" rel="tooltip" title="" data-placement="bottom" href="https://www.t00ls.net/members-profile-12179.html" target="_blank" data-original-title="See me here">
+                                    <i class="fa fa-twitch"></i>
+                                </a>
+                            </li>
+                        
+                            <li class="nav-item">
+                                <a class="nav-link" rel="tooltip" title="" data-placement="bottom" href="https://misakikata.github.io/atom.xml" target="_blank" data-original-title="See me here">
+                                    <i class="fa fa-rss"></i>
+                                </a>
+                            </li>
+                        
+                            <li class="nav-item">
+                                <a class="nav-link" rel="tooltip" title="" data-placement="bottom" href="mailto:misakikatas@gmail.com" target="_blank" data-original-title="See me here">
+                                    <i class="fa fa-envelope"></i>
+                                </a>
+                            </li>
+                        
+                    
+                </ul>
+            </div>
+    </div>
+</nav>
+    
+  <div class="page-header header-filter" data-parallax="true" style="background-image: url('/img/post-banner.jpg'); height: 70vh;">
+    
+      <div class="container">
+        <h1 class="title text-center post_title">微信小程序解包</h1>
+        <p class="text-center"><b>Wednesday, March 24th 2021, 3:34 pm</b></p>
+      </div>
+    
+  </div>
+
+  
+  
+  
+    <div class="row" style="margin: 0 0 0; z-index: 999;">
+  <div class="col-md-8 offset-md-1">
+    <div class="main main-raised">
+      <div class="container">
+        <div class="section">
+          <div class="post_content">
+              <h2 id="认识微信小程序"><a href="#认识微信小程序" class="headerlink" title="认识微信小程序"></a>认识微信小程序</h2><p>此处使用Windows版微信做介绍，但是Windows版和手机版稍微有点区别。先去获取一个Windows版的微信小程序包。默认位置在：<code>C:\Users\user\Documents\WeChat Files\Applet</code>。移动端的包在<code>/data/data/com.tencent.mm/MicroMsg/&#123;id&#125;/appbrand/pkg</code>，此处没有移动设备，不使用移动设备做演示。</p>
+<p>目录下有一堆wx开头的目录，这些ID就是对应的小程序ID，可以在访问小程序抓包中获取到，如果懒得抓包也不知道小程序ID就把这些删掉，重新访问会再次下载，根据日期来找到对应的包即可。</p>
+<p>Windows版的小程序包自动在外部加了一层的加密，我们看到的包名统一为：<code>__APP__.wxapkg</code>。我们可以看到这样的文件头，V1MMWX标识就是加密后添加的标识。</p>
+<p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/image-20210322151852954.png" alt="image-20210322151852954"></p>
+<p>这个是需要解密的，借助大佬的go语音项目来解密：<code>https://github.com/BlackTrace/pc_wxapkg_decrypt</code>，同时也有编译后的程序，直接用即可。</p>
+<p>那Windows版的小程序的加密流程为：</p>
+<ol>
+<li>首先pbkdf2生成AES的key。利用微信小程序id字符串为pass，salt为<strong>saltiest</strong> 迭代次数为1000。调用pbkdf2生成一个32位的key</li>
+<li>首先取原始的wxapkg的包得前1023个字节通过AES通过1生成的key和iv(<strong>the iv: 16 bytes</strong>),进行加密</li>
+<li>接着利用微信小程序id字符串的倒数第2个字符为xor key，依次异或1023字节后的所有数据，如果微信小程序id小于2位，则xorkey 为 <strong>0x66</strong></li>
+<li>把AES加密后的数据（1024字节）和xor后的数据一起写入文件，并在文件头部添加<strong>V1MMWX</strong>标识</li>
+</ol>
+<p>解密后，就能获得一个以微信小程序ID命令的包，这个包就是需要解析来获取小程序源码的包。先来看一下小程序的结构。</p>
+<p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/image-20210322152633592.png" alt="image-20210322152633592"></p>
+<p>从十六进制中可以看到，旁边的文件目录文件。这种包并非一个压缩格式的包，而是一个二进制的包，需要特定的方法解包。</p>
+<h2 id="小程序解包"><a href="#小程序解包" class="headerlink" title="小程序解包"></a>小程序解包</h2><p>使用工具：<a target="_blank" rel="noopener" href="https://gist.github.com/Integ/bcac5c21de5ea35b63b3db2c725f07ad">https://gist.github.com/Integ/bcac5c21de5ea35b63b3db2c725f07ad</a></p>
+<p>执行：<code>python3 python.py wxid.wxapkg</code>，可以看到目录下生成的微信id的目录包。</p>
+<p>或者使用：<a target="_blank" rel="noopener" href="https://github.com/xuedingmiaojun/wxappUnpacker">https://github.com/xuedingmiaojun/wxappUnpacker</a>，一个nodejs的项目。提供Windows的安装版。</p>
+<p>获取到小程序的源码格式包的时候，跟原来的源码还是稍微有点区别。在一级目录下，可以看到有三个文件，实际上不同的解包工具看到的不一样，有时候是四个文件。</p>
+<pre class="line-numbers language-none"><code class="language-none">app-service.js
+app-config.json
+page-frame.html
+&#x2F;&#x2F;app.js<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p><code>app-service.js</code>是所以js的汇总，只是微信把js都压缩到这个js内。</p>
+<p><code>app-config.json</code>: 小程序工程 <code>app.json</code> 以及各个页面的 JSON 配置文件汇总，可直接查看；</p>
+<p><code>page-frame.html</code>: 所有页面的 <code>.wxml</code> 和 <code>app.wxss</code> 样式文件的汇总；</p>
+<p><code>*.html</code>: 包含每个页面对应的 <code>.wxss</code> 信息，可读性较好；</p>
+<p><code>static</code>: 各类图片、音频等资源文件。</p>
+<p>获取解包后，小程序源码有什么用？</p>
+<h2 id="小程序内的信息泄露"><a href="#小程序内的信息泄露" class="headerlink" title="小程序内的信息泄露"></a>小程序内的信息泄露</h2><p>有一部分开发者会把Appid和Secret放在小程序内请求，比如如下的开发者</p>
+<p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/image-20210322161110075.png"></p>
+<p>如果这个appid和secret可以使用，就能获取到seesion_key。借用官方的登陆流程。</p>
+<p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/api-login.2fcc9f35.jpg" alt="img"></p>
+<p>所以需要code和appid还有secret，code如何获取，只需要使用带有登陆功能的点，需要触发了wx.login()功能，点击登陆抓包即可。</p>
+<p>一般打开小程序的时候就有流量交互了。比如，但这个code只能使用一次</p>
+<p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/image-20210322162950522.png" alt="image-20210322162950522"></p>
+<p>构造一个请求，查看小程序官方文档：<a target="_blank" rel="noopener" href="https://developers.weixin.qq.com/miniprogram/dev/api-backend/open-api/login/auth.code2Session.html">https://developers.weixin.qq.com/miniprogram/dev/api-backend/open-api/login/auth.code2Session.html</a></p>
+<pre class="line-numbers language-none"><code class="language-none">curl https:&#x2F;&#x2F;api.weixin.qq.com&#x2F;sns&#x2F;jscode2session?appid&#x3D;wxxxxx&amp;secret&#x3D;568wdxxx&amp;js_code&#x3D;041xxxx&amp;grant_type&#x3D;authorization_code<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<p>为了方便，此处使用云函数功能测试，需要小程序开启云函数。使用python的第三方包<code>python-weixin</code>。但云函数功能不一定都开放，需要小程序开放才能查询。</p>
+<pre class="line-numbers language-none"><code class="language-none">from os import environ, path
+from weixin import WxAppCloudAPI
+​
+appid &#x3D; environ.get(&quot;WXAPP_APPID&quot;, &quot;wx88xxxxx&quot;)
+secret &#x3D; environ.get(&quot;WXAPP_SECRET&quot;, &quot;56xxxxx&quot;)
+env &#x3D; &quot;test-id&quot;
+​
+example_db &#x3D; path.abspath(path.join(path.dirname(__file__), &quot;.&#x2F;example_db&quot;))
+app_cloud &#x3D; WxAppCloudAPI(
+    appid&#x3D;appid, app_secret&#x3D;secret, grant_type&#x3D;&quot;client_credential&quot;
+)
+token &#x3D; app_cloud.client_credential_for_access_token().get(&quot;access_token&quot;)
+print(token)
+​
+cloud_api &#x3D; WxAppCloudAPI(access_token&#x3D;token)
+# 获取库的集合信息
+db_info &#x3D; cloud_api.db_collection_info(json_body&#x3D;&#123;&quot;env&quot;: env, &quot;limit&quot;: 10&#125;)
+print(db_info)<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>根据包的wiki来利用云函数操作小程序，文档：<a target="_blank" rel="noopener" href="https://github.com/gusibi/python-weixin/wiki/%E5%B0%8F%E7%A8%8B%E5%BA%8F%E4%BA%91%E5%BC%80%E5%8F%91">https://github.com/gusibi/python-weixin/wiki/%E5%B0%8F%E7%A8%8B%E5%BA%8F%E4%BA%91%E5%BC%80%E5%8F%91</a></p>
+<h3 id="利用accesstoken"><a href="#利用accesstoken" class="headerlink" title="利用accesstoken"></a>利用accesstoken</h3><p>获取session_key是用户数据的加密密钥，那accesstoken就是操作小程序的调用凭证。</p>
+<p>先获取accesstoken，也可以利用上面提到的代码来获取accesstoken。</p>
+<pre class="line-numbers language-none"><code class="language-none">https:&#x2F;&#x2F;api.weixin.qq.com&#x2F;cgi-bin&#x2F;token?grant_type&#x3D;client_credential&amp;appid&#x3D;APPID&amp;secret&#x3D;APPSECRET<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<p>获取到token后可以利用官方的接口操作小程序来查询等操作，比如查询最近一天的访问</p>
+<pre class="line-numbers language-none"><code class="language-none">https:&#x2F;&#x2F;api.weixin.qq.com&#x2F;datacube&#x2F;getweanalysisappidvisitpage?access_token&#x3D;ACCESS_TOKEN
+data &#x3D; &#123;&quot;begin_date&quot; : &quot;20170313&quot;,&quot;end_date&quot; : &quot;20170313&quot;&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+
+<p>其他查询接口查看：<a target="_blank" rel="noopener" href="https://developers.weixin.qq.com/miniprogram/dev/api-backend/open-api/access-token/auth.getAccessToken.html">https://developers.weixin.qq.com/miniprogram/dev/api-backend/open-api/access-token/auth.getAccessToken.html</a></p>
+
+          </div>
+          <br><br>
+              
+                <div class="license-wrapper">
+                    <p>原文作者：<a href="https://misakikata.github.io">Misaki</a>
+                    <p>原文链接：<a href="https://misakikata.github.io/2021/03/%E5%BE%AE%E4%BF%A1%E5%B0%8F%E7%A8%8B%E5%BA%8F%E8%A7%A3%E5%8C%85/">https://misakikata.github.io/2021/03/%E5%BE%AE%E4%BF%A1%E5%B0%8F%E7%A8%8B%E5%BA%8F%E8%A7%A3%E5%8C%85/</a>
+                    <p>发表日期：<a href="https://misakikata.github.io/2021/03/%E5%BE%AE%E4%BF%A1%E5%B0%8F%E7%A8%8B%E5%BA%8F%E8%A7%A3%E5%8C%85/">March 24th 2021, 3:34:27 pm</a>
+                    <p>更新日期：<a href="https://misakikata.github.io/2021/03/%E5%BE%AE%E4%BF%A1%E5%B0%8F%E7%A8%8B%E5%BA%8F%E8%A7%A3%E5%8C%85/">March 24th 2021, 3:34:27 pm</a>
+                    <p>版权声明：本文采用<a rel="license noopener" target="_blank" href="http://creativecommons.org/licenses/by-nc/4.0/">知识共享署名-非商业性使用 4.0 国际许可协议</a>进行许可</p>
+                </div>
+              
+          <br><br>
+          <div>
+              <p>
+                       
+                      <span class="badge badge-default">#&nbsp;渗透测试</span>
+                      &nbsp;
+                       
+                      <span class="badge badge-default">#&nbsp;web安全</span>
+                      &nbsp;
+                      
+              </p>
+          </div>
+        </div>
+      </div>  
+    </div>
+  </div>
+  <!-- TOC -->
+  
+      <div class="">
+        <div id="toc">
+          <p class="toc-title"><i class="material-icons" style="vertical-align:middle">toc</i>Toc:</p> 
+          <div id="tocbot"></div>
+        </div>
+      </div>
+  
+</div>
+
+
+<!-- Comments -->
+<div class="row">
+    <div class="col-md-8 offset-md-2">
+    
+        
+            <div class="disqus" style="width:100%">
+    <div id="disqus_thread"></div>
+    <script>               
+        var disqus_shortname = '';
+        var disqus_config = function () {
+            this.page.url = 'https://misakikata.github.io/2021/03/微信小程序解包/'; 
+            this.page.identifier = '/2021/03/微信小程序解包/';
+        };
+        (function() { 
+            var d = document, s = d.createElement('script');
+            s.type = 'text/javascript';
+            s.src = '//'+disqus_shortname+'.disqus.com/embed.js';
+            s.setAttribute('data-timestamp', +new Date());
+            (d.head || d.body).appendChild(s);
+        })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a target="_blank" rel="noopener" href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>                                
+</div>
+        
+    
+    </div>
+</div>
+  
+
+<footer class="footer footer-default">
+        <div class="container">
+          <div class="float-left" style="padding: 15px 0;">
+              <b>假如今天的你被生活辜负了，别伤心，因为明天生活还会继续辜负你！</b>
+          </div>
+          <div align="right" style="padding: 15px 0;">
+              <i class="iconfont icon-love" ></i>
+              <a href="https://github.com/0x2e/Material-T" target="_blank"> <b>Material-T</b></a>
+          </div>
+        </div>
+</footer>
+      <!--   Core JS Files   -->
+      
+<script src="/js/core/jquery.min.js?v=3.2.1.js"></script>
+
+      
+<script src="/js/main.js"></script>
+
+      
+<script src="/js/core/popper.min.js"></script>
+
+      
+<script src="/js/core/bootstrap-material-design.min.js"></script>
+
+      
+<script src="/js/plugins/moment.min.js"></script>
+
+      
+<script src="/js/material-kit.min.js?v=2.0.5.js"></script>
+
+      
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.4.2/tocbot.min.js"></script>
+        
+<script src="/js/post.js"></script>
+
+        
+<script src="/js/plugins/prettify.js"></script>
+
+        <script>
+            $(document).ready(function(){
+                $('pre').addClass('prettyprint linenums');
+                prettyPrint();
+            })
+        </script>
+      
+<script src="/live2d-widget/autoload.js"></script>
+</body>
+</html>
