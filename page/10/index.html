@@ -116,6 +116,32 @@
             
             
                 <div class="col-md-11">
+                    <a href="/2019/04/APP%E8%A7%A3%E5%AF%86%E5%8F%82%E6%95%B0sign/" class="h3 title" target="_self">APP解密参数sign</a>
+                    
+                    <p>APP解密参数signAPP是公司自己的业务APP，没有加固，只做了代码混淆。本以为要对加密字段进行so文件的逆向，查看后发现是Java层的加密，相对较简单。
+首先抓包查看加密字段和相关参数值，可以看到一共有四个参数，其中sign是加密验证完整性字段
+
+利用AK逆向APP包，搜索sign字段信息，但是搜索结果过多，查找较困难，但是sign是一个da...</p>
+                    
+                    
+                    <p class="h6">
+                        <i class="material-icons">date_range</i>2019-04-18
+                        
+                            <i class="material-icons">bookmark_border</i>
+                                
+                                    Android逆向 &nbsp;
+                                
+                        
+                    </p>
+                    
+                </div>
+        </div>
+       
+        
+        <div class="row post-card">
+            
+            
+                <div class="col-md-11">
                     <a href="/2019/04/MySQL%E5%8E%86%E5%8F%B2%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/" class="h3 title" target="_self">MySQL历史漏洞分析</a>
                     
                     <p>MySQL历史漏洞分析前段时间公司一托管的老系统，被木马勒索，然后紧急处理了一下，此系统使用少，而且是外包托管阿里云，因此并没有影响其他系统。拿到这个系统后，查看端口服务时发现，数据库端口对外开放，ssh对外开放，然后根据对系统的核查，猜测有可能存在以下问题：
@@ -234,31 +260,6 @@ Windows权限提升基础没有多少人谈论严重的Windows权限升级，这
                             <i class="material-icons">bookmark_border</i>
                                 
                                     渗透测试 &nbsp;
-                                
-                        
-                    </p>
-                    
-                </div>
-        </div>
-       
-        
-        <div class="row post-card">
-            
-            
-                <div class="col-md-11">
-                    <a href="/2019/03/python%E9%81%8D%E5%8E%86%E8%B7%AF%E5%BE%84%E7%A0%B4%E8%A7%A3%E8%A1%A8%E5%8D%95/" class="h3 title" target="_self">python遍历路径破解表单</a>
-                    
-                    <p>python遍历路径破解表单​    首先是利用python遍历路径，采用字典爆破的形式，当然如果只是单纯的爆破路径，简单写一个多线程脚本就行了。这里考虑如何对爆破到的路径进行第二步利用，此处尝试对猜解到的路径进行表单发现及登陆爆破处理。
-​    首先就是路径爆破，采用多线程队列，爆破路径，判断形式为200响应码。
-while not self....</p>
-                    
-                    
-                    <p class="h6">
-                        <i class="material-icons">date_range</i>2019-03-12
-                        
-                            <i class="material-icons">bookmark_border</i>
-                                
-                                    python &nbsp;
                                 
                         
                     </p>

